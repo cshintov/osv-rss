@@ -8,9 +8,10 @@ on:
     branches: [main]
     paths: [generate.py, .github/workflows/build.yml]
 
-# Least privilege: read the repo, write Pages, mint the OIDC token deploy-pages needs.
+# contents:write so we can commit the refreshed feeds back (keeps the repo active,
+# so the scheduled run is never auto-disabled, and gives a git history of changes).
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -37,6 +38,18 @@ jobs:
         env:
           OSV_RSS_BASE_URL: ${{ steps.pages.outputs.base_url }}
         run: python3 generate.py
+      - name: Commit refreshed feeds back to main
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add feeds
+          if git diff --staged --quiet; then
+            echo "No feed changes to commit."
+          else
+            git commit -m "feeds: refresh $(date -u +%FT%TZ) [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi
       - uses: actions/upload-pages-artifact@v3
         with:
           path: feeds

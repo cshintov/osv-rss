@@ -3,12 +3,166 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-05-26T11:14:21Z</updated>
+  <updated>2026-05-27T00:15:08Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-rr59-xxvx-96qr: Kata Containers have VM Escape via virtiofsd Argument Injection through Default-Enabled Pod Annotations</title>
+    <id>https://osv.dev/vulnerability/GHSA-rr59-xxvx-96qr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rr59-xxvx-96qr"/>
+    <published>2026-05-26T23:57:58Z</published>
+    <updated>2026-05-27T00:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-44210"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Kata Containers have VM Escape via virtiofsd Argument Injection through Default-Enabled Pod Annotations&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44210&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:H/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kata-containers/kata-containers&lt;/code&gt; — fixed in 0.0.0-20260519062212-ffa59ce3aa78&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Kata Containers ships with a default configuration that allows pod creators to inject arbitrary command-line arguments into the virtiofsd process through the `io.katacontainers.config.hypervisor.virtio_fs_extra_args` pod annotation. By injecting `-o source=/` along with `--no-announce-submounts` and `--sandbox=none`, an attacker can override the virtiofsd shared directory to serve the entire host root filesystem into the guest VM. Combined with the `kernel_params` annotation (also enabled by default) to activate the agent debug console, the attacker can mount the host filesystem from inside the VM and read or write any file on the host, including /etc/shadow.
+
+## Details
+
+The default Kata configuration at configuration.toml line 1 contains:
+
+```
+enable_annotations = [&amp;quot;enable_io…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/security/advisories/GHSA-rr59-xxvx-96qr"&gt;https://github.com/kata-containers/kata-containers/security/advisories/GHSA-rr59-xxvx-96qr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/commit/ffa59ce3aa7877d067c9a372df0c329a23a01744"&gt;https://github.com/kata-containers/kata-containers/commit/ffa59ce3aa7877d067c9a372df0c329a23a01744&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers"&gt;https://github.com/kata-containers/kata-containers&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rr59-xxvx-96qr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-pc3f-x583-g7j2: SpdyStream: DOS on CRI</title>
+    <id>https://osv.dev/vulnerability/GHSA-pc3f-x583-g7j2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pc3f-x583-g7j2"/>
+    <published>2026-04-16T20:44:01Z</published>
+    <updated>2026-05-26T23:26:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-35469"/>
+    <category term="GO-2026-4958"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SpdyStream: DOS on CRI&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35469, GO-2026-4958&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/moby/spdystream&lt;/code&gt; — fixed in 0.5.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The SPDY/3 frame parser in spdystream does not validate
+attacker-controlled counts and lengths before allocating memory. A
+remote peer that can send SPDY frames to a service using spdystream can
+cause the process to allocate gigabytes of memory with a small number of
+malformed control frames, leading to an out-of-memory crash.
+ 
+Three allocation paths in the receive side are affected:
+1. **SETTINGS entry count** -- The SETTINGS frame reader reads a 32-bit
+`numSettings` from the payload and allocates a slice of that size
+without checking it against the declared frame length. An attacker
+can set `numSettings` to a value far exceeding the actual payload,
+triggering a large allocation before any setting data is read.
+ 
+2. **Header count** -- `parseHeaderValueBlock` reads a 32-bit
+`numHeaders` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/moby/spdystream/security/advisories/GHSA-pc3f-x583-g7j2"&gt;https://github.com/moby/spdystream/security/advisories/GHSA-pc3f-x583-g7j2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35469"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35469&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/moby/spdystream"&gt;https://github.com/moby/spdystream&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/moby/spdystream/releases/tag/v0.5.1"&gt;https://github.com/moby/spdystream/releases/tag/v0.5.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pc3f-x583-g7j2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-78h2-9frx-2jm8: Go JOSE Panics in JWE decryption</title>
+    <id>https://osv.dev/vulnerability/GHSA-78h2-9frx-2jm8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-78h2-9frx-2jm8"/>
+    <published>2026-04-03T03:28:56Z</published>
+    <updated>2026-05-26T23:26:17Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34986"/>
+    <category term="GO-2026-4945"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Go JOSE Panics in JWE decryption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34986, GO-2026-4945&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-jose/go-jose/v4&lt;/code&gt; — fixed in 4.1.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-jose/go-jose/v3&lt;/code&gt; — fixed in 3.0.5&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-jose/go-jose&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Decrypting a JSON Web Encryption (JWE) object will panic if the `alg` field indicates a key wrapping algorithm ([one ending in `KW`](https://pkg.go.dev/github.com/go-jose/go-jose/v4#pkg-constants), with the exception of `A128GCMKW`, `A192GCMKW`, and `A256GCMKW`) and the `encrypted_key` field is empty. The panic happens when `cipher.KeyUnwrap()` in `key_wrap.go` attempts to allocate a slice with a zero or negative length based on the length of the `encrypted_key`.
+
+This code path is reachable from `ParseEncrypted()` / `ParseEncryptedJSON()` / `ParseEncryptedCompact()` followed by `Decrypt()` on the resulting object. Note that the parse functions take a list of accepted key algorithms. If the accepted key algorithms do not include any key wrapping algorithms, parsing will fail an…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-jose/go-jose/security/advisories/GHSA-78h2-9frx-2jm8"&gt;https://github.com/go-jose/go-jose/security/advisories/GHSA-78h2-9frx-2jm8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34986"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34986&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-jose/go-jose"&gt;https://github.com/go-jose/go-jose&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/github.com/go-jose/go-jose/v4#pkg-constants"&gt;https://pkg.go.dev/github.com/go-jose/go-jose/v4#pkg-constants&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-78h2-9frx-2jm8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-2rc4-7jc6-qffh: Fleet has a Windows MDM management endpoint authentication bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-2rc4-7jc6-qffh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2rc4-7jc6-qffh"/>
+    <published>2026-05-14T13:13:11Z</published>
+    <updated>2026-05-26T23:26:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-23998"/>
+    <category term="GO-2026-5002"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fleet has a Windows MDM management endpoint authentication bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-23998, GO-2026-5002&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fleetdm/fleet/v4&lt;/code&gt; — fixed in 4.81.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A vulnerability in Fleet’s Windows MDM management endpoint could allow requests to be processed without proper client certificate validation. In certain circumstances, this could allow an attacker to impersonate an enrolled Windows device and retrieve sensitive configuration data.
+
+### Impact
+
+Fleet’s Windows MDM management endpoint relies on mutual TLS (mTLS) client certificates to authenticate enrolled devices. In affected versions, requests that did not present a client certificate could be incorrectly treated as trusted.
+
+As a result, an attacker with prior knowledge of a valid enrolled device identifier could potentially impersonate that device and receive configuration payloads intended for it. These payloads may contain sensitive information such as Wi-Fi or VPN configu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fleetdm/fleet/security/advisories/GHSA-2rc4-7jc6-qffh"&gt;https://github.com/fleetdm/fleet/security/advisories/GHSA-2rc4-7jc6-qffh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-23998"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-23998&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fleetdm/fleet"&gt;https://github.com/fleetdm/fleet&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fleetdm/fleet/releases/tag/fleet-v4.81.0"&gt;https://github.com/fleetdm/fleet/releases/tag/fleet-v4.81.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2rc4-7jc6-qffh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-w8rr-5gcm-pp58: opentelemetry-go: OTLP HTTP exporters read unbounded HTTP response bodies</title>
+    <id>https://osv.dev/vulnerability/GHSA-w8rr-5gcm-pp58</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w8rr-5gcm-pp58"/>
+    <published>2026-04-08T19:22:01Z</published>
+    <updated>2026-05-26T23:26:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39882"/>
+    <category term="GO-2026-4985"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;opentelemetry-go: OTLP HTTP exporters read unbounded HTTP response bodies&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39882, GO-2026-4985&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp&lt;/code&gt; — fixed in 1.43.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp&lt;/code&gt; — fixed in 1.43.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp&lt;/code&gt; — fixed in 0.19.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;overview:
+this report shows that the otlp HTTP exporters (traces/metrics/logs) read the full HTTP response body into an in-memory `bytes.Buffer` without a size cap.
+
+this is exploitable for memory exhaustion when the configured collector endpoint is attacker-controlled (or a network attacker can mitm the exporter connection).
+
+severity
+
+HIGH
+
+not claiming: this is a remote dos against every default deployment.
+claiming: if the exporter sends traces to an untrusted collector endpoint (or over a network segment where mitm is realistic), that endpoint can crash the process via a large response body.
+
+callsite (pinned):
+- exporters/otlp/otlptrace/otlptracehttp/client.go:199
+- exporters/otlp/otlptrace/otlptracehttp/client.go:230
+- exporters/otlp/otlpmetric/otlpmetrichttp/client.go:170
+- exporte…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-w8rr-5gcm-pp58"&gt;https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-w8rr-5gcm-pp58&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39882"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39882&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/pull/8108"&gt;https://github.com/open-telemetry/opentelemetry-go/pull/8108&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go"&gt;https://github.com/open-telemetry/opentelemetry-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://github.com/open-telemetry/opentelemetry-go/releases/tag/v1.43.0"&gt;http://github.com/open-telemetry/opentelemetry-go/releases/tag/v1.43.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w8rr-5gcm-pp58"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5002: Windows MDM management endpoint authentication bypass in github.com/fleetdm/fleet/v4</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5002</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5002"/>
+    <published>2026-05-26T22:48:34Z</published>
+    <updated>2026-05-26T23:15:13Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-23998"/>
+    <category term="GHSA-2rc4-7jc6-qffh"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Windows MDM management endpoint authentication bypass in github.com/fleetdm/fleet/v4&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-23998, GHSA-2rc4-7jc6-qffh&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fleetdm/fleet/v4&lt;/code&gt; — fixed in 4.81.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Windows MDM management endpoint authentication bypass in github.com/fleetdm/fleet/v4&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fleetdm/fleet/security/advisories/GHSA-2rc4-7jc6-qffh"&gt;https://github.com/fleetdm/fleet/security/advisories/GHSA-2rc4-7jc6-qffh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fleetdm/fleet/commit/3ff8119ab8f794806a4cc82e21f760c123d92966"&gt;https://github.com/fleetdm/fleet/commit/3ff8119ab8f794806a4cc82e21f760c123d92966&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5002"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-4985: Oversized OTLP HTTP response bodies can cause memory exhaustion in go.opentelemetry.io/otel/exporters/otlp</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4985</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4985"/>
+    <published>2026-05-26T22:48:49Z</published>
+    <updated>2026-05-26T23:15:13Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39882"/>
+    <category term="GHSA-w8rr-5gcm-pp58"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oversized OTLP HTTP response bodies can cause memory exhaustion in go.opentelemetry.io/otel/exporters/otlp&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39882, GHSA-w8rr-5gcm-pp58&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp&lt;/code&gt; — fixed in 0.19.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp&lt;/code&gt; — fixed in 1.43.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp&lt;/code&gt; — fixed in 1.43.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The OTLP HTTP exporters (traces, metrics, and logs) do not limit the size of the HTTP response body read from the collector. A malicious or misconfigured collector can send a large response body, leading to excessive memory consumption and potential process termination (OOM).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/pull/8108"&gt;https://github.com/open-telemetry/opentelemetry-go/pull/8108&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-w8rr-5gcm-pp58"&gt;https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-w8rr-5gcm-pp58&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://github.com/open-telemetry/opentelemetry-go/releases/tag/v1.43.0"&gt;http://github.com/open-telemetry/opentelemetry-go/releases/tag/v1.43.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4985"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-4945: Go JOSE Panics in JWE decryption in github.com/go-jose/go-jose</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4945</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4945"/>
+    <published>2026-05-26T22:49:18Z</published>
+    <updated>2026-05-26T23:15:13Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34986"/>
+    <category term="GHSA-78h2-9frx-2jm8"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Go JOSE Panics in JWE decryption in github.com/go-jose/go-jose&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34986, GHSA-78h2-9frx-2jm8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-jose/go-jose/v3&lt;/code&gt; — fixed in 3.0.5&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-jose/go-jose/v4&lt;/code&gt; — fixed in 4.1.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The go-jose package is subject to a panic when decrypting certain JSON Web Encryption (JWE) tokens. This occurs when an attacker can provide a maliciously crafted JWE token that triggers an unhandled exception during the decryption process, leading to a denial-of-service.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-jose/go-jose/security/advisories/GHSA-78h2-9frx-2jm8"&gt;https://github.com/go-jose/go-jose/security/advisories/GHSA-78h2-9frx-2jm8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/github.com/go-jose/go-jose/v4#pkg-constants"&gt;https://pkg.go.dev/github.com/go-jose/go-jose/v4#pkg-constants&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4945"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-4958: Uncontrolled resource consumption when parsing SPDY frames in github.com/moby/spdystream</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4958</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4958"/>
+    <published>2026-05-26T22:49:05Z</published>
+    <updated>2026-05-26T23:15:13Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-35469"/>
+    <category term="GHSA-pc3f-x583-g7j2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Uncontrolled resource consumption when parsing SPDY frames in github.com/moby/spdystream&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35469, GHSA-pc3f-x583-g7j2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/moby/spdystream&lt;/code&gt; — fixed in 0.5.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The SPDY/3 frame parser in spdystream does not validate attacker-controlled counts and lengths before allocating memory. A remote peer that can send SPDY frames to a service using spdystream can cause the process to allocate gigabytes of memory with a small number of malformed control frames, leading to an out-of-memory crash.
+
+Three allocation paths in the receive side are affected:
+1. SETTINGS entry count: The SETTINGS frame reader reads a 32-bit numSettings from the payload and allocates a slice of that size without checking it against the declared frame length.
+2. Header count: parseHeaderValueBlock reads a 32-bit numHeaders from the decompressed header block and allocates an http.Header map of that size with no upper bound.
+3. Header field size: Individual header name and value length…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/moby/spdystream/security/advisories/GHSA-pc3f-x583-g7j2"&gt;https://github.com/moby/spdystream/security/advisories/GHSA-pc3f-x583-g7j2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/moby/spdystream/commit/ef6121f62c730110bf5ae604a865a8613bfb787f"&gt;https://github.com/moby/spdystream/commit/ef6121f62c730110bf5ae604a865a8613bfb787f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/moby/spdystream/releases/tag/v0.5.1"&gt;https://github.com/moby/spdystream/releases/tag/v0.5.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4958"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-wg65-39gg-5wfj: Prometheus Azure AD remote write OAuth client secret exposed via config API</title>
     <id>https://osv.dev/vulnerability/GHSA-wg65-39gg-5wfj</id>
@@ -92,169 +246,5 @@ This only affects TLS 1.3.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;
     <content type="html">&lt;p&gt;&lt;strong&gt;TOCTOU permits root escape on Linux via Root.Chmod in os in internal/syscall/unix&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32282, CVE-2026-32282&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;On Linux, if the target of Root.Chmod is replaced with a symlink while the chmod operation is in progress, Chmod can operate on the target of the symlink, even when the target lies outside the root.
 
 The Linux fchmodat syscall silently ignores the AT_SYMLINK_NOFOLLOW flag, which Root.Chmod uses to avoid symlink traversal. Root.Chmod checks its target before acting and returns an error if the target is a symlink lying outside the root, so the impact is limited to cases where the target is replaced with a symlink between the check and operation.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/763761"&gt;https://go.dev/cl/763761&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78293"&gt;https://go.dev/issue/78293&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4864"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jpjh-jm2p-39hh: Arcane: Missing admin authorization on global variables endpoint</title>
-    <id>https://osv.dev/vulnerability/GHSA-jpjh-jm2p-39hh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jpjh-jm2p-39hh"/>
-    <published>2026-05-23T00:16:56Z</published>
-    <updated>2026-05-23T00:30:09Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-47125"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Arcane: Missing admin authorization on global variables endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47125&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getarcaneapp/arcane/backend&lt;/code&gt; — fixed in 1.19.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The `PUT /api/environments/{id}/templates/variables` endpoint, which writes the system-wide `.env.global` file used for variable substitution in every project&amp;#x27;s compose file, is missing an admin authorization check. Any authenticated non-admin user can call this endpoint with their bearer token or API key and overwrite the global environment variables that are merged into every project deployment. By overriding values like `REGISTRY`, `IMAGE`, `DATABASE_URL`, or `SECRET_KEY` that other users reference via `${VAR}` in compose files, an attacker can redirect image pulls to attacker-controlled registries (supply-chain RCE on the Docker host), exfiltrate database credentials, or disrupt all projects.
-
-## Details
-
-The endpoint is registered at `backend/internal/huma/handlers/templat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/security/advisories/GHSA-jpjh-jm2p-39hh"&gt;https://github.com/getarcaneapp/arcane/security/advisories/GHSA-jpjh-jm2p-39hh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane"&gt;https://github.com/getarcaneapp/arcane&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jpjh-jm2p-39hh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-hvv7-hfrh-7gxj: Nezha Monitoring: Nezha WebSocket server stream discloses cross-tenant server telemetry to authenticated members</title>
-    <id>https://osv.dev/vulnerability/GHSA-hvv7-hfrh-7gxj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hvv7-hfrh-7gxj"/>
-    <published>2026-05-23T00:18:33Z</published>
-    <updated>2026-05-23T00:30:09Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-47124"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha Monitoring: Nezha WebSocket server stream discloses cross-tenant server telemetry to authenticated members&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47124&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 1.14.15-0.20260517034128-05e5da253519&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Any authenticated non-admin member can connect to the server-status WebSocket and receive telemetry for all servers, including servers owned by other users. The normal server list API filters objects by `HasPermission`, but the WebSocket stream treats the presence of any authenticated user as authorization for the full unfiltered server list.
-
-### Details
-
-The server WebSocket route is registered under the optional-auth group in `cmd/dashboard/controller/controller.go:71-73`:
-
-```go
-optionalAuth := api.Group(&amp;quot;&amp;quot;, optionalAuthMw)
-optionalAuth.GET(&amp;quot;/ws/server&amp;quot;, commonHandler(serverStream))
-```
-
-`serverStream` treats any `CtxKeyAuthorizedUser` as a member, without checking admin role or per-server ownership, in `cmd/dashboard/controller/ws.go:123-139`:
-
-```go
-u, isMember := c.Get(…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-hvv7-hfrh-7gxj"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-hvv7-hfrh-7gxj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hvv7-hfrh-7gxj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-99gv-2m7h-3hh9: Nezha Monitoring: RoleMember can run shell on every server (cross-tenant RCE) via POST /api/v1/cron</title>
-    <id>https://osv.dev/vulnerability/GHSA-99gv-2m7h-3hh9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-99gv-2m7h-3hh9"/>
-    <published>2026-05-23T00:17:58Z</published>
-    <updated>2026-05-23T00:30:09Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-46716"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha Monitoring: RoleMember can run shell on every server (cross-tenant RCE) via POST /api/v1/cron&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46716&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 1.14.15-0.20260517022419-d7526351cf97&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`nezha`&amp;#x27;s dashboard supports two user roles: `RoleAdmin` (Role==0) and `RoleMember` (Role==1). The cron routes `POST /api/v1/cron` and `PATCH /api/v1/cron/:id` are wired through `commonHandler` (any authenticated user) rather than `adminHandler`, and the per-server permission check on cron creation has a vacuous-true bypass.
-
-A `RoleMember` user can create a scheduled cron task with `Cover=CronCoverAll, Servers=[]` and an arbitrary `Command`. At every tick of the scheduler, the dashboard pushes that command to **every server in the global `ServerShared` map** — including servers that belong to other tenants (admin&amp;#x27;s servers, other members&amp;#x27; servers). Each agent runs the command and returns the output, which is then sent to the attacker&amp;#x27;s own NotificationGroup → attacker-controll…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-99gv-2m7h-3hh9"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-99gv-2m7h-3hh9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-99gv-2m7h-3hh9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rxf6-wjh4-jfj6: Nezha Monitoring: RoleMember can fire other users' cron tasks via AlertRule.FailTriggerTasks (no ownership check)</title>
-    <id>https://osv.dev/vulnerability/GHSA-rxf6-wjh4-jfj6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rxf6-wjh4-jfj6"/>
-    <published>2026-05-23T00:08:45Z</published>
-    <updated>2026-05-23T00:15:16Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-47120"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha Monitoring: RoleMember can fire other users&amp;#x27; cron tasks via AlertRule.FailTriggerTasks (no ownership check)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47120&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 1.14.15-0.20260517022419-d7526351cf97&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`createAlertRule` and `createService` (and their `update*` siblings) accept `FailTriggerTasks []uint64` and `RecoverTriggerTasks []uint64` — IDs of cron tasks to fire when the alert/service trips. The validation function only validates the alert&amp;#x27;s `Rules.Ignore` server map; it never checks that the cron task IDs in `FailTriggerTasks` / `RecoverTriggerTasks` belong to the caller.
-
-When the alert fires, `singleton.CronShared.SendTriggerTasks(taskIDs, triggerServer)` (`service/singleton/crontask.go:113-127`) looks up those task IDs in the global cron registry and executes them via `CronTrigger`. For non-`AlertTrigger` cover modes, `CronTrigger` fans the command out to every server in `ServerShared.Range` with no ownership check.
-
-Net effect: a `RoleMember` can attach their alert r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-rxf6-wjh4-jfj6"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-rxf6-wjh4-jfj6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rxf6-wjh4-jfj6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-w4g9-mxgg-j532: Nezha Monitoring: RoleMember-reachable SSRF with full response-body reflection via POST /api/v1/notification</title>
-    <id>https://osv.dev/vulnerability/GHSA-w4g9-mxgg-j532</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w4g9-mxgg-j532"/>
-    <published>2026-05-23T00:08:04Z</published>
-    <updated>2026-05-23T00:15:16Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-46717"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha Monitoring: RoleMember-reachable SSRF with full response-body reflection via POST /api/v1/notification&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46717&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 1.14.15-0.20260517022419-d06d539d34c1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-nezha&amp;#x27;s dashboard supports two user roles: `RoleAdmin` (Role==0) and `RoleMember` (Role==1). The notification routes `POST /api/v1/notification` and `PATCH /api/v1/notification/:id` are wired through `commonHandler` rather than `adminHandler` — so a `RoleMember` user can call them. These handlers synchronously `Send()` an HTTP request to a user-controlled URL and reflect the *entire* response body (no size limit) back to the caller on any non-2xx response.
-
-Net effect: a low-privilege `RoleMember` can read intranet HTTP response bodies via the dashboard&amp;#x27;s hub.
-
-## Affected versions
-
-Commit `50dc8e660326b9f22990898142c58b7a5312b42a` and earlier on `master`.
-
-## Reachability chain
-
-```
-cmd/dashboard/controller/controller.go:121-122
-    auth.GET(&amp;quot;/notification&amp;quot;, listHandler(listNo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-w4g9-mxgg-j532"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-w4g9-mxgg-j532&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/commit/d06d539d34c143d842b91e2a64326e8c8f9bc405"&gt;https://github.com/nezhahq/nezha/commit/d06d539d34c143d842b91e2a64326e8c8f9bc405&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w4g9-mxgg-j532"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5024: Invoking integer overflow in NewNTUnicodeString in golang.org/x/sys/windows</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5024</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5024"/>
-    <published>2026-05-22T18:28:47Z</published>
-    <updated>2026-05-22T19:45:12Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-39824"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking integer overflow in NewNTUnicodeString in golang.org/x/sys/windows&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39824&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/sys&lt;/code&gt; — fixed in 0.44.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;NewNTUnicodeString does not check for string length overflow. When provided with a string that overflows the maximum size of a NTUnicodeString (a 16-bit number of bytes), it returns a truncated string rather than an error.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78916"&gt;https://go.dev/issue/78916&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/770080"&gt;https://go.dev/cl/770080&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/6MMI8Lj-Atg"&gt;https://groups.google.com/g/golang-announce/c/6MMI8Lj-Atg&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5024"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8rm2-7qqf-34qm: Prometheus: Remote read endpoint allows denial of service via crafted snappy payload</title>
-    <id>https://osv.dev/vulnerability/GHSA-8rm2-7qqf-34qm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8rm2-7qqf-34qm"/>
-    <published>2026-05-05T19:34:05Z</published>
-    <updated>2026-05-22T17:44:19Z</updated>
-    <category term="Go"/>
-    <category term="BIT-prometheus-2026-42154"/>
-    <category term="CVE-2026-42154"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Prometheus: Remote read endpoint allows denial of service via crafted snappy payload&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-prometheus-2026-42154, CVE-2026-42154&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 0.311.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-The remote read endpoint (`/api/v1/read`) does not validate the declared decoded length in a snappy-compressed request body before allocating memory.
-An unauthenticated attacker can send a small payload that causes a huge heap allocation per request. Under concurrent load this can exhaust available memory and crash the Prometheus process.
-
-### Patches
-_Has the problem been patched? What versions should users upgrade to?_
-
-Fixed in 3.11.3 and 3.5.3 LTS. Users should upgrade to these versions or later.
-
-### Workarounds
-User who can not upgrade can place Prometheus behind a reverse proxy or firewall that requires authentication before requests reach /api/v1/read.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/security/advisories/GHSA-8rm2-7qqf-34qm"&gt;https://github.com/prometheus/prometheus/security/advisories/GHSA-8rm2-7qqf-34qm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42154"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42154&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18584"&gt;https://github.com/prometheus/prometheus/pull/18584&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18585"&gt;https://github.com/prometheus/prometheus/pull/18585&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus"&gt;https://github.com/prometheus/prometheus&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/releases/tag/v3.11.3"&gt;https://github.com/prometheus/prometheus/releases/tag/v3.11.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/releases/tag/v3.5.3"&gt;https://github.com/prometheus/prometheus/releases/tag/v3.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8rm2-7qqf-34qm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-qqqm-5547-774x: FileBrowser Quantum: Path traversal in public share PATCH allows file ops outside shared directory</title>
-    <id>https://osv.dev/vulnerability/GHSA-qqqm-5547-774x</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qqqm-5547-774x"/>
-    <published>2026-05-22T17:26:25Z</published>
-    <updated>2026-05-22T17:30:31Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;FileBrowser Quantum: Path traversal in public share PATCH allows file ops outside shared directory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gtsteffaniak/filebrowser/backend&lt;/code&gt; — fixed in 0.0.0-20260518193514-28e9b81e438e&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`publicPatchHandler` in `backend/http/public.go` joins user-controlled `fromPath` and `toPath` body fields with the trusted `d.share.Path` BEFORE the downstream sanitizer runs. Because `filepath.Join` collapses `..` segments during the join, the sanitizer in `resourcePatchHandler` never sees the traversal and the move/copy/rename operates on a path outside the shared directory. The same root-cause pattern was patched for the bulk DELETE endpoint as CVE-2026-44542 (GHSA-fwj3-42wh-8673), but the PATCH handler with the identical pattern was not updated.
-
-A public share link with `AllowModify=true` is sufficient to exploit this. Anyone holding such a link can move, copy, or rename arbitrary files within the share owner&amp;#x27;s source root.
-
-Verified on commit 869b640 (HEAD of `main` as o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/security/advisories/GHSA-qqqm-5547-774x"&gt;https://github.com/gtsteffaniak/filebrowser/security/advisories/GHSA-qqqm-5547-774x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser"&gt;https://github.com/gtsteffaniak/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qqqm-5547-774x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rmx9-2pp3-xhcr: Tekton Pipelines has VerificationPolicy regex pattern bypass via substring matching</title>
-    <id>https://osv.dev/vulnerability/GHSA-rmx9-2pp3-xhcr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rmx9-2pp3-xhcr"/>
-    <published>2026-04-21T16:25:19Z</published>
-    <updated>2026-05-22T16:16:31Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-25542"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Tekton Pipelines has VerificationPolicy regex pattern bypass via substring matching&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25542&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.3.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.6.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.9.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.11.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;hey guys,
-
-triage contract
-this is a first-screen summary; deterministic proof is in the proof bundle (canonical.log/control.log/witness.txt).
-
-summary
-trusted resources verification policies match a resource source string (`refSource.URI`) against `spec.resources[].pattern` using `regexp.MatchString`. in go, `regexp.MatchString` reports a match if the pattern matches anywhere in the string, so common unanchored patterns (including examples in tekton documentation) can be bypassed by attacker-controlled source strings that contain the trusted pattern as a substring. this can cause an unintended policy match and change which verification mode/keys apply.
-
-pins
-- repo: https://github.com/tektoncd/pipeline
-- commit: 0133513db03dadb3cb08801d6b0330badcb63830
-- callsite: pkg/trustedresources/ver…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline/security/advisories/GHSA-rmx9-2pp3-xhcr"&gt;https://github.com/tektoncd/pipeline/security/advisories/GHSA-rmx9-2pp3-xhcr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-25542"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-25542&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline/commit/2c398711e6e9e232180508f0648425a8ea34dc9e"&gt;https://github.com/tektoncd/pipeline/commit/2c398711e6e9e232180508f0648425a8ea34dc9e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline/commit/b8905600322aa86327baae0a7c04d6cf1207362a"&gt;https://github.com/tektoncd/pipeline/commit/b8905600322aa86327baae0a7c04d6cf1207362a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline"&gt;https://github.com/tektoncd/pipeline&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline/releases/tag/v1.11.0"&gt;https://github.com/tektoncd/pipeline/releases/tag/v1.11.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rmx9-2pp3-xhcr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,74 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-05-27T14:44:16Z</updated>
+  <updated>2026-05-27T23:00:24Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-2gv2-cffp-j227: Kata guest escape: runtime-rs guest-root to host-root escape via virtiofs</title>
+    <id>https://osv.dev/vulnerability/GHSA-2gv2-cffp-j227</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2gv2-cffp-j227"/>
+    <published>2026-05-27T22:50:01Z</published>
+    <updated>2026-05-27T23:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-47243"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Kata guest escape: runtime-rs guest-root to host-root escape via virtiofs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47243&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:H/VI:H/VA:N/SC:H/SI:H/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kata-containers/kata-containers&lt;/code&gt; — fixed in 0.0.0-20260519062212-ffa59ce3aa78&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+In the runtime-rs standalone virtio-fs path, verified here with QEMU (and verified with Cloud Hypervisor too), Kata Containers runs host `virtiofsd` as root with:
+
+```
+--sandbox none --seccomp none
+```
+
+If an attacker has root-equivalent execution inside the Kata guest VM, they can send raw FUSE requests directly to the host `virtiofsd`. With the tested runtime-rs virtio-fs configuration, a raw `FUSE_SYMLINK` request whose new symlink name is an absolute host path is honored outside the virtio-fs shared directory.
+
+This lets guest root create host-root owned symlinks in sensitive host paths. The PoC created here will create symlinks in the host `/etc/cron.d` directory, causing host cron to execute a guest-controlled payload as host root.
+
+Impact: guest root can execute code as…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/security/advisories/GHSA-2gv2-cffp-j227"&gt;https://github.com/kata-containers/kata-containers/security/advisories/GHSA-2gv2-cffp-j227&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/commit/ffa59ce3aa7877d067c9a372df0c329a23a01744"&gt;https://github.com/kata-containers/kata-containers/commit/ffa59ce3aa7877d067c9a372df0c329a23a01744&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers"&gt;https://github.com/kata-containers/kata-containers&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/releases/tag/3.31.0"&gt;https://github.com/kata-containers/kata-containers/releases/tag/3.31.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2gv2-cffp-j227"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rw47-hm26-6wr7: CrowdSec AppSec silently drops request body for chunked / HTTP-2 requests</title>
+    <id>https://osv.dev/vulnerability/GHSA-rw47-hm26-6wr7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rw47-hm26-6wr7"/>
+    <published>2026-05-27T19:58:15Z</published>
+    <updated>2026-05-27T20:00:10Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-44982"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;CrowdSec AppSec silently drops request body for chunked / HTTP-2 requests&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44982&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/crowdsecurity/crowdsec&lt;/code&gt; — fixed in 1.7.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The CrowdSec AppSec component fails to read the HTTP request body for any request whose `Content-Length` is not positive — most notably HTTP/1.1 requests using `Transfer-Encoding: chunked` and HTTP/2 requests sent without a `content-length` header. Coraza is then evaluated against an empty body, so every WAF rule targeting `REQUEST_BODY`, `BODY_ARGS`, `ARGS_POST`, `JSON`, or `XML` silently fails to match.
+
+An unauthenticated remote attacker can bypass the entire AppSec body-inspection pipeline  by changing a single framing header on an otherwise-malicious request. The bypassed request is forwarded as `allow` and produces no WAF log entry.
+
+## Affected versions
+
+- `github.com/crowdsecurity/crowdsec` — all releases up to and including **v1.7.7**.
+
+## Affected component
+
+`pkg/apps…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/crowdsecurity/crowdsec/security/advisories/GHSA-rw47-hm26-6wr7"&gt;https://github.com/crowdsecurity/crowdsec/security/advisories/GHSA-rw47-hm26-6wr7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/crowdsecurity/crowdsec"&gt;https://github.com/crowdsecurity/crowdsec&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rw47-hm26-6wr7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-273h-gvwr-c3qj: CrowdSec LAPI: Denial of Service via Unbounded Gzip Decompression</title>
+    <id>https://osv.dev/vulnerability/GHSA-273h-gvwr-c3qj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-273h-gvwr-c3qj"/>
+    <published>2026-05-27T19:57:28Z</published>
+    <updated>2026-05-27T20:00:10Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-44981"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;CrowdSec LAPI: Denial of Service via Unbounded Gzip Decompression&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44981&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/crowdsecurity/crowdsec&lt;/code&gt; — fixed in 1.7.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The LAPI router uses `gin-contrib/gzip` with `DefaultDecompressHandle` globally (`pkg/apiserver/controllers/controller.go`).
+This middleware decompresses incoming request bodies without enforcing a maximum decompressed size. 
+
+The endpoints `/v1/watchers` or `/v1/watchers/login` require no authentication.
+An attacker can send small gzip-compressed JSON payloads that, when decompressed, result in hundreds of MB of valid JSON occupying server memory.
+Sending enough requests concurrently will cause LAPI to allocate excessive heap memory, leading the OS to forcibly terminate the process.
+ 
+This vulnerability is not exploitable from the network in default configurations, as LAPI only listens on the loopback interface.
+If developers&amp;#x27; applications are using a multi-server setup, LAPI will be expo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/crowdsecurity/crowdsec/security/advisories/GHSA-273h-gvwr-c3qj"&gt;https://github.com/crowdsecurity/crowdsec/security/advisories/GHSA-273h-gvwr-c3qj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/crowdsecurity/crowdsec"&gt;https://github.com/crowdsecurity/crowdsec&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-273h-gvwr-c3qj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GO-2026-4985: Oversized OTLP HTTP response bodies can cause memory exhaustion in go.opentelemetry.io/otel/exporters/otlp</title>
     <id>https://osv.dev/vulnerability/GO-2026-4985</id>

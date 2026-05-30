@@ -3,12 +3,57 @@
   <title>OSV — new &amp; updated vulnerabilities: NuGet (.NET)</title>
   <subtitle>Open-source vulns affecting NuGet (.NET) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:nuget</id>
-  <updated>2026-05-26T18:29:26Z</updated>
+  <updated>2026-05-29T20:15:14Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/nuget.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-92vj-hp7m-gwcj: Nerdbank.MessagePack has Inefficient CPU Computation</title>
+    <id>https://osv.dev/vulnerability/GHSA-92vj-hp7m-gwcj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-92vj-hp7m-gwcj"/>
+    <published>2026-05-29T20:02:59Z</published>
+    <updated>2026-05-29T20:15:14Z</updated>
+    <category term="NuGet"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nerdbank.MessagePack has Inefficient CPU Computation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;Nerdbank.MessagePack&lt;/code&gt; — fixed in 1.2.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Applications that call `OptionalConverters.WithExpandoObjectConverter` and deserialize untrusted data are open to a vulnerability by which an attacker can exploit a `O(n²)` algorithm to burn an inordinate amount of CPU effort by adding a great many properties to an `ExpandoObject`, whose `Add` method is implemented as an `O(n)` algorithm.
+
+### Patches
+
+Update to a patched version.
+
+If a project&amp;#x27;s `ExpandoObject` data requires more than 128 properties, the default limit should be changed:
+
+```cs
+this.Serializer = this.Serializer with
+{
+	StartingContext = this.Serializer.StartingContext with
+	{
+		Security = this.Serializer.StartingContext.Security with
+		{
+			ExpandoObjectMaxPropertyCount = 256, // Set this to whatever limit is required by your application
+		},
+	},
+};
+```
+
+### Wo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/AArnott/Nerdbank.MessagePack/security/advisories/GHSA-92vj-hp7m-gwcj"&gt;https://github.com/AArnott/Nerdbank.MessagePack/security/advisories/GHSA-92vj-hp7m-gwcj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AArnott/Nerdbank.MessagePack/commit/c5a239e4f20c38548de44c4dd2a782efd5e2547c"&gt;https://github.com/AArnott/Nerdbank.MessagePack/commit/c5a239e4f20c38548de44c4dd2a782efd5e2547c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AArnott/Nerdbank.MessagePack"&gt;https://github.com/AArnott/Nerdbank.MessagePack&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-92vj-hp7m-gwcj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qjvr-435c-5fjh: Nerdbank.MessagePack has a memory amplification DoS in collection deserialization</title>
+    <id>https://osv.dev/vulnerability/GHSA-qjvr-435c-5fjh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qjvr-435c-5fjh"/>
+    <published>2026-05-29T19:55:09Z</published>
+    <updated>2026-05-29T20:00:14Z</updated>
+    <category term="NuGet"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nerdbank.MessagePack has a memory amplification DoS in collection deserialization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;Nerdbank.MessagePack&lt;/code&gt; — fixed in 1.1.78&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Nerdbank.MessagePack deserializers for many collection-shaped types trusted the element count declared in MessagePack array and map headers when allocating destination storage. A crafted payload could therefore force large arrays, pooled buffers, dictionaries, or collection instances to be allocated before the deserializer had consumed the corresponding elements.
+
+The same allocation pattern existed across strongly typed arrays, primitive arrays, mutable and immutable dictionaries, mutable enumerables, span-backed enumerable construction, `JsonNode`, `MessagePackValue`, and the object/dynamic primitive converters.
+
+Because MessagePack array and map headers carry an attacker-controlled element count, any converter that immediately allocates `count` elements or constructs a collection with c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/AArnott/Nerdbank.MessagePack/security/advisories/GHSA-qjvr-435c-5fjh"&gt;https://github.com/AArnott/Nerdbank.MessagePack/security/advisories/GHSA-qjvr-435c-5fjh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AArnott/Nerdbank.MessagePack/commit/6f19387a3d1322aea880ce3f8db2cfd0de195e12"&gt;https://github.com/AArnott/Nerdbank.MessagePack/commit/6f19387a3d1322aea880ce3f8db2cfd0de195e12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AArnott/Nerdbank.MessagePack"&gt;https://github.com/AArnott/Nerdbank.MessagePack&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qjvr-435c-5fjh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-rvv3-g6hj-g44x: AutoMapper Vulnerable to Denial of Service (DoS) via Uncontrolled Recursion</title>
     <id>https://osv.dev/vulnerability/GHSA-rvv3-g6hj-g44x</id>
@@ -193,27 +238,5 @@ The recent Brent&amp;#x27;s-algorithm commit ([`24f445a`](https://github.com/ope
 `ArrayFunctions.InsertAt` in Scriban allocates `index - list.Count` null entries in a tight C# `for` loop with no bound on `index`. The function is exposed to template authors as `array.insert_at`, and the fill loop ignores every existing safety control: `LoopLimit`, `LimitToString`, `ObjectRecursionLimit`, and `RecursiveLimit`. A single template such as `{{ [1] | array.insert_at 200000000 &amp;#x27;x&amp;#x27; | array.size }}` causes `OutOfMemoryException` in well under a second on a host with 1 GB of memory, even when `LoopLimit` is set to `10` and `LimitToString` is set to `100`. Because `OutOfMemoryException` is generally not caught by the template renderer or by typical host applications, the vulnerability terminates the host process, not just the template.
 
 This is a sibling vector to GHSA…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/scriban/scriban/security/advisories/GHSA-24c8-4792-22hx"&gt;https://github.com/scriban/scriban/security/advisories/GHSA-24c8-4792-22hx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/scriban/scriban"&gt;https://github.com/scriban/scriban&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-24c8-4792-22hx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jwvw-v7c5-m82h: protobuf susceptible to buffer overflow</title>
-    <id>https://osv.dev/vulnerability/GHSA-jwvw-v7c5-m82h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jwvw-v7c5-m82h"/>
-    <published>2022-05-13T01:06:54Z</published>
-    <updated>2026-05-19T05:26:10Z</updated>
-    <category term="NuGet"/>
-    <category term="CVE-2015-5237"/>
-    <category term="PYSEC-2017-150"/>
-    <category term="PYSEC-2017-65"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;protobuf susceptible to buffer overflow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2015-5237, PYSEC-2017-150, PYSEC-2017-65&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;Google.Protobuf&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;com.google.protobuf:protobuf-parent&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/protocolbuffers/protobuf&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;google/protobuf&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;protobuf&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;protobuf allows remote authenticated attackers to cause a heap-based buffer overflow.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2015-5237"&gt;https://nvd.nist.gov/vuln/detail/CVE-2015-5237&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/google/protobuf/issues/760"&gt;https://github.com/google/protobuf/issues/760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=1256426"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=1256426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread.html/r320dc858da88846ba00bb077bcca2cdf75b7dde0f6eb3a3d60dba6a1@%3Ccommits.pulsar.apache.org%3E"&gt;https://lists.apache.org/thread.html/r320dc858da88846ba00bb077bcca2cdf75b7dde0f6eb3a3d60dba6a1@%3Ccommits.pulsar.apache.org%3E&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread.html/r42e47994734cd1980ef3e204a40555336e10cc80096927aca2f37d90@%3Ccommits.pulsar.apache.org%3E"&gt;https://lists.apache.org/thread.html/r42e47994734cd1980ef3e204a40555336e10cc80096927aca2f37d90@%3Ccommits.pulsar.apache.org%3E&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread.html/r42ef6acfb0d86a2df0c2390702ecbe97d2104a331560f2790d17ca69@%3Ccommits.pulsar.apache.org%3E"&gt;https://lists.apache.org/thread.html/r42ef6acfb0d86a2df0c2390702ecbe97d2104a331560f2790d17ca69@%3Ccommits.pulsar.apache.org%3E&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread.html/r4886108206d4c535db9b20c813fe4723d4fe6a91b9278382af8b9d08@%3Cissues.spark.apache.org%3E"&gt;https://lists.apache.org/thread.html/r4886108206d4c535db9b20c813fe4723d4fe6a91b9278382af8b9d08@%3Cissues.spark.apache.org%3E&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread.html/r4ef574a5621b0e670a3ce641e9922543e34f22bf4c9ee9584aa67fcf@%3Cissues.hbase.apache.org%3E"&gt;https://lists.apache.org/thread.html/r4ef574a5621b0e670a3ce641e9922543e34f22bf4c9ee9584aa67fcf@%3Cissues.hbase.apache.org%3E&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jwvw-v7c5-m82h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rcr6-g7jc-f57g: ImageMagick: Stack overflow in fx operation</title>
-    <id>https://osv.dev/vulnerability/GHSA-rcr6-g7jc-f57g</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rcr6-g7jc-f57g"/>
-    <published>2026-05-18T20:37:31Z</published>
-    <updated>2026-05-18T20:49:43Z</updated>
-    <category term="NuGet"/>
-    <category term="CVE-2026-46557"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;ImageMagick: Stack overflow in fx operation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46557&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-AnyCPU&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-HDRI-AnyCPU&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-HDRI-OpenMP-arm64&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-HDRI-OpenMP-x64&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-HDRI-arm64&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-HDRI-x64&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-HDRI-x86&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-OpenMP-arm64&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-OpenMP-x64&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-arm64&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-x64&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;Magick.NET-Q16-x86&lt;/code&gt; — fixed in 14.13.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Due to a missing depth check a stack overflow can occur in the fx operation by passing a crafted argument.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ImageMagick/ImageMagick/security/advisories/GHSA-rcr6-g7jc-f57g"&gt;https://github.com/ImageMagick/ImageMagick/security/advisories/GHSA-rcr6-g7jc-f57g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ImageMagick/ImageMagick"&gt;https://github.com/ImageMagick/ImageMagick&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rcr6-g7jc-f57g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

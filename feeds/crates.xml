@@ -3,12 +3,55 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-05-29T20:59:15Z</updated>
+  <updated>2026-06-01T13:30:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0152: Use-after-free</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0152</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0152"/>
+    <published>2026-05-27T12:00:00Z</published>
+    <updated>2026-06-01T13:30:04Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Use-after-free&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oneringbuf&lt;/code&gt; — fixed in 0.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `oneringbuf` exposed the obsolete `IntoRef::into_ref` method through the public `IntoRef` trait. For heap-backed ring buffers, this method returned a `DroppableRef` handle.
+
+`DroppableRef` stored an owning raw pointer created from `Box::into_raw`. Its `Clone` implementation copied this raw pointer without incrementing the internal `alive_iters` counter. Internally, this clone pattern appears to rely on a fixed number of handles being created to match the initial `alive_iters` value. However, exposing `DroppableRef` through the public `IntoRef::TargetRef` associated type allows safe external code to create additional clones beyond that fixed count, breaking the lifetime protocol. `Drop` later dereferenced the pointer and could free the backing allocation with `Box::from…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/oneringbuf"&gt;https://crates.io/crates/oneringbuf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0152.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0152.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/skilvingr/rust-oneringbuf/commit/643a24b30914068416dff9021a069c12c865a316"&gt;https://github.com/skilvingr/rust-oneringbuf/commit/643a24b30914068416dff9021a069c12c865a316&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/skilvingr/rust-oneringbuf/commit/643a24b30914068416dff9021a069c12c865a316"&gt;https://github.com/skilvingr/rust-oneringbuf/commit/643a24b30914068416dff9021a069c12c865a316&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0152"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3pv8-6f4r-ffg2: tar has a PAX header desynchronization issue</title>
+    <id>https://osv.dev/vulnerability/GHSA-3pv8-6f4r-ffg2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3pv8-6f4r-ffg2"/>
+    <published>2026-05-29T19:16:12Z</published>
+    <updated>2026-06-01T10:59:10Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;tar has a PAX header desynchronization issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tar&lt;/code&gt; — fixed in 0.4.46&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When a tar stream contains multiple &amp;quot;header&amp;quot; entries prior to a file entry, tar-rs applies the PAX header (`x`) to the _next_ entry in the stream, regardless of type. For example, a stream of `x -&amp;gt; L -&amp;gt; file` (PAX, GNU longname, file) would result in `x`&amp;#x27;s extensions being applied to `L` rather than to `file`.
+
+[Per POSIX pax](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/pax.html), this is incorrect: a PAX header always applies to a file entry, not any intermediary entries. See the &amp;quot;pax Header Block&amp;quot; section for the specific prescription there.
+
+As a result of this, an attacker can contrive a tar containing a sequence of tar headers such that tar-rs applies the PAX header&amp;#x27;s `size` extension to the next header in sequence, effectively desynchronizing the stream an…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs/security/advisories/GHSA-3pv8-6f4r-ffg2"&gt;https://github.com/composefs/tar-rs/security/advisories/GHSA-3pv8-6f4r-ffg2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs/pull/454"&gt;https://github.com/composefs/tar-rs/pull/454&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs/commit/bab14dd84b411ac16ecb56d4f2d2f7bfb88a9838"&gt;https://github.com/composefs/tar-rs/commit/bab14dd84b411ac16ecb56d4f2d2f7bfb88a9838&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs"&gt;https://github.com/composefs/tar-rs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs/releases/tag/0.4.46"&gt;https://github.com/composefs/tar-rs/releases/tag/0.4.46&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3pv8-6f4r-ffg2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-9857-6mw7-fq2m: gix-transport: HTTP credentials leaked to redirected host in curl backend</title>
+    <id>https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m"/>
+    <published>2026-05-05T19:16:35Z</published>
+    <updated>2026-06-01T10:59:10Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;gix-transport: HTTP credentials leaked to redirected host in curl backend&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gix-transport&lt;/code&gt; — fixed in 0.56.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The curl-based HTTP transport in `gix-transport` sends user credentials (passwords, tokens) to an attacker-controlled server after an HTTP redirect. When a server responds with a 302 redirect during the initial `GET /info/refs`, gitoxide records the redirected base URL and rewrites all subsequent requests to point at the redirected host. The `Authorization` header is still attached because `add_basic_auth_if_present()` only checks `self.url` (the original, never-updated URL).
+
+The reqwest backend is not affected. Its custom redirect policy at `reqwest/remote.rs` lines 60-64 compares `prev_url.host_str()` to `curr_url.host_str()` and calls `attempt.stop()` on cross-domain redirects, so `redirected_base_url` is never set to a different host.
+
+## Details
+
+The vulnerability involve…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-9857-6mw7-fq2m"&gt;https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-9857-6mw7-fq2m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide"&gt;https://github.com/GitoxideLabs/gitoxide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-4p46-pwfr-66x6: Some AES functions may panic when overflow checking is enabled in ring</title>
     <id>https://osv.dev/vulnerability/GHSA-4p46-pwfr-66x6</id>
@@ -82,21 +125,6 @@ This is an internal library state mismatch. Applications are responsible for any
 
 ### Details
 The …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-hpv4-5h6f-wqr3"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-hpv4-5h6f-wqr3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hpv4-5h6f-wqr3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-3pv8-6f4r-ffg2: tar has a PAX header desynchronization issue</title>
-    <id>https://osv.dev/vulnerability/GHSA-3pv8-6f4r-ffg2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3pv8-6f4r-ffg2"/>
-    <published>2026-05-29T19:16:12Z</published>
-    <updated>2026-05-29T19:30:14Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;tar has a PAX header desynchronization issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tar&lt;/code&gt; — fixed in 0.4.46&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-When a tar stream contains multiple &amp;quot;header&amp;quot; entries prior to a file entry, tar-rs applies the PAX header (`x`) to the _next_ entry in the stream, regardless of type. For example, a stream of `x -&amp;gt; L -&amp;gt; file` (PAX, GNU longname, file) would result in `x`&amp;#x27;s extensions being applied to `L` rather than to `file`.
-
-[Per POSIX pax](https://pubs.opengroup.org/onlinepubs/9799919799/utilities/pax.html), this is incorrect: a PAX header always applies to a file entry, not any intermediary entries. See the &amp;quot;pax Header Block&amp;quot; section for the specific prescription there.
-
-As a result of this, an attacker can contrive a tar containing a sequence of tar headers such that tar-rs applies the PAX header&amp;#x27;s `size` extension to the next header in sequence, effectively desynchronizing the stream an…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs/security/advisories/GHSA-3pv8-6f4r-ffg2"&gt;https://github.com/composefs/tar-rs/security/advisories/GHSA-3pv8-6f4r-ffg2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs/pull/454"&gt;https://github.com/composefs/tar-rs/pull/454&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs/commit/bab14dd84b411ac16ecb56d4f2d2f7bfb88a9838"&gt;https://github.com/composefs/tar-rs/commit/bab14dd84b411ac16ecb56d4f2d2f7bfb88a9838&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs"&gt;https://github.com/composefs/tar-rs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/composefs/tar-rs/releases/tag/0.4.46"&gt;https://github.com/composefs/tar-rs/releases/tag/0.4.46&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3pv8-6f4r-ffg2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-3cv2-h65g-fgmm: astral-tokio-tar has a PAX Header Desynchronization issue</title>
@@ -260,34 +288,5 @@ The underlying unsafe paths were in `CryptoVec`:
   - unchecked capacity growth
   - unchecked length arithmetic in growth callers
   - raw allocation and reallocation path…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-g9f8-wqj9-fjw5"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-g9f8-wqj9-fjw5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g9f8-wqj9-fjw5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0149: WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0149</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0149"/>
-    <published>2026-05-21T12:00:00Z</published>
-    <updated>2026-05-22T10:15:03Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-47261"/>
-    <category term="GHSA-2r75-cxrj-cmph"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47261, GHSA-2r75-cxrj-cmph&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 24.0.9, 36.0.10, 44.0.2, 45.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime-wasi"&gt;https://crates.io/crates/wasmtime-wasi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0149.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0149.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0149"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-pvmv-cwg8-v6c8: Zebra v4.4.0 still accepts V5 SIGHASH_SINGLE without a corresponding output</title>
-    <id>https://osv.dev/vulnerability/GHSA-pvmv-cwg8-v6c8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pvmv-cwg8-v6c8"/>
-    <published>2026-05-08T18:27:26Z</published>
-    <updated>2026-05-22T05:15:08Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Zebra v4.4.0 still accepts V5 SIGHASH_SINGLE without a corresponding output&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:H/SC:N/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebra-script&lt;/code&gt; — fixed in 6.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Consensus Divergence in V5 Transparent SIGHASH_SINGLE With No Corresponding Output
-
-## Summary
-
-Zebra failed to enforce a ZIP-244 consensus rule for V5 transparent transactions: when an input is signed with `SIGHASH_SINGLE` and there is no transparent output at the same index as that input, validation must fail. Zebra instead asked the underlying sighash library to compute a digest, and that library produced a digest over an empty output set rather than failing. An attacker could craft a V5 transaction with more transparent inputs than outputs that Zebra accepts but `zcashd` rejects, creating a consensus split between Zebra and `zcashd` nodes.
-
-A previous fix ([`GHSA-cwfq-rfcr-8hmp`](https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-cwfq-rfcr-8hmp)) addressed a closely re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-pvmv-cwg8-v6c8"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-pvmv-cwg8-v6c8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pvmv-cwg8-v6c8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,50 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-06-01T22:11:14Z</updated>
+  <updated>2026-06-02T05:15:10Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-2q4c-3mrw-63c3: Kopia: RCE via SSH ProxyCommand Injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-2q4c-3mrw-63c3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2q4c-3mrw-63c3"/>
+    <published>2026-05-19T19:18:32Z</published>
+    <updated>2026-06-02T05:15:10Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-45695"/>
+    <category term="GO-2026-5009"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Kopia: RCE via SSH ProxyCommand Injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45695, GO-2026-5009&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kopia/kopia&lt;/code&gt; — fixed in 0.23.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Kopia&amp;#x27;s HTTP server, when started with `--without-password `, accepts unauthenticated requests to `/api/v1/repo/exists`. The handler forwards an attacker-supplied storage configuration to `blob.NewStorage`. For SFTP backends with `externalSSH: true`, that path constructs a process command line by splitting `sshArguments` on spaces and passes the result directly to `exec.CommandContext(&amp;quot;ssh&amp;quot;)`. An `-oProxyCommand=&amp;lt;cmd&amp;gt;` token in `sshArguments` causes OpenSSH to invoke `&amp;lt;cmd&amp;gt;` via `$SHELL -c` before any TCP connection is attempted, giving the requester arbitrary command execution as the Kopia process user.
+
+## Analysis
+
+[`internal/server/server_authz_checks.go` lines 61–73](https://github.com/kopia/kopia/blob/v0.22.3/internal/server/server_authz_checks.go#L61-L73):
+
+when the serv…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kopia/kopia/security/advisories/GHSA-2q4c-3mrw-63c3"&gt;https://github.com/kopia/kopia/security/advisories/GHSA-2q4c-3mrw-63c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kopia/kopia/pull/5354"&gt;https://github.com/kopia/kopia/pull/5354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kopia/kopia"&gt;https://github.com/kopia/kopia&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2q4c-3mrw-63c3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jfwf-28xr-xw6q: RClone: Unauthenticated operations/fsinfo allows attacker-controlled backend instantiation and local command execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q"/>
+    <published>2026-04-22T14:45:10Z</published>
+    <updated>2026-06-02T05:15:10Z</updated>
+    <category term="Go"/>
+    <category term="BIT-rclone-2026-41179"/>
+    <category term="CVE-2026-41179"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;RClone: Unauthenticated operations/fsinfo allows attacker-controlled backend instantiation and local command execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-41179, CVE-2026-41179&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.73.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The RC endpoint `operations/fsinfo` is exposed without `AuthRequired: true` and accepts attacker-controlled `fs` input. Because `rc.GetFs(...)` supports inline backend definitions, an unauthenticated attacker can instantiate an attacker-controlled backend on demand. For the WebDAV backend, `bearer_token_command` is executed during backend initialization, making single-request unauthenticated local command execution possible on reachable RC deployments without global HTTP authentication.
+
+### Preconditions
+
+Preconditions for this vulnerability are:
+
+- The rclone remote control API **must** be enabled, either by the `--rc` flag or by running the `rclone rcd` server
+- The remote control API **must** be reachable by the attacker - by default rclone only serves the rc to localhost u…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-jfwf-28xr-xw6q"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-jfwf-28xr-xw6q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41179"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/commit/2a9e952b38e03a96bf40c9eb6e8e22199865ee3b"&gt;https://github.com/rclone/rclone/commit/2a9e952b38e03a96bf40c9eb6e8e22199865ee3b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone"&gt;https://github.com/rclone/rclone&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/backend/webdav/webdav.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/backend/webdav/webdav.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/operations/rc.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/operations/rc.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/cache.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/cache.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/releases/tag/v1.73.5"&gt;https://github.com/rclone/rclone/releases/tag/v1.73.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-2gw9-c2r2-f5qf: Neko has a Self-service Privilege Escalation for Authenticated Users</title>
     <id>https://osv.dev/vulnerability/GHSA-2gw9-c2r2-f5qf</id>

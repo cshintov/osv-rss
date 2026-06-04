@@ -3,12 +3,156 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-06-04T12:29:29Z</updated>
+  <updated>2026-06-04T18:45:22Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-wc3v-3457-c8cm: OpenMeter: SQL injection through meter creation</title>
+    <id>https://osv.dev/vulnerability/GHSA-wc3v-3457-c8cm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wc3v-3457-c8cm"/>
+    <published>2026-06-04T18:39:52Z</published>
+    <updated>2026-06-04T18:45:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-8462"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenMeter: SQL injection through meter creation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-8462&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openmeterio/openmeter&lt;/code&gt; — fixed in 1.0.0-beta.228&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+An authenticated tenant can inject arbitrary SQL through the `valueProperty` or `groupBy` fields of `POST /api/v1/meters`. The injection passes the application&amp;#x27;s JSONPath validation check and executes against the shared ClickHouse database, which contains event data for all tenants with no row-level security. Any authenticated tenant can read or write every other tenant&amp;#x27;s metering data.
+
+### Details
+
+`openmeter/streaming/clickhouse/utils_query.go:15` builds a ClickHouse `SELECT` by interpolating user input with `fmt.Sprintf`:
+
+```go
+sb.Select(fmt.Sprintf(&amp;quot;JSON_VALUE(&amp;#x27;{}&amp;#x27;, &amp;#x27;%s&amp;#x27;)&amp;quot;, sqlbuilder.Escape(d.jsonPath)))
+```
+
+`sqlbuilder.Escape()` (go-sqlbuilder v1.40.2) only replaces `$` → `$$` to prevent collisions with the library&amp;#x27;s own argument placeholders. It does not escape singl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openmeterio/openmeter/security/advisories/GHSA-wc3v-3457-c8cm"&gt;https://github.com/openmeterio/openmeter/security/advisories/GHSA-wc3v-3457-c8cm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openmeterio/openmeter/pull/4383"&gt;https://github.com/openmeterio/openmeter/pull/4383&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openmeterio/openmeter/commit/6ce29e743165890c10346f4c71d5bf79f1ecaf6f"&gt;https://github.com/openmeterio/openmeter/commit/6ce29e743165890c10346f4c71d5bf79f1ecaf6f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openmeterio/openmeter"&gt;https://github.com/openmeterio/openmeter&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openmeterio/openmeter/releases/tag/v1.0.0-beta.228"&gt;https://github.com/openmeterio/openmeter/releases/tag/v1.0.0-beta.228&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wc3v-3457-c8cm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-64cj-qvx5-m4f3: Nhost CLI local configserver allows cross-origin unauthenticated read/write access to local development configuration and secrets</title>
+    <id>https://osv.dev/vulnerability/GHSA-64cj-qvx5-m4f3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-64cj-qvx5-m4f3"/>
+    <published>2026-06-04T17:43:40Z</published>
+    <updated>2026-06-04T18:00:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-47671"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nhost CLI local configserver allows cross-origin unauthenticated read/write access to local development configuration and secrets&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47671&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nhost/nhost&lt;/code&gt; — fixed in 0.0.0-20260518172022-e407511627d2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The hidden `nhost configserver` used by `nhost dev` exposes the Mimir GraphQL API with dummy authorization directives and permissive CORS. When a developer is running the local development environment, any process that can reach the developer&amp;#x27;s localhost service, including a web page loaded from an arbitrary origin, can query the configserver for local Nhost configuration and secrets and can mutate the local `.secrets` file.
+
+This impacts developers using `nhost dev`: project admin secrets, JWT signing keys, webhook secrets, Grafana credentials, and custom environment variables can be read, and attacker-controlled secrets can be written to the local development project.
+
+### Details
+
+The CLI registers a hidden `configserver` command in `cli/main.go:39` and `cli/main.go:41`. Th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nhost/nhost/security/advisories/GHSA-64cj-qvx5-m4f3"&gt;https://github.com/nhost/nhost/security/advisories/GHSA-64cj-qvx5-m4f3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nhost/nhost/pull/4302"&gt;https://github.com/nhost/nhost/pull/4302&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nhost/nhost/commit/e407511627d2c2c1137a70e9ca1ca31095d23479"&gt;https://github.com/nhost/nhost/commit/e407511627d2c2c1137a70e9ca1ca31095d23479&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nhost/nhost"&gt;https://github.com/nhost/nhost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nhost/nhost/releases/tag/cli@1.46.0"&gt;https://github.com/nhost/nhost/releases/tag/cli@1.46.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-64cj-qvx5-m4f3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-74m6-4hjp-7226: Klever-Go P2P MultiDataInterceptor leaks global throttler slots on malformed compressed batches (DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-74m6-4hjp-7226</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-74m6-4hjp-7226"/>
+    <published>2026-06-04T17:40:51Z</published>
+    <updated>2026-06-04T17:45:21Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Klever-Go P2P MultiDataInterceptor leaks global throttler slots on malformed compressed batches (DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klever-io/klever-go&lt;/code&gt; — fixed in 1.7.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Publisher note
+
+**Fixed in `v1.7.17`.** Operators running `&amp;lt; v1.7.17` should upgrade. The decompression-error path in `MultiDataInterceptor.ProcessReceivedMessage` now releases the global throttler slot before returning (guarded `defer` after `StartProcessing()`, disabled when the asynchronous goroutine takes ownership).
+
+Patch commits on `develop`: 333f6ec9, 68b94a40 (merged from private fork `klever-io/klever-go-ghsa-74m6-4hjp-7226`).
+
+This advisory was originally filed jointly with a separate KVM read-only isolation bypass; that finding is now tracked under [GHSA-jc6w-wmfc-fh33](https://github.com/klever-io/klever-go/security/advisories/GHSA-jc6w-wmfc-fh33) so each issue receives its own CVE.
+
+The original disclosure from @LoGGGG240211 follows verbatim, including the embedded proof-o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/security/advisories/GHSA-74m6-4hjp-7226"&gt;https://github.com/klever-io/klever-go/security/advisories/GHSA-74m6-4hjp-7226&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/commit/333f6ec910906e227705fc5767dc897d8fbfc862"&gt;https://github.com/klever-io/klever-go/commit/333f6ec910906e227705fc5767dc897d8fbfc862&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/commit/68b94a40824fac2d848a4ded6eb7c91ada6ce9ef"&gt;https://github.com/klever-io/klever-go/commit/68b94a40824fac2d848a4ded6eb7c91ada6ce9ef&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go"&gt;https://github.com/klever-io/klever-go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-74m6-4hjp-7226"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wqcr-7rf3-f64m: Singluarity: Incorrect path matching for 'limit container paths' directive</title>
+    <id>https://osv.dev/vulnerability/GHSA-wqcr-7rf3-f64m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wqcr-7rf3-f64m"/>
+    <published>2026-06-04T17:38:21Z</published>
+    <updated>2026-06-04T17:45:21Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-47215"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Singluarity: Incorrect path matching for &amp;#x27;limit container paths&amp;#x27; directive&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47215&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/sylabs/singularity/v4&lt;/code&gt; — fixed in 4.4.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/sylabs/singularity&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+The `limit container paths` directive in `singularity.conf` is intended to allow a system administrator limit the paths from which containers can be run, under setuid mode. Due to incorrect matching of a path string, sibling directories with similar names may incorrectly be allowed.
+
+For example, the configuration:
+
+```
+limit container paths = /data/safe
+```
+
+Will also allow containers in `/data/safe-but-unsafe` to be run.
+
+
+### Patches
+
+This issue is patched in SingularityCE 4.4.2 and SingularityPRO 4.3.9 / 4.1.14
+
+### Workarounds
+
+If you do not use the `limit container paths` functionality, then this issue does not affect your installation.
+
+If you do use the `limit container paths` functionality then you must update. Please also review the documented limitations when user na…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sylabs/singularity/security/advisories/GHSA-wqcr-7rf3-f64m"&gt;https://github.com/sylabs/singularity/security/advisories/GHSA-wqcr-7rf3-f64m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sylabs/singularity/commit/c08791793e843d4c9c1f2fc1d9d12abef747378f"&gt;https://github.com/sylabs/singularity/commit/c08791793e843d4c9c1f2fc1d9d12abef747378f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://docs.sylabs.io/guides/latest/admin-guide/configfiles.html#limiting-container-execution"&gt;https://docs.sylabs.io/guides/latest/admin-guide/configfiles.html#limiting-container-execution&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sylabs/singularity"&gt;https://github.com/sylabs/singularity&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sylabs/singularity/releases/tag/v4.4.2"&gt;https://github.com/sylabs/singularity/releases/tag/v4.4.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wqcr-7rf3-f64m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vvgj-x9jq-8cj9: quic-go: HTTP/3 QPACK Trailer Expansion Memory Exhaustion </title>
+    <id>https://osv.dev/vulnerability/GHSA-vvgj-x9jq-8cj9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vvgj-x9jq-8cj9"/>
+    <published>2026-06-03T20:59:49Z</published>
+    <updated>2026-06-04T17:29:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-40898"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;quic-go: HTTP/3 QPACK Trailer Expansion Memory Exhaustion &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40898&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/quic-go/quic-go&lt;/code&gt; — fixed in 0.59.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+An attacker can cause excessive memory allocation in quic-go&amp;#x27;s HTTP/3 client and server implementations by sending a QPACK-encoded HEADERS frame that decodes into a large trailer field section with many unique field names and/or large values. The implementation builds an `http.Header` for the corresponding `http.Request` or `http.Response`, while only enforcing limits on the size of the QPACK-compressed HEADERS frame, not on the decoded field section. This can lead to memory exhaustion.
+
+This is very similar to CVE-2025-64702. The difference is that this issue uses HTTP trailers, rather than HTTP headers, as the attack vector.
+
+## Impact
+
+A misbehaving or malicious peer can cause a denial-of-service (DoS) attack against quic-go&amp;#x27;s HTTP/3 servers or clients by triggering excessiv…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/security/advisories/GHSA-vvgj-x9jq-8cj9"&gt;https://github.com/quic-go/quic-go/security/advisories/GHSA-vvgj-x9jq-8cj9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/pull/5642"&gt;https://github.com/quic-go/quic-go/pull/5642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/commit/c56e8c79d1627cc1ed6005b421b4b0adadd83665"&gt;https://github.com/quic-go/quic-go/commit/c56e8c79d1627cc1ed6005b421b4b0adadd83665&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-g754-hx8w-x2g6"&gt;https://github.com/advisories/GHSA-g754-hx8w-x2g6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go"&gt;https://github.com/quic-go/quic-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/releases/tag/v0.59.1"&gt;https://github.com/quic-go/quic-go/releases/tag/v0.59.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vvgj-x9jq-8cj9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-m8xg-8xg9-mxhm: Nuclio: Missing authorization on project write paths allows any authenticated user to modify or delete any project</title>
+    <id>https://osv.dev/vulnerability/GHSA-m8xg-8xg9-mxhm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m8xg-8xg9-mxhm"/>
+    <published>2026-06-04T15:05:56Z</published>
+    <updated>2026-06-04T15:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-45730"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nuclio: Missing authorization on project write paths allows any authenticated user to modify or delete any project&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45730&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nuclio/nuclio&lt;/code&gt; — fixed in 0.0.0-20260513101907-1915cd26d514&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This vulnerability exists in Nuclio Dashboard&amp;#x27;s project management API, allowing any authenticated user (without membership in the target project) to bypass OPA authorization checks on write paths (`PUT /api/projects/{id}`, `DELETE /api/projects`) and modify or delete any project along with all its associated resources (functions, API gateways, etc.). CWE classification: CWE-862 (Missing Authorization).
+
+---
+
+## Summary
+
+Nuclio Dashboard correctly enforces OPA-based authorization on the project read path (`GET /api/projects`), populating `MemberIds` in `PermissionOptions` so OPA can filter results by user membership. However, the write paths (`PUT /api/projects/{id}` and `DELETE /api/projects`) construct `PermissionOptions` without setting `MemberIds`. The platform-layer `FilterProjectsByP…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nuclio/nuclio/security/advisories/GHSA-m8xg-8xg9-mxhm"&gt;https://github.com/nuclio/nuclio/security/advisories/GHSA-m8xg-8xg9-mxhm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nuclio/nuclio/pull/4107"&gt;https://github.com/nuclio/nuclio/pull/4107&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nuclio/nuclio/commit/1915cd26d514dcdd487517d4be56673fc02298e0"&gt;https://github.com/nuclio/nuclio/commit/1915cd26d514dcdd487517d4be56673fc02298e0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nuclio/nuclio"&gt;https://github.com/nuclio/nuclio&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nuclio/nuclio/releases/tag/1.16.0"&gt;https://github.com/nuclio/nuclio/releases/tag/1.16.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m8xg-8xg9-mxhm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5037: Inefficient candidate hostname parsing in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5037</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5037"/>
+    <published>2026-06-02T21:39:47Z</published>
+    <updated>2026-06-04T13:29:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-27145"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Inefficient candidate hostname parsing in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-27145&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.11, 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(*x509.Certificate).VerifyHostname previously called matchHostnames in a loop over all DNS Subject Alternative Name (SAN) entries. This caused strings.Split(host, &amp;quot;.&amp;quot;) to execute repeatedly on the same input hostname.
+
+With a large DNS SAN list, verification costs scaled quadratically based on the number of SAN entries multiplied by the hostname&amp;#x27;s label count. Because x509.Verify validates hostnames before building the certificate chain, this overhead occurred even for untrusted certificates.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/783621"&gt;https://go.dev/cl/783621&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79694"&gt;https://go.dev/issue/79694&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw"&gt;https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5037"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5039: Arbitrary inputs are included in errors without any escaping in net/textproto</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5039</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5039"/>
+    <published>2026-06-02T21:39:47Z</published>
+    <updated>2026-06-04T13:29:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-42507"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Arbitrary inputs are included in errors without any escaping in net/textproto&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42507&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.11, 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When returning errors, functions in the net/textproto package would include its input as part of the error. This might allow an attacker to inject misleading content to errors that are printed or logged.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79346"&gt;https://go.dev/issue/79346&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/777060"&gt;https://go.dev/cl/777060&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw"&gt;https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5039"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GO-2026-5038: Quadratic complexity in WordDecoder.DecodeHeader in mime</title>
     <id>https://osv.dev/vulnerability/GO-2026-5038</id>
@@ -175,24 +319,6 @@ While the maximum size of query parameters in URLs is generally limited by the m
 This behavior can lead to privilege escalation in programs using the idna package. For example, a program which performs privilege checks on the ASCII hostname may reject &amp;quot;example.com&amp;quot; but permit &amp;quot;xn--example-.com&amp;quot;. If that program subsequently converts the ASCII hostname to Unicode, it will inadvertently permits access to the Unicode name &amp;quot;example.com&amp;quot;.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/767220"&gt;https://go.dev/cl/767220&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78760"&gt;https://go.dev/issue/78760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8"&gt;https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5026"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-vvgj-x9jq-8cj9: quic-go: HTTP/3 QPACK Trailer Expansion Memory Exhaustion </title>
-    <id>https://osv.dev/vulnerability/GHSA-vvgj-x9jq-8cj9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vvgj-x9jq-8cj9"/>
-    <published>2026-06-03T20:59:49Z</published>
-    <updated>2026-06-03T21:15:07Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-40898"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;quic-go: HTTP/3 QPACK Trailer Expansion Memory Exhaustion &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40898&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/quic-go/quic-go&lt;/code&gt; — fixed in 0.59.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-An attacker can cause excessive memory allocation in quic-go&amp;#x27;s HTTP/3 client and server implementations by sending a QPACK-encoded HEADERS frame that decodes into a large trailer field section with many unique field names and/or large values. The implementation builds an `http.Header` for the corresponding `http.Request` or `http.Response`, while only enforcing limits on the size of the QPACK-compressed HEADERS frame, not on the decoded field section. This can lead to memory exhaustion.
-
-This is very similar to CVE-2025-64702. The difference is that this issue uses HTTP trailers, rather than HTTP headers, as the attack vector.
-
-## Impact
-
-A misbehaving or malicious peer can cause a denial-of-service (DoS) attack against quic-go&amp;#x27;s HTTP/3 servers or clients by triggering excessiv…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/security/advisories/GHSA-vvgj-x9jq-8cj9"&gt;https://github.com/quic-go/quic-go/security/advisories/GHSA-vvgj-x9jq-8cj9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/pull/5642"&gt;https://github.com/quic-go/quic-go/pull/5642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/commit/c56e8c79d1627cc1ed6005b421b4b0adadd83665"&gt;https://github.com/quic-go/quic-go/commit/c56e8c79d1627cc1ed6005b421b4b0adadd83665&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-g754-hx8w-x2g6"&gt;https://github.com/advisories/GHSA-g754-hx8w-x2g6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go"&gt;https://github.com/quic-go/quic-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/releases/tag/v0.59.1"&gt;https://github.com/quic-go/quic-go/releases/tag/v0.59.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vvgj-x9jq-8cj9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] GO-2026-4342: Excessive CPU consumption when building archive index in archive/zip</title>
     <id>https://osv.dev/vulnerability/GO-2026-4342</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4342"/>
@@ -333,27 +459,5 @@ Exploitation requires the ability to alter read-only files such as `.pack` or `.
 
 ### Patches
 …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-git/go-git/security/advisories/GHSA-w5pp-99ch-qj29"&gt;https://github.com/go-git/go-git/security/advisories/GHSA-w5pp-99ch-qj29&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-git/go-git"&gt;https://github.com/go-git/go-git&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w5pp-99ch-qj29"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GO-2026-5037: Inefficient candidate hostname parsing in crypto/x509</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5037</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5037"/>
-    <published>2026-06-02T21:39:47Z</published>
-    <updated>2026-06-02T22:00:16Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-27145"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Inefficient candidate hostname parsing in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-27145&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.11, 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(*x509.Certificate).VerifyHostname previously called matchHostnames in a loop over all DNS Subject Alternative Name (SAN) entries. This caused strings.Split(host, &amp;quot;.&amp;quot;) to execute repeatedly on the same input hostname.
-
-With a large DNS SAN list, verification costs scaled quadratically based on the number of SAN entries multiplied by the hostname&amp;#x27;s label count. Because x509.Verify validates hostnames before building the certificate chain, this overhead occurred even for untrusted certificates.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/783621"&gt;https://go.dev/cl/783621&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79694"&gt;https://go.dev/issue/79694&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw"&gt;https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5037"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GO-2026-5039: Arbitrary inputs are included in errors without any escaping in net/textproto</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5039</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5039"/>
-    <published>2026-06-02T21:39:47Z</published>
-    <updated>2026-06-02T22:00:16Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-42507"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Arbitrary inputs are included in errors without any escaping in net/textproto&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42507&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.11, 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When returning errors, functions in the net/textproto package would include its input as part of the error. This might allow an attacker to inject misleading content to errors that are printed or logged.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79346"&gt;https://go.dev/issue/79346&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/777060"&gt;https://go.dev/cl/777060&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw"&gt;https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5039"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

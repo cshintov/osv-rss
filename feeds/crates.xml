@@ -3,12 +3,67 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-06-05T20:00:07Z</updated>
+  <updated>2026-06-06T15:11:16Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-6x45-r4pr-5362: trailer mishandles allocating with a size of zero</title>
+    <id>https://osv.dev/vulnerability/GHSA-6x45-r4pr-5362</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6x45-r4pr-5362"/>
+    <published>2025-05-09T06:32:36Z</published>
+    <updated>2026-06-06T15:11:16Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2025-47737"/>
+    <category term="RUSTSEC-2025-0163"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;trailer mishandles allocating with a size of zero&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-47737, RUSTSEC-2025-0163&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;trailer&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;lib.rs in the trailer crate through 0.1.2 for Rust mishandles allocating with a size of zero.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-47737"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-47737&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Geal/trailer/issues/2"&gt;https://github.com/Geal/trailer/issues/2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/trailer"&gt;https://crates.io/crates/trailer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Geal/trailer"&gt;https://github.com/Geal/trailer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6x45-r4pr-5362"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2025-0163: Unsound issue in Trailer</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0163</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0163"/>
+    <published>2025-05-04T12:00:00Z</published>
+    <updated>2026-06-06T15:11:16Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2025-47737"/>
+    <category term="GHSA-6x45-r4pr-5362"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unsound issue in Trailer&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-47737, GHSA-6x45-r4pr-5362&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;trailer&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Our static analyzer find a potential unsound issue
+in the construction of Trailer, where it doesn&amp;#x27;t
+provide enough check to ensure the soundness.
+
+trailer/src/lib.rs, Lines 18 to 25 in d474984:
+```
+ pub fn new(capacity: usize) -&amp;gt; Trailer&amp;lt;T&amp;gt; { 
+     unsafe { 
+         let trailer = Trailer::allocate(capacity); 
+         let ptr = trailer.ptr as *mut T; 
+         ptr.write(T::default()); 
+         trailer 
+     } 
+ } 
+```
+
+The constructor does not check the T is not a ZST in
+rust, and allocating with size 0 is considered
+as undefined behaviors in Rust. A poc code like
+below can work:
+
+```
+use trailer::Trailer;
+#[derive(Default)]
+struct Zst;
+
+fn main() {
+    let mut a = Trailer::&amp;lt;Zst&amp;gt;::new(0);
+    drop(a);
+}
+```
+
+The trailer crate is unmaintained and this security issue
+will not be fixed.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/trailer"&gt;https://crates.io/crates/trailer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0163.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0163.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Geal/trailer/issues/2"&gt;https://github.com/Geal/trailer/issues/2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0163"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-wx3m-whqv-xv47: skillctl: Path traversal and symlink-follow in skillctl allow arbitrary file disclosure and deletion</title>
     <id>https://osv.dev/vulnerability/GHSA-wx3m-whqv-xv47</id>
@@ -133,7 +188,7 @@ The closest maintained alternative might be [trillium](https://crates.io/crates/
 See [this issue](https://github.com/http-rs/tide/issues/922) for more context.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/tide"&gt;https://crates.io/crates/tide&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0170.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0170.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http-rs/tide/issues/922"&gt;https://github.com/http-rs/tide/issues/922&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0170"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-h97m-27fx-42rx: matrix-sdk-ui: Incomplete edit validation</title>
+    <title>[UPDATED] GHSA-h97m-27fx-42rx: matrix-sdk-ui: Incomplete edit validation</title>
     <id>https://osv.dev/vulnerability/GHSA-h97m-27fx-42rx</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h97m-27fx-42rx"/>
     <published>2026-06-04T14:50:47Z</published>
@@ -157,7 +212,7 @@ N/A
 If you have any questions or comments about this advisory, please email us at [security at matrix.org](mailto:security@matrix.org).…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/matrix-org/matrix-rust-sdk/security/advisories/GHSA-h97m-27fx-42rx"&gt;https://github.com/matrix-org/matrix-rust-sdk/security/advisories/GHSA-h97m-27fx-42rx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/matrix-org/matrix-rust-sdk/pull/6454"&gt;https://github.com/matrix-org/matrix-rust-sdk/pull/6454&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/matrix-org/matrix-rust-sdk"&gt;https://github.com/matrix-org/matrix-rust-sdk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/matrix-org/matrix-rust-sdk/releases/tag/matrix-sdk-0.16.1"&gt;https://github.com/matrix-org/matrix-rust-sdk/releases/tag/matrix-sdk-0.16.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0158.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0158.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h97m-27fx-42rx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-wfq4-36m3-9g42: Matrix Rust SDK: Sender-binding gaps in to-device and room-key attribution</title>
+    <title>[UPDATED] GHSA-wfq4-36m3-9g42: Matrix Rust SDK: Sender-binding gaps in to-device and room-key attribution</title>
     <id>https://osv.dev/vulnerability/GHSA-wfq4-36m3-9g42</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wfq4-36m3-9g42"/>
     <published>2026-06-04T14:47:05Z</published>
@@ -257,91 +312,5 @@ archived in or after July 2026 (see [PQClean/PQClean#604](https://github.com/PQC
 
 As a result, this crate and the broader `pqcrypto-*` ecosystem will no longer
 receive updates. Users should migrate to actively maintained alternatives.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pqcrypto-traits"&gt;https://crates.io/crates/pqcrypto-traits&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0162.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0162.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustpq/pqcrypto/issues/97"&gt;https://github.com/rustpq/pqcrypto/issues/97&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0162"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0161: `pqcrypto-mlkem` is unmaintained: upstream PQClean project being archived</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0161</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0161"/>
-    <published>2026-06-04T12:00:00Z</published>
-    <updated>2026-06-04T15:00:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`pqcrypto-mlkem` is unmaintained: upstream PQClean project being archived&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pqcrypto-mlkem&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This crate provides Rust bindings to ML-KEM (FIPS 203) via C implementations
-from [PQClean](https://github.com/PQClean/PQClean). The PQClean project is
-being archived in or after July 2026 (see [PQClean/PQClean#604](https://github.com/PQClean/PQClean/issues/604)),
-after which no further security patches or bug fixes will be applied to the
-upstream implementations.
-
-As a result, this crate will no longer receive updates. Users should migrate
-to the [`ml-kem`](https://crates.io/crates/ml-kem) crate, which provides a
-pure-Rust implementation of ML-KEM (FIPS 203).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pqcrypto-mlkem"&gt;https://crates.io/crates/pqcrypto-mlkem&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0161.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0161.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustpq/pqcrypto/issues/97"&gt;https://github.com/rustpq/pqcrypto/issues/97&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0161"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0165: `pqcrypto-falcon` is unmaintained: upstream PQClean project being archived</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0165</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0165"/>
-    <published>2026-06-04T12:00:00Z</published>
-    <updated>2026-06-04T15:00:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`pqcrypto-falcon` is unmaintained: upstream PQClean project being archived&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pqcrypto-falcon&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This crate provides Rust bindings to the Falcon (FN-DSA) signature scheme
-via C implementations from
-[PQClean](https://github.com/PQClean/PQClean). The PQClean project is being
-archived in or after July 2026 (see [PQClean/PQClean#604](https://github.com/PQClean/PQClean/issues/604)),
-after which no further security patches or bug fixes will be applied to the
-upstream implementations.
-
-As a result, this crate will no longer receive updates. Users should migrate
-to the [`fn-dsa`](https://crates.io/crates/fn-dsa) crate, which provides a
-pure-Rust implementation of FN-DSA (FIPS 206).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pqcrypto-falcon"&gt;https://crates.io/crates/pqcrypto-falcon&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0165.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0165.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustpq/pqcrypto/issues/97"&gt;https://github.com/rustpq/pqcrypto/issues/97&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0165"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0166: `pqcrypto-mldsa` is unmaintained: upstream PQClean project being archived</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0166</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0166"/>
-    <published>2026-06-04T12:00:00Z</published>
-    <updated>2026-06-04T15:00:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`pqcrypto-mldsa` is unmaintained: upstream PQClean project being archived&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pqcrypto-mldsa&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This crate provides Rust bindings to ML-DSA (FIPS 204) via C implementations
-from [PQClean](https://github.com/PQClean/PQClean). The PQClean project is
-being archived in or after July 2026 (see [PQClean/PQClean#604](https://github.com/PQClean/PQClean/issues/604)),
-after which no further security patches or bug fixes will be applied to the
-upstream implementations.
-
-As a result, this crate will no longer receive updates. Users should migrate
-to the [`ml-dsa`](https://crates.io/crates/ml-dsa) crate, which provides a
-pure-Rust implementation of ML-DSA (FIPS 204).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pqcrypto-mldsa"&gt;https://crates.io/crates/pqcrypto-mldsa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0166.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0166.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustpq/pqcrypto/issues/97"&gt;https://github.com/rustpq/pqcrypto/issues/97&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0166"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0163: `pqcrypto-internals` is unmaintained: upstream PQClean project being archived</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0163</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0163"/>
-    <published>2026-06-04T12:00:00Z</published>
-    <updated>2026-06-04T15:00:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`pqcrypto-internals` is unmaintained: upstream PQClean project being archived&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pqcrypto-internals&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This crate provides internal FFI utilities for the `pqcrypto-*` ecosystem,
-directly wrapping C implementations from
-[PQClean](https://github.com/PQClean/PQClean). The PQClean project is being
-archived in or after July 2026 (see [PQClean/PQClean#604](https://github.com/PQClean/PQClean/issues/604)),
-after which no further security patches or bug fixes will be applied to the
-upstream implementations.
-
-As a result, this crate and the broader `pqcrypto-*` ecosystem will no longer
-receive updates.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pqcrypto-internals"&gt;https://crates.io/crates/pqcrypto-internals&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0163.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0163.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustpq/pqcrypto/issues/97"&gt;https://github.com/rustpq/pqcrypto/issues/97&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0163"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0168: `pqcrypto-hqc` is unmaintained: upstream PQClean project being archived</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0168</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0168"/>
-    <published>2026-06-04T12:00:00Z</published>
-    <updated>2026-06-04T15:00:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`pqcrypto-hqc` is unmaintained: upstream PQClean project being archived&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pqcrypto-hqc&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This crate provides Rust bindings to the HQC key encapsulation mechanism
-via C implementations from
-[PQClean](https://github.com/PQClean/PQClean). The PQClean project is being
-archived in or after July 2026 (see [PQClean/PQClean#604](https://github.com/PQClean/PQClean/issues/604)),
-after which no further security patches or bug fixes will be applied to the
-upstream implementations.
-
-As a result, this crate will no longer receive updates. Users should migrate
-to actively maintained alternatives.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pqcrypto-hqc"&gt;https://crates.io/crates/pqcrypto-hqc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0168.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0168.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustpq/pqcrypto/issues/97"&gt;https://github.com/rustpq/pqcrypto/issues/97&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0168"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

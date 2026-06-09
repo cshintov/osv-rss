@@ -3,12 +3,44 @@
   <title>OSV — new &amp; updated vulnerabilities: RubyGems</title>
   <subtitle>Open-source vulns affecting RubyGems packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:rubygems</id>
-  <updated>2026-06-09T12:00:16Z</updated>
+  <updated>2026-06-09T18:45:28Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/rubygems.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-c4fp-cxrr-mj66: Net::IMAP: Denial of Service via incomplete raw argument validation</title>
+    <id>https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66"/>
+    <published>2026-06-09T18:36:11Z</published>
+    <updated>2026-06-09T18:45:28Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-47241"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Net::IMAP: Denial of Service via incomplete raw argument validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47241&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Several Net::IMAP commands accept a raw string argument which is only validated to prevent CRLF injection and then sent verbatim.  If this string is derived from user-controlled input, an attacker can force the next command to be absorbed as a continuation of the first command.  This will cause the first command to eventually fail, but also prevents it from returning until another command is sent (from another thread).  That other command will not return until the connection is closed.
+
+### Details
+
+`Net::IMAP::RawData` was hardened in v0.6.4, v0.5.14, and v0.4.24 to reject string arguments that would smuggle an invalid literal-continuation marker onto the wire (CVE-2026-42257, GHSA-hm49-wcqc-g2xg).  But the trailing-marker check uses an incorrect regex which does not match `{…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-c4fp-cxrr-mj66"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-c4fp-cxrr-mj66&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/releases/tag/v0.6.4.1"&gt;https://github.com/ruby/net-imap/releases/tag/v0.6.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8p34-64r3-mwg8: Net::IMAP: Command Injection via non-synchronizing literal in "raw" argument</title>
+    <id>https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8"/>
+    <published>2026-06-09T18:36:04Z</published>
+    <updated>2026-06-09T18:45:28Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-47240"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Net::IMAP: Command Injection via non-synchronizing literal in &amp;quot;raw&amp;quot; argument&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47240&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Several Net::IMAP commands accept a &amp;quot;raw data&amp;quot; argument that is sent verbatim after validation to prevent command injection.  However, if a server does not support non-synchronizing literals, it may still be possible to inject arbitrary IMAP commands inside non-synchronizing literals.
+
+### Details
+
+Raw data arguments support embedded literal values, both synchronizing and non-synchronizing.  Non-synchronizing literals can only be safely sent when the server advertises any of the `LITERAL+`, `LITERAL-`, or `IMAP4rev2` capabilities.  But raw data arguments do not verify server support for non-synchronizing literals prior to sending.
+
+Servers without support for non-synchronizing literals could handle them in several different ways:  If a server sees a `&amp;quot;}\r\n&amp;quot;` byte sequence but can&amp;#x27;t parse …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-8p34-64r3-mwg8"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-8p34-64r3-mwg8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/releases/tag/v0.6.4.1"&gt;https://github.com/ruby/net-imap/releases/tag/v0.6.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-m6vc-f87m-cc2h: Doorkeeper Openid Connect: Dynamic Client Registration feature creates public clients with client_secret</title>
     <id>https://osv.dev/vulnerability/GHSA-m6vc-f87m-cc2h</id>

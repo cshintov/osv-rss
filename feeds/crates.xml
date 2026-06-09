@@ -3,12 +3,48 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-06-09T12:00:16Z</updated>
+  <updated>2026-06-09T18:29:29Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-2r75-cxrj-cmph: wasmtime-wasi: WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction</title>
+    <id>https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph"/>
+    <published>2026-06-05T15:47:02Z</published>
+    <updated>2026-06-09T18:29:29Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-47261"/>
+    <category term="RUSTSEC-2026-0149"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;wasmtime-wasi: WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47261, RUSTSEC-2026-0149&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 44.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 36.0.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 24.0.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+In `wasmtime-wasi`, when a filesystem preopen is given `DirPerms::all()` and `FilePerms::READ` without `FilePerms::WRITE`,  this wasmtime-wasi enforced access control mechanism can be bypassed by using the wasip2 `descriptor.open-at` or wasip1 `path_open` interfaces by opening a file with `OpenFlags::TRUNCATE` oflag only, for example:
+
+```rust
+dir_descriptor.open_at(
+   PathFlags::empty(),
+   FILENAME,
+   OpenFlags::TRUNCATE,
+   DescriptorFlags::READ,
+)
+```
+
+```rust
+wasip1::path_open(
+    dir_fd,
+    0,
+    FILENAME,
+    wasip1::OFLAGS_TRUNC,
+    wasip1::RIGHTS_FD_READ,
+    0,
+    0
+)
+```
+
+The root cause is that the clause that considered `OpenFlags::TRUNCATE` did not set `open_mode |= OpenMode::WRITE;`, used later in that function for the access control check against `FilePerm…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime"&gt;https://github.com/bytecodealliance/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v24.0.9"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v24.0.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v36.0.10"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v36.0.10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v44.0.2"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v44.0.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v45.0.0"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v45.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0149.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0149.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-q53q-5r4j-5729: rattler has an entry-point path traversal in noarch:python install (arbitrary file write)</title>
     <id>https://osv.dev/vulnerability/GHSA-q53q-5r4j-5729</id>

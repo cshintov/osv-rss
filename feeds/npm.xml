@@ -3,12 +3,969 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-06-08T18:30:11Z</updated>
+  <updated>2026-06-09T00:00:25Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-q7rr-3cgh-j5r3: Prometheus exporter process crash via malformed HTTP request</title>
+    <id>https://osv.dev/vulnerability/GHSA-q7rr-3cgh-j5r3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q7rr-3cgh-j5r3"/>
+    <published>2026-05-11T14:42:10Z</published>
+    <updated>2026-06-09T00:00:25Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44902"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Prometheus exporter process crash via malformed HTTP request&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44902&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@opentelemetry/exporter-prometheus&lt;/code&gt; — fixed in 0.217.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@opentelemetry/sdk-node&lt;/code&gt; — fixed in 0.217.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@opentelemetry/auto-instrumentations-node&lt;/code&gt; — fixed in 0.75.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A single malformed HTTP request crashes any Node.js process running the OpenTelemetry JS Prometheus exporter. The metrics endpoint (default `0.0.0.0:9464`) has no error handling around URL parsing, so a request with an invalid URI causes an uncaught `TypeError` that terminates the process.
+
+**You are affected by this vulnerability if either of the following apply to your application:**
+
+* you directly use `@opentelemetry/exporter-prometheus` in your code through its built-in server.
+* your `OTEL_METRICS_EXPORTER` environment variable includes `prometheus` **AND**
+  * you use `@opentelemetry/sdk-node`
+  * you use  `@opentelemetry/auto-instrumentations-node` via `--require @opentelemetry/auto-instrumentations-node/register`/`--import @opentelemetry/auto-instrumentations-node/regi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-js/security/advisories/GHSA-q7rr-3cgh-j5r3"&gt;https://github.com/open-telemetry/opentelemetry-js/security/advisories/GHSA-q7rr-3cgh-j5r3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44902"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44902&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-js"&gt;https://github.com/open-telemetry/opentelemetry-js&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q7rr-3cgh-j5r3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-rpj4-7x2v-wjrf: Budibase: SSRF in AI Extract File Automation Step via Missing IP Blacklist Validation</title>
+    <id>https://osv.dev/vulnerability/GHSA-rpj4-7x2v-wjrf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rpj4-7x2v-wjrf"/>
+    <published>2026-05-15T17:47:10Z</published>
+    <updated>2026-06-09T00:00:25Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45548"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: SSRF in AI Extract File Automation Step via Missing IP Blacklist Validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45548&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@budibase/server&lt;/code&gt; — fixed in 3.34.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability Details
+
+**CWE-918**: Server-Side Request Forgery (SSRF)
+
+The `processUrlFile` function in `packages/server/src/automations/steps/ai/extract.ts` uses `fetch(fileUrl)` directly **without the IP blacklist validation** that is consistently applied to all other automation steps. This allows an authenticated user to trigger server-side requests to internal network addresses.
+
+### Vulnerable Code
+
+**`packages/server/src/automations/steps/ai/extract.ts` (lines 116, 139)**:
+
+```typescript
+async function processUrlFile(fileUrl: string, ...): Promise&amp;lt;ExtractInput&amp;gt; {
+  const response = await fetch(fileUrl)  // NO blacklist check!
+  // ...
+  const fallbackResponse = await fetch(fileUrl)  // Also NO blacklist check!
+}
+```
+
+### Contrast with All Other Automation Steps (Same Codebase)
+
+E…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-rpj4-7x2v-wjrf"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-rpj4-7x2v-wjrf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45548"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45548&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/releases/tag/3.38.4"&gt;https://github.com/Budibase/budibase/releases/tag/3.38.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rpj4-7x2v-wjrf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6vp2-6r7m-2jvx: Budibase: Missing Cache Invalidation on Public API Role Unassignment Allows Revoked Users to Retain Privileges for Up to 1 Hour</title>
+    <id>https://osv.dev/vulnerability/GHSA-6vp2-6r7m-2jvx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6vp2-6r7m-2jvx"/>
+    <published>2026-05-19T16:30:38Z</published>
+    <updated>2026-06-09T00:00:24Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-46424"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: Missing Cache Invalidation on Public API Role Unassignment Allows Revoked Users to Retain Privileges for Up to 1 Hour&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46424&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@budibase/backend-core&lt;/code&gt; — fixed in 3.38.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The public API role unassignment endpoint (`POST /api/public/v1/roles/unassign`) updates user documents in CouchDB but does not invalidate the corresponding Redis user cache entries. Because the authentication middleware resolves user identity and permissions from this cache (TTL: 3600 seconds), a user whose admin, builder, or app-level roles have been revoked via the public API retains those privileges for up to 1 hour.
+
+## Details
+
+The root cause is an inconsistency between the `UserDB.save()` and `UserDB.bulkUpdate()` code paths.
+
+**Vulnerable path** — `packages/pro/src/sdk/publicApi/roles.ts:49-75`:
+```typescript
+export async function unAssign(userIds: string[], opts: AssignmentOpts) {
+  // ... modifies user objects: deletes roles, admin, builder ...
+  await userDB.bulkUpda…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-6vp2-6r7m-2jvx"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-6vp2-6r7m-2jvx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46424"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46424&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/releases/tag/3.38.2"&gt;https://github.com/Budibase/budibase/releases/tag/3.38.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6vp2-6r7m-2jvx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-82rc-gxrg-v4gf: Budibase: Unrestricted Upload of File with Dangerous Type</title>
+    <id>https://osv.dev/vulnerability/GHSA-82rc-gxrg-v4gf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-82rc-gxrg-v4gf"/>
+    <published>2026-05-19T16:31:30Z</published>
+    <updated>2026-06-09T00:00:24Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-46426"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: Unrestricted Upload of File with Dangerous Type&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46426&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;budibase&lt;/code&gt; — fixed in 3.38.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The file upload endpoint `POST /api/attachments/process` does not enforce active-content restrictions for authenticated users. The checks for dangerous file extensions (`html`, `svg`, `js`, `php`, etc.) are conditionally wrapped inside `if (isPublicUser)` or `if (isPublicUser || !env.SELF_HOSTED)`, meaning any authenticated builder can upload executable web content — SVG files with inline `&amp;lt;script&amp;gt;` tags, HTML pages with JavaScript, `.js` modules — which are then stored in the object store (MinIO/S3) with their correct MIME types (`image/svg+xml`, `text/html`, `application/javascript`). When the resulting signed URL is opened by any app user, the browser executes the payload.
+
+Impact is **persistent stored XSS** over all application end users.
+
+### Details
+The vulnerability exi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-82rc-gxrg-v4gf"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-82rc-gxrg-v4gf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46426"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/releases/tag/3.38.2"&gt;https://github.com/Budibase/budibase/releases/tag/3.38.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-82rc-gxrg-v4gf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-44m2-crh7-f4q2: Budibase: `PUT /api/datasources/:datasourceId` is protected only by `TABLE/READ` permission instead of builder access, allowing any authenticated app user to overwrite datasource connection parameters including host, port, and URL</title>
+    <id>https://osv.dev/vulnerability/GHSA-44m2-crh7-f4q2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-44m2-crh7-f4q2"/>
+    <published>2026-05-15T17:59:47Z</published>
+    <updated>2026-06-09T00:00:22Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45717"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: `PUT /api/datasources/:datasourceId` is protected only by `TABLE/READ` permission instead of builder access, allowing any authenticated app user to overwrite datasource connection parameters including host, port, and URL&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45717&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@budibase/server&lt;/code&gt; — fixed in 3.38.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Budibase exposes a REST API for datasource management. The route `PUT /api/datasources/:datasourceId` is registered in the `authorizedRoutes` group with `TABLE/READ` permission. This is the same authorization level as the read endpoint (`GET /api/datasources/:datasourceId`). Every authenticated Budibase app user with the `BASIC` built-in role or higher carries `TABLE/WRITE` (and therefore `TABLE/READ`) permissions, and the datasource update controller performs no additional builder check.
+
+As a result, any authenticated non-builder app user can submit a `PUT` request to rewrite a datasource&amp;#x27;s `config` object — including the connection `host`, `port`, database credentials, or the base `url` of a REST datasource. Because no network-level SSRF protection is applied to SQL driver c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-44m2-crh7-f4q2"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-44m2-crh7-f4q2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45717"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45717&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/releases/tag/3.38.1"&gt;https://github.com/Budibase/budibase/releases/tag/3.38.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-44m2-crh7-f4q2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3644-q5cj-c5c7: LangSmith SDK: Public prompt pull deserializes untrusted manifests without trust boundary warning</title>
+    <id>https://osv.dev/vulnerability/GHSA-3644-q5cj-c5c7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3644-q5cj-c5c7"/>
+    <published>2026-05-13T15:29:30Z</published>
+    <updated>2026-06-09T00:00:22Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45134"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;LangSmith SDK: Public prompt pull deserializes untrusted manifests without trust boundary warning&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45134&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;langsmith&lt;/code&gt; — fixed in 0.8.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;langsmith&lt;/code&gt; — fixed in 0.6.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;langchain-classic&lt;/code&gt; — fixed in 1.0.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;langchain&lt;/code&gt; — fixed in 0.3.30&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
+
+The LangSmith SDK&amp;#x27;s prompt pull methods (`pull_prompt` / `pull_prompt_commit` in Python, `pullPrompt` / `pullPromptCommit` in JS/TS) fetch and deserialize prompt manifests from the LangSmith Hub. These manifests may contain serialized LangChain objects and model configuration that affect runtime behavior. When pulling a public prompt by `owner/name` identifier, the manifest content is controlled by an external party, but prior versions of the SDK did not distinguish this from pulling a prompt within the caller&amp;#x27;s own organization.
+
+Prompt manifests can intentionally configure a model with a custom base URL, default headers, model name, or other constructor arguments. These are supported features, but they also mean the prompt contents should be treated as executable configur…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langsmith-sdk/security/advisories/GHSA-3644-q5cj-c5c7"&gt;https://github.com/langchain-ai/langsmith-sdk/security/advisories/GHSA-3644-q5cj-c5c7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45134"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45134&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langsmith-sdk"&gt;https://github.com/langchain-ai/langsmith-sdk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3644-q5cj-c5c7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-363w-hvwh-w7m6: Budibase: CouchDB Reduce Injection via Unsanitized Calculation Parameter in V1 Views API </title>
+    <id>https://osv.dev/vulnerability/GHSA-363w-hvwh-w7m6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-363w-hvwh-w7m6"/>
+    <published>2026-05-18T17:47:58Z</published>
+    <updated>2026-06-09T00:00:21Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45719"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: CouchDB Reduce Injection via Unsanitized Calculation Parameter in V1 Views API &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45719&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@budibase/server&lt;/code&gt; — fixed in 3.38.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Security Advisory: CouchDB Reduce Injection via Unsanitized Calculation Parameter in V1 Views API
+
+**Affected Software:** Budibase
+**Affected Component:** `packages/server/src/api/controllers/view/viewBuilder.ts`, `packages/server/src/api/routes/view.ts`
+**CWE:** CWE-94 (Improper Control of Generation of Code)
+**Discovery Date:** 2026-03-24
+
+---
+
+## Summary
+
+The V1 Views API (`POST /api/views`) accepts a `calculation` parameter from the request body that is interpolated directly into a CouchDB reduce function definition without validation. Although an internal `SCHEMA_MAP` object defines the valid calculation types (`sum`, `count`, `stats`), no actual validation is performed against this map before the value is used in string interpolation.
+
+A user with Builder permissions can inject arb…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-363w-hvwh-w7m6"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-363w-hvwh-w7m6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45719"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45719&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/releases/tag/3.38.1"&gt;https://github.com/Budibase/budibase/releases/tag/3.38.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-363w-hvwh-w7m6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3263-v5v9-xq8q: Budibase: Row Action Trigger Bypasses View Row Filter Security Boundary Allowing Action on Out-of-Scope Rows</title>
+    <id>https://osv.dev/vulnerability/GHSA-3263-v5v9-xq8q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3263-v5v9-xq8q"/>
+    <published>2026-05-18T17:44:22Z</published>
+    <updated>2026-06-09T00:00:21Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45718"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: Row Action Trigger Bypasses View Row Filter Security Boundary Allowing Action on Out-of-Scope Rows&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45718&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;budibase&lt;/code&gt; — fixed in 3.38.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The row action trigger endpoint (`POST /api/tables/:sourceId/actions/:actionId/trigger`) fails to validate that the user-supplied `rowId` is within the scope of the view&amp;#x27;s row filters. A user with access to a filtered view can trigger row actions on any row in the underlying table, including rows explicitly excluded by the view&amp;#x27;s security filters.
+
+## Details
+
+View filters in Budibase are treated as a security boundary. The search path (`packages/server/src/sdk/workspace/rows/search.ts:93-94`) explicitly enforces view query filters with the comment: *&amp;quot;that could let users find rows they should not be allowed to access.&amp;quot;*
+
+However, the row action trigger path bypasses this enforcement entirely:
+
+1. **Route** (`packages/server/src/api/routes/rowAction.ts:55-59`): Accepts a `sourc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-3263-v5v9-xq8q"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-3263-v5v9-xq8q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45718"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/releases/tag/3.38.1"&gt;https://github.com/Budibase/budibase/releases/tag/3.38.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3263-v5v9-xq8q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-223g-f5mq-gw33: OpenLearnX: Critical Authentication Bypass via JWT Signature Verification Disabled Leading to Account Takeover</title>
+    <id>https://osv.dev/vulnerability/GHSA-223g-f5mq-gw33</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-223g-f5mq-gw33"/>
+    <published>2026-05-13T01:39:04Z</published>
+    <updated>2026-06-09T00:00:20Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44720"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenLearnX: Critical Authentication Bypass via JWT Signature Verification Disabled Leading to Account Takeover&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44720&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openlearnx&lt;/code&gt; — fixed in 2.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Overview
+
+A critical authentication vulnerability was identified in OpenLearnX that could allow unauthorized access to user accounts under specific conditions. The issue has been fixed.
+
+**Advisory**:  https://github.com/th30d4y/OpenLearnX/security/advisories/GHSA-223g-f5mq-gw33&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/th30d4y/OpenLearnX/security/advisories/GHSA-223g-f5mq-gw33"&gt;https://github.com/th30d4y/OpenLearnX/security/advisories/GHSA-223g-f5mq-gw33&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44720"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44720&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/th30d4y/OpenLearnX"&gt;https://github.com/th30d4y/OpenLearnX&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/th30d4y/OpenLearnX/releases/tag/v2.0.4"&gt;https://github.com/th30d4y/OpenLearnX/releases/tag/v2.0.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-223g-f5mq-gw33"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g7cv-rxg3-hmpx: Malware in @tanstack/* packages exfiltrates cloud credentials, GitHub tokens, and SSH keys</title>
+    <id>https://osv.dev/vulnerability/GHSA-g7cv-rxg3-hmpx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g7cv-rxg3-hmpx"/>
+    <published>2026-05-12T00:12:49Z</published>
+    <updated>2026-06-09T00:00:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45321"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malware in @tanstack/* packages exfiltrates cloud credentials, GitHub tokens, and SSH keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45321&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@tanstack/arktype-adapter&lt;/code&gt; — fixed in 1.166.16&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/eslint-plugin-router&lt;/code&gt; — fixed in 1.161.13&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/eslint-plugin-start&lt;/code&gt; — fixed in 0.0.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/history&lt;/code&gt; — fixed in 1.161.13&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/nitro-v2-vite-plugin&lt;/code&gt; — fixed in 1.154.16&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/react-router&lt;/code&gt; — fixed in 1.169.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/react-router-devtools&lt;/code&gt; — fixed in 1.166.20&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/react-router-ssr-query&lt;/code&gt; — fixed in 1.166.19&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/react-start&lt;/code&gt; — fixed in 1.167.72&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/react-start-client&lt;/code&gt; — fixed in 1.166.55&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/react-start-rsc&lt;/code&gt; — fixed in 0.0.51&lt;/li&gt;&lt;li&gt;&lt;code&gt;@tanstack/react-start-server&lt;/code&gt; — fixed in 1.166.59&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+On 2026-05-11, between approximately 19:20 and 19:26 UTC, 84 malicious versions across 42 `@tanstack/*` packages were published to the npm registry. The publishes were authenticated via the legitimate GitHub Actions OIDC trusted-publisher binding for `TanStack/router`, but the publish workflow itself was not modified. The attacker chained three known vulnerability classes — a `pull_request_target` &amp;quot;Pwn Request&amp;quot; misconfiguration, GitHub Actions cache poisoning across the fork↔base trust boundary, and runtime memory extraction of the OIDC token from the Actions runner process — to publish credential-stealing malware under a trusted identity.
+
+Each affected package received exactly two malicious versions, published a few minutes apart.
+
+## Impact
+
+A user installing any affected ve…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/TanStack/router/security/advisories/GHSA-g7cv-rxg3-hmpx"&gt;https://github.com/TanStack/router/security/advisories/GHSA-g7cv-rxg3-hmpx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45321"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TanStack/router/issues/7383"&gt;https://github.com/TanStack/router/issues/7383&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TanStack/router"&gt;https://github.com/TanStack/router&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://socket.dev/blog/tanstack-npm-packages-compromised-mini-shai-hulud-supply-chain-attack"&gt;https://socket.dev/blog/tanstack-npm-packages-compromised-mini-shai-hulud-supply-chain-attack&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tanstack.com/blog/npm-supply-chain-compromise-postmortem"&gt;https://tanstack.com/blog/npm-supply-chain-compromise-postmortem&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve=CVE-2026-45321"&gt;https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve=CVE-2026-45321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.stepsecurity.io/blog/mini-shai-hulud-is-back-a-self-spreading-supply-chain-attack-hits-the-npm-ecosystem"&gt;https://www.stepsecurity.io/blog/mini-shai-hulud-is-back-a-self-spreading-supply-chain-attack-hits-the-npm-ecosystem&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g7cv-rxg3-hmpx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-j944-w549-3453: Cinny vulnerable to access token disclosure via invalidated emoji pack avatar URL in service worker</title>
+    <id>https://osv.dev/vulnerability/GHSA-j944-w549-3453</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j944-w549-3453"/>
+    <published>2026-05-07T16:40:52Z</published>
+    <updated>2026-06-09T00:00:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-42553"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cinny vulnerable to access token disclosure via invalidated emoji pack avatar URL in service worker&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42553&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cinny&lt;/code&gt; — fixed in 4.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+A remote authenticated attacker who shares a room with a victim and has permissions to create room emotes (for example in a DM) can cause the victim&amp;#x27;s client to send their Matrix access token to an attacker-controlled server. This occurs when the victim opens the emoji or sticker picker for the room containing a malicious emote pack. 
+
+The root causes are: 
+
+(1) an incorrect fallback in EmojiBoard that uses untrusted `pack.meta.avatar` (user-controlled) without converting/validating it as an MXC URL, allowing arbitrary HTTP(S) URLs to be used; and 
+
+(2) the service worker attaching the user&amp;#x27;s Authorization bearer token to all outbound GET requests whose URL contains `/_matrix/client/v1/media/download` or `/_matrix/client/v1/media/thumbnail` without verifying the request host mat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cinnyapp/cinny/security/advisories/GHSA-j944-w549-3453"&gt;https://github.com/cinnyapp/cinny/security/advisories/GHSA-j944-w549-3453&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42553"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42553&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cinnyapp/cinny"&gt;https://github.com/cinnyapp/cinny&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cinnyapp/cinny/releases/tag/v4.10.3"&gt;https://github.com/cinnyapp/cinny/releases/tag/v4.10.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j944-w549-3453"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-hvx9-hwr7-wjj9: Systeminformation vulnerable to Linux command injection in networkInterfaces() via unsanitized NetworkManager connection profile name</title>
+    <id>https://osv.dev/vulnerability/GHSA-hvx9-hwr7-wjj9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hvx9-hwr7-wjj9"/>
+    <published>2026-05-13T15:29:21Z</published>
+    <updated>2026-06-09T00:00:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44724"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Systeminformation vulnerable to Linux command injection in networkInterfaces() via unsanitized NetworkManager connection profile name&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44724&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;systeminformation&lt;/code&gt; — fixed in 5.31.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+On Linux, `systeminformation` is vulnerable to command injection in `networkInterfaces()` when an **active NetworkManager connection profile name** contains shell metacharacters.
+
+This is not caused by a caller passing attacker-controlled arguments into `networkInterfaces()`. The vulnerable value is obtained internally from real `nmcli device status` output. The library sanitizes the network interface name before using it in shell commands, but it does **not** apply equivalent sanitization to the parsed NetworkManager connection profile name. That unsanitized `connectionName` is then interpolated into three shell command strings executed through `execSync()`.
+
+This issue was validated locally against **real NetworkManager** and **real `nmcli`**. Calling only:
+
+```js
+require(&amp;#x27;./…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sebhildebrandt/systeminformation/security/advisories/GHSA-hvx9-hwr7-wjj9"&gt;https://github.com/sebhildebrandt/systeminformation/security/advisories/GHSA-hvx9-hwr7-wjj9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44724"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44724&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sebhildebrandt/systeminformation"&gt;https://github.com/sebhildebrandt/systeminformation&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sebhildebrandt/systeminformation/releases/tag/v5.31.6"&gt;https://github.com/sebhildebrandt/systeminformation/releases/tag/v5.31.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hvx9-hwr7-wjj9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g3xq-3gmv-qq8g: claude-code-cache-fix vulnerable to local code execution via Python triple-quote injection in tools/quota-statusline.sh</title>
+    <id>https://osv.dev/vulnerability/GHSA-g3xq-3gmv-qq8g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g3xq-3gmv-qq8g"/>
+    <published>2026-05-13T15:31:41Z</published>
+    <updated>2026-06-09T00:00:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45136"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;claude-code-cache-fix vulnerable to local code execution via Python triple-quote injection in tools/quota-statusline.sh&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45136&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;claude-code-cache-fix&lt;/code&gt; — fixed in 3.5.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`tools/quota-statusline.sh` (introduced in v3.5.0) interpolates Claude Code&amp;#x27;s hook stdin payload directly into a Python triple-quoted string literal. A `&amp;#x27;&amp;#x27;&amp;#x27;` byte sequence in any user-controlled field of the payload closes the literal early and lets following bytes execute as Python in the user&amp;#x27;s Claude Code process.
+
+## Affected versions
+
+- v3.5.0
+- v3.5.1
+
+## Patched versions
+
+- v3.5.2
+
+## Affected configurations
+
+Users who wired `tools/quota-statusline.sh` into Claude Code&amp;#x27;s `statusLine` configuration. The v3.5.0 README explicitly recommends this setup, so most users on v3.5.0/v3.5.1 with the recommended setup are affected.
+
+## Attack chain
+
+Claude Code&amp;#x27;s statusline hook payload reflects user-controlled paths (`cwd`, `workspace.current_dir`, `workspace.project_dir`, `transcr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cnighswonger/claude-code-cache-fix/security/advisories/GHSA-g3xq-3gmv-qq8g"&gt;https://github.com/cnighswonger/claude-code-cache-fix/security/advisories/GHSA-g3xq-3gmv-qq8g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45136"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45136&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cnighswonger/claude-code-cache-fix/issues/108"&gt;https://github.com/cnighswonger/claude-code-cache-fix/issues/108&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cnighswonger/claude-code-cache-fix/pull/110"&gt;https://github.com/cnighswonger/claude-code-cache-fix/pull/110&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cnighswonger/claude-code-cache-fix/commit/613e4df30547f3e6baf32d161eddc828f171da17"&gt;https://github.com/cnighswonger/claude-code-cache-fix/commit/613e4df30547f3e6baf32d161eddc828f171da17&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cnighswonger/claude-code-cache-fix"&gt;https://github.com/cnighswonger/claude-code-cache-fix&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g3xq-3gmv-qq8g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fgqv-jh4g-pvg2: Budibase: SSRF Bypass via HTTP Redirect in REST Datasource Integration</title>
+    <id>https://osv.dev/vulnerability/GHSA-fgqv-jh4g-pvg2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fgqv-jh4g-pvg2"/>
+    <published>2026-05-15T17:53:08Z</published>
+    <updated>2026-06-09T00:00:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45715"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: SSRF Bypass via HTTP Redirect in REST Datasource Integration&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45715&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@budibase/server&lt;/code&gt; — fixed in 3.38.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The REST datasource integration follows HTTP redirects without re-checking the IP blacklist, allowing an authenticated Builder to access internal services (cloud metadata, databases) by redirecting through an attacker-controlled server. The same vulnerability class was already patched in automation steps (`fetchWithBlacklist` in `packages/server/src/automations/steps/utils.ts`) but the REST integration was missed.
+
+### Details
+
+**Vulnerable file:** `packages/server/src/integrations/rest.ts`, lines 754-778
+
+The `_req()` method checks the request URL against the IP blacklist at line 754, then calls `fetch(url, input)` at line 778. No `redirect: &amp;quot;manual&amp;quot;` option is set, so undici&amp;#x27;s fetch defaults to `redirect: &amp;quot;follow&amp;quot;`, automatically following HTTP 301/302/307 redirects **withou…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-fgqv-jh4g-pvg2"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-fgqv-jh4g-pvg2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45715"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45715&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/releases/tag/3.38.1"&gt;https://github.com/Budibase/budibase/releases/tag/3.38.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fgqv-jh4g-pvg2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-c567-44rc-m5hq: @rvf/set-get has a prototype pollution issue that's reachable via @rvf/core preprocessFormData (HTTP form data)</title>
+    <id>https://osv.dev/vulnerability/GHSA-c567-44rc-m5hq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c567-44rc-m5hq"/>
+    <published>2026-05-11T16:09:40Z</published>
+    <updated>2026-06-09T00:00:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44483"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@rvf/set-get has a prototype pollution issue that&amp;#x27;s reachable via @rvf/core preprocessFormData (HTTP form data)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44483&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@rvf/set-get&lt;/code&gt; — fixed in 7.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;@rvf/set-get&lt;/code&gt; — fixed in 6.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`setPath` in `@rvf/set-get` (used by `@rvf/core` to flatten incoming form data into a nested object) does not block the keys `__proto__`, `constructor`, or `prototype` when walking a path. Because field names in submitted form data are passed directly to `setPath` via `preprocessFormData` (and through `parseFormData` / `validate`), an attacker who can submit a form to a Remix / React Router app using the library can set arbitrary properties on `Object.prototype` of the running server process.
+
+This is a default-reachable prototype pollution primitive: no special configuration is required. Any endpoint that accepts a form via `parseFormData` or runs a validator created with `createValidator` is affected.
+
+## Affected versions
+
+- `@rvf/set-get` `&amp;lt; 7.0.2` (7.x line)
+- `@rvf/set-ge…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/airjp73/rvf/security/advisories/GHSA-c567-44rc-m5hq"&gt;https://github.com/airjp73/rvf/security/advisories/GHSA-c567-44rc-m5hq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44483"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44483&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/airjp73/rvf"&gt;https://github.com/airjp73/rvf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c567-44rc-m5hq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-c54j-xp92-wh28: Budibase: Builder-to-Admin Privilege Escalation via onboardUsers Endpoint Without SMTP Configuration</title>
+    <id>https://osv.dev/vulnerability/GHSA-c54j-xp92-wh28</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c54j-xp92-wh28"/>
+    <published>2026-05-18T17:42:24Z</published>
+    <updated>2026-06-09T00:00:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45716"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: Builder-to-Admin Privilege Escalation via onboardUsers Endpoint Without SMTP Configuration&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45716&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@budibase/worker&lt;/code&gt; — fixed in 3.38.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `POST /api/global/users/onboard` endpoint is protected by `workspaceBuilderOrAdmin` middleware, allowing any user with builder permissions to access it. When SMTP email is not configured (the default for self-hosted Budibase instances), this endpoint bypasses the admin-restricted invite flow and directly creates users via `bulkCreate`, accepting arbitrary `admin` and `builder` role assignments from the request body. A builder-level user can create a new global admin account and receive the generated password in the response, achieving full privilege escalation.
+
+## Details
+
+The vulnerability stems from a mismatch between the authorization level of the `onboardUsers` endpoint and the user-creation capabilities it exposes when SMTP is not configured.
+
+**Route definition** (`p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-c54j-xp92-wh28"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-c54j-xp92-wh28&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45716"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45716&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/releases/tag/3.38.1"&gt;https://github.com/Budibase/budibase/releases/tag/3.38.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c54j-xp92-wh28"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-pv5w-4p9q-p3v2: Kysely: JSON-path traversal injection via unsanitized path-leg metacharacters in `JSONPathBuilder.key()` / `.at()`</title>
+    <id>https://osv.dev/vulnerability/GHSA-pv5w-4p9q-p3v2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pv5w-4p9q-p3v2"/>
+    <published>2026-05-11T19:40:15Z</published>
+    <updated>2026-06-09T00:00:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44635"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Kysely: JSON-path traversal injection via unsanitized path-leg metacharacters in `JSONPathBuilder.key()` / `.at()`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44635&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;kysely&lt;/code&gt; — fixed in 0.28.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Kysely 0.28.12 added a `sanitizeStringLiteral()` call inside `DefaultQueryCompiler.visitJSONPathLeg` (commit `0a602bf`, PR #1727) to fix CVE-2026-32763 (`GHSA-wmrf-hv6w-mr66`). The fix only doubles single quotes (`&amp;#x27;` → `&amp;#x27;&amp;#x27;`); it does **not** escape JSON-path metacharacters (`.`, `[`, `]`, `*`, `**`, `?`). When attacker-controlled input flows into `eb.ref(col, &amp;#x27;-&amp;gt;$&amp;#x27;).key(input)` or `.at(input)` — including type-safe code where the JSON column is shaped like `Record&amp;lt;string, T&amp;gt;` so `K extends string` is the inferred type — every dot becomes a path-leg separator, letting an attacker traverse from the intended key into sibling and child fields the developer never meant to expose. The result is read access (and, in update statements, write access) to JSON sub-fields outside the inten…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kysely-org/kysely/security/advisories/GHSA-pv5w-4p9q-p3v2"&gt;https://github.com/kysely-org/kysely/security/advisories/GHSA-pv5w-4p9q-p3v2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44635"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44635&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kysely-org/kysely"&gt;https://github.com/kysely-org/kysely&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kysely-org/kysely/releases/tag/v0.28.17"&gt;https://github.com/kysely-org/kysely/releases/tag/v0.28.17&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pv5w-4p9q-p3v2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xvp7-8vm8-xfxx: Actual Sync-server Gocardless service is logging sensitive data including bearer tokens and account numbers</title>
+    <id>https://osv.dev/vulnerability/GHSA-xvp7-8vm8-xfxx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xvp7-8vm8-xfxx"/>
+    <published>2025-10-20T17:55:59Z</published>
+    <updated>2026-06-08T23:45:17Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Actual Sync-server Gocardless service is logging sensitive data including bearer tokens and account numbers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:H/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@actual-app/sync-server&lt;/code&gt; — fixed in 25.11.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The GoCardless components in Actualbudget in are logging responses to STDOUT in a parsed format using `console.log`and `console.debug` (Which in this version of node is an alias for `console.log`). This is exposing sensitive information in log files including, but not limited to:
+
+- Gocardless bearer tokens.
+- Account IBAN and Bank Account numbers.
+- PII of the account holder.
+- Transaction details (Payee bank information, Recipient account numbers, Transaction IDs)...
+
+### Details
+
+Whenever GoCardless responds to a request, the payload is printed to the debug log: 
+https://github.com/actualbudget/actual/blob/36c40d90d2fe09eb1f25a6e2f77f6dd40638b267/packages/sync-server/src/app-gocardless/banks/integration-bank.js#L25-L27
+
+This in turn logs the following information to Docker (…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/actualbudget/actual/security/advisories/GHSA-xvp7-8vm8-xfxx"&gt;https://github.com/actualbudget/actual/security/advisories/GHSA-xvp7-8vm8-xfxx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/actualbudget/actual/commit/97482a082d502887ef22514b93e35e4c67f4f30f"&gt;https://github.com/actualbudget/actual/commit/97482a082d502887ef22514b93e35e4c67f4f30f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/actualbudget/actual"&gt;https://github.com/actualbudget/actual&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/actualbudget/actual/blob/36c40d90d2fe09eb1f25a6e2f77f6dd40638b267/packages/sync-server/src/app-gocardless/app-gocardless.js#L263-L264"&gt;https://github.com/actualbudget/actual/blob/36c40d90d2fe09eb1f25a6e2f77f6dd40638b267/packages/sync-server/src/app-gocardless/app-gocardless.js#L263-L264&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/actualbudget/actual/blob/36c40d90d2fe09eb1f25a6e2f77f6dd40638b267/packages/sync-server/src/app-gocardless/banks/integration-bank.js#L25-L27"&gt;https://github.com/actualbudget/actual/blob/36c40d90d2fe09eb1f25a6e2f77f6dd40638b267/packages/sync-server/src/app-gocardless/banks/integration-bank.js#L25-L27&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/actualbudget/actual/blob/36c40d90d2fe09eb1f25a6e2f77f6dd40638b267/packages/sync-server/src/app-gocardless/banks/integration-bank.js#L83-L85"&gt;https://github.com/actualbudget/actual/blob/36c40d90d2fe09eb1f25a6e2f77f6dd40638b267/packages/sync-server/src/app-gocardless/banks/integration-bank.js#L83-L85&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xvp7-8vm8-xfxx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4xw9-cx39-r355: json-web-token library is vulnerable to a JWT algorithm confusion attack</title>
+    <id>https://osv.dev/vulnerability/GHSA-4xw9-cx39-r355</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4xw9-cx39-r355"/>
+    <published>2023-11-17T22:48:15Z</published>
+    <updated>2026-06-08T23:45:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2023-48238"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;json-web-token library is vulnerable to a JWT algorithm confusion attack&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-48238&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;json-web-token&lt;/code&gt; — fixed in 4.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The json-web-token library is vulnerable to a JWT algorithm confusion attack.
+
+### Details
+On line 86 of the &amp;#x27;index.js&amp;#x27; file, the algorithm to use for verifying the signature of the JWT token is taken from the JWT token, which at that point is still unverified and thus shouldn&amp;#x27;t be trusted. To exploit this vulnerability, an attacker needs to craft a malicious JWT token containing the HS256 algorithm, signed with the public RSA key of the victim application. This attack will only work against this library is the RS256 algorithm is in use, however it is a best practice to use that algorithm.
+
+### PoC
+Take a server running the following code:
+```javascript
+const express = require(&amp;#x27;express&amp;#x27;);
+const jwt = require(&amp;#x27;json-web-token&amp;#x27;);
+const fs = require(&amp;#x27;fs&amp;#x27;);
+const path = require(&amp;#x27;pat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/joaquimserafim/json-web-token/security/advisories/GHSA-4xw9-cx39-r355"&gt;https://github.com/joaquimserafim/json-web-token/security/advisories/GHSA-4xw9-cx39-r355&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-48238"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-48238&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/joaquimserafim/json-web-token/commit/b6e56b1346f48432d29133c76b65222ad93956b7"&gt;https://github.com/joaquimserafim/json-web-token/commit/b6e56b1346f48432d29133c76b65222ad93956b7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/joaquimserafim/json-web-token"&gt;https://github.com/joaquimserafim/json-web-token&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/joaquimserafim/json-web-token/blob/acf6a462471e1b14187eb77414e9161b8b7bff7e/index.js#L86"&gt;https://github.com/joaquimserafim/json-web-token/blob/acf6a462471e1b14187eb77414e9161b8b7bff7e/index.js#L86&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4xw9-cx39-r355"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-j658-c2gf-x6pq: Velocity.js has a Prototype Pollution vulnerability through #set path assignment</title>
+    <id>https://osv.dev/vulnerability/GHSA-j658-c2gf-x6pq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j658-c2gf-x6pq"/>
+    <published>2026-05-09T00:40:16Z</published>
+    <updated>2026-06-08T23:45:16Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44966"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Velocity.js has a Prototype Pollution vulnerability through #set path assignment&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44966&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;velocityjs&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A prototype pollution vulnerability was discovered in Velocity.js &amp;lt;= 2.1.5. This issue occurs during the processing of #set directives in Velocity templates. If an application renders a template controlled by an attacker, it is possible to modify Object.prototype, potentially leading to Denial of Service (DoS) or Remote Code Execution (RCE) depending on the server environment.
+
+### Details
+The root cause is located in the #set path assignment logic within the source code:
+- File: /src/compile/set.ts 
+- Issue: The engine accepts arbitrary path keys and performs assignments using the logic `(baseRef as Record&amp;lt;string, unknown&amp;gt;)[key] = val`.
+
+
+Because there is no validation or filtering to block sensitive keys such as \_\_proto\_\_, constructor, or prototype, an attacker can traver…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/shepherdwind/velocity.js/security/advisories/GHSA-j658-c2gf-x6pq"&gt;https://github.com/shepherdwind/velocity.js/security/advisories/GHSA-j658-c2gf-x6pq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44966"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44966&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/shepherdwind/velocity.js"&gt;https://github.com/shepherdwind/velocity.js&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j658-c2gf-x6pq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-m9g3-3g99-mhpx: eventsource-encoder vulnerable to SSE event injection via unsanitized `event` and `id` fields</title>
+    <id>https://osv.dev/vulnerability/GHSA-m9g3-3g99-mhpx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m9g3-3g99-mhpx"/>
+    <published>2026-05-08T20:49:40Z</published>
+    <updated>2026-06-08T23:45:16Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44214"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;eventsource-encoder vulnerable to SSE event injection via unsanitized `event` and `id` fields&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44214&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;eventsource-encoder&lt;/code&gt; — fixed in 1.0.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`eventsource-encoder` does not sanitize the `event` or `id` fields of an `EventSourceMessage` before serializing them. An attacker who controls either field can inject arbitrary Server-Sent Events line terminators (`\n`, `\r`, or `\r\n`) and thereby forge additional SSE fields or entire messages on the stream. This is similar in spirit to [GHSA-4hxc-9384-m385](https://github.com/advisories/GHSA-4hxc-9384-m385) (h3), but the vulnerable fields are `event`/`id` rather than `data`/`comment`. These are less likely to be user-controllable, but should still be sanitized.
+
+### Details
+
+In `src/encode.ts`, `encodeMessage` interpolates `event` and `id` into the output without inspecting them for line terminators:
+
+```ts
+if (message.event) {
+  output += `event: ${message.event}\n`
+}
+// .…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rexxars/eventsource-encoder/security/advisories/GHSA-m9g3-3g99-mhpx"&gt;https://github.com/rexxars/eventsource-encoder/security/advisories/GHSA-m9g3-3g99-mhpx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44214"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44214&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rexxars/eventsource-encoder"&gt;https://github.com/rexxars/eventsource-encoder&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream"&gt;https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m9g3-3g99-mhpx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fv7c-fp4j-7gwp: @babel/plugin-transform-modules-systemjs generates arbitrary code when compiling malicious input</title>
+    <id>https://osv.dev/vulnerability/GHSA-fv7c-fp4j-7gwp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fv7c-fp4j-7gwp"/>
+    <published>2026-05-08T20:34:07Z</published>
+    <updated>2026-06-08T23:45:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44728"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@babel/plugin-transform-modules-systemjs generates arbitrary code when compiling malicious input&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44728&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@babel/plugin-transform-modules-systemjs&lt;/code&gt; — fixed in 7.29.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;@babel/plugin-transform-modules-systemjs&lt;/code&gt; — fixed in 8.0.0-alpha.13&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Using Babel to compile code that was specifically crafted by an attacker can cause Babel to generate output code that executes arbitrary code.
+
+Known affected plugins are:
+- `@babel/plugin-transform-modules-systemjs`
+- `@babel/preset-env` when using the [`modules: &amp;quot;systemjs&amp;quot;` option](https://babel.dev/docs/babel-preset-env#modules), as it delegates to `@babel/plugin-transform-modules-systemjs`
+
+No other plugins under the `@babel` namespace are impacted.
+
+**Users that only compile trusted code are not impacted.**
+
+### Patches
+
+The vulnerability has been fixed in `@babel/plugin-transform-modules-systemjs@7.29.4`.
+
+Babel also released `@babel/preset-env@7.29.5`, updating its `@babel/plugin-transform-modules-systemjs` dependency, to simplify forcing the update if you are using `@ba…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/babel/babel/security/advisories/GHSA-fv7c-fp4j-7gwp"&gt;https://github.com/babel/babel/security/advisories/GHSA-fv7c-fp4j-7gwp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44728"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44728&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/babel/babel"&gt;https://github.com/babel/babel&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fv7c-fp4j-7gwp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-8qjv-jj2q-x832: Auth.js SDK has Improper Permission Checking</title>
+    <id>https://osv.dev/vulnerability/GHSA-8qjv-jj2q-x832</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8qjv-jj2q-x832"/>
+    <published>2026-05-06T17:05:14Z</published>
+    <updated>2026-06-08T23:45:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-42280"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Auth.js SDK has Improper Permission Checking&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42280&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;auth0-js&lt;/code&gt; — fixed in 10.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Description
+Under specific preconditions, the Auth0.js SDK may improperly return user profile information using a valid access token when a specifically crafted invalid ID token is provided.
+
+### Am I Affected?
+Users are affected if they meet each of the following preconditions:
+- Applications built using Auth0.js version between 8.11.0 and 9.32.0
+- The application’s access control relies on rules defined in Auth0 Actions.
+
+
+### Affected product and versions
+auth0.js SDK v8.11.0 to v9.32.0
+
+### Resolution
+Upgrade auth0/auth0.js to v10.0.0 or greater.
+
+### Acknowledgements
+Okta would like to thank Quan Le (@aleister1102) for their discovery and responsible disclosure.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/auth0/auth0.js/security/advisories/GHSA-8qjv-jj2q-x832"&gt;https://github.com/auth0/auth0.js/security/advisories/GHSA-8qjv-jj2q-x832&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42280"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42280&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/auth0/auth0.js"&gt;https://github.com/auth0/auth0.js&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8qjv-jj2q-x832"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-8jr5-6gvj-rfpf: @yoda.digital/gitlab-mcp-server's SSE transport has no authentication and wildcard CORS, exposing all 86 GitLab tools</title>
+    <id>https://osv.dev/vulnerability/GHSA-8jr5-6gvj-rfpf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8jr5-6gvj-rfpf"/>
+    <published>2026-05-09T00:10:28Z</published>
+    <updated>2026-06-08T23:45:13Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44895"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@yoda.digital/gitlab-mcp-server&amp;#x27;s SSE transport has no authentication and wildcard CORS, exposing all 86 GitLab tools&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44895&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yoda.digital/gitlab-mcp-server&lt;/code&gt; — fixed in 0.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## SSE Transport Has No Authentication and Wildcard CORS, Exposing All 86 GitLab Tools Including Destructive Operations
+
+A review of `mcp-gitlab-server` at commit `80a7b4cf3fba6b55389c0ef491a48190f7c8996a` uncovered that the SSE HTTP transport — advertised in the README and comparison table as a differentiating feature — runs with no authentication and wildcard CORS on every endpoint. The maintainers&amp;#x27; own roadmap confirms auth is a known gap.
+
+When `USE_SSE=true`, the HTTP server in `src/transport.ts` sets:
+
+```typescript
+res.setHeader(&amp;#x27;Access-Control-Allow-Origin&amp;#x27;, &amp;#x27;*&amp;#x27;);
+res.setHeader(&amp;#x27;Access-Control-Allow-Methods&amp;#x27;, &amp;#x27;GET, POST&amp;#x27;);
+res.setHeader(&amp;#x27;Access-Control-Allow-Headers&amp;#x27;, &amp;#x27;Content-Type&amp;#x27;);
+```
+
+The `httpServer.listen(port)` call at line 97 passes no host argument — Node.js defaults to `…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/yoda-digital/mcp-gitlab-server/security/advisories/GHSA-8jr5-6gvj-rfpf"&gt;https://github.com/yoda-digital/mcp-gitlab-server/security/advisories/GHSA-8jr5-6gvj-rfpf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44895"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44895&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yoda-digital/mcp-gitlab-server"&gt;https://github.com/yoda-digital/mcp-gitlab-server&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8jr5-6gvj-rfpf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mfg5-7q5g-f37j: OpenClaw voice-call media stream validated streams after upgrade, which could allow pre-start unauthenticated sockets to increase resource pressure</title>
+    <id>https://osv.dev/vulnerability/GHSA-mfg5-7q5g-f37j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mfg5-7q5g-f37j"/>
+    <published>2026-03-02T22:39:43Z</published>
+    <updated>2026-06-08T23:30:20Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-32062"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenClaw voice-call media stream validated streams after upgrade, which could allow pre-start unauthenticated sockets to increase resource pressure&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-32062&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openclaw&lt;/code&gt; — fixed in 2026.2.22&lt;/li&gt;&lt;li&gt;&lt;code&gt;@openclaw/voice-call&lt;/code&gt; — fixed in 2026.2.22&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`@openclaw/voice-call` (and the bundled copy shipped in `openclaw`) accepted media-stream WebSocket upgrades before stream validation. In reachable deployments, unauthenticated pre-start sockets could be held open and increase resource pressure.
+
+### Affected Packages / Versions
+- `openclaw` (npm): vulnerable `&amp;lt;= 2026.2.21-2`, patched in `2026.2.22`.
+- `@openclaw/voice-call` (npm): vulnerable `&amp;lt;= 2026.2.21`, patched in `2026.2.22`.
+
+### Technical Details
+Before this fix, the voice-call media-stream path upgraded sockets first and ran `shouldAcceptStream()` after a later `start` frame. This created a pre-auth window where remote clients could hold idle sockets without call/token validation.
+
+### Impact
+Availability risk in deployments where the media-stream endpoint is reachable…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/security/advisories/GHSA-mfg5-7q5g-f37j"&gt;https://github.com/openclaw/openclaw/security/advisories/GHSA-mfg5-7q5g-f37j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-32062"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-32062&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/commit/1d8968c8a821ff1a05c294a1846b3bcb6f343794"&gt;https://github.com/openclaw/openclaw/commit/1d8968c8a821ff1a05c294a1846b3bcb6f343794&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw"&gt;https://github.com/openclaw/openclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openclaw-unauthenticated-websocket-resource-exhaustion-via-media-stream"&gt;https://www.vulncheck.com/advisories/openclaw-unauthenticated-websocket-resource-exhaustion-via-media-stream&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mfg5-7q5g-f37j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3xfw-4pmr-4xc5: OpenClaw safeBins grep -e File Read Bypass (stdin-only policy bypass)</title>
+    <id>https://osv.dev/vulnerability/GHSA-3xfw-4pmr-4xc5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3xfw-4pmr-4xc5"/>
+    <published>2026-03-03T19:09:20Z</published>
+    <updated>2026-06-08T23:30:20Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-32022"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenClaw safeBins grep -e File Read Bypass (stdin-only policy bypass)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-32022&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openclaw&lt;/code&gt; — fixed in 2026.2.21&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+OpenClaw `tools.exec.safeBins` had a stdin-only policy bypass for `grep`.
+If pattern input was supplied through `-e` / `--regexp`, the validator consumed the pattern as a flag value and still allowed one positional operand. That positional could be a bare filename like `.env`.
+
+### Affected Packages / Versions
+
+- Package: `openclaw` (npm)
+- Latest published vulnerable version: `2026.2.19-2`
+- Structured vulnerable range: `&amp;lt;= 2026.2.19-2`
+- Planned fixed range for next release: `&amp;gt;= 2026.2.21`
+
+### Exploit Preconditions
+
+- `tools.exec.safeBins` must include `grep` (this is opt-in; `grep` is not in the default safe-bin list).
+- An actor must be able to invoke exec tooling under that profile.
+
+### Technical Details
+
+`src/infra/exec-safe-bin-policy.ts` configured `grep` with `maxPo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/security/advisories/GHSA-3xfw-4pmr-4xc5"&gt;https://github.com/openclaw/openclaw/security/advisories/GHSA-3xfw-4pmr-4xc5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-32022"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-32022&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/commit/c6ee14d60e4cbd6a82f9b2d74ebeb1e8ee814964"&gt;https://github.com/openclaw/openclaw/commit/c6ee14d60e4cbd6a82f9b2d74ebeb1e8ee814964&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw"&gt;https://github.com/openclaw/openclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openclaw-arbitrary-file-read-via-grep-e-flag-policy-bypass"&gt;https://www.vulncheck.com/advisories/openclaw-arbitrary-file-read-via-grep-e-flag-policy-bypass&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3xfw-4pmr-4xc5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-w52v-v783-gw97: Ghost has a SQL injection in Content API</title>
+    <id>https://osv.dev/vulnerability/GHSA-w52v-v783-gw97</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w52v-v783-gw97"/>
+    <published>2026-02-18T21:50:23Z</published>
+    <updated>2026-06-08T23:30:20Z</updated>
+    <category term="npm"/>
+    <category term="BIT-ghost-2026-26980"/>
+    <category term="CVE-2026-26980"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Ghost has a SQL injection in Content API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-ghost-2026-26980, CVE-2026-26980&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ghost&lt;/code&gt; — fixed in 6.19.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A SQL injection vulnerability existed in Ghost&amp;#x27;s Content API that allowed unauthenticated attackers to read arbitrary data from the database. 
+
+### Vulnerable Versions
+
+This vulnerability is present in Ghost v3.24.0 to v6.19.0.
+
+### Patches
+
+v6.19.1 contains a fix for this issue. 
+
+**Note:** as this vulnerability lets an attacker gain access to a site&amp;#x27;s API keys, we recommend reviewing staff users and rotating keys. We generally recommend always updating Ghost to its most current version. 
+
+### Workarounds
+
+There is no application-level workaround. The Content API key is public by design, so restricting key access does not mitigate this vulnerability.
+
+As a temporary mitigation, a reverse proxy or WAF rule can be used to block Content API requests containing `slug%3A%5B` or `sl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/TryGhost/Ghost/security/advisories/GHSA-w52v-v783-gw97"&gt;https://github.com/TryGhost/Ghost/security/advisories/GHSA-w52v-v783-gw97&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-26980"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-26980&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TryGhost/Ghost/commit/30868d632b2252b638bc8a4c8ebf73964592ed91"&gt;https://github.com/TryGhost/Ghost/commit/30868d632b2252b638bc8a4c8ebf73964592ed91&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.xlab.qianxin.com/ghost-cms-page-poisoning-cve-2026-26980"&gt;https://blog.xlab.qianxin.com/ghost-cms-page-poisoning-cve-2026-26980&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TryGhost/Ghost"&gt;https://github.com/TryGhost/Ghost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TryGhost/Ghost/releases/tag/v6.19.1"&gt;https://github.com/TryGhost/Ghost/releases/tag/v6.19.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w52v-v783-gw97"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7mvr-5x2g-wfc8: Bootstrap Cross-site Scripting vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-7mvr-5x2g-wfc8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7mvr-5x2g-wfc8"/>
+    <published>2018-09-13T15:50:32Z</published>
+    <updated>2026-06-08T23:30:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2018-14042"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Bootstrap Cross-site Scripting vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2018-14042&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;bootstrap&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;bootstrap&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;bootstrap&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;bootstrap&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.webjars:bootstrap&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.webjars:bootstrap&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;twbs/bootstrap&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;twbs/bootstrap&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;bootstrap&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;bootstrap&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;bootstrap-sass&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;bootstrap-sass&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In Bootstrap starting in version 2.3.0 and prior to versions 3.4.0 and 4.1.2, XSS is possible in the data-container property of tooltip.  This is similar to CVE-2018-14041.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2018-14042"&gt;https://nvd.nist.gov/vuln/detail/CVE-2018-14042&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twbs/bootstrap/issues/26423"&gt;https://github.com/twbs/bootstrap/issues/26423&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twbs/bootstrap/issues/26428"&gt;https://github.com/twbs/bootstrap/issues/26428&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twbs/bootstrap/issues/26628"&gt;https://github.com/twbs/bootstrap/issues/26628&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twbs/bootstrap/pull/26630"&gt;https://github.com/twbs/bootstrap/pull/26630&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twbs/bootstrap/commit/2a5ba23ce8f041f3548317acc992ed8a736b609d"&gt;https://github.com/twbs/bootstrap/commit/2a5ba23ce8f041f3548317acc992ed8a736b609d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twbs/bootstrap/commit/2d90d369bbc2bd2647620246c55cec8c4705e3d0"&gt;https://github.com/twbs/bootstrap/commit/2d90d369bbc2bd2647620246c55cec8c4705e3d0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.tenable.com/security/tns-2021-14"&gt;https://www.tenable.com/security/tns-2021-14&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7mvr-5x2g-wfc8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xcj9-5m2h-648r: Mermaid: Improper sanitization of `classDefs` in diagrams leads to CSS injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-xcj9-5m2h-648r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xcj9-5m2h-648r"/>
+    <published>2026-05-11T19:36:41Z</published>
+    <updated>2026-06-08T23:30:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-41148"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Mermaid: Improper sanitization of `classDefs` in diagrams leads to CSS injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41148&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mermaid&lt;/code&gt; — fixed in 11.15.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;mermaid&lt;/code&gt; — fixed in 10.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Details
+
+The state diagram and any other diagram type that routes user-controlled style strings through createCssStyles parser for Mermaid v11.14.0 and earlier captures `classDef` values with an unrestricted regex:
+
+```jison
+// packages/mermaid/src/diagrams/state/parser/stateDiagram.jison:83
+&amp;lt;CLASSDEFID&amp;gt;[^\n]*   { this.popState(); return &amp;#x27;CLASSDEF_STYLEOPTS&amp;#x27; }
+```
+
+The value passes unsanitized through `addStyleClass()` -&amp;gt; `createCssStyles()` -&amp;gt; `style.innerHTML` (mermaidAPI.ts:418). A `}` in the value closes the generated CSS selector, and everything after becomes a new CSS rule on the page.
+
+### PoC
+
+```
+stateDiagram-v2 
+      classDef x }*{ background-image: url(&amp;quot;http://media.giphy.com/media/SggILpMXO7Xt6/giphy.gif&amp;quot;)}
+```
+
+Live demo:
+&amp;lt;https://mermaid.live/edit#pako:eNpFjzFvgzAQhf-KdV…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/security/advisories/GHSA-xcj9-5m2h-648r"&gt;https://github.com/mermaid-js/mermaid/security/advisories/GHSA-xcj9-5m2h-648r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41148"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41148&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/commit/8fead23c59166b7bab6a39eac81acebee2859102"&gt;https://github.com/mermaid-js/mermaid/commit/8fead23c59166b7bab6a39eac81acebee2859102&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/commit/e9b0f34d8d82a6260077764ee45e1d7d90957a0f"&gt;https://github.com/mermaid-js/mermaid/commit/e9b0f34d8d82a6260077764ee45e1d7d90957a0f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid"&gt;https://github.com/mermaid-js/mermaid&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/releases/tag/mermaid%4011.15.0"&gt;https://github.com/mermaid-js/mermaid/releases/tag/mermaid%4011.15.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/releases/tag/v10.9.6"&gt;https://github.com/mermaid-js/mermaid/releases/tag/v10.9.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://mermaid.js.org/config/schema-docs/config.html#securitylevel"&gt;https://mermaid.js.org/config/schema-docs/config.html#securitylevel&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xcj9-5m2h-648r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-ph6f-2cvq-79hq: MagicMirror vulnerable to unauthenticated SSRF via /cors endpoint</title>
+    <id>https://osv.dev/vulnerability/GHSA-ph6f-2cvq-79hq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ph6f-2cvq-79hq"/>
+    <published>2026-05-05T20:53:59Z</published>
+    <updated>2026-06-08T23:30:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-42281"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MagicMirror vulnerable to unauthenticated SSRF via /cors endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42281&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:H/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;magicmirror&lt;/code&gt; — fixed in 2.36.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+An unauthenticated Server-Side Request Forgery (SSRF) vulnerability in the `/cors` endpoint allows any remote attacker to force the MagicMirror² server to perform arbitrary HTTP requests to internal networks, cloud metadata services, and localhost services. The endpoint also expands environment variable placeholders (`**VAR_NAME**`), enabling exfiltration of server-side secrets.
+
+### Details
+
+The `/cors` endpoint in `js/server_functions.js` (function `cors()`, lines 37-78) acts as an open HTTP proxy with no authentication and no URL validation. Any user-supplied URL is fetched server-side via `fetch()` and the full response is returned to the caller.
+
+Additionally, the `replaceSecretPlaceholder()` function (lines 21-25) expands any `**VARIABLE_NAME**` pattern in the URL with t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/MagicMirrorOrg/MagicMirror/security/advisories/GHSA-ph6f-2cvq-79hq"&gt;https://github.com/MagicMirrorOrg/MagicMirror/security/advisories/GHSA-ph6f-2cvq-79hq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42281"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42281&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MagicMirrorOrg/MagicMirror"&gt;https://github.com/MagicMirrorOrg/MagicMirror&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MagicMirrorOrg/MagicMirror/releases/tag/v2.36.0"&gt;https://github.com/MagicMirrorOrg/MagicMirror/releases/tag/v2.36.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ph6f-2cvq-79hq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-ghcm-xqfw-q4vr: Mermaid: Improper sanitization of `classDef` in state diagrams leads to HTML injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-ghcm-xqfw-q4vr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ghcm-xqfw-q4vr"/>
+    <published>2026-05-11T19:36:46Z</published>
+    <updated>2026-06-08T23:30:16Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-41149"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Mermaid: Improper sanitization of `classDef` in state diagrams leads to HTML injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41149&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:L/SI:L/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mermaid&lt;/code&gt; — fixed in 11.15.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;mermaid&lt;/code&gt; — fixed in 10.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Under the default configuration, Mermaid state diagram&amp;#x27;s `classDef` allow DOM injection that escapes the SVG, although `&amp;lt;script&amp;gt;` tags are removed, preventing XSS.
+
+#### Proof-of-concept
+
+```
+stateDiagram-v2
+  classDef xss fill:red&amp;lt;/style&amp;gt;&amp;lt;/svg&amp;gt;&amp;lt;style&amp;gt;*{x:x;y:y;overflow:visible!important;contain:none!important;transform:none!important;filter:none!important;clip-path:none!important}&amp;lt;/style&amp;gt;&amp;lt;div style=&amp;quot;x:x;y:y;color:red;font:5em/1 monospace;display:grid;place-items:center;z-index:2147483647;width:100vw;height:100vh;position:fixed;top:0;left:0;background:black&amp;quot;&amp;gt;HACKED&amp;lt;/div&amp;gt;&amp;lt;svg&amp;gt;&amp;lt;style&amp;gt;a:b
+  [*] --&amp;gt; A:::xss
+```
+
+### Patches
+
+- [v11.15.0](https://github.com/mermaid-js/mermaid/releases/tag/mermaid%4011.15.0) (see [37ff937f1da2e19f882fd1db01235db4d01f4056](https://github.com/mermaid-j…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/security/advisories/GHSA-ghcm-xqfw-q4vr"&gt;https://github.com/mermaid-js/mermaid/security/advisories/GHSA-ghcm-xqfw-q4vr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41149"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41149&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/commit/37ff937f1da2e19f882fd1db01235db4d01f4056"&gt;https://github.com/mermaid-js/mermaid/commit/37ff937f1da2e19f882fd1db01235db4d01f4056&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/commit/4e2d512bf5bf6f9de1a8f0a48da78dc4d09ac4f3"&gt;https://github.com/mermaid-js/mermaid/commit/4e2d512bf5bf6f9de1a8f0a48da78dc4d09ac4f3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid"&gt;https://github.com/mermaid-js/mermaid&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/releases/tag/mermaid%4011.15.0"&gt;https://github.com/mermaid-js/mermaid/releases/tag/mermaid%4011.15.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mermaid-js/mermaid/releases/tag/v10.9.6"&gt;https://github.com/mermaid-js/mermaid/releases/tag/v10.9.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://mermaid.js.org/config/schema-docs/config.html#securitylevel"&gt;https://mermaid.js.org/config/schema-docs/config.html#securitylevel&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ghcm-xqfw-q4vr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-cfw5-68c4-ffqp: MikroORM has SQL injection via runtime-controlled identifiers and JSON-path keys</title>
+    <id>https://osv.dev/vulnerability/GHSA-cfw5-68c4-ffqp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cfw5-68c4-ffqp"/>
+    <published>2026-05-08T19:17:45Z</published>
+    <updated>2026-06-08T23:30:15Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44680"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MikroORM has SQL injection via runtime-controlled identifiers and JSON-path keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44680&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@mikro-orm/sql&lt;/code&gt; — fixed in 7.0.14&lt;/li&gt;&lt;li&gt;&lt;code&gt;@mikro-orm/knex&lt;/code&gt; — fixed in 6.6.14&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+MikroORM&amp;#x27;s identifier-quoting helper (`Platform.quoteIdentifier` and the postgres/mssql overrides) and its JSON-path emitters (`Platform.getSearchJsonPropertyKey`, `quoteJsonKey`) did not properly escape characters that delimit the SQL identifier or string-literal context they emit into. When application code passes attacker-influenced strings to public ORM APIs that expect an identifier or a JSON-property filter, an attacker can break out of the quoted context and inject arbitrary SQL.
+
+## Affected APIs
+
+The vulnerability is reachable when application code passes an attacker-influenced string to any of the following documented APIs:
+
+* **Multi-tenant `schema` option** — `em.fork({ schema })`, `qb.withSchema(name)`, `wrap(entity).setSchema(name)`, `em.create(Cls, data, { schema…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mikro-orm/mikro-orm/security/advisories/GHSA-cfw5-68c4-ffqp"&gt;https://github.com/mikro-orm/mikro-orm/security/advisories/GHSA-cfw5-68c4-ffqp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44680"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44680&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mikro-orm/mikro-orm/pull/7653"&gt;https://github.com/mikro-orm/mikro-orm/pull/7653&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mikro-orm/mikro-orm/pull/7654"&gt;https://github.com/mikro-orm/mikro-orm/pull/7654&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mikro-orm/mikro-orm/pull/7656"&gt;https://github.com/mikro-orm/mikro-orm/pull/7656&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mikro-orm/mikro-orm/pull/7657"&gt;https://github.com/mikro-orm/mikro-orm/pull/7657&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mikro-orm/mikro-orm"&gt;https://github.com/mikro-orm/mikro-orm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cfw5-68c4-ffqp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-p4wh-cr8m-gm6c: OpenClaw: shell-env trusted-prefix fallback allowed attacker-controlled binary execution via $SHELL</title>
+    <id>https://osv.dev/vulnerability/GHSA-p4wh-cr8m-gm6c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p4wh-cr8m-gm6c"/>
+    <published>2026-03-03T21:36:16Z</published>
+    <updated>2026-06-08T23:30:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-22217"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenClaw: shell-env trusted-prefix fallback allowed attacker-controlled binary execution via $SHELL&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-22217&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openclaw&lt;/code&gt; — fixed in 2026.2.23&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`shell-env` fallback trusted prefix-based executable paths for `$SHELL`, allowing execution of attacker-controlled binaries in local/runtime-env influence scenarios.
+
+### Details
+In affected versions, shell selection accepted either:
+1. a shell listed in `/etc/shells`, or
+2. any executable under hardcoded trusted prefixes (`/bin`, `/usr/bin`, `/usr/local/bin`, `/opt/homebrew/bin`, `/run/current-system/sw/bin`).
+
+The selected shell was then executed as a login shell (`-l -c &amp;#x27;env -0&amp;#x27;`) for PATH/environment probing.
+
+On systems where a trusted-prefix directory is writable (for example common Homebrew layouts under `/opt/homebrew/bin`) and runtime `$SHELL` can be influenced, this enabled attacker-controlled binary execution in OpenClaw process context.
+
+The fix removes the trusted-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/security/advisories/GHSA-p4wh-cr8m-gm6c"&gt;https://github.com/openclaw/openclaw/security/advisories/GHSA-p4wh-cr8m-gm6c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-22217"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-22217&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/commit/ff10fe8b91670044a6bb0cd85deb736a0ec8fb55"&gt;https://github.com/openclaw/openclaw/commit/ff10fe8b91670044a6bb0cd85deb736a0ec8fb55&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw"&gt;https://github.com/openclaw/openclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openclaw-arbitrary-binary-execution-via-shell-environment-variable-trusted-prefix-fallback"&gt;https://www.vulncheck.com/advisories/openclaw-arbitrary-binary-execution-via-shell-environment-variable-trusted-prefix-fallback&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p4wh-cr8m-gm6c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4f8g-77mw-3rxc: OpenClaw: Gateway plugin HTTP `auth: gateway` widens identity-bearing `operator.read` requests into runtime `operator.write`</title>
+    <id>https://osv.dev/vulnerability/GHSA-4f8g-77mw-3rxc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4f8g-77mw-3rxc"/>
+    <published>2026-04-09T17:36:53Z</published>
+    <updated>2026-06-08T23:30:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-42429"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenClaw: Gateway plugin HTTP `auth: gateway` widens identity-bearing `operator.read` requests into runtime `operator.write`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42429&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:N · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openclaw&lt;/code&gt; — fixed in 2026.4.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+Gateway plugin HTTP `auth: gateway` widens identity-bearing `operator.read` requests into runtime `operator.write`.
+
+Plugin HTTP routes using gateway auth could receive runtime write scopes even when the upstream trusted-proxy request only declared read.
+
+OpenClaw is a user-controlled local assistant. This advisory is scoped to the OpenClaw trust model and does not assume a multi-tenant service boundary.
+
+## Affected Packages / Versions
+
+- Package: `openclaw` (npm)
+- Affected versions: `2026.1.29`
+- Patched versions: `2026.4.8`
+
+## Fix
+
+The issue was fixed on `main` and is available in the patched npm version listed above. The verified fixed tree is commit `d7c3210cd6f5fdfdc1beff4c9541673e814354d5`.
+
+## Verification
+
+The fix was re-checked against `main` before publication, incl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/security/advisories/GHSA-4f8g-77mw-3rxc"&gt;https://github.com/openclaw/openclaw/security/advisories/GHSA-4f8g-77mw-3rxc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42429"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42429&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/commit/d7c3210cd6f5fdfdc1beff4c9541673e814354d5"&gt;https://github.com/openclaw/openclaw/commit/d7c3210cd6f5fdfdc1beff4c9541673e814354d5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw"&gt;https://github.com/openclaw/openclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openclaw-privilege-escalation-via-gateway-plugin-http-authentication"&gt;https://www.vulncheck.com/advisories/openclaw-privilege-escalation-via-gateway-plugin-http-authentication&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4f8g-77mw-3rxc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-5wj5-87vq-39xm: OpenClaw: Node Pairing Reconnect Command Escalation Bypasses operator.admin Scope Requirement</title>
+    <id>https://osv.dev/vulnerability/GHSA-5wj5-87vq-39xm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5wj5-87vq-39xm"/>
+    <published>2026-04-09T17:35:53Z</published>
+    <updated>2026-06-08T23:30:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-42432"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenClaw: Node Pairing Reconnect Command Escalation Bypasses operator.admin Scope Requirement&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42432&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openclaw&lt;/code&gt; — fixed in 2026.4.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+Node Pairing Reconnect Command Escalation Bypasses operator.admin Scope Requirement.
+
+A previously paired node could reconnect with a broader command set, including exec-capable commands, without forcing the operator/admin re-pairing path.
+
+OpenClaw is a user-controlled local assistant. This advisory is scoped to the OpenClaw trust model and does not assume a multi-tenant service boundary.
+
+## Affected Packages / Versions
+
+- Package: `openclaw` (npm)
+- Affected versions: `&amp;lt;=2026.4.5`
+- Patched versions: `2026.4.8`
+
+## Fix
+
+The issue was fixed on `main` and is available in the patched npm version listed above. The verified fixed tree is commit `d7c3210cd6f5fdfdc1beff4c9541673e814354d5`.
+
+## Verification
+
+The fix was re-checked against `main` before publication, including targeted…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/security/advisories/GHSA-5wj5-87vq-39xm"&gt;https://github.com/openclaw/openclaw/security/advisories/GHSA-5wj5-87vq-39xm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42432"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42432&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/commit/d7c3210cd6f5fdfdc1beff4c9541673e814354d5"&gt;https://github.com/openclaw/openclaw/commit/d7c3210cd6f5fdfdc1beff4c9541673e814354d5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw"&gt;https://github.com/openclaw/openclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openclaw-command-escalation-via-node-pairing-reconnect-bypass"&gt;https://www.vulncheck.com/advisories/openclaw-command-escalation-via-node-pairing-reconnect-bypass&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5wj5-87vq-39xm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vw3h-q6xq-jjm5: OpenClaw: Voice-call realtime WebSocket accepted oversized frames</title>
+    <id>https://osv.dev/vulnerability/GHSA-vw3h-q6xq-jjm5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vw3h-q6xq-jjm5"/>
+    <published>2026-04-17T21:48:36Z</published>
+    <updated>2026-06-08T23:30:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-42437"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenClaw: Voice-call realtime WebSocket accepted oversized frames&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42437&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openclaw&lt;/code&gt; — fixed in 2026.4.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Voice-call realtime WebSocket accepted oversized frames.
+
+## Affected Packages / Versions
+
+- Package: `openclaw`
+- Ecosystem: npm
+- Affected versions: `&amp;gt;= 2026.4.9 &amp;lt; 2026.4.10`
+- Patched versions: `&amp;gt;= 2026.4.10`
+
+## Impact
+
+The voice-call realtime WebSocket path could accept oversized frames, creating a remote availability risk for deployments exposing that webhook path.
+
+## Technical Details
+
+The fix rejects oversized realtime WebSocket frames before processing them.
+
+## Fix
+
+The issue was fixed in #63890. The first stable tag containing the fix is `v2026.4.10`, and `openclaw@2026.4.14` includes the fix.
+
+## Fix Commit(s)
+
+- `afadb7dae6738819ad9c7d2597ace0516957d20e`
+- PR: #63890
+
+## Release Process Note
+
+Users should upgrade to `openclaw` 2026.4.10 or newer. The latest npm re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/security/advisories/GHSA-vw3h-q6xq-jjm5"&gt;https://github.com/openclaw/openclaw/security/advisories/GHSA-vw3h-q6xq-jjm5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42437"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42437&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/pull/63890"&gt;https://github.com/openclaw/openclaw/pull/63890&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/commit/afadb7dae6738819ad9c7d2597ace0516957d20e"&gt;https://github.com/openclaw/openclaw/commit/afadb7dae6738819ad9c7d2597ace0516957d20e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw"&gt;https://github.com/openclaw/openclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openclaw-denial-of-service-via-oversized-websocket-frames-in-voice-call-realtime-path"&gt;https://www.vulncheck.com/advisories/openclaw-denial-of-service-via-oversized-websocket-frames-in-voice-call-realtime-path&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vw3h-q6xq-jjm5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-w86f-rf9w-h3x6: FUXA: Unauthenticated SSRF via Socket.IO DEVICE_WEBAPI_REQUEST and DEVICE_PROPERTY with response reading</title>
+    <id>https://osv.dev/vulnerability/GHSA-w86f-rf9w-h3x6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w86f-rf9w-h3x6"/>
+    <published>2026-06-08T23:06:40Z</published>
+    <updated>2026-06-08T23:15:20Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47719"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;FUXA: Unauthenticated SSRF via Socket.IO DEVICE_WEBAPI_REQUEST and DEVICE_PROPERTY with response reading&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47719&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fuxa-server&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+An unauthenticated attacker (Alice) connects to FUXA&amp;#x27;s Socket.IO endpoint and emits a `device-webapi-request` event whose `property.address` field names an arbitrary URL. FUXA&amp;#x27;s `DEVICE_WEBAPI_REQUEST` handler at `server/runtime/index.js:296` calls `axios.get(address)` server-side and broadcasts the full response body back on the same event via `io.emit`. The companion handler `DEVICE_PROPERTY` at `server/runtime/index.js:153` has the same miss against OPC UA and ODBC endpoints. Both handlers skip the `isSocketWriteAuthorized()` check that the other write-capable events (`DEVICE_VALUES` at line 182, `DEVICE_ENABLE` at line 358) call. Alice reads cloud instance metadata, scans internal services, and connects to any OPC UA server or ODBC database the FUXA host can reach, then rec…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/frangoteam/FUXA/security/advisories/GHSA-w86f-rf9w-h3x6"&gt;https://github.com/frangoteam/FUXA/security/advisories/GHSA-w86f-rf9w-h3x6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/frangoteam/FUXA"&gt;https://github.com/frangoteam/FUXA&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/frangoteam/FUXA/releases/tag/v1.3.2"&gt;https://github.com/frangoteam/FUXA/releases/tag/v1.3.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w86f-rf9w-h3x6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8ghr-w65f-j3qr: FUXA's scheduler API missing admin check enables operator-to-admin escalation via scheduled device actions</title>
+    <id>https://osv.dev/vulnerability/GHSA-8ghr-w65f-j3qr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8ghr-w65f-j3qr"/>
+    <published>2026-06-08T23:07:02Z</published>
+    <updated>2026-06-08T23:15:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47721"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;FUXA&amp;#x27;s scheduler API missing admin check enables operator-to-admin escalation via scheduled device actions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47721&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fuxa-server&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+An authorization issue in the Scheduler API allowed authenticated non-admin users to create or modify scheduled actions that should be restricted to administrators.
+
+## Details
+
+The Scheduler API did not correctly enforce administrator permissions when processing scheduler modifications.
+
+As a result, authenticated users with non-administrative roles could create or modify scheduled actions that execute privileged operations, including device value changes and server-side script execution.
+
+The issue was fixed in version 1.3.2 by enforcing the appropriate permission checks for scheduler modifications.
+
+
+## Impact
+
+An operator-level user in FUXA reaches the PLC-write and server-side-script-execution surface that the platform otherwise restricts to administrators. In a SCADA depl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/frangoteam/FUXA/security/advisories/GHSA-8ghr-w65f-j3qr"&gt;https://github.com/frangoteam/FUXA/security/advisories/GHSA-8ghr-w65f-j3qr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/frangoteam/FUXA"&gt;https://github.com/frangoteam/FUXA&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/frangoteam/FUXA/releases/tag/v1.3.2"&gt;https://github.com/frangoteam/FUXA/releases/tag/v1.3.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8ghr-w65f-j3qr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-h9fj-c2qr-76g2: FUXA has SQL Injection in its TDengine DAQ connector via backslash bypass of escapeTdString</title>
+    <id>https://osv.dev/vulnerability/GHSA-h9fj-c2qr-76g2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h9fj-c2qr-76g2"/>
+    <published>2026-06-08T23:06:43Z</published>
+    <updated>2026-06-08T23:15:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47720"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;FUXA has SQL Injection in its TDengine DAQ connector via backslash bypass of escapeTdString&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47720&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fuxa-server&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The TDengine DAQ storage connector&amp;#x27;s `escapeTdString` at `server/runtime/storage/tdengine/index.js:10` doubles single quotes but does not escape backslashes. TDengine&amp;#x27;s SQL parser treats `\&amp;#x27;` as a literal single quote inside a string, so a tag id of the form `x\&amp;#x27; OR 1=1--` escapes the first single quote, lets the doubled quote close the string, and appends an injected clause that runs on the TDengine server. An attacker (Alice) sends the crafted `sids` value through `GET /api/daq` or the Socket.IO `DAQ_QUERY` event and reads every row in `fuxa.meters`, which holds the historical tag values of every PLC the FUXA instance records.
+
+## Details
+
+The TDengine DAQ storage connector did not correctly sanitize user-controlled values before including them in SQL queries.
+
+A specially cr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/frangoteam/FUXA/security/advisories/GHSA-h9fj-c2qr-76g2"&gt;https://github.com/frangoteam/FUXA/security/advisories/GHSA-h9fj-c2qr-76g2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/frangoteam/FUXA"&gt;https://github.com/frangoteam/FUXA&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h9fj-c2qr-76g2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-3311: Malicious code in path-addon (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-3311</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-3311"/>
+    <published>2026-05-01T07:11:33Z</published>
+    <updated>2026-06-08T21:31:25Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in path-addon (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;path-addon&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (ba1a7df799b6bd11bd036f1cfb1de6b1dfe0e4e72082be1b8a60537a59e5ae58)
+path-addon impersonates the Node.js core `path` module (package name `path-addon`, README claims to be &amp;#x27;an exact copy of the NodeJS path module&amp;#x27;). The body of path.js is the genuine Joyent path implementation, but a remote-code-execution dropper has been inserted: on require(), the module calls `fetch(atob(&amp;quot;aHR0cHM6Ly93d3cuanNvbmtlZXBlci5jb20vYi9SRlc2SQ==&amp;quot;))` — which decodes to https://www.jsonkeeper.com/b/RFW6I, an anonymous mutable JSON paste host — then reads the response&amp;#x27;s `content` field and passes it to `eval()`. The destination URL is base64-encoded specifically to evade casual review and string-based scanners. Any process that …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-addon/v/1.0.5"&gt;https://www.npmjs.com/package/path-addon/v/1.0.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-addon/v/1.0.6"&gt;https://www.npmjs.com/package/path-addon/v/1.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-addon/v/1.0.7"&gt;https://www.npmjs.com/package/path-addon/v/1.0.7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-3311"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-2930: Malicious code in path-internal (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-2930</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-2930"/>
+    <published>2026-04-14T10:53:25Z</published>
+    <updated>2026-06-08T21:31:25Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in path-internal (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;path-internal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (5393cf6d8cf49c2550e7cc90ff3de58b1e97bdc89183f63beae60b3e46b9d2e0)
+The package presents itself as a copy of the Node.js core `path` module (name `path-internal`, README: &amp;quot;exact copy of the NodeJS &amp;#x27;path&amp;#x27; module&amp;quot;) and ships the upstream Joyent path implementation with a malicious dropper spliced between `posix.basename` and `posix.extname` in `path.js`. On `require(&amp;#x27;path-internal&amp;#x27;)`, the module decodes a base64-encoded URL (`https://www.jsonkeeper.com/b/YCW2F`, stored under the misleading variable name `randomStringRe`), fetches the JSON document at that URL, and passes `data.content` straight to `eval()`. A second identical IIFE for `https://www.jsonkeeper.com/b/TPQHE` is present (commented out) under …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-internal/v/1.0.14"&gt;https://www.npmjs.com/package/path-internal/v/1.0.14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-internal/v/1.0.13"&gt;https://www.npmjs.com/package/path-internal/v/1.0.13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-internal/v/1.0.15"&gt;https://www.npmjs.com/package/path-internal/v/1.0.15&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-2930"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-2929: Malicious code in path-extend (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-2929</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-2929"/>
+    <published>2026-04-14T09:46:58Z</published>
+    <updated>2026-06-08T21:31:25Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in path-extend (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;path-extend&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (429c0dbb9c8395a6c87ffcf5e6ebe03c6cf6568b4bf205afa933b7d6a49aa578)
+On require(), path.js runs an IIFE that calls a loader which fetches a base64-hidden URL (https://www.jsonkeeper.com/b/XTTBX) from jsonkeeper.com — an anonymous, mutable JSON paste host — and passes the returned `data.content` to eval(). A second loader fetches https://www.jsonkeeper.com/b/P0CND for the same purpose. Variable names (`randomStringRe`, `tokenStringRe`) and base64-encoded URLs are obfuscation to evade scanning. The package name typosquats Node&amp;#x27;s built-in `path` module; package.json lists an empty author field and a generic &amp;#x27;Node.js path module&amp;#x27; description, while path.js is otherwise a verbatim copy of Node core&amp;#x27;s path.js…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-extend/v/1.0.10"&gt;https://www.npmjs.com/package/path-extend/v/1.0.10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-extend/v/1.0.11"&gt;https://www.npmjs.com/package/path-extend/v/1.0.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-extend/v/1.0.13"&gt;https://www.npmjs.com/package/path-extend/v/1.0.13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/path-extend/v/1.0.12"&gt;https://www.npmjs.com/package/path-extend/v/1.0.12&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-2929"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xh5j-727m-w6gg: Budibase vulnerable to SSRF via trivial `.tar.gz` substring bypass in Plugin URL upload (`/api/plugin`)</title>
+    <id>https://osv.dev/vulnerability/GHSA-xh5j-727m-w6gg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xh5j-727m-w6gg"/>
+    <published>2026-05-11T16:20:27Z</published>
+    <updated>2026-06-08T20:31:02Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-45061"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase vulnerable to SSRF via trivial `.tar.gz` substring bypass in Plugin URL upload (`/api/plugin`)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45061&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;budibase&lt;/code&gt; — fixed in 3.35.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## 1. Summary
+
+| Field | Value |
+|-------|-------|
+| **Title** | SSRF via trivial `.tar.gz` substring bypass in Plugin URL upload |
+| **Product** | Budibase (Self-Hosted) |
+| **Version** | ≤ 3.34.11 (latest stable as of 2026-03-30) |
+| **Component** | `packages/server/src/api/controllers/plugin/url.ts` |
+| **Vulnerability Type** | CWE-918: Server-Side Request Forgery (SSRF), CWE-184: Incomplete List of Disallowed Inputs |
+| **Severity** | High (chained) / Medium (standalone) |
+| **CVSS 3.1 Score (chained)** | 7.7 — `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N` |
+| **CVSS 3.1 Score (standalone)** | 5.4 — `CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N` |
+| **Attack Vector** | Network |
+| **Privileges Required** | Low (Global Builder role) |
+| **User Interaction** | None |
+| **Affected Deploy…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-xh5j-727m-w6gg"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-xh5j-727m-w6gg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45061"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45061&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xh5j-727m-w6gg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-ccgf-5rwj-j3hv: TeleJSON: DOM XSS via unsanitised constructor name in `new Function()`</title>
+    <id>https://osv.dev/vulnerability/GHSA-ccgf-5rwj-j3hv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ccgf-5rwj-j3hv"/>
+    <published>2026-04-02T23:21:23Z</published>
+    <updated>2026-06-08T20:30:58Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-47099"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;TeleJSON: DOM XSS via unsanitised constructor name in `new Function()`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47099&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;telejson&lt;/code&gt; — fixed in 6.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+ 
+telejson versions prior to 6.0.0 (released 2022) are vulnerable to DOM-based Cross-Site Scripting (XSS) through unsafe deserialisation. Attacker-controlled input from the `_constructor-name_` property in parsed JSON is passed directly to `new Function()` without sanitisation, allowing arbitrary JavaScript execution.
+ 
+## Affected versions
+ 
+| Package  | Affected  | Fixed    |
+|----------|-----------|----------|
+| telejson | &amp;lt; 6.0.0   | &amp;gt;= 6.0.0 |
+ 
+ 
+## Details
+ 
+telejson&amp;#x27;s `parse()` function uses a custom reviver to reconstruct JavaScript objects from serialised JSON. When processing objects with a `_constructor-name_` property, the reviver passes the constructor name directly to `new Function()` to recreate the object&amp;#x27;s prototype.
+ 
+In versions prior to 6.0.0, this construct…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/storybookjs/telejson/security/advisories/GHSA-ccgf-5rwj-j3hv"&gt;https://github.com/storybookjs/telejson/security/advisories/GHSA-ccgf-5rwj-j3hv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-47099"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-47099&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Niccolo10/Security-Advisories/blob/main/CVE-2026-47099/cve-2026-47099.md"&gt;https://github.com/Niccolo10/Security-Advisories/blob/main/CVE-2026-47099/cve-2026-47099.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/storybookjs/telejson"&gt;https://github.com/storybookjs/telejson&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/telejson-dom-based-xss-via-parse-function"&gt;https://www.vulncheck.com/advisories/telejson-dom-based-xss-via-parse-function&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ccgf-5rwj-j3hv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-hggm-x7r9-mm7v: OpenClaw is vulnerable to Path Traversal through path validation bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-hggm-x7r9-mm7v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hggm-x7r9-mm7v"/>
+    <published>2026-03-26T18:31:41Z</published>
+    <updated>2026-06-08T20:30:57Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-32846"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenClaw is vulnerable to Path Traversal through path validation bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-32846&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openclaw&lt;/code&gt; — fixed in 2026.03.28&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenClaw through 2026.3.23 (fixed in commit 4797bbc) contains a path traversal vulnerability in media parsing that allows attackers to read arbitrary files by bypassing path validation in the isLikelyLocalPath() and isValidMedia() functions. Attackers can exploit incomplete validation and the allowBareFilename bypass to reference files outside the intended application sandbox, resulting in disclosure of sensitive information including system files, environment files, and SSH keys.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/security/advisories/GHSA-f6pf-4gjx-c94r"&gt;https://github.com/openclaw/openclaw/security/advisories/GHSA-f6pf-4gjx-c94r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-32846"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-32846&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/pull/54642"&gt;https://github.com/openclaw/openclaw/pull/54642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/commit/4797bbc5b96e2cca5532e43b58915c051746fe37"&gt;https://github.com/openclaw/openclaw/commit/4797bbc5b96e2cca5532e43b58915c051746fe37&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw"&gt;https://github.com/openclaw/openclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openclaw-media-parsing-path-traversal-to-arbitrary-file-read"&gt;https://www.vulncheck.com/advisories/openclaw-media-parsing-path-traversal-to-arbitrary-file-read&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hggm-x7r9-mm7v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3g43-6gmg-66jw: axios Vulnerable to Credential Theft and Response Hijacking via Prototype Pollution Gadget in Config Merge</title>
+    <id>https://osv.dev/vulnerability/GHSA-3g43-6gmg-66jw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3g43-6gmg-66jw"/>
+    <published>2026-05-29T16:07:31Z</published>
+    <updated>2026-06-08T18:44:23Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44495"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;axios Vulnerable to Credential Theft and Response Hijacking via Prototype Pollution Gadget in Config Merge&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44495&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.15.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 0.31.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Axios versions before the fixed releases contain prototype-pollution gadgets in request config processing. If another vulnerability in the same JavaScript process has already polluted `Object.prototype.transformResponse`, affected Axios versions may treat that inherited value as request configuration or as an option validator.
+
+Axios does not itself create the prototype pollution. Exploitability requires a separate prototype-pollution vulnerability or equivalent attacker control over `Object.prototype` before Axios creates a request.
+
+## Impact
+For ordinary prototype-pollution primitives that can only assign JSON-like values, this issue primarily results in request failures or denial-of-service attacks.
+
+If the attacker can pollute `Object.prototype.transformResponse` with a fu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-3g43-6gmg-66jw"&gt;https://github.com/axios/axios/security/advisories/GHSA-3g43-6gmg-66jw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3g43-6gmg-66jw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-7rvm-xjpp-63r9: actual Allows Electron to Run As Node</title>
     <id>https://osv.dev/vulnerability/GHSA-7rvm-xjpp-63r9</id>
@@ -275,81 +1232,5 @@ It is considered malicious because:
 
 - The package communicates with a domain associated with malicious activity.
 &lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5291"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-5289: Malicious code in unifi-portal (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-5289</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5289"/>
-    <published>2026-06-06T20:06:37Z</published>
-    <updated>2026-06-06T20:46:24Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in unifi-portal (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;unifi-portal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ossf-package-analysis (8ff224f10cd94268bd5347ea6898f0cb1c54d23b19a6eb02d8efa268a16e15e8)
-The OpenSSF Package Analysis project identified &amp;#x27;unifi-portal&amp;#x27; @ 99.0.0 (npm) as malicious.
-
-It is considered malicious because:
-
-- The package communicates with a domain associated with malicious activity.
-&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5289"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-5288: Malicious code in uisp-connector (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-5288</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5288"/>
-    <published>2026-06-06T19:29:29Z</published>
-    <updated>2026-06-06T19:46:22Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in uisp-connector (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;uisp-connector&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ossf-package-analysis (7387d5655b4341cd75024769045f64a7a2e6315e948c9b2e9789c9704f48ecc7)
-The OpenSSF Package Analysis project identified &amp;#x27;uisp-connector&amp;#x27; @ 99.0.0 (npm) as malicious.
-
-It is considered malicious because:
-
-- The package communicates with a domain associated with malicious activity.
-&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5288"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-5286: Malicious code in encrypted-archive (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-5286</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5286"/>
-    <published>2026-06-06T19:29:29Z</published>
-    <updated>2026-06-06T19:46:22Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in encrypted-archive (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;encrypted-archive&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ossf-package-analysis (13428a6cdcd4736d3f044dd6a580724699318155a1c1e283b586b9a4c3ab6295)
-The OpenSSF Package Analysis project identified &amp;#x27;encrypted-archive&amp;#x27; @ 99.0.0 (npm) as malicious.
-
-It is considered malicious because:
-
-- The package communicates with a domain associated with malicious activity.
-&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5286"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-5287: Malicious code in uhd-setup (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-5287</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5287"/>
-    <published>2026-06-06T19:02:40Z</published>
-    <updated>2026-06-06T19:46:22Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in uhd-setup (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;uhd-setup&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ossf-package-analysis (358eee34aaba61eaa93e977d35a18f35f59a56527d7c20b6e9a0bdf9c4a0a8da)
-The OpenSSF Package Analysis project identified &amp;#x27;uhd-setup&amp;#x27; @ 99.0.0 (npm) as malicious.
-
-It is considered malicious because:
-
-- The package communicates with a domain associated with malicious activity.
-&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5287"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

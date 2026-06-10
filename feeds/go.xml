@@ -3,12 +3,244 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-06-10T12:11:14Z</updated>
+  <updated>2026-06-10T19:00:19Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-rqfj-vv8r-xhqc: nebula-mesh: Session and OIDC state cookies lack the Secure attribute</title>
+    <id>https://osv.dev/vulnerability/GHSA-rqfj-vv8r-xhqc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rqfj-vv8r-xhqc"/>
+    <published>2026-06-10T18:49:22Z</published>
+    <updated>2026-06-10T19:00:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48058"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nebula-mesh: Session and OIDC state cookies lack the Secure attribute&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48058&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/juev/nebula-mesh&lt;/code&gt; — fixed in 0.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`internal/web/session.go` and `internal/web/oidc.go` set `HttpOnly` and `SameSite=Lax` on every cookie but never `Secure`. A single plaintext request to the origin (operator on a LAN, mistyped URL, HTTP→HTTPS not strictly enforced, reverse proxy misconfiguration) discloses the session.
+
+## Affected
+All released versions up to v0.3.1.
+
+## Impact
+An attacker who can observe one HTTP request to the origin recovers the session cookie and impersonates the operator for the remainder of its 24h TTL. The OIDC state cookie has a narrower 10-minute window but enables CSRF on the OIDC callback during that window.
+
+## Cookie sites
+- `internal/web/session.go` — `Login`, `StartAuthenticatedSession`, `CompleteTwoFactor`, `Logout`
+- `internal/web/oidc.go` — `HandleLogin` (state set), `HandleCallback` (sta…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/juev/nebula-mesh/security/advisories/GHSA-rqfj-vv8r-xhqc"&gt;https://github.com/juev/nebula-mesh/security/advisories/GHSA-rqfj-vv8r-xhqc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/ffdd67dbf221d9a5855c39fbe11b49c245048d85"&gt;https://github.com/forgekeep/nebula-mesh/commit/ffdd67dbf221d9a5855c39fbe11b49c245048d85&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/juev/nebula-mesh"&gt;https://github.com/juev/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rqfj-vv8r-xhqc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3g33-6vg6-27m8: Fission router exposes /fission-function/&lt;ns&gt;/&lt;name&gt; on its public listener, allowing invocation of any function without an HTTPTrigger</title>
+    <id>https://osv.dev/vulnerability/GHSA-3g33-6vg6-27m8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3g33-6vg6-27m8"/>
+    <published>2026-05-21T20:14:51Z</published>
+    <updated>2026-06-10T18:46:56Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46614"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fission router exposes /fission-function/&amp;lt;ns&amp;gt;/&amp;lt;name&amp;gt; on its public listener, allowing invocation of any function without an HTTPTrigger&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46614&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fission/fission&lt;/code&gt; — fixed in 1.23.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Fission router registers an internal-style route — `/fission-function/&amp;lt;name&amp;gt;` and `/fission-function/&amp;lt;ns&amp;gt;/&amp;lt;name&amp;gt;` — for every `Function` object, independent of whether any `HTTPTrigger` exists for that function. The route was mounted on the same listener as user-defined `HTTPTrigger`s (`svc/router`, port 8888), so any caller who could reach the router could invoke any function by guessing its `metadata.name` (and namespace), bypassing the host / path / method / method-allow-list restrictions encoded in `HTTPTrigger` objects.
+
+### Affected component
+
+- `pkg/router/httpTriggers.go:280-284` — `internalRoute` registration via `utils.UrlForFunction(fn.Name, fn.Namespace)`, bound to the function handler.
+
+### Impact
+
+An external caller who reaches the public router could:
+
+1. In…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/security/advisories/GHSA-3g33-6vg6-27m8"&gt;https://github.com/fission/fission/security/advisories/GHSA-3g33-6vg6-27m8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46614"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46614&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3365"&gt;https://github.com/fission/fission/pull/3365&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3369"&gt;https://github.com/fission/fission/pull/3369&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission"&gt;https://github.com/fission/fission&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/releases/tag/v1.23.0"&gt;https://github.com/fission/fission/releases/tag/v1.23.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3g33-6vg6-27m8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3g8v-8r37-cgjm: FrankenPHP: Unsafe Unicode Handling in CGI Path Splitting Allows Execution of Non-PHP Files</title>
+    <id>https://osv.dev/vulnerability/GHSA-3g8v-8r37-cgjm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3g8v-8r37-cgjm"/>
+    <published>2026-05-15T17:09:46Z</published>
+    <updated>2026-06-10T18:46:56Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-45062"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;FrankenPHP: Unsafe Unicode Handling in CGI Path Splitting Allows Execution of Non-PHP Files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45062&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dunglas/frankenphp&lt;/code&gt; — fixed in 1.12.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `splitPos()` function in [`cgi.go`](https://github.com/php/frankenphp/blob/main/cgi.go) misuses `golang.org/x/text/search` with `search.IgnoreCase` when the request path contains a non-ASCII byte. Two distinct flaws in that fallback let an attacker mislead FrankenPHP into treating a non-`.php` file as a `.php` script. In any deployment where the attacker can place content into a file served by FrankenPHP (uploads, file storage, etc.), this can be escalated to remote code execution by crafting a URL whose path triggers either flaw.
+
+This advisory consolidates two independent reports against the same function (the duplicate, GHSA-v4h7-cj44-8fc8, has been closed). Both were reported by @KC1zs4.
+
+### Details
+
+```go
+var splitSearchNonASCII = search.New(language.Und, search.Igno…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp/security/advisories/GHSA-3g8v-8r37-cgjm"&gt;https://github.com/php/frankenphp/security/advisories/GHSA-3g8v-8r37-cgjm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45062"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45062&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp/commit/2d0f480329a02571d6f635dad9fdb066e1a11e81"&gt;https://github.com/php/frankenphp/commit/2d0f480329a02571d6f635dad9fdb066e1a11e81&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp"&gt;https://github.com/php/frankenphp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp/releases/tag/v1.12.3"&gt;https://github.com/php/frankenphp/releases/tag/v1.12.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3g8v-8r37-cgjm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-chf8-4hv6-8pg6: Fission StorageSvc /v1/archive endpoint exposes unauthenticated CRUD over all function archives</title>
+    <id>https://osv.dev/vulnerability/GHSA-chf8-4hv6-8pg6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-chf8-4hv6-8pg6"/>
+    <published>2026-05-21T20:07:13Z</published>
+    <updated>2026-06-10T18:46:54Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46612"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fission StorageSvc /v1/archive endpoint exposes unauthenticated CRUD over all function archives&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46612&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fission/fission&lt;/code&gt; — fixed in 1.23.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Fission `storagesvc` component registers archive CRUD handlers (`/v1/archive` GET / POST / DELETE and `/v1/archives` list) directly on its HTTP router without performing any authentication or authorization. Any caller able to reach the `storagesvc` ClusterIP — including  any other workload in the same Kubernetes cluster — could enumerate archive IDs, download archives belonging to other tenants, upload arbitrary archive content, and delete archives.
+
+ ### Affected component
+
+  - `pkg/storagesvc/storagesvc.go` — handler registration and per-route handler logic at lines   72-95 (list), 167-199 (download/delete), and 263-270 (route wiring).
+
+ ### Impact
+
+A workload elsewhere in the cluster (e.g. a compromised function pod, a noisy-neighbour tenant in a multi-tenant deployment…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/security/advisories/GHSA-chf8-4hv6-8pg6"&gt;https://github.com/fission/fission/security/advisories/GHSA-chf8-4hv6-8pg6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46612"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46612&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3365"&gt;https://github.com/fission/fission/pull/3365&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3368"&gt;https://github.com/fission/fission/pull/3368&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission"&gt;https://github.com/fission/fission&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/releases/tag/v1.23.0"&gt;https://github.com/fission/fission/releases/tag/v1.23.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-chf8-4hv6-8pg6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-85g2-pmrx-r49q: Fission runtime pods automount the fission-fetcher service-account token into the user function   container, granting function code namespace-wide secret / configmap read</title>
+    <id>https://osv.dev/vulnerability/GHSA-85g2-pmrx-r49q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-85g2-pmrx-r49q"/>
+    <published>2026-05-21T20:16:12Z</published>
+    <updated>2026-06-10T18:46:54Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46617"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fission runtime pods automount the fission-fetcher service-account token into the user function   container, granting function code namespace-wide secret / configmap read&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46617&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fission/fission&lt;/code&gt; — fixed in 1.23.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Fission runtime pods were created with `ServiceAccountName: fission-fetcher`, and the `fission-fetcher` ServiceAccount was granted namespace-wide `get` on `secrets` and `configmaps` (it needs that to load function code, env vars, and config). The runtime pod&amp;#x27;s automounted token was reachable from inside the user&amp;#x27;s function container at `/var/run/secrets/kubernetes.io/serviceaccount/token`, so user-supplied function code inherited the same Kubernetes API privileges and could read any secret or configmap in the function&amp;#x27;s namespace — far beyond the `Function.spec.secrets` allowlist that the function specification suggests.
+
+### Affected component
+
+- `pkg/executor/executortype/poolmgr/gp_deployment.go:154-156` — pool-manager runtime pod `ServiceAccountName`.
+- `pkg/executor/execu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/security/advisories/GHSA-85g2-pmrx-r49q"&gt;https://github.com/fission/fission/security/advisories/GHSA-85g2-pmrx-r49q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46617"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46617&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3366"&gt;https://github.com/fission/fission/pull/3366&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission"&gt;https://github.com/fission/fission&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/releases/tag/v1.23.0"&gt;https://github.com/fission/fission/releases/tag/v1.23.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-85g2-pmrx-r49q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7pjr-qpvh-m339: Fission builder accepts arbitrary buildcmd strings from Environment.spec.builder.command, allowing the builder pod to invoke arbitrary executables</title>
+    <id>https://osv.dev/vulnerability/GHSA-7pjr-qpvh-m339</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7pjr-qpvh-m339"/>
+    <published>2026-05-21T20:17:24Z</published>
+    <updated>2026-06-10T18:46:54Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46618"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fission builder accepts arbitrary buildcmd strings from Environment.spec.builder.command, allowing the builder pod to invoke arbitrary executables&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46618&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fission/fission&lt;/code&gt; — fixed in 1.23.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Before the round-1 security sweep, `pkg/builder/builder.go` passed `Environment.spec.builder.command` directly into `exec.Command(...)` after a `strings.Fields` split, with no validation of the executable path or its arguments. A user who could create or update `Environment` CRDs in a namespace observed by the buildermgr could thereby point the builder pod at any executable inside the builder image (e.g. `/bin/sh -c &amp;#x27;...&amp;#x27;`) and execute arbitrary code in the builder pod context.
+
+### Affected component
+
+- `pkg/builder/builder.go:254` — call site (`exec.Command(buildCmd, buildArgs...)`).
+- `pkg/builder/builder.go:106` — input source: `buildCmd, buildArgs = strings.Fields(req.BuildCommand)[0], strings.Fields(req.BuildCommand)[1:]`.
+
+### Impact
+
+A subject with `create` / `update` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/security/advisories/GHSA-7pjr-qpvh-m339"&gt;https://github.com/fission/fission/security/advisories/GHSA-7pjr-qpvh-m339&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46618"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46618&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3364"&gt;https://github.com/fission/fission/pull/3364&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission"&gt;https://github.com/fission/fission&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/releases/tag/v1.23.0"&gt;https://github.com/fission/fission/releases/tag/v1.23.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7pjr-qpvh-m339"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8h84-fhqq-q58v: nebula-mesh: Decrypted CA private key persists in heap after signing</title>
+    <id>https://osv.dev/vulnerability/GHSA-8h84-fhqq-q58v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8h84-fhqq-q58v"/>
+    <published>2026-06-10T18:34:29Z</published>
+    <updated>2026-06-10T18:46:54Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48025"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nebula-mesh: Decrypted CA private key persists in heap after signing&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48025&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/juev/nebula-mesh&lt;/code&gt; — fixed in 0.3.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`internal/pki/resolver.go:36-64` constructs a `CAManager` with the plaintext `ed25519.PrivateKey` after unwrapping via the master key; `internal/pki/ca.go:13-16` stores it. Callers at `internal/api/enroll.go:116`, `internal/api/updates.go:297`, and `internal/api/mobile_bundle.go:40` use the manager for one `Sign()` and drop the reference on function return — but the underlying slice contents are not wiped before release.
+
+The keystore package&amp;#x27;s contract (`internal/keystore/keystore.go` doc: *&amp;quot;Callers MUST zeroise the returned plaintext DEK as soon as it is no longer needed&amp;quot;*) is not met by the `CAManager` consumer. Decrypted CA private keys persist in process heap until Go&amp;#x27;s GC scavenges the underlying slice — minutes to hours under load, indefinitely on idle servers.
+
+## Affected
+All rele…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/juev/nebula-mesh/security/advisories/GHSA-8h84-fhqq-q58v"&gt;https://github.com/juev/nebula-mesh/security/advisories/GHSA-8h84-fhqq-q58v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/bca1d5914fbaf3517d3b86145a802c00de4a8122"&gt;https://github.com/forgekeep/nebula-mesh/commit/bca1d5914fbaf3517d3b86145a802c00de4a8122&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.3.7"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.3.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/juev/nebula-mesh"&gt;https://github.com/juev/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8h84-fhqq-q58v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-cxh2-4639-vmc5: OpenTelemetry Operator for Kubernetes's ServiceMonitor bearerTokenFile reads arbitrary local file and sends contents as bearer auth</title>
+    <id>https://osv.dev/vulnerability/GHSA-cxh2-4639-vmc5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cxh2-4639-vmc5"/>
+    <published>2026-06-10T17:24:01Z</published>
+    <updated>2026-06-10T17:30:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-47701"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenTelemetry Operator for Kubernetes&amp;#x27;s ServiceMonitor bearerTokenFile reads arbitrary local file and sends contents as bearer auth&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47701&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/open-telemetry/opentelemetry-operator&lt;/code&gt; — fixed in 0.152.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Affected
+
+Repository: github.com/open-telemetry/opentelemetry-operator
+Component: cmd/otel-allocator (TargetAllocator)
+Companion: Prometheus Operator API types (CRDs)
+
+## Summary
+
+OpenTelemetry Operator&amp;#x27;s TargetAllocator watches `ServiceMonitor` resources via the Prometheus Operator CR watcher and converts each selected endpoint into a Prometheus scrape configuration entry. The endpoint field `bearerTokenFile` is preserved through the conversion as `HTTPClientConfig.Authorization.CredentialsFile`. The OpenTelemetry Collector, configured with the Prometheus receiver, then loads that scrape config and, at scrape time, reads the file from its own pod filesystem and sends the contents as `Authorization: Bearer ...` to the scrape endpoint.
+
+A tenant who can create or update a `ServiceMonitor…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-operator/security/advisories/GHSA-cxh2-4639-vmc5"&gt;https://github.com/open-telemetry/opentelemetry-operator/security/advisories/GHSA-cxh2-4639-vmc5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-operator/pull/5104"&gt;https://github.com/open-telemetry/opentelemetry-operator/pull/5104&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-operator"&gt;https://github.com/open-telemetry/opentelemetry-operator&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cxh2-4639-vmc5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-j9rx-rppg-6hh4: Anyquery has Path Traversal through `clear_plugin_cache`, Allowing Arbitrary Directory Deletion</title>
+    <id>https://osv.dev/vulnerability/GHSA-j9rx-rppg-6hh4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j9rx-rppg-6hh4"/>
+    <published>2026-06-10T17:11:53Z</published>
+    <updated>2026-06-10T17:15:06Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-47253"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Anyquery has Path Traversal through `clear_plugin_cache`, Allowing Arbitrary Directory Deletion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47253&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/julien040/anyquery&lt;/code&gt; — fixed in 0.4.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Path Traversal in `clear_plugin_cache` Allows Arbitrary Directory Deletion
+
+| Field            | Value |
+| ---------------- | ----- |
+| Repository       | julien040/anyquery |
+| Affected version | 0.4.4 |
+| Vulnerability    | CWE-22 — Improper Limitation of a Pathname to a Restricted Directory |
+| Severity         | High |
+
+
+## Summary
+
+The SQL scalar function `clear_plugin_cache(plugin)` in `namespace/other_functions.go` passes the caller-supplied `plugin` argument directly to `path.Join` and then to `os.RemoveAll`, with only an empty-string check as a guard. Because `path.Join` silently resolves `..` segments, a low-privileged bearer-token holder can submit `SELECT clear_plugin_cache(&amp;#x27;../../../../tmp/target&amp;#x27;)` to the `/v1/query` HTTP endpoint and delete any directory reachable by the s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery/security/advisories/GHSA-j9rx-rppg-6hh4"&gt;https://github.com/julien040/anyquery/security/advisories/GHSA-j9rx-rppg-6hh4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery"&gt;https://github.com/julien040/anyquery&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery/releases/tag/0.4.5"&gt;https://github.com/julien040/anyquery/releases/tag/0.4.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j9rx-rppg-6hh4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vrmh-5mmx-hjwx: Nezha's private services (`EnableShowInService: false`) are enumerable via per-server endpoints, leaking name and timing data</title>
+    <id>https://osv.dev/vulnerability/GHSA-vrmh-5mmx-hjwx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vrmh-5mmx-hjwx"/>
+    <published>2026-06-10T13:39:24Z</published>
+    <updated>2026-06-10T13:45:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-49397"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha&amp;#x27;s private services (`EnableShowInService: false`) are enumerable via per-server endpoints, leaking name and timing data&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49397&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 2.0.14&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Private services (`EnableShowInService: false`) are enumerable via per-server endpoints, leaking name and timing data
+
+**CWE**: CWE-285 (Improper Authorization) via CWE-200 (Exposure of Sensitive Information to an Unauthorized Actor) and CWE-863 (Incorrect Authorization — inconsistent gating across data-reader paths)
+
+**CVSS v3.1**: `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N` → 5.3 (Medium)
+
+## Summary
+
+The `EnableShowInService` flag on a `Service` is meant to gate that service&amp;#x27;s visibility from the public dashboard. The main service-listing endpoint (`GET /api/v1/service` → `showService`) correctly filters services with `EnableShowInService: false` via `ServiceSentinel.CopyStats()` (`service/singleton/servicesentinel.go:421-438`). However, two adjacent reader endpoints retrieve servi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-vrmh-5mmx-hjwx"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-vrmh-5mmx-hjwx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vrmh-5mmx-hjwx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mqq6-462x-jxmm: Go Restful API Boilerplate: Hardcoded JWT Secret "random" Allows Token Forgery</title>
+    <id>https://osv.dev/vulnerability/GHSA-mqq6-462x-jxmm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mqq6-462x-jxmm"/>
+    <published>2026-06-10T13:39:18Z</published>
+    <updated>2026-06-10T13:45:17Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48031"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Go Restful API Boilerplate: Hardcoded JWT Secret &amp;quot;random&amp;quot; Allows Token Forgery&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48031&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dhax/go-base&lt;/code&gt; — fixed in 0.0.0-20260517152733-cc82b9740fa6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability: CWE-798 — Hardcoded JWT Secret + Broken Mitigation
+
+### Affected Component
+- `github.com/dhax/go-base` — Go REST API boilerplate (go-chi/jwtauth/v5, Viper, PostgreSQL/Bun)
+- 1,685 stars on GitHub
+
+### Vulnerability Locations
+
+| File | Line | Role |
+|------|------|------|
+| `dev.env` | 10 | `AUTH_JWT_SECRET=random` — template default shipped to all users |
+| `cmd/serve.go` | 35 | `viper.SetDefault(&amp;quot;auth_jwt_secret&amp;quot;, &amp;quot;random&amp;quot;)` — code-level fallback |
+| `auth/jwt/tokenauth.go` | 22-25 | Weak mitigation: only checked literal `&amp;quot;random&amp;quot;`, auto-generated non-persistent key |
+| `auth/jwt/tokenauth.go` | 28 | `jwtauth.New(&amp;quot;HS256&amp;quot;, []byte(secret), nil)` — creates JWT signer with the weak key |
+| `pwdless/api.go` | 203 | `GenTokenPair()` — issues access + refresh tokens signed with…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dhax/go-base/security/advisories/GHSA-mqq6-462x-jxmm"&gt;https://github.com/dhax/go-base/security/advisories/GHSA-mqq6-462x-jxmm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dhax/go-base/commit/cc82b9740fa6b08e0fad409cd4b418e240dd0e00"&gt;https://github.com/dhax/go-base/commit/cc82b9740fa6b08e0fad409cd4b418e240dd0e00&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dhax/go-base"&gt;https://github.com/dhax/go-base&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mqq6-462x-jxmm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8qhj-4f8c-j8qg: Nezha has cross-site GET request that can trigger stored cron commands on a victim's agents</title>
+    <id>https://osv.dev/vulnerability/GHSA-8qhj-4f8c-j8qg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8qhj-4f8c-j8qg"/>
+    <published>2026-06-10T13:39:21Z</published>
+    <updated>2026-06-10T13:45:16Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-49396"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha has cross-site GET request that can trigger stored cron commands on a victim&amp;#x27;s agents&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49396&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 2.0.14&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The dashboard exposes the cron manual-trigger action as an authenticated `GET /api/v1/cron/:id/manual` endpoint. Dashboard JWTs are sent in the `nz-jwt` cookie and configured with `SameSite=Lax`, which browsers include on top-level cross-site GET navigations. Because this state-changing GET endpoint has no CSRF token, origin validation, or fetch-metadata guard, an attacker can cause a logged-in Nezha user to trigger one of their existing cron tasks by navigating the victim&amp;#x27;s browser to the manual-trigger URL.
+
+If the targeted cron task sends a command to an online agent, the stored command is dispatched to the agent task stream. The attacker cannot create or modify the cron command through this issue alone, but can force execution of a command that the victim already saved and…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-8qhj-4f8c-j8qg"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-8qhj-4f8c-j8qg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8qhj-4f8c-j8qg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-2xf2-gjm6-g2c6: Ollama Divide by Zero Vulnerability</title>
     <id>https://osv.dev/vulnerability/GHSA-2xf2-gjm6-g2c6</id>
@@ -2433,155 +2665,5 @@ ls: key.txt: No such file or directory
 Start the SFTP server:
 ``` bash
 /tmp/s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patrickhener/goshs/security/advisories/GHSA-2943-crp8-38xx"&gt;https://github.com/patrickhener/goshs/security/advisories/GHSA-2943-crp8-38xx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40188"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40188&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patrickhener/goshs/commit/141c188ce270ffbec087844a50e5e695b7da7744"&gt;https://github.com/patrickhener/goshs/commit/141c188ce270ffbec087844a50e5e695b7da7744&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patrickhener/goshs"&gt;https://github.com/patrickhener/goshs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patrickhener/goshs/releases/tag/v2.0.0-beta.4"&gt;https://github.com/patrickhener/goshs/releases/tag/v2.0.0-beta.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2943-crp8-38xx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2g7h-7rqr-9p4r: Vikunja has iCalendar Property Injection via CRLF in CalDAV Task Output</title>
-    <id>https://osv.dev/vulnerability/GHSA-2g7h-7rqr-9p4r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2g7h-7rqr-9p4r"/>
-    <published>2026-04-10T15:35:05Z</published>
-    <updated>2026-06-08T20:08:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-35601"/>
-    <category term="GO-2026-4951"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja has iCalendar Property Injection via CRLF in CalDAV Task Output&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35601, GO-2026-4951&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The CalDAV output generator builds iCalendar VTODO entries via raw string concatenation without applying RFC 5545 TEXT value escaping. User-controlled task titles containing CRLF characters break the iCalendar property boundary, allowing injection of arbitrary iCalendar properties such as `ATTACH`, `VALARM`, or `ORGANIZER`.
-
-## Details
-
-The `ParseTodos` function at `pkg/caldav/caldav.go:146` concatenates the task summary directly into the iCalendar output:
-
-```go
-SUMMARY:` + t.Summary + getCaldavColor(t.Color)
-```
-
-RFC 5545 Section 3.3.11 requires TEXT property values to escape newlines as `\n`, semicolons as `\;`, commas as `\,`, and backslashes as `\\`. None of these escaping rules are applied to `Summary`, `Categories`, `UID`, project name, or alarm `Description` fields.
-
-Go…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-2g7h-7rqr-9p4r"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-2g7h-7rqr-9p4r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35601"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35601&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/pull/2580"&gt;https://github.com/go-vikunja/vikunja/pull/2580&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.3.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2g7h-7rqr-9p4r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2vq4-854f-5c72: Vikunja vulnerable to Privilege Escalation via Project Reparenting</title>
-    <id>https://osv.dev/vulnerability/GHSA-2vq4-854f-5c72</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2vq4-854f-5c72"/>
-    <published>2026-04-10T15:33:50Z</published>
-    <updated>2026-06-08T20:08:25Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-35595"/>
-    <category term="GO-2026-4952"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja vulnerable to Privilege Escalation via Project Reparenting&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35595, GO-2026-4952&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-A user with Write-level access to a project can escalate their permissions to Admin by moving the project under a project they own. After reparenting, the recursive permission CTE resolves ownership of the new parent as Admin on the moved project. The attacker can then delete the project, manage shares, and remove other users&amp;#x27; access.
-
-## Details
-
-The `CanUpdate` check at `pkg/models/project_permissions.go:139-148` only requires `CanWrite` on the new parent project when changing `parent_project_id`. However, Vikunja&amp;#x27;s permission model uses a recursive CTE that walks up the project hierarchy to compute permissions. Moving a project under a different parent changes the permission inheritance chain.
-
-When a user has inherited Write access (from a parent project share) and reparent…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-2vq4-854f-5c72"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-2vq4-854f-5c72&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35595"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35595&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/pull/2583"&gt;https://github.com/go-vikunja/vikunja/pull/2583&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/c03d682f48aff890eeb3c8b41d38226069722827"&gt;https://github.com/go-vikunja/vikunja/commit/c03d682f48aff890eeb3c8b41d38226069722827&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.3.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2vq4-854f-5c72"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8rm2-7qqf-34qm: Prometheus: Remote read endpoint allows denial of service via crafted snappy payload</title>
-    <id>https://osv.dev/vulnerability/GHSA-8rm2-7qqf-34qm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8rm2-7qqf-34qm"/>
-    <published>2026-05-05T19:34:05Z</published>
-    <updated>2026-06-08T16:30:07Z</updated>
-    <category term="Go"/>
-    <category term="BIT-prometheus-2026-42154"/>
-    <category term="CVE-2026-42154"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Prometheus: Remote read endpoint allows denial of service via crafted snappy payload&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-prometheus-2026-42154, CVE-2026-42154&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 0.311.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 0.305.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-The remote read endpoint (`/api/v1/read`) does not validate the declared decoded length in a snappy-compressed request body before allocating memory.
-An unauthenticated attacker can send a small payload that causes a huge heap allocation per request. Under concurrent load this can exhaust available memory and crash the Prometheus process.
-
-### Patches
-_Has the problem been patched? What versions should users upgrade to?_
-
-Fixed in 3.11.3 and 3.5.3 LTS. Users should upgrade to these versions or later.
-
-### Workarounds
-User who can not upgrade can place Prometheus behind a reverse proxy or firewall that requires authentication before requests reach /api/v1/read.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/security/advisories/GHSA-8rm2-7qqf-34qm"&gt;https://github.com/prometheus/prometheus/security/advisories/GHSA-8rm2-7qqf-34qm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42154"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42154&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18584"&gt;https://github.com/prometheus/prometheus/pull/18584&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18585"&gt;https://github.com/prometheus/prometheus/pull/18585&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus"&gt;https://github.com/prometheus/prometheus&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/releases/tag/v3.11.3"&gt;https://github.com/prometheus/prometheus/releases/tag/v3.11.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/releases/tag/v3.5.3"&gt;https://github.com/prometheus/prometheus/releases/tag/v3.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8rm2-7qqf-34qm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-p7mv-53f2-4cwj: CometBFT Vote Extensions: Panic when receiving a Pre-commit with an invalid data</title>
-    <id>https://osv.dev/vulnerability/GHSA-p7mv-53f2-4cwj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p7mv-53f2-4cwj"/>
-    <published>2024-11-06T15:33:55Z</published>
-    <updated>2026-06-08T16:15:09Z</updated>
-    <category term="Go"/>
-    <category term="GO-2024-3259"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;CometBFT Vote Extensions: Panic when receiving a Pre-commit with an invalid data&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GO-2024-3259&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cometbft/cometbft&lt;/code&gt; — fixed in 0.38.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Name: ASA-2024-011: Vote Extensions: Panic when receiving a Pre-commit with an invalid data
-Component: CometBFT
-Criticality: High (Considerable Impact, and Possible Likelihood per [ACMv1.2](https://github.com/interchainio/security/blob/main/resources/CLASSIFICATION_MATRIX.md))
-Affected versions: `&amp;gt;= 0.38.x`, unreleased `v1.x` and `main` development branches
-Affected users: Chain Builders + Maintainers, Validators
-
-### Impact
-
-A CometBFT node running in a network with [vote extensions][abci-spec] enabled could produce an invalid `Vote` message and send it to its peers. The invalid field of the `Vote` message is the `ValidatorIndex`, which identifies the sender in the `ValidatorSet` running that height of consensus. This field is ordinarily verified in the processing of `Vote` messages, but …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cometbft/cometbft/security/advisories/GHSA-p7mv-53f2-4cwj"&gt;https://github.com/cometbft/cometbft/security/advisories/GHSA-p7mv-53f2-4cwj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cometbft/cometbft/commit/17d3bb66664cab6d6798c17e27198e15bbac1905"&gt;https://github.com/cometbft/cometbft/commit/17d3bb66664cab6d6798c17e27198e15bbac1905&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://docs.cometbft.com/v0.38/spec/abci/abci++_basic_concepts"&gt;https://docs.cometbft.com/v0.38/spec/abci/abci++_basic_concepts&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cometbft/cometbft"&gt;https://github.com/cometbft/cometbft&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cometbft/cometbft/releases/tag/v0.38.15"&gt;https://github.com/cometbft/cometbft/releases/tag/v0.38.15&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2024-3259"&gt;https://pkg.go.dev/vuln/GO-2024-3259&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p7mv-53f2-4cwj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-p93v-m2r2-4387: Denial of service via insufficient metadata validation</title>
-    <id>https://osv.dev/vulnerability/GHSA-p93v-m2r2-4387</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p93v-m2r2-4387"/>
-    <published>2022-03-01T21:05:01Z</published>
-    <updated>2026-06-08T16:15:09Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2022-25327"/>
-    <category term="GHSA-8vwm-8vj8-rqjf"/>
-    <category term="GO-2022-0340"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Denial of service via insufficient metadata validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2022-25327, GHSA-8vwm-8vj8-rqjf, GO-2022-0340&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/google/fscrypt&lt;/code&gt; — fixed in 0.3.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The PAM module for `fscrypt` through v0.3.2 doesn&amp;#x27;t adequately validate `fscrypt` metadata files, allowing users to create malicious metadata files that prevent other users from logging in. A local user can cause a denial of service by creating a `fscrypt` metadata file that prevents other users from logging into the system. We recommend upgrading to v0.3.3 or above.
-
-For more details, see [CVE-2022-25327](https://www.cve.org/CVERecord?id=CVE-2022-25327).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/google/fscrypt/security/advisories/GHSA-p93v-m2r2-4387"&gt;https://github.com/google/fscrypt/security/advisories/GHSA-p93v-m2r2-4387&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/google/fscrypt/commit/91aa3ebf42032ca783c41f9ec25d885875f66ddb"&gt;https://github.com/google/fscrypt/commit/91aa3ebf42032ca783c41f9ec25d885875f66ddb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2022-0340"&gt;https://pkg.go.dev/vuln/GO-2022-0340&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="github.com/google/fscrypt"&gt;github.com/google/fscrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p93v-m2r2-4387"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-c2c3-pqw5-5p7c: Go-Guerrilla SMTP Daemon allows the PROXY command to be sent multiple times</title>
-    <id>https://osv.dev/vulnerability/GHSA-c2c3-pqw5-5p7c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c2c3-pqw5-5p7c"/>
-    <published>2025-04-01T22:23:49Z</published>
-    <updated>2026-06-08T16:00:10Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2025-31135"/>
-    <category term="GO-2025-3588"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Go-Guerrilla SMTP Daemon allows the PROXY command to be sent multiple times&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-31135, GO-2025-3588&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/phires/go-guerrilla&lt;/code&gt; — fixed in 1.6.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The PROXY command is accepted multiple times, allowing a client to spoof its IP address when the proxy protocol is being used.
-
-### Details
-
-When ProxyOn is enabled, [it looks like the PROXY command will be accepted multiple times](https://github.com/phires/go-guerrilla/blob/fca3b2d8957a746997c7e71fca39004f5c96e91f/server.go#L495), with later invocations overriding earlier ones.  The proxy protocol only supports one initial PROXY header; anything after that is considered part of the exchange between client and server, so the client is free to send further PROXY commands with whatever data it pleases.  go-guerrilla will treat these as coming from the reverse proxy, allowing a client to spoof its IP address.
-
-Note that the format of the PROXY header is [well-defined](https://www…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/phires/go-guerrilla/security/advisories/GHSA-c2c3-pqw5-5p7c"&gt;https://github.com/phires/go-guerrilla/security/advisories/GHSA-c2c3-pqw5-5p7c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-31135"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-31135&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/phires/go-guerrilla/commit/7673947f2d5204a135d7ae0b7f80759e548abee6"&gt;https://github.com/phires/go-guerrilla/commit/7673947f2d5204a135d7ae0b7f80759e548abee6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/phires/go-guerrilla"&gt;https://github.com/phires/go-guerrilla&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2025-3588"&gt;https://pkg.go.dev/vuln/GO-2025-3588&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c2c3-pqw5-5p7c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f8ch-w75v-c847: 1Panel arbitrary file write vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-f8ch-w75v-c847</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f8ch-w75v-c847"/>
-    <published>2024-05-09T15:14:24Z</published>
-    <updated>2026-06-08T16:00:10Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2024-34352"/>
-    <category term="GO-2024-2830"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;1Panel arbitrary file write vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-34352, GO-2024-2830&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/1Panel-dev/1Panel&lt;/code&gt; — fixed in 1.10.3-lts&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-There are many command injections in the project, and some of them are not well filtered, leading to arbitrary file writes, and ultimately leading to RCEs.
-We can use the following mirror configuration write symbol `&amp;gt;` to achieve arbitrary file writing
-
-### PoC
-Dockerfile
-```
-FROM bash:latest
-
-COPY echo.sh /usr/local/bin/echo.sh
-RUN chmod +x /usr/local/bin/echo.sh
-CMD [&amp;quot;echo.sh&amp;quot;]
-```
-echo.sh
-```
-#!/usr/local/bin/bash
-echo &amp;quot;Hello, World!&amp;quot;
-```
-Build this image like this, upload it to dockerhub, and then 1panel pulls the image to build the container
-Send the following packet, taking care to change the containerID to the malicious container we constructed
-
-```
-GET /api/v1/containers/search/log?container=6e6308cb8e4734856189b65b3ce2d13a69e87d2717898d120dac23b13b6f1377%3E%2Ftmp%2F1&amp;amp;s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/1Panel-dev/1Panel/security/advisories/GHSA-f8ch-w75v-c847"&gt;https://github.com/1Panel-dev/1Panel/security/advisories/GHSA-f8ch-w75v-c847&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-34352"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-34352&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/1Panel-dev/1Panel/commit/e037b69f52799e110af8e98f39a3627ad0285ea6"&gt;https://github.com/1Panel-dev/1Panel/commit/e037b69f52799e110af8e98f39a3627ad0285ea6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/1Panel-dev/1Panel"&gt;https://github.com/1Panel-dev/1Panel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2024-2830"&gt;https://pkg.go.dev/vuln/GO-2024-2830&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f8ch-w75v-c847"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

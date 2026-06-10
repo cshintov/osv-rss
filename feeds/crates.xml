@@ -3,12 +3,145 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-06-10T06:13:29Z</updated>
+  <updated>2026-06-10T16:29:22Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-wwx6-x28x-8259: russh: Post-decompression SSH packet size was not bounded, allowing remote oversized compressed packets</title>
+    <id>https://osv.dev/vulnerability/GHSA-wwx6-x28x-8259</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wwx6-x28x-8259"/>
+    <published>2026-05-29T19:37:14Z</published>
+    <updated>2026-06-10T16:29:22Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46702"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;russh: Post-decompression SSH packet size was not bounded, allowing remote oversized compressed packets&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46702&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.61.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When SSH compression is enabled, `russh` accepted compressed packets whose on-wire size passed the normal transport packet-length checks but whose decompressed size was much larger. This allowed a remote peer to send oversized post-decompression packets that should have been rejected.
+
+In current releases, this is a remote denial-of-service / resource-exhaustion issue in the post-decompression receive path.
+
+In older releases before `0.58.0`, the same remote decompression path used `CryptoVec`, which appears to make the historical impact worse.
+
+### Details
+
+The normal SSH transport read path enforces a packet-length limit before the packet body is read:
+
+- `russh/src/cipher/mod.rs`
+
+However, RFC 4253 compression is applied to the SSH `payload` field only. The `packet_length` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-wwx6-x28x-8259"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-wwx6-x28x-8259&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wwx6-x28x-8259"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-hpv4-5h6f-wqr3: russh server userauth state is not reset when authentication principal changes</title>
+    <id>https://osv.dev/vulnerability/GHSA-hpv4-5h6f-wqr3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hpv4-5h6f-wqr3"/>
+    <published>2026-05-29T19:39:41Z</published>
+    <updated>2026-06-10T16:29:22Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46705"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;russh server userauth state is not reset when authentication principal changes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46705&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.61.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The `russh` server authentication path keeps internal userauth state across `SSH_MSG_USERAUTH_REQUEST` messages without separating that state when the request principal changes.
+
+RFC 4252 allows the `user name` and `service name` fields to change between authentication requests. The issue is not that such changes are invalid. The issue is that russh-owned authentication state, such as remaining methods, partial-success state, and in-progress method state, can remain associated with the connection and then influence a later request for a different `(user, service)`.
+
+This is an internal library state mismatch. Applications are responsible for any authentication state they keep in their own handlers, but russh must reset or separate state that russh itself owns.
+
+### Details
+The …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-hpv4-5h6f-wqr3"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-hpv4-5h6f-wqr3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hpv4-5h6f-wqr3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-2r3c-m6v7-9354: sudo-rs Session File Relative Path Traversal vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-2r3c-m6v7-9354</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2r3c-m6v7-9354"/>
+    <published>2023-09-21T17:07:15Z</published>
+    <updated>2026-06-10T14:00:09Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2023-42456"/>
+    <category term="RUSTSEC-2023-0069"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;sudo-rs Session File Relative Path Traversal vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-42456, RUSTSEC-2023-0069&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;sudo-rs&lt;/code&gt; — fixed in 0.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Background
+
+Sudo-rs allows users to not have to enter authentication at every sudo attempt, but instead only requiring authentication every once in a while in every terminal or process group. Only once a configurable timeout has passed will the user have to re-authenticate themselves. Supporting this functionality is a set of session files (timestamps) for each user, stored in `/var/run/sudo-rs/ts`. These files are named according to the username from which the sudo attempt is made (the origin user).
+
+### Impact
+
+An issue was discovered where usernames containing the `.` and `/` characters could result in the corruption of specific files on the filesystem. On some operating systems usernames are not limited as to the characters they can contain, so a username appearing to be a relative…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/memorysafety/sudo-rs/security/advisories/GHSA-2r3c-m6v7-9354"&gt;https://github.com/memorysafety/sudo-rs/security/advisories/GHSA-2r3c-m6v7-9354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/trifectatechfoundation/sudo-rs/security/advisories/GHSA-2r3c-m6v7-9354"&gt;https://github.com/trifectatechfoundation/sudo-rs/security/advisories/GHSA-2r3c-m6v7-9354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-42456"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-42456&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/memorysafety/sudo-rs/commit/bfdbda22968e3de43fa8246cab1681cfd5d5493d"&gt;https://github.com/memorysafety/sudo-rs/commit/bfdbda22968e3de43fa8246cab1681cfd5d5493d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://ferrous-systems.com/blog/sudo-rs-audit"&gt;https://ferrous-systems.com/blog/sudo-rs-audit&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-2r3c-m6v7-9354"&gt;https://github.com/advisories/GHSA-2r3c-m6v7-9354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/memorysafety/sudo-rs"&gt;https://github.com/memorysafety/sudo-rs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2023-0069.html"&gt;https://rustsec.org/advisories/RUSTSEC-2023-0069.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2r3c-m6v7-9354"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mw3q-r9wh-h2ff: nimiq-primitives: Panic DoS in trie chunk processing via ROOT-keyed item</title>
+    <id>https://osv.dev/vulnerability/GHSA-mw3q-r9wh-h2ff</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mw3q-r9wh-h2ff"/>
+    <published>2026-05-21T19:50:31Z</published>
+    <updated>2026-06-10T13:45:16Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46545"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nimiq-primitives: Panic DoS in trie chunk processing via ROOT-keyed item&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46545&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nimiq-primitives&lt;/code&gt; — fixed in 1.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A remote, unauthenticated denial-of-service vulnerability in `MerkleRadixTrie::put_chunk` allows any state-sync peer to crash any node performing state synchronization (freshly joining nodes and recovering nodes).
+
+A malicious peer can respond to a `RequestChunk` with a `ResponseChunk::Chunk` whose first `TrieItem.key` is the empty (ROOT) key. The chunk passes sorting, range, and Merkle-proof validation, but when `put_raw` tries to store a value at the root node, it calls `TrieNode::put_value(...).unwrap()`, which returns `Err(RootCantHaveValue)` and panics, aborting the node process. The panic fires on the first malicious chunk the victim commits; no rate limit or authentication gate caps the attack.
+
+Impacted: any node running state sync against untrusted peers — this include…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-mw3q-r9wh-h2ff"&gt;https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-mw3q-r9wh-h2ff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46545"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46545&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/pull/3762"&gt;https://github.com/nimiq/core-rs-albatross/pull/3762&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/commit/0fb8766adea91e038af00e635a6eb92756e50172"&gt;https://github.com/nimiq/core-rs-albatross/commit/0fb8766adea91e038af00e635a6eb92756e50172&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross"&gt;https://github.com/nimiq/core-rs-albatross&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/releases/tag/v1.5.0"&gt;https://github.com/nimiq/core-rs-albatross/releases/tag/v1.5.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mw3q-r9wh-h2ff"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vghx-352f-93jm: nimiq-blockchain: Genesis batch set request</title>
+    <id>https://osv.dev/vulnerability/GHSA-vghx-352f-93jm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vghx-352f-93jm"/>
+    <published>2026-05-21T19:46:15Z</published>
+    <updated>2026-06-10T13:45:16Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46543"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nimiq-blockchain: Genesis batch set request&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46543&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nimiq-blockchain&lt;/code&gt; — fixed in 1.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+A remote peer can crash any full node by sending a RequestBatchSet message containing the genesis block&amp;#x27;s hash. The handler calls `get_epoch_chunks` which iterates backwards through macro blocks using `Policy::macro_block_before`. When it reaches the genesis block number, `macro_block_before` panics with &amp;quot;No macro blocks before genesis block&amp;quot;.
+
+### Patches
+[The patch for this vulnerability](https://github.com/nimiq/core-rs-albatross/pull/3745) is formally released as part of [v1.5.0](https://github.com/nimiq/core-rs-albatross/releases/tag/v1.5.0).
+
+### Workarounds
+No Workaround, although requesting the genesis batch set is not used during normal operation.
+
+### Resources
+See [PR](https://github.com/nimiq/core-rs-albatross/pull/3745).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-vghx-352f-93jm"&gt;https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-vghx-352f-93jm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46543"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46543&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/pull/3745"&gt;https://github.com/nimiq/core-rs-albatross/pull/3745&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/commit/8e8b0abdb1b66f5e9b25b3833879f05c173a5596"&gt;https://github.com/nimiq/core-rs-albatross/commit/8e8b0abdb1b66f5e9b25b3833879f05c173a5596&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross"&gt;https://github.com/nimiq/core-rs-albatross&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/releases/tag/v1.5.0"&gt;https://github.com/nimiq/core-rs-albatross/releases/tag/v1.5.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vghx-352f-93jm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h9cc-w26m-j342: nimiq-keys: Denial of service in Ed25519 multisig delinearization via invalid curve points</title>
+    <id>https://osv.dev/vulnerability/GHSA-h9cc-w26m-j342</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h9cc-w26m-j342"/>
+    <published>2026-05-21T19:45:08Z</published>
+    <updated>2026-06-10T13:45:15Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46542"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nimiq-keys: Denial of service in Ed25519 multisig delinearization via invalid curve points&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46542&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nimiq-keys&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A denial-of-service vulnerability exists in the Ed25519 multisig delinearization code path. `Ed25519PublicKey::delinearize()` in `keys/src/multisig/mod.rs` called `.unwrap()` on curve point decompression, which panics when a public key is
+constructed from 32 bytes that do not represent a valid point on the Ed25519 curve. `Ed25519PublicKey` construction only validates byte length, not curve membership, so invalid keys can reach the delinearization path and crash the
+hosting process.
+
+A secondary panic existed in `Commitment::From&amp;lt;[u8; 32]&amp;gt;`, which similarly called `.unwrap()` on a failing curve point decompression.
+
+**Who is affected:** Browser and desktop wallet users of the web-client WASM library and the `nimiq-wallet` crate, when initiating a multisig operation with an attac…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-h9cc-w26m-j342"&gt;https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-h9cc-w26m-j342&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46542"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46542&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/pull/3713"&gt;https://github.com/nimiq/core-rs-albatross/pull/3713&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/commit/3bc449a8138960c4de6bfd506bad1730c621d4de"&gt;https://github.com/nimiq/core-rs-albatross/commit/3bc449a8138960c4de6bfd506bad1730c621d4de&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross"&gt;https://github.com/nimiq/core-rs-albatross&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/releases/tag/v1.4.0"&gt;https://github.com/nimiq/core-rs-albatross/releases/tag/v1.4.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h9cc-w26m-j342"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-799f-29jm-gr6c: nimiq-primitives: BlockInclusionProof interlink issue when hops are empty</title>
+    <id>https://osv.dev/vulnerability/GHSA-799f-29jm-gr6c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-799f-29jm-gr6c"/>
+    <published>2026-05-21T19:38:00Z</published>
+    <updated>2026-06-10T13:45:15Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46539"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nimiq-primitives: BlockInclusionProof interlink issue when hops are empty&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46539&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nimiq-primitives&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+A logic flaw in `BlockInclusionProof::is_block_proven` causes the function to return true without performing any cryptographic verification when `get_interlink_hops` yields an empty hop list. This occurs when the target block is at the election block position immediately preceding the election head&amp;#x27;s epoch. An attacker providing transaction inclusion proofs can forge a MacroBlock header for that epoch position and have it accepted as &amp;quot;proven&amp;quot; without any hash or signature verification.
+
+### Patches
+[The patch for this vulnerability](https://github.com/nimiq/core-rs-albatross/pull/3705) is formally released as part of [v1.4.0](https://github.com/nimiq/core-rs-albatross/releases/tag/v1.4.0).
+
+### Workarounds
+No Workarounds
+
+### Resources
+See [PR](https://github.com/nimiq/core-rs-a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-799f-29jm-gr6c"&gt;https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-799f-29jm-gr6c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46539"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46539&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/pull/3705"&gt;https://github.com/nimiq/core-rs-albatross/pull/3705&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/commit/cc5a1d54bbbffd1ea975bd2ee87d5f7b3b30bbf1"&gt;https://github.com/nimiq/core-rs-albatross/commit/cc5a1d54bbbffd1ea975bd2ee87d5f7b3b30bbf1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross"&gt;https://github.com/nimiq/core-rs-albatross&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/releases/tag/v1.4.0"&gt;https://github.com/nimiq/core-rs-albatross/releases/tag/v1.4.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-799f-29jm-gr6c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2025-0163: Unsound issue in Trailer</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2025-0163</id>
@@ -515,25 +648,5 @@ Specifically, the following steps must occur to trigger the bug:
     <category term="CVE-2024-27529"/>
     <category term="PYSEC-2024-305"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;wasm3 uncontrolled memory allocation vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-27529, PYSEC-2024-305&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/shareup/wasm-interpreter-apple&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;pywasm3&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasm3&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;wasm3 at commit 139076a contains a memory leak in the Read_utf8 function.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-27529"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-27529&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wasm3/wasm3/issues/462"&gt;https://github.com/wasm3/wasm3/issues/462&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wasm3/wasm3/pull/490"&gt;https://github.com/wasm3/wasm3/pull/490&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wasm3/wasm3/commit/526c1251b64e6e9fdc0d40c768ae46cd20338594"&gt;https://github.com/wasm3/wasm3/commit/526c1251b64e6e9fdc0d40c768ae46cd20338594&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/haruki3hhh/ac70bd83b9c0ed1de6289d818488da78"&gt;https://gist.github.com/haruki3hhh/ac70bd83b9c0ed1de6289d818488da78&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/pywasm3/PYSEC-2024-305.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/pywasm3/PYSEC-2024-305.yaml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fmq6-4w57-2w3v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0174: `Authorization::value` and `WwwAuthenticate::value` can violate ASCII invariants</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0174</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0174"/>
-    <published>2026-03-11T12:00:00Z</published>
-    <updated>2026-06-08T16:30:03Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`Authorization::value` and `WwwAuthenticate::value` can violate ASCII invariants&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;http-types&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`Authorization::value` uses `HeaderValue::value` with the claim
-that the internal string is ASCII, but `Authorization::new` and
-`Authorization::set_credentials` accept arbitrary `String` credentials without
-validation. As a result, safe code can construct a header value containing
-non-ASCII UTF-8 while the implementation assumes ASCII.
-
-`WwwAuthenticate::new` and `WwwAuthenticate::set_realm` similarly accepts arbitrary `String` input, so `WwwAuthenticate::value` can also produce a header value that violates the crate’s documented ASCII invariants. 
-
-This issue has not been confirmed as Undefined Behavior, but the unsafe
-justification in `Authorization::value` and `WwwAuthenticate::value` appears incorrect and can produce values outside the expected ASCII-only constraints.
-
-The http-types c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/http-types"&gt;https://crates.io/crates/http-types&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0174.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0174.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http-rs/http-types/issues/534"&gt;https://github.com/http-rs/http-types/issues/534&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0174"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

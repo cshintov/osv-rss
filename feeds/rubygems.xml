@@ -3,12 +3,103 @@
   <title>OSV — new &amp; updated vulnerabilities: RubyGems</title>
   <subtitle>Open-source vulns affecting RubyGems packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:rubygems</id>
-  <updated>2026-06-10T08:14:25Z</updated>
+  <updated>2026-06-10T16:29:23Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/rubygems.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-c4fp-cxrr-mj66: Net::IMAP: Denial of Service via incomplete raw argument validation</title>
+    <id>https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66"/>
+    <published>2026-06-09T18:36:11Z</published>
+    <updated>2026-06-10T16:29:23Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-47241"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Net::IMAP: Denial of Service via incomplete raw argument validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47241&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Several Net::IMAP commands accept a raw string argument which is only validated to prevent CRLF injection and then sent verbatim.  If this string is derived from user-controlled input, an attacker can force the next command to be absorbed as a continuation of the first command.  This will cause the first command to eventually fail, but also prevents it from returning until another command is sent (from another thread).  That other command will not return until the connection is closed.
+
+### Details
+
+`Net::IMAP::RawData` was hardened in v0.6.4, v0.5.14, and v0.4.24 to reject string arguments that would smuggle an invalid literal-continuation marker onto the wire (CVE-2026-42257, GHSA-hm49-wcqc-g2xg).  But the trailing-marker check uses an incorrect regex which does not match `{…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-c4fp-cxrr-mj66"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-c4fp-cxrr-mj66&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/releases/tag/v0.6.4.1"&gt;https://github.com/ruby/net-imap/releases/tag/v0.6.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-46q3-7gv7-qmgg: Net::IMAP: Command Injection via ID command argument</title>
+    <id>https://osv.dev/vulnerability/GHSA-46q3-7gv7-qmgg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-46q3-7gv7-qmgg"/>
+    <published>2026-06-09T20:31:52Z</published>
+    <updated>2026-06-10T16:29:22Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-47242"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Net::IMAP: Command Injection via ID command argument&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47242&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Two `Net::IMAP` commands, `#id` and `#enable`, do not validate their arguments.  Arguments to either command could be used by an attacker to inject arbitrary IMAP commands.
+
+Please note that passing untrusted inputs to these commands is usually inappropriate and expected to be uncommon.
+
+### Details
+
+When `Net::IMAP#id` is called with a hash argument, although the ID field value strings are correctly quoted (escaping quoted specials), they were not validated to prohibit CRLF sequences.
+
+While `Net::IMAP#enable` does process its arguments for aliases, it does not validate them as valid atoms (or as a list of valid atoms).  The `#to_s` value is sent verbatim.
+
+### Impact
+
+This is expected to impact very few users: use of untrusted user input for either command is expected to be …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-46q3-7gv7-qmgg"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-46q3-7gv7-qmgg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/releases/tag/v0.6.4.1"&gt;https://github.com/ruby/net-imap/releases/tag/v0.6.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-46q3-7gv7-qmgg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8p34-64r3-mwg8: Net::IMAP: Command Injection via non-synchronizing literal in "raw" argument</title>
+    <id>https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8"/>
+    <published>2026-06-09T18:36:04Z</published>
+    <updated>2026-06-10T16:29:22Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-47240"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Net::IMAP: Command Injection via non-synchronizing literal in &amp;quot;raw&amp;quot; argument&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47240&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Several Net::IMAP commands accept a &amp;quot;raw data&amp;quot; argument that is sent verbatim after validation to prevent command injection.  However, if a server does not support non-synchronizing literals, it may still be possible to inject arbitrary IMAP commands inside non-synchronizing literals.
+
+### Details
+
+Raw data arguments support embedded literal values, both synchronizing and non-synchronizing.  Non-synchronizing literals can only be safely sent when the server advertises any of the `LITERAL+`, `LITERAL-`, or `IMAP4rev2` capabilities.  But raw data arguments do not verify server support for non-synchronizing literals prior to sending.
+
+Servers without support for non-synchronizing literals could handle them in several different ways:  If a server sees a `&amp;quot;}\r\n&amp;quot;` byte sequence but can&amp;#x27;t parse …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-8p34-64r3-mwg8"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-8p34-64r3-mwg8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/releases/tag/v0.6.4.1"&gt;https://github.com/ruby/net-imap/releases/tag/v0.6.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g857-hhfv-j68w: Buffer Overflow in Zlib::GzipReader ungetc via large input leads to memory corruption</title>
+    <id>https://osv.dev/vulnerability/GHSA-g857-hhfv-j68w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g857-hhfv-j68w"/>
+    <published>2026-04-16T20:40:54Z</published>
+    <updated>2026-06-10T13:40:46Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-27820"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Buffer Overflow in Zlib::GzipReader ungetc via large input leads to memory corruption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-27820&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zlib&lt;/code&gt; — fixed in 3.2.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;zlib&lt;/code&gt; — fixed in 3.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;zlib&lt;/code&gt; — fixed in 3.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Details
+
+A buffer overflow vulnerability exists in `Zlib::GzipReader`.
+
+The `zstream_buffer_ungets` function prepends caller-provided bytes ahead of previously produced output but fails to guarantee the backing Ruby string has enough capacity before the memmove shifts the existing data. This can lead to memory corruption when the buffer length exceeds capacity.
+
+### Recommended action
+
+We recommend to update the `zlib` gem to version 3.2.3 or later. In order to ensure compatibility with bundled version in older Ruby series, you may update as follows instead:
+
+* For Ruby 3.2 users: Update to zlib 3.0.1
+* For Ruby 3.3 users: Update to zlib 3.1.2
+
+You can use gem update zlib to update it. If you are using bundler, please add `gem &amp;quot;zlib&amp;quot;, &amp;quot;&amp;gt;= 3.2.3&amp;quot;` to your Gemfile.
+
+### Affected versions…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/zlib/security/advisories/GHSA-g857-hhfv-j68w"&gt;https://github.com/ruby/zlib/security/advisories/GHSA-g857-hhfv-j68w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-27820"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-27820&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://hackerone.com/reports/3467067"&gt;https://hackerone.com/reports/3467067&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/zlib"&gt;https://github.com/ruby/zlib&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rubysec/ruby-advisory-db/blob/master/gems/zlib/CVE-2026-27820.yml"&gt;https://github.com/rubysec/ruby-advisory-db/blob/master/gems/zlib/CVE-2026-27820.yml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.ruby-lang.org/en/news/2026/03/05/buffer-overflow-zlib-cve-2026-27820"&gt;https://www.ruby-lang.org/en/news/2026/03/05/buffer-overflow-zlib-cve-2026-27820&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g857-hhfv-j68w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4hm9-844j-jmxp: Uninitialized read in Nokogiri gem</title>
+    <id>https://osv.dev/vulnerability/GHSA-4hm9-844j-jmxp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4hm9-844j-jmxp"/>
+    <published>2022-05-24T16:49:06Z</published>
+    <updated>2026-06-10T13:40:34Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2019-13117"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Uninitialized read in Nokogiri gem&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2019-13117&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.10.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In numbers.c in libxslt 1.1.33, an xsl:number with certain format strings could lead to a uninitialized read in xsltNumberFormatInsertNumbers. This could allow an attacker to discern whether a byte on the stack contains the characters A, a, I, i, or 0, or any other character.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2019-13117"&gt;https://nvd.nist.gov/vuln/detail/CVE-2019-13117&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/issues/1943"&gt;https://github.com/sparklemotion/nokogiri/issues/1943&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.oracle.com/security-alerts/cpujan2020.html"&gt;https://www.oracle.com/security-alerts/cpujan2020.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://usn.ubuntu.com/4164-1"&gt;https://usn.ubuntu.com/4164-1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.netapp.com/advisory/ntap-20200122-0003"&gt;https://security.netapp.com/advisory/ntap-20200122-0003&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.netapp.com/advisory/ntap-20190806-0004"&gt;https://security.netapp.com/advisory/ntap-20190806-0004&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://oss-fuzz.com/testcase-detail/5631739747106816"&gt;https://oss-fuzz.com/testcase-detail/5631739747106816&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/IOYJKXPQCUNBMMQJWYXOR6QRUJZHEDRZ"&gt;https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/IOYJKXPQCUNBMMQJWYXOR6QRUJZHEDRZ&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4hm9-844j-jmxp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-2vqw-3mp8-cgmx: Puma PROXY Protocol v1 Accepts Repeated Protocol Headers on Persistent Connections</title>
     <id>https://osv.dev/vulnerability/GHSA-2vqw-3mp8-cgmx</id>
@@ -45,62 +136,6 @@ This can cause unbounded in-process memory growth and additional CPU cost from r
 
 ```ruby
    set_remote_address proxy_protocol: :…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/puma/puma/security/advisories/GHSA-qpgp-93vx-g8v8"&gt;https://github.com/puma/puma/security/advisories/GHSA-qpgp-93vx-g8v8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/puma/puma"&gt;https://github.com/puma/puma&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rubysec/ruby-advisory-db/blob/master/gems/puma/CVE-2026-47736.yml"&gt;https://github.com/rubysec/ruby-advisory-db/blob/master/gems/puma/CVE-2026-47736.yml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.cve.org/CVERecord?id=CVE-2026-47736"&gt;https://www.cve.org/CVERecord?id=CVE-2026-47736&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qpgp-93vx-g8v8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-46q3-7gv7-qmgg: Net::IMAP: Command Injection via ID command argument</title>
-    <id>https://osv.dev/vulnerability/GHSA-46q3-7gv7-qmgg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-46q3-7gv7-qmgg"/>
-    <published>2026-06-09T20:31:52Z</published>
-    <updated>2026-06-09T20:45:15Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-47242"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Net::IMAP: Command Injection via ID command argument&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47242&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Two `Net::IMAP` commands, `#id` and `#enable`, do not validate their arguments.  Arguments to either command could be used by an attacker to inject arbitrary IMAP commands.
-
-Please note that passing untrusted inputs to these commands is usually inappropriate and expected to be uncommon.
-
-### Details
-
-When `Net::IMAP#id` is called with a hash argument, although the ID field value strings are correctly quoted (escaping quoted specials), they were not validated to prohibit CRLF sequences.
-
-While `Net::IMAP#enable` does process its arguments for aliases, it does not validate them as valid atoms (or as a list of valid atoms).  The `#to_s` value is sent verbatim.
-
-### Impact
-
-This is expected to impact very few users: use of untrusted user input for either command is expected to be …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-46q3-7gv7-qmgg"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-46q3-7gv7-qmgg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/releases/tag/v0.6.4.1"&gt;https://github.com/ruby/net-imap/releases/tag/v0.6.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-46q3-7gv7-qmgg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-c4fp-cxrr-mj66: Net::IMAP: Denial of Service via incomplete raw argument validation</title>
-    <id>https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66"/>
-    <published>2026-06-09T18:36:11Z</published>
-    <updated>2026-06-09T18:45:28Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-47241"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Net::IMAP: Denial of Service via incomplete raw argument validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47241&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Several Net::IMAP commands accept a raw string argument which is only validated to prevent CRLF injection and then sent verbatim.  If this string is derived from user-controlled input, an attacker can force the next command to be absorbed as a continuation of the first command.  This will cause the first command to eventually fail, but also prevents it from returning until another command is sent (from another thread).  That other command will not return until the connection is closed.
-
-### Details
-
-`Net::IMAP::RawData` was hardened in v0.6.4, v0.5.14, and v0.4.24 to reject string arguments that would smuggle an invalid literal-continuation marker onto the wire (CVE-2026-42257, GHSA-hm49-wcqc-g2xg).  But the trailing-marker check uses an incorrect regex which does not match `{…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-c4fp-cxrr-mj66"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-c4fp-cxrr-mj66&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/releases/tag/v0.6.4.1"&gt;https://github.com/ruby/net-imap/releases/tag/v0.6.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-8p34-64r3-mwg8: Net::IMAP: Command Injection via non-synchronizing literal in "raw" argument</title>
-    <id>https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8"/>
-    <published>2026-06-09T18:36:04Z</published>
-    <updated>2026-06-09T18:45:28Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-47240"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Net::IMAP: Command Injection via non-synchronizing literal in &amp;quot;raw&amp;quot; argument&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47240&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Several Net::IMAP commands accept a &amp;quot;raw data&amp;quot; argument that is sent verbatim after validation to prevent command injection.  However, if a server does not support non-synchronizing literals, it may still be possible to inject arbitrary IMAP commands inside non-synchronizing literals.
-
-### Details
-
-Raw data arguments support embedded literal values, both synchronizing and non-synchronizing.  Non-synchronizing literals can only be safely sent when the server advertises any of the `LITERAL+`, `LITERAL-`, or `IMAP4rev2` capabilities.  But raw data arguments do not verify server support for non-synchronizing literals prior to sending.
-
-Servers without support for non-synchronizing literals could handle them in several different ways:  If a server sees a `&amp;quot;}\r\n&amp;quot;` byte sequence but can&amp;#x27;t parse …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-8p34-64r3-mwg8"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-8p34-64r3-mwg8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/releases/tag/v0.6.4.1"&gt;https://github.com/ruby/net-imap/releases/tag/v0.6.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8p34-64r3-mwg8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-m6vc-f87m-cc2h: Doorkeeper Openid Connect: Dynamic Client Registration feature creates public clients with client_secret</title>
@@ -223,16 +258,6 @@ In `ERB#result` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&
     <content type="html">&lt;p&gt;&lt;strong&gt;libxslt Type Confusion vulnerability that affects Nokogiri&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2019-13118&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.10.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In `numbers.c` in libxslt 1.1.33, a type holding grouping characters of an `xsl:number` instruction was too narrow and an invalid character/length combination could be passed to `xsltNumberFormatDecimal`, leading to a read of uninitialized stack data.
 
 Nokogiri prior to version 1.10.5 used a vulnerable version of libxslt. Nokogiri 1.10.5 updated libxslt to version 1.1.34 to address this and other vulnerabilities in libxslt.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2019-13118"&gt;https://nvd.nist.gov/vuln/detail/CVE-2019-13118&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/issues/1943"&gt;https://github.com/sparklemotion/nokogiri/issues/1943&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/commit/43a175339b47b8c604508813fc75b83f13cd173e"&gt;https://github.com/sparklemotion/nokogiri/commit/43a175339b47b8c604508813fc75b83f13cd173e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15069"&gt;https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15069&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://seclists.org/bugtraq/2019/Jul/36"&gt;https://seclists.org/bugtraq/2019/Jul/36&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://seclists.org/bugtraq/2019/Jul/37"&gt;https://seclists.org/bugtraq/2019/Jul/37&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://seclists.org/bugtraq/2019/Jul/40"&gt;https://seclists.org/bugtraq/2019/Jul/40&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://seclists.org/bugtraq/2019/Jul/41"&gt;https://seclists.org/bugtraq/2019/Jul/41&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cf46-6xxh-pc75"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4hm9-844j-jmxp: Uninitialized read in Nokogiri gem</title>
-    <id>https://osv.dev/vulnerability/GHSA-4hm9-844j-jmxp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4hm9-844j-jmxp"/>
-    <published>2022-05-24T16:49:06Z</published>
-    <updated>2026-06-09T10:30:14Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2019-13117"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Uninitialized read in Nokogiri gem&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2019-13117&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.10.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In numbers.c in libxslt 1.1.33, an xsl:number with certain format strings could lead to a uninitialized read in xsltNumberFormatInsertNumbers. This could allow an attacker to discern whether a byte on the stack contains the characters A, a, I, i, or 0, or any other character.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2019-13117"&gt;https://nvd.nist.gov/vuln/detail/CVE-2019-13117&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/issues/1943"&gt;https://github.com/sparklemotion/nokogiri/issues/1943&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.oracle.com/security-alerts/cpujan2020.html"&gt;https://www.oracle.com/security-alerts/cpujan2020.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://usn.ubuntu.com/4164-1"&gt;https://usn.ubuntu.com/4164-1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.netapp.com/advisory/ntap-20200122-0003"&gt;https://security.netapp.com/advisory/ntap-20200122-0003&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.netapp.com/advisory/ntap-20190806-0004"&gt;https://security.netapp.com/advisory/ntap-20190806-0004&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://oss-fuzz.com/testcase-detail/5631739747106816"&gt;https://oss-fuzz.com/testcase-detail/5631739747106816&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/IOYJKXPQCUNBMMQJWYXOR6QRUJZHEDRZ"&gt;https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/IOYJKXPQCUNBMMQJWYXOR6QRUJZHEDRZ&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4hm9-844j-jmxp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-242x-7cm6-4w8j: Nokogiri affected by libxslt Use of Uninitialized Resource/Use After Free vulnerability</title>
@@ -512,30 +537,5 @@ You can use `gem update rdoc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt
     <category term="RubyGems"/>
     <category term="CVE-2023-5349"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;memory leak flaw was found in ruby-magick&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-5349&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rmagick&lt;/code&gt; — fixed in 5.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A memory leak flaw was found in ruby-magick, an interface between Ruby and ImageMagick. This issue can lead to a denial of service (DOS) by memory exhaustion.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-5349"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-5349&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rmagick/rmagick/issues/1401"&gt;https://github.com/rmagick/rmagick/issues/1401&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rmagick/rmagick/pull/1406"&gt;https://github.com/rmagick/rmagick/pull/1406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rmagick/rmagick/commit/02f37ca0d6c2b8fff316e0668efa690f5c90a429"&gt;https://github.com/rmagick/rmagick/commit/02f37ca0d6c2b8fff316e0668efa690f5c90a429&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rmagick/rmagick/commit/fec7a7e639ae565386f7615155dbcf49b957b64a"&gt;https://github.com/rmagick/rmagick/commit/fec7a7e639ae565386f7615155dbcf49b957b64a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2023-5349"&gt;https://access.redhat.com/security/cve/CVE-2023-5349&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2247064"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2247064&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-frgf-8jr5-j2jv"&gt;https://github.com/advisories/GHSA-frgf-8jr5-j2jv&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-frgf-8jr5-j2jv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-g857-hhfv-j68w: Buffer Overflow in Zlib::GzipReader ungetc via large input leads to memory corruption</title>
-    <id>https://osv.dev/vulnerability/GHSA-g857-hhfv-j68w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g857-hhfv-j68w"/>
-    <published>2026-04-16T20:40:54Z</published>
-    <updated>2026-06-08T23:15:17Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-27820"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Buffer Overflow in Zlib::GzipReader ungetc via large input leads to memory corruption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-27820&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zlib&lt;/code&gt; — fixed in 3.2.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;zlib&lt;/code&gt; — fixed in 3.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;zlib&lt;/code&gt; — fixed in 3.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Details
-
-A buffer overflow vulnerability exists in `Zlib::GzipReader`.
-
-The `zstream_buffer_ungets` function prepends caller-provided bytes ahead of previously produced output but fails to guarantee the backing Ruby string has enough capacity before the memmove shifts the existing data. This can lead to memory corruption when the buffer length exceeds capacity.
-
-### Recommended action
-
-We recommend to update the `zlib` gem to version 3.2.3 or later. In order to ensure compatibility with bundled version in older Ruby series, you may update as follows instead:
-
-* For Ruby 3.2 users: Update to zlib 3.0.1
-* For Ruby 3.3 users: Update to zlib 3.1.2
-
-You can use gem update zlib to update it. If you are using bundler, please add `gem &amp;quot;zlib&amp;quot;, &amp;quot;&amp;gt;= 3.2.3&amp;quot;` to your Gemfile.
-
-### Affected versions…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/zlib/security/advisories/GHSA-g857-hhfv-j68w"&gt;https://github.com/ruby/zlib/security/advisories/GHSA-g857-hhfv-j68w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-27820"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-27820&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://hackerone.com/reports/3467067"&gt;https://hackerone.com/reports/3467067&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/zlib"&gt;https://github.com/ruby/zlib&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rubysec/ruby-advisory-db/blob/master/gems/zlib/CVE-2026-27820.yml"&gt;https://github.com/rubysec/ruby-advisory-db/blob/master/gems/zlib/CVE-2026-27820.yml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.ruby-lang.org/en/news/2026/03/05/buffer-overflow-zlib-cve-2026-27820"&gt;https://www.ruby-lang.org/en/news/2026/03/05/buffer-overflow-zlib-cve-2026-27820&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g857-hhfv-j68w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

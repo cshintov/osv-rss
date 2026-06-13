@@ -3,12 +3,140 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-06-12T17:30:03Z</updated>
+  <updated>2026-06-12T20:15:09Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-chgr-c6px-7xpp: PyO3 has a missing `Sync` bound on `PyCFunction::new_closure` closures</title>
+    <id>https://osv.dev/vulnerability/GHSA-chgr-c6px-7xpp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-chgr-c6px-7xpp"/>
+    <published>2026-06-12T20:09:05Z</published>
+    <updated>2026-06-12T20:15:09Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;PyO3 has a missing `Sync` bound on `PyCFunction::new_closure` closures&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pyo3&lt;/code&gt; — fixed in 0.29.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`PyCFunction::new_closure` (and the temporary `new_closure_bound` complement in the 0.21–0.22 series) required the supplied closure to be `Send + &amp;#x27;static` but not `Sync`. The resulting `PyCFunction` is a Python callable that can be invoked from any Python thread, which means the closure may be called concurrently from multiple threads, and needs a `Sync` bound to prevent possible data races.
+
+The problem exists under all Python versions but is particularly vulnerable under the newer free-threaded Python variant, which do not have serial execution imposed by the Global Interpreter Lock. Under releases protected by the GIL, the ability to &amp;quot;detach&amp;quot; from the Python interpreter temporarily inside the closure (e.g. by `Python::detach`) makes it possible for interleaved and/or concurrent executio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3/pull/6096"&gt;https://github.com/PyO3/pyo3/pull/6096&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3"&gt;https://github.com/PyO3/pyo3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3/releases/tag/v0.29.0"&gt;https://github.com/PyO3/pyo3/releases/tag/v0.29.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0177.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0177.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-chgr-c6px-7xpp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-36hh-v3qg-5jq4: PyO3 has an Out-of-bounds Read in `nth` / `nth_back` for `PyList` and `PyTuple` iterators</title>
+    <id>https://osv.dev/vulnerability/GHSA-36hh-v3qg-5jq4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-36hh-v3qg-5jq4"/>
+    <published>2026-06-12T19:32:47Z</published>
+    <updated>2026-06-12T19:45:11Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;PyO3 has an Out-of-bounds Read in `nth` / `nth_back` for `PyList` and `PyTuple` iterators&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pyo3&lt;/code&gt; — fixed in 0.29.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;PyO3 0.24.0 added optimized implementations of `Iterator::nth` and `DoubleEndedIterator::nth_back` for the `BoundListIterator` and `BoundTupleIterator` types. These implementations computed the target index using unchecked `usize` addition (`index + n`) before bounds-checking against the sequence length, then read the element via `get_item_unchecked`.
+
+In `nth` methods, a sufficiently large `n` (combined with a non-zero internal index) could cause the addition to overflow and wrap around, producing a small &amp;quot;target index&amp;quot; that passed the bounds check and enabling reads at the front of the `list` or `tuple` of elements previously yielded by the iterator.
+
+In `nth_back` methods, a sufficiently large `n` could cause underflow in a similar fashion, however would instead allow reads of arbitrary…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3/pull/6086"&gt;https://github.com/PyO3/pyo3/pull/6086&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3"&gt;https://github.com/PyO3/pyo3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0176.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0176.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-36hh-v3qg-5jq4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6m57-8r3p-pqx6: unbounded-spsc: Sender::send pointer-as-value transmute causes OOB read and fake-Arc drop under TX/RX race</title>
+    <id>https://osv.dev/vulnerability/GHSA-6m57-8r3p-pqx6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6m57-8r3p-pqx6"/>
+    <published>2026-05-29T19:05:21Z</published>
+    <updated>2026-06-12T19:45:09Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46690"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;unbounded-spsc: Sender::send pointer-as-value transmute causes OOB read and fake-Arc drop under TX/RX race&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46690&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;unbounded-spsc&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`Sender::send` in `src/lib.rs` contains an `unsafe` block in the `DISCONNECTED` arm that transmutes a **raw pointer** (`*mut Producer&amp;lt;T&amp;gt;`) into the bytes of a **value-level** `Consumer&amp;lt;T&amp;gt;`. The author&amp;#x27;s intent, visible in the surrounding comment at lines 386-390, was a value transmute. The shipped code is one level of indirection off.
+
+The resulting `Consumer&amp;lt;T&amp;gt;` has its internal `Arc::ptr` set to the address of the `producer` field on the `Sender`, not the real `ArcInner&amp;lt;Buffer&amp;lt;T&amp;gt;&amp;gt;`. Every subsequent `consumer.try_pop()` walks `Buffer&amp;lt;T&amp;gt;` fields at offsets that lie inside the `Sender&amp;lt;T&amp;gt;` struct (over `send_new`, `inner`) and adjacent memory, an out-of-bounds read. When the fake `Consumer&amp;lt;T&amp;gt;` is dropped at the end of the `unsafe` block, its `Drop` calls `Arc::drop_in_place` on …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/spearman/unbounded-spsc/security/advisories/GHSA-6m57-8r3p-pqx6"&gt;https://github.com/spearman/unbounded-spsc/security/advisories/GHSA-6m57-8r3p-pqx6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46690"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46690&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/spearman/unbounded-spsc"&gt;https://github.com/spearman/unbounded-spsc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6m57-8r3p-pqx6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-436v-8fw5-4mj8: Local settings bypass config trust checks</title>
+    <id>https://osv.dev/vulnerability/GHSA-436v-8fw5-4mj8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-436v-8fw5-4mj8"/>
+    <published>2026-04-07T20:13:11Z</published>
+    <updated>2026-06-12T19:45:09Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-35533"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Local settings bypass config trust checks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35533&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mise&lt;/code&gt; — fixed in 2026.6.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`mise` loads trust-control settings from a local project `.mise.toml` before the trust check runs. An attacker who can place a malicious `.mise.toml` in a repository can make that same file appear trusted and then reach dangerous directives such as `[env] _.source`, templates, hooks, or tasks.
+
+The strongest current variant is `trusted_config_paths = [&amp;quot;/&amp;quot;]`. I confirmed on current `v2026.3.17` in Docker that this causes an untrusted project config to become trusted during `mise hook-env`, which then executes an attacker-controlled `_.source` script. The same preload issue also lets local `yes = true` / `ci = true` auto-approve trust prompts on `v2026.2.18+`, but the primary PoC below uses the stronger `trusted_config_paths` path.
+
+### Details
+
+The vulnerable load order is:
+
+1.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise/security/advisories/GHSA-436v-8fw5-4mj8"&gt;https://github.com/jdx/mise/security/advisories/GHSA-436v-8fw5-4mj8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35533"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35533&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise"&gt;https://github.com/jdx/mise&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-436v-8fw5-4mj8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g6ww-w5j2-r7x3: BoxLite: Permission Bypass Allows Modification of Read-Only Files</title>
+    <id>https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3"/>
+    <published>2026-05-21T21:52:51Z</published>
+    <updated>2026-06-12T19:30:11Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46695"/>
+    <category term="RUSTSEC-2026-0147"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;BoxLite: Permission Bypass Allows Modification of Read-Only Files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46695, RUSTSEC-2026-0147&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@boxlite-ai/boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/boxlite-ai/boxlite/sdks/go&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite-cli&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
+
+Boxlite is a sandbox service that allows users to create lightweight virtual machines (Boxes) and launch OCI containers within them to run untrusted code.
+
+One of the core security features claimed by Boxlite is the ability to mount host directories in read-only mode (read_only=True) into the VM via the virtiofs protocol (a host-guest shared filesystem protocol designed specifically for virtual machines), so that untrusted code can only read but not modify host data. Since the underlying function of the lightweight VM library libkrun used by Boxlite does not support mounting in read-only mode, Boxlite chooses to implement read-only by adding the MS_RDONLY flag when mounting the directory after the VM starts.
+
+However, because Boxlite does not restrict the kernel capabilities …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-g6ww-w5j2-r7x3"&gt;https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-g6ww-w5j2-r7x3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46695"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46695&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/pull/454"&gt;https://github.com/boxlite-ai/boxlite/pull/454&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite"&gt;https://github.com/boxlite-ai/boxlite&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0"&gt;https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0147.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0147.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-f396-4rp4-7v2j: Boxlite: Path Traversal Vulnerability Leads to Arbitrary File Write on the Host</title>
+    <id>https://osv.dev/vulnerability/GHSA-f396-4rp4-7v2j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f396-4rp4-7v2j"/>
+    <published>2026-05-21T21:54:15Z</published>
+    <updated>2026-06-12T19:30:11Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46703"/>
+    <category term="RUSTSEC-2026-0148"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Boxlite: Path Traversal Vulnerability Leads to Arbitrary File Write on the Host&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46703, RUSTSEC-2026-0148&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite-cli&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@boxlite-ai/boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/boxlite-ai/boxlite/sdks/go&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
+
+Boxlite is a sandbox service that allows users to create lightweight virtual machines (Boxes) and run OCI containers within them. Boxlite allows users to specify the OCI image used by containers in the sandbox. However, when processing tar entries in OCI images, Boxlite does not account for the possibility that entries may be symlinks pointing to absolute paths. An attacker can craft a malicious OCI image and distribute it on image hosting platforms such as DockerHub, tricking users into using it. Once a user loads the malicious image, the attacker can write arbitrary content to any path on the host, which can further lead to remote code execution on the host.
+
+
+
+#### Details
+
+1. Entry Point — OCI Layer Tarball Extraction
+
+**File:** `boxlite/src/images/archive/tar.rs` **Funct…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-f396-4rp4-7v2j"&gt;https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-f396-4rp4-7v2j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46703"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46703&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite"&gt;https://github.com/boxlite-ai/boxlite&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0"&gt;https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0148.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0148.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f396-4rp4-7v2j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-5qf9-cf9c-hjc6: Routinator crashes when encountering maliciously crafted RRDP XML files</title>
+    <id>https://osv.dev/vulnerability/GHSA-5qf9-cf9c-hjc6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5qf9-cf9c-hjc6"/>
+    <published>2026-06-08T15:33:00Z</published>
+    <updated>2026-06-12T19:15:19Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-49235"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Routinator crashes when encountering maliciously crafted RRDP XML files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49235&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;routinator&lt;/code&gt; — fixed in 0.15.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When Routinator encounters a file via RRDP using a specifically crafted Document Type Definition, Routinator crashes.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-49235"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-49235&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NLnetLabs/routinator"&gt;https://github.com/NLnetLabs/routinator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NLnetLabs/routinator/releases/tag/v0.15.2"&gt;https://github.com/NLnetLabs/routinator/releases/tag/v0.15.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.nlnetlabs.nl/downloads/routinator/CVE-2026-49235.txt"&gt;https://www.nlnetlabs.nl/downloads/routinator/CVE-2026-49235.txt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5qf9-cf9c-hjc6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-33mj-99mg-8g73: Routinator has cache path traversal when processing the module component of rsync URIs</title>
+    <id>https://osv.dev/vulnerability/GHSA-33mj-99mg-8g73</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-33mj-99mg-8g73"/>
+    <published>2026-06-08T15:33:00Z</published>
+    <updated>2026-06-12T19:15:19Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-49233"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Routinator has cache path traversal when processing the module component of rsync URIs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49233&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;routinator&lt;/code&gt; — fixed in 0.15.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Routinator does not properly check the module component of rsync URIs, which are used to create the file system paths for the Routinator cache. This allows for path traversal by having a module name containing .., potentially providing an attacker access to the entire Routinator rsync cache.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-49233"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-49233&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NLnetLabs/routinator"&gt;https://github.com/NLnetLabs/routinator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NLnetLabs/routinator/releases/tag/v0.15.2"&gt;https://github.com/NLnetLabs/routinator/releases/tag/v0.15.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.nlnetlabs.nl/downloads/routinator/CVE-2026-49233.txt"&gt;https://www.nlnetlabs.nl/downloads/routinator/CVE-2026-49233.txt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-33mj-99mg-8g73"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-gc6q-cwcj-3vh9: Routinator crashes when sending a maliciously crafted select-asn query parameter</title>
+    <id>https://osv.dev/vulnerability/GHSA-gc6q-cwcj-3vh9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gc6q-cwcj-3vh9"/>
+    <published>2026-06-08T15:33:00Z</published>
+    <updated>2026-06-12T19:15:18Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-49234"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Routinator crashes when sending a maliciously crafted select-asn query parameter&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49234&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;routinator&lt;/code&gt; — fixed in 0.15.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When sending a specifically crafted non-UTF-8 string as select-asn query parameter to the /api/v1/origins endpoint, Routinator crashes. 
+
+This only affects users who allow API access from untrusted networks.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-49234"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-49234&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NLnetLabs/routinator"&gt;https://github.com/NLnetLabs/routinator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NLnetLabs/routinator/releases/tag/v0.15.2"&gt;https://github.com/NLnetLabs/routinator/releases/tag/v0.15.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.nlnetlabs.nl/downloads/routinator/CVE-2026-49234.txt"&gt;https://www.nlnetlabs.nl/downloads/routinator/CVE-2026-49234.txt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gc6q-cwcj-3vh9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] RUSTSEC-2026-0178: Panic on a `DataRow` with fewer fields than columns allows denial of service</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0178</id>
@@ -191,23 +319,6 @@ The normal SSH transport read path enforces a packet-length limit before the pac
 However, RFC 4253 compression is applied to the SSH `payload` field only. The `packet_length` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-wwx6-x28x-8259"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-wwx6-x28x-8259&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46702"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46702&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wwx6-x28x-8259"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[UPDATED] GHSA-g6ww-w5j2-r7x3: BoxLite: Permission Bypass Allows Modification of Read-Only Files</title>
-    <id>https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3"/>
-    <published>2026-05-21T21:52:51Z</published>
-    <updated>2026-06-11T14:15:10Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-46695"/>
-    <category term="RUSTSEC-2026-0147"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;BoxLite: Permission Bypass Allows Modification of Read-Only Files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46695, RUSTSEC-2026-0147&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@boxlite-ai/boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/boxlite-ai/boxlite/sdks/go&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite-cli&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
-
-Boxlite is a sandbox service that allows users to create lightweight virtual machines (Boxes) and launch OCI containers within them to run untrusted code.
-
-One of the core security features claimed by Boxlite is the ability to mount host directories in read-only mode (read_only=True) into the VM via the virtiofs protocol (a host-guest shared filesystem protocol designed specifically for virtual machines), so that untrusted code can only read but not modify host data. Since the underlying function of the lightweight VM library libkrun used by Boxlite does not support mounting in read-only mode, Boxlite chooses to implement read-only by adding the MS_RDONLY flag when mounting the directory after the VM starts.
-
-However, because Boxlite does not restrict the kernel capabilities …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-g6ww-w5j2-r7x3"&gt;https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-g6ww-w5j2-r7x3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46695"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46695&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/pull/454"&gt;https://github.com/boxlite-ai/boxlite/pull/454&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite"&gt;https://github.com/boxlite-ai/boxlite&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0"&gt;https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0147.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0147.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] GHSA-hpv4-5h6f-wqr3: russh server userauth state is not reset when authentication principal changes</title>
     <id>https://osv.dev/vulnerability/GHSA-hpv4-5h6f-wqr3</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hpv4-5h6f-wqr3"/>
@@ -250,27 +361,6 @@ The underlying unsafe paths were in `CryptoVec`:
   - raw allocation and reallocation path…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-g9f8-wqj9-fjw5"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-g9f8-wqj9-fjw5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46673"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46673&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0153.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0153.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0154.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0154.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g9f8-wqj9-fjw5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[UPDATED] GHSA-f396-4rp4-7v2j: Boxlite: Path Traversal Vulnerability Leads to Arbitrary File Write on the Host</title>
-    <id>https://osv.dev/vulnerability/GHSA-f396-4rp4-7v2j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f396-4rp4-7v2j"/>
-    <published>2026-05-21T21:54:15Z</published>
-    <updated>2026-06-11T14:15:10Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-46703"/>
-    <category term="RUSTSEC-2026-0148"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Boxlite: Path Traversal Vulnerability Leads to Arbitrary File Write on the Host&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46703, RUSTSEC-2026-0148&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite-cli&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@boxlite-ai/boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/boxlite-ai/boxlite/sdks/go&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
-
-Boxlite is a sandbox service that allows users to create lightweight virtual machines (Boxes) and run OCI containers within them. Boxlite allows users to specify the OCI image used by containers in the sandbox. However, when processing tar entries in OCI images, Boxlite does not account for the possibility that entries may be symlinks pointing to absolute paths. An attacker can craft a malicious OCI image and distribute it on image hosting platforms such as DockerHub, tricking users into using it. Once a user loads the malicious image, the attacker can write arbitrary content to any path on the host, which can further lead to remote code execution on the host.
-
-
-
-#### Details
-
-1. Entry Point — OCI Layer Tarball Extraction
-
-**File:** `boxlite/src/images/archive/tar.rs` **Funct…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-f396-4rp4-7v2j"&gt;https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-f396-4rp4-7v2j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46703"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46703&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite"&gt;https://github.com/boxlite-ai/boxlite&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0"&gt;https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0148.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0148.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f396-4rp4-7v2j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] GHSA-vj64-rjf3-w3v7: Plonky3 MultiField32Challenger: transcript malleability and challenge entropy loss</title>
     <id>https://osv.dev/vulnerability/GHSA-vj64-rjf3-w3v7</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vj64-rjf3-w3v7"/>
@@ -298,21 +388,5 @@ Boxlite is a sandbox service that allows users to create lightweight virtual mac
 Any application using instruction `sponge_absorb_mem` to hash memory data can be given a proof for a forged hash that doesn&amp;#x27;t correspond to the actual memory. This breaks the security of memory-based commitments.
 
 The flaw was corrected in commits `17c7ba0a` and `ef9d9e72` by including the appropriate constraints.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/triton-vm"&gt;https://crates.io/crates/triton-vm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2021-0156.html"&gt;https://rustsec.org/advisories/RUSTSEC-2021-0156.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2021-0156"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0175: `onering` 1.4.1 was removed from crates.io for malicious code</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0175</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0175"/>
-    <published>2026-06-10T12:00:00Z</published>
-    <updated>2026-06-10T19:15:05Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`onering` 1.4.1 was removed from crates.io for malicious code&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;onering&lt;/code&gt; — fixed in 1.4.2-0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A new version of the `onering` crate was published with code that attempted to
-exfiltrate both metadata and code from the project it was included within.
-
-One malicious version was published on 2026-06-10, approximately six hours
-before removal. This crate has no dependencies on crates.io, and there is no
-evidence of actual usage of the compromised version.
-
-Thanks to Charlie Eriksen for the report.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/onering"&gt;https://crates.io/crates/onering&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0175.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0175.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0175"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

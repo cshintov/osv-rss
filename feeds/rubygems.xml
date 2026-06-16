@@ -3,12 +3,38 @@
   <title>OSV — new &amp; updated vulnerabilities: RubyGems</title>
   <subtitle>Open-source vulns affecting RubyGems packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:rubygems</id>
-  <updated>2026-06-10T16:29:23Z</updated>
+  <updated>2026-06-16T05:15:09Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/rubygems.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-c32j-vqhx-rx3x: ruby-jwt: Empty-key HMAC bypass; cross-language sibling of CVE-2026-44351</title>
+    <id>https://osv.dev/vulnerability/GHSA-c32j-vqhx-rx3x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c32j-vqhx-rx3x"/>
+    <published>2026-05-18T17:24:55Z</published>
+    <updated>2026-06-16T05:15:09Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-45363"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ruby-jwt: Empty-key HMAC bypass; cross-language sibling of CVE-2026-44351&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45363&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;jwt&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;jwt&lt;/code&gt; — fixed in 2.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`JWT.decode(token, &amp;#x27;&amp;#x27;, true, algorithm: &amp;#x27;HS256&amp;#x27;)` accepts an attacker-forged token.
+`OpenSSL::HMAC.digest(&amp;#x27;SHA256&amp;#x27;, &amp;#x27;&amp;#x27;, payload)` returns a valid digest under an empty key, and no `raise
+  InvalidKeyError if key.empty?` precondition exists in the HMAC algorithm.
+
+```
+JWT.decode(token, &amp;quot;&amp;quot;, true, algorithm: &amp;#x27;HS256&amp;#x27;)
+  -&amp;gt; JWA::Hmac.verify(verification_key: &amp;quot;&amp;quot;, ...)
+  -&amp;gt; OpenSSL::HMAC.digest(&amp;#x27;SHA256&amp;#x27;, &amp;quot;&amp;quot;, signing_input) == signature
+```
+
+The same path is reached when a keyfinder block or key_finder: argument returns &amp;quot;&amp;quot;, nil, or an
+array containing nil for an unknown key. JWT::Decode#find_key only rejects literal nil and empty
+arrays, and JWT::JWA::Hmac silently coerces nil to &amp;quot;&amp;quot; (signing_key ||= &amp;#x27;&amp;#x27;) before signing.
+
+```
+JWT.decode(token, nil, true, algorithms: [&amp;#x27;HS256&amp;#x27;]) { |_h| &amp;quot;&amp;quot; }
+  -&amp;gt; find_…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/security/advisories/GHSA-c32j-vqhx-rx3x"&gt;https://github.com/jwt/ruby-jwt/security/advisories/GHSA-c32j-vqhx-rx3x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/issues/724"&gt;https://github.com/jwt/ruby-jwt/issues/724&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/commit/db560b769a07bd9724e77ff505011ac01872106f"&gt;https://github.com/jwt/ruby-jwt/commit/db560b769a07bd9724e77ff505011ac01872106f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt"&gt;https://github.com/jwt/ruby-jwt&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/releases/tag/v2.10.3"&gt;https://github.com/jwt/ruby-jwt/releases/tag/v2.10.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/releases/tag/v3.2.0"&gt;https://github.com/jwt/ruby-jwt/releases/tag/v3.2.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rubysec/ruby-advisory-db/blob/master/gems/jwt/CVE-2026-45363.yml"&gt;https://github.com/rubysec/ruby-advisory-db/blob/master/gems/jwt/CVE-2026-45363.yml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.cve.org/CVERecord?id=CVE-2026-45363"&gt;https://www.cve.org/CVERecord?id=CVE-2026-45363&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c32j-vqhx-rx3x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-c4fp-cxrr-mj66: Net::IMAP: Denial of Service via incomplete raw argument validation</title>
     <id>https://osv.dev/vulnerability/GHSA-c4fp-cxrr-mj66</id>
@@ -258,17 +284,5 @@ In `ERB#result` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&
     <content type="html">&lt;p&gt;&lt;strong&gt;libxslt Type Confusion vulnerability that affects Nokogiri&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2019-13118&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.10.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In `numbers.c` in libxslt 1.1.33, a type holding grouping characters of an `xsl:number` instruction was too narrow and an invalid character/length combination could be passed to `xsltNumberFormatDecimal`, leading to a read of uninitialized stack data.
 
 Nokogiri prior to version 1.10.5 used a vulnerable version of libxslt. Nokogiri 1.10.5 updated libxslt to version 1.1.34 to address this and other vulnerabilities in libxslt.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2019-13118"&gt;https://nvd.nist.gov/vuln/detail/CVE-2019-13118&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/issues/1943"&gt;https://github.com/sparklemotion/nokogiri/issues/1943&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/commit/43a175339b47b8c604508813fc75b83f13cd173e"&gt;https://github.com/sparklemotion/nokogiri/commit/43a175339b47b8c604508813fc75b83f13cd173e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15069"&gt;https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15069&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://seclists.org/bugtraq/2019/Jul/36"&gt;https://seclists.org/bugtraq/2019/Jul/36&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://seclists.org/bugtraq/2019/Jul/37"&gt;https://seclists.org/bugtraq/2019/Jul/37&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://seclists.org/bugtraq/2019/Jul/40"&gt;https://seclists.org/bugtraq/2019/Jul/40&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://seclists.org/bugtraq/2019/Jul/41"&gt;https://seclists.org/bugtraq/2019/Jul/41&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cf46-6xxh-pc75"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-242x-7cm6-4w8j: Nokogiri affected by libxslt Use of Uninitialized Resource/Use After Free vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-242x-7cm6-4w8j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-242x-7cm6-4w8j"/>
-    <published>2022-05-24T16:59:28Z</published>
-    <updated>2026-06-09T10:22:03Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2019-18197"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nokogiri affected by libxslt Use of Uninitialized Resource/Use After Free vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2019-18197&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.10.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In xsltCopyText in transform.c in libxslt 1.1.33, a pointer variable isn&amp;#x27;t reset under certain circumstances. If the relevant memory area happened to be freed and reused in a certain way, a bounds check could fail and memory outside a buffer could be written to, or uninitialized data could be disclosed.
-
-Nokogiri prior to version 1.10.5 contains a vulnerable version of libxslt. Nokogiri version 1.10.5 upgrades the dependency to libxslt 1.1.34, which contains a patch for this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2019-18197"&gt;https://nvd.nist.gov/vuln/detail/CVE-2019-18197&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/issues/1943"&gt;https://github.com/sparklemotion/nokogiri/issues/1943&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2020:0514"&gt;https://access.redhat.com/errata/RHSA-2020:0514&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15746"&gt;https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15746&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15768"&gt;https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15768&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15914"&gt;https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15914&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rubysec/ruby-advisory-db/blob/master/gems/nokogiri/CVE-2019-18197.yml"&gt;https://github.com/rubysec/ruby-advisory-db/blob/master/gems/nokogiri/CVE-2019-18197.yml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri"&gt;https://github.com/sparklemotion/nokogiri&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-242x-7cm6-4w8j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

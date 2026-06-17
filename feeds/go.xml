@@ -3,12 +3,168 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-06-17T10:29:20Z</updated>
+  <updated>2026-06-17T18:30:09Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-gwxr-7h77-7777: Capsule: Incomplete fix of CVE-2026-30963: singular/plural typo leaves namespaces/finalize unprotected</title>
+    <id>https://osv.dev/vulnerability/GHSA-gwxr-7h77-7777</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gwxr-7h77-7777"/>
+    <published>2026-06-17T18:14:12Z</published>
+    <updated>2026-06-17T18:30:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55636"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Capsule: Incomplete fix of CVE-2026-30963: singular/plural typo leaves namespaces/finalize unprotected&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55636&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:L/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/projectcapsule/capsule&lt;/code&gt; — fixed in 0.13.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Capsule v0.13.2 webhook rules contain `namespace/finalize` (singular) instead of `namespaces/finalize` (plural). K8s requires plural. The finalize defense from CVE-2026-30963 fix is absent.
+
+### Details
+PUT to `/api/v1/namespaces/&amp;lt;ns&amp;gt;/finalize` has resource=namespaces (plural). The singular rule never matches. `matchPolicy: Equivalent` does not compensate.
+
+### PoC
+Confirmed on kind + Capsule v0.13.2. alice (non-admin with namespaces/finalize RBAC): `kubectl label --as=alice` = DENIED (control). `kubectl replace --raw /finalize --as=alice` = 200 OK (bypass). Tenant label changed.
+
+### Impact
+Namespace tenant-label hijack. Same threat model as CVE-2026-30963. One-char fix: `namespace/finalize` -&amp;gt; `namespaces/finalize`.
+The CVE-2026-30963 fix in Capsule v0.13.2 added subresource …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/projectcapsule/capsule/security/advisories/GHSA-gwxr-7h77-7777"&gt;https://github.com/projectcapsule/capsule/security/advisories/GHSA-gwxr-7h77-7777&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcapsule/capsule"&gt;https://github.com/projectcapsule/capsule&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gwxr-7h77-7777"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9cpj-qc93-vw8v: Gitea: Stored XSS via glTF `extensionsRequired` in Gitea 3D File Viewer</title>
+    <id>https://osv.dev/vulnerability/GHSA-9cpj-qc93-vw8v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9cpj-qc93-vw8v"/>
+    <published>2026-06-17T18:10:19Z</published>
+    <updated>2026-06-17T18:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-28737"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Stored XSS via glTF `extensionsRequired` in Gitea 3D File Viewer&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-28737&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Me again.
+
+Gitea&amp;#x27;s built-in 3D file viewer (powered by Online3DViewer) is vulnerable to stored cross-site scripting (XSS) through crafted `.gltf` files. When a glTF file declares an unsupported required extension, Online3DViewer generates an error message containing the extension name and Gitea inserts it into the DOM using `innerHTML` without sanitization. An attacker who can push a `.gltf` file to any repository can execute arbitrary JavaScript in the context of any user who views the file.
+
+## Affected Versions
+
+- Gitea **1.25.0** and later (3D file preview was introduced in 1.25 via the Online3DViewer integration)
+- Confirmed on `gitea:1.25-nightly` (SHA `e33d1da...`), which bundles `online-3d-viewer` npm package v0.16.0
+- The upstream [Online3DViewer](https://github.com/ko…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-9cpj-qc93-vw8v"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-9cpj-qc93-vw8v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9cpj-qc93-vw8v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qwxf-2m7m-2m3x: Daytona: Cross-tenant data leak in notification WebSocket gateway via unverified organizationId join</title>
+    <id>https://osv.dev/vulnerability/GHSA-qwxf-2m7m-2m3x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qwxf-2m7m-2m3x"/>
+    <published>2026-06-17T18:07:30Z</published>
+    <updated>2026-06-17T18:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54324"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Daytona: Cross-tenant data leak in notification WebSocket gateway via unverified organizationId join&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54324&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/daytonaio/daytona&lt;/code&gt; — fixed in 0.185.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A cross-tenant authorization flaw in Daytona&amp;#x27;s notification WebSocket gateway allowed any authenticated user to subscribe to another organization&amp;#x27;s realtime notification channel and passively receive that organization&amp;#x27;s events.
+
+### Impact
+The notification gateway&amp;#x27;s JWT handshake joined a client-supplied organization identifier to the corresponding notification room without verifying that the authenticated user was a member of that organization. As a result, an authenticated user could receive another organization&amp;#x27;s realtime sandbox, snapshot, volume, and runner events, including data carried in those events. This is a cross-tenant confidentiality break. It required a valid account and knowledge of the target organization id (a non-secret UUID); no elevated privileges were need…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona/security/advisories/GHSA-qwxf-2m7m-2m3x"&gt;https://github.com/daytonaio/daytona/security/advisories/GHSA-qwxf-2m7m-2m3x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona"&gt;https://github.com/daytonaio/daytona&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qwxf-2m7m-2m3x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wrr5-99h5-gq57: Gitea: Public-only tokens bypass private-resource restrictions on `/api/v1/user` self routes</title>
+    <id>https://osv.dev/vulnerability/GHSA-wrr5-99h5-gq57</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wrr5-99h5-gq57"/>
+    <published>2026-06-17T18:09:41Z</published>
+    <updated>2026-06-17T18:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-24791"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Public-only tokens bypass private-resource restrictions on `/api/v1/user` self routes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-24791&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Many authenticated self routes under `/api/v1/user/...` do not enforce the `public-only` token restriction. As a result, a token or OAuth grant marked `public-only`, but otherwise carrying the route-required read/write scope category, can access or modify private account resources through self routes.
+
+The canonical private-user endpoint correctly rejects the same tokens, for example `GET /api/v1/users/{privateUser}` returns `403`. The bypass exists because the generic `/api/v1/user` route group requires user scope and `reqToken()`, but does not enforce the token&amp;#x27;s public-only restriction for most self routes.
+
+This is a systemic token/OAuth scope-boundary bypass, not a single endpoint bug.
+
+This appears related to the previously fixed public-only token issue tracked as [CVE-20…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-wrr5-99h5-gq57"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-wrr5-99h5-gq57&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wrr5-99h5-gq57"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-j5r2-4c8j-xc3m: Gitea: Open Redirect via redirect_to</title>
+    <id>https://osv.dev/vulnerability/GHSA-j5r2-4c8j-xc3m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j5r2-4c8j-xc3m"/>
+    <published>2026-06-17T18:10:46Z</published>
+    <updated>2026-06-17T18:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-25779"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Open Redirect via redirect_to&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25779&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-gitea/gitea&lt;/code&gt; — fixed in 1.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Details
+
+Despite the validation within `urlIsRelative` in `modules/httplib/url.go`, an open redirect is still possible due to usage of directory traversal sequences plus a back-slash in the &amp;quot;redirect_to&amp;quot; parameter.
+
+### PoC
+
+When a user uses this URL to login:
+
+`https://gitea.com/user/login?redirect_to=/a/../\example.com`
+
+They would be redirected to `example.com` upon a successful login to their gitea account.
+
+### Impact
+
+* Phishing: Attackers can use trusted domain links to redirect victims to credential-harvesting pages
+* OAuth/SSO Token Theft: In authentication flows, authorization codes or tokens may leak via redirect
+* Referer Leakage: Sensitive URL parameters may be exposed to attacker domains via the Referer header
+* Cache Poisoning: In deployments with shared caches, maliciou…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-j5r2-4c8j-xc3m"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-j5r2-4c8j-xc3m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j5r2-4c8j-xc3m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fhx7-m96w-mv29: Gitea: API Fork Missing CanCreateOrgRepo Check Allows Org Secret Exfiltration</title>
+    <id>https://osv.dev/vulnerability/GHSA-fhx7-m96w-mv29</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fhx7-m96w-mv29"/>
+    <published>2026-06-17T18:08:00Z</published>
+    <updated>2026-06-17T18:15:10Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-22555"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: API Fork Missing CanCreateOrgRepo Check Allows Org Secret Exfiltration&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-22555&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The API endpoint `POST /api/v1/repos/{owner}/{repo}/forks` only checks `IsOrgMember()` when a user forks a repository into an organization, but does not check `CanCreateOrgRepo()`. The web UI fork handler correctly checks both. This allows a read-only organization member — in a team with `can_create_org_repo=false` — to create repositories in the organization namespace via the API. The attacker receives full admin permissions on the forked repository, can enable Actions, push arbitrary workflow files, and exfiltrate all organization-level CI/CD secrets (deploy keys, cloud credentials, API tokens) through the runner infrastructure.
+
+## Steps To Reproduce
+
+### 1. Environment setup
+
+Start a Gitea instance with Actions enabled:
+
+```bash
+# docker-compose.yml
+cat &amp;gt; docker-compose.yml…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-fhx7-m96w-mv29"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-fhx7-m96w-mv29&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fhx7-m96w-mv29"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xgrm-4fwx-7qm8: pgx contains memory-safety vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-xgrm-4fwx-7qm8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xgrm-4fwx-7qm8"/>
+    <published>2026-04-07T18:31:36Z</published>
+    <updated>2026-06-17T17:59:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-33815"/>
+    <category term="GO-2026-4771"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;pgx contains memory-safety vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-33815, GO-2026-4771&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/jackc/pgx/v5/pgproto3&lt;/code&gt; — fixed in 5.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;[pgx](github.com/jackc/pgx/v5) is a pure Go driver and toolkit for PostgreSQL. pgx prior to v5.9.0 contains a memory-safety vulnerability.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33815"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-33815&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jackc/pgx/issues/2519"&gt;https://github.com/jackc/pgx/issues/2519&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jackc/pgx/issues/2530"&gt;https://github.com/jackc/pgx/issues/2530&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jackc/pgx/commit/6dbad4cafdb8a4daab7ff79c858c95da4b6109e8"&gt;https://github.com/jackc/pgx/commit/6dbad4cafdb8a4daab7ff79c858c95da4b6109e8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-4771"&gt;https://pkg.go.dev/vuln/GO-2026-4771&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="github.com/jackc/pgx/v5"&gt;github.com/jackc/pgx/v5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xgrm-4fwx-7qm8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4771: CVE-2026-33815 in github.com/jackc/pgx</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4771</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4771"/>
+    <published>2026-04-07T14:58:41Z</published>
+    <updated>2026-06-17T17:59:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-33815"/>
+    <category term="GHSA-xgrm-4fwx-7qm8"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;CVE-2026-33815 in github.com/jackc/pgx&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-33815, GHSA-xgrm-4fwx-7qm8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/jackc/pgx/v5&lt;/code&gt; — fixed in 5.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Memory-safety vulnerability in github.com/jackc/pgx/v5.&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4771"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3g6v-2r68-prfc: Traefik: Kubernetes Gateway crossProviderNamespaces bypass allows HTTPRoute outside the allowlist to expose internal Traefik services</title>
+    <id>https://osv.dev/vulnerability/GHSA-3g6v-2r68-prfc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3g6v-2r68-prfc"/>
+    <published>2026-06-17T14:01:48Z</published>
+    <updated>2026-06-17T14:15:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54761"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik: Kubernetes Gateway crossProviderNamespaces bypass allows HTTPRoute outside the allowlist to expose internal Traefik services&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54761&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.6.21&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.7.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+There is a high severity vulnerability in Traefik&amp;#x27;s Kubernetes Gateway provider affecting the `crossProviderNamespaces` allowlist. For `HTTPRoute` rules that declare multiple (WRR) backendRefs, Traefik evaluates the allowlist against the target `backendRef.namespace` instead of the route&amp;#x27;s own namespace. As a result, an `HTTPRoute` created in a namespace that is not allow-listed can reference a cross-provider `TraefikService` such as `api@internal`, `dashboard@internal` or `rest@internal` by pointing `backendRef.namespace` at an allow-listed namespace covered by a Gateway API `ReferenceGrant`, exposing internal Traefik services on the data plane. Exploitation requires the ability to create an accepted `HTTPRoute` and a matching `ReferenceGrant` from an allow-listed namespace ; …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-3g6v-2r68-prfc"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-3g6v-2r68-prfc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.6.21"&gt;https://github.com/traefik/traefik/releases/tag/v3.6.21&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.5"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3g6v-2r68-prfc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-5023: Invoking VerifiedPublicKeyCallback permissions skip enforcement in golang.org/x/crypto/ssh</title>
     <id>https://osv.dev/vulnerability/GO-2026-5023</id>

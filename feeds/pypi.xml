@@ -3,12 +3,106 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-06-19T13:00:57Z</updated>
+  <updated>2026-06-19T15:15:08Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-jv2h-4p9v-wf5w: ouroboros-ai: Incomplete fix of CVE-2026-47211: untrusted project .env can still reach RCE via omitted execution-routing keys</title>
+    <id>https://osv.dev/vulnerability/GHSA-jv2h-4p9v-wf5w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jv2h-4p9v-wf5w"/>
+    <published>2026-06-19T15:12:25Z</published>
+    <updated>2026-06-19T15:15:08Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ouroboros-ai: Incomplete fix of CVE-2026-47211: untrusted project .env can still reach RCE via omitted execution-routing keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ouroboros-ai&lt;/code&gt; — fixed in 0.42.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+The CVE-2026-47211 fix (0.39.0) added `_UNTRUSTED_ENV_DENYLIST` to stop an untrusted project-directory `.env` from redirecting execution. The denylist was incomplete — several execution-routing keys of the same RCE class were omitted, so a malicious cloned repo can still reach arbitrary command execution by shipping a `.env` (auto-loaded at import, no review step):
+
+- **Backend config-home roots** `CODEX_HOME`, `OPENCODE_CONFIG`, `OPENCODE_CONFIG_DIR`, `XDG_CONFIG_HOME`: a spawned vendor CLI resolves its config from these. `CODEX_HOME=./.evil` + committed `./.evil/config.toml` redirects the nested Codex agent to attacker config — `mcp_servers.&amp;lt;name&amp;gt;.command/args` (RCE) and `approval_policy=&amp;quot;never&amp;quot;` / `sandbox_mode=&amp;quot;danger-full-access&amp;quot;` (silent removal of the human approval gate)…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Q00/ouroboros/security/advisories/GHSA-jv2h-4p9v-wf5w"&gt;https://github.com/Q00/ouroboros/security/advisories/GHSA-jv2h-4p9v-wf5w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Q00/ouroboros"&gt;https://github.com/Q00/ouroboros&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jv2h-4p9v-wf5w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wg5p-8h9p-3mr7: agent-coderag: Gradle Wrapper Execution During Dependency Discovery Enables Arbitrary Code Execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-wg5p-8h9p-3mr7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wg5p-8h9p-3mr7"/>
+    <published>2026-06-19T15:01:06Z</published>
+    <updated>2026-06-19T15:15:08Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;agent-coderag: Gradle Wrapper Execution During Dependency Discovery Enables Arbitrary Code Execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;agent-coderag&lt;/code&gt; — fixed in 1.3.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Gradle Wrapper Execution During Dependency Discovery Enables Arbitrary Code Execution
+
+### Summary
+
+`agent-coderag` unconditionally executes a repository-controlled `gradlew` script during its default `sync` dependency-discovery flow. An attacker who can induce a victim to index a malicious Gradle repository (one containing `build.gradle` and a crafted `gradlew`) achieves arbitrary code execution with the victim&amp;#x27;s OS privileges. No authentication, no extra flags, and no elevated permissions are required; the attack fires on the default `agent-coderag sync &amp;lt;path&amp;gt;` invocation.
+
+### Details
+
+The vulnerability exists across a four-step call chain in the `sync` command:
+
+**1. Entry point — `code_rag/entry/cli.py:70`**
+
+```python
+await manager.sync_dependencies(args.path or &amp;quot;.&amp;quot;)
+```
+
+`sync_de…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/naranor/agent-coderag/security/advisories/GHSA-wg5p-8h9p-3mr7"&gt;https://github.com/naranor/agent-coderag/security/advisories/GHSA-wg5p-8h9p-3mr7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/naranor/agent-coderag"&gt;https://github.com/naranor/agent-coderag&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wg5p-8h9p-3mr7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vmhf-c436-hxj4: JupyterLab: Stored XSS in extension manager through package metadata unsanitized URI protocol</title>
+    <id>https://osv.dev/vulnerability/GHSA-vmhf-c436-hxj4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vmhf-c436-hxj4"/>
+    <published>2026-06-19T15:11:17Z</published>
+    <updated>2026-06-19T15:15:08Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;JupyterLab: Stored XSS in extension manager through package metadata unsanitized URI protocol&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;jupyterlab&lt;/code&gt; — fixed in 4.5.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A malicious PyPI package can place a `javascript:` URL in its `[project.urls]` metadata. JupyterLab&amp;#x27;s Extension Manager renders this as the extension&amp;#x27;s home-page link without validating the protocol, so a user who clicks the extension name executes attacker-controlled JavaScript in the JupyterLab origin.
+
+### Details
+
+One of the PyPI package&amp;#x27;s URL (jupyterlab/extensions/pypi.py) is copied straight into the `homepage_url` rendered by the frontend in packages/extensionmanager/src/widget.tsx#L77-L88.
+
+```python
+best_guess_home_url = (
+    homepage_url            # home_page / [project.urls] Homepage
+    or data.get(&amp;quot;project_url&amp;quot;)
+    or data.get(&amp;quot;package_url&amp;quot;)
+    or documentation_url    # docs_url / [project.urls] Documentation
+    or source_url           # [project.urls] Source Code
+    or …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/security/advisories/GHSA-vmhf-c436-hxj4"&gt;https://github.com/jupyterlab/jupyterlab/security/advisories/GHSA-vmhf-c436-hxj4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/commit/4e61e07d0a91145b53fbf96ac74b0387f6bc51f6"&gt;https://github.com/jupyterlab/jupyterlab/commit/4e61e07d0a91145b53fbf96ac74b0387f6bc51f6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/commit/d5d961f6e10a6442dddbf94d9a976b3897055a12"&gt;https://github.com/jupyterlab/jupyterlab/commit/d5d961f6e10a6442dddbf94d9a976b3897055a12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab"&gt;https://github.com/jupyterlab/jupyterlab&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/releases/tag/v4.5.9"&gt;https://github.com/jupyterlab/jupyterlab/releases/tag/v4.5.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vmhf-c436-hxj4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6rfw-mq36-jm8h: Improper neutralization of argument delimiters in AWS Bedrock AgentCore Python SDK install_packages()</title>
+    <id>https://osv.dev/vulnerability/GHSA-6rfw-mq36-jm8h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6rfw-mq36-jm8h"/>
+    <published>2026-06-19T14:46:33Z</published>
+    <updated>2026-06-19T15:00:15Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-12530"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Improper neutralization of argument delimiters in AWS Bedrock AgentCore Python SDK install_packages()&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-12530&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:A/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;bedrock-agentcore&lt;/code&gt; — fixed in 1.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The AWS Bedrock AgentCore Python SDK (bedrock-agentcore) is an open-source SDK that enables developers to build, deploy, and manage agents on AWS Bedrock AgentCore. An issue exists in the install_packages() method of the Code Interpreter client where crafted package name arguments can bypass input validation and allow a remote authenticated user to execute arbitrary commands within the Code Interpreter sandbox.
+
+
+### Impact
+The install_packages() method constructs a &amp;#x27;pip install&amp;#x27; shell command executed within the Code Interpreter sandbox using package name arguments provided by the caller. The method applied an incomplete blocklist that allowed crafted package name arguments - specifically pip flags such as &amp;#x27;--index-url&amp;#x27; and &amp;#x27;-r&amp;#x27; - to pass validation unchecked. A remote authent…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aws/bedrock-agentcore-sdk-python/security/advisories/GHSA-6rfw-mq36-jm8h"&gt;https://github.com/aws/bedrock-agentcore-sdk-python/security/advisories/GHSA-6rfw-mq36-jm8h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-12530"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-12530&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://aws.amazon.com/security/security-bulletins/2026-044-aws"&gt;https://aws.amazon.com/security/security-bulletins/2026-044-aws&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aws/bedrock-agentcore-sdk-python"&gt;https://github.com/aws/bedrock-agentcore-sdk-python&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/bedrock-agentcore/1.6.1"&gt;https://pypi.org/project/bedrock-agentcore/1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6rfw-mq36-jm8h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-99f9-j8r3-p853: Hermes Agent creates response_store.db and webhook_subscriptions.json with world-readable permissions (mode 0o644)</title>
+    <id>https://osv.dev/vulnerability/GHSA-99f9-j8r3-p853</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-99f9-j8r3-p853"/>
+    <published>2026-06-17T21:34:38Z</published>
+    <updated>2026-06-19T15:00:15Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-53870"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Hermes Agent creates response_store.db and webhook_subscriptions.json with world-readable permissions (mode 0o644)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53870&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hermes-agent&lt;/code&gt; — fixed in 0.16.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Hermes Agent before 0.16.0 creates response_store.db and webhook_subscriptions.json with world-readable permissions (mode 0o644), exposing conversation history and HMAC secrets to local users. Attackers with local filesystem access can read these files directly to obtain sensitive data including conversation history, tool payloads, prompts, and per-route HMAC secrets.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53870"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53870&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/pull/30917"&gt;https://github.com/NousResearch/hermes-agent/pull/30917&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/pull/31469"&gt;https://github.com/NousResearch/hermes-agent/pull/31469&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/commit/3bace071bfadf2d2bec2ee048471a31ec920e3e8"&gt;https://github.com/NousResearch/hermes-agent/commit/3bace071bfadf2d2bec2ee048471a31ec920e3e8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent"&gt;https://github.com/NousResearch/hermes-agent&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/releases/tag/v2026.6.5"&gt;https://github.com/NousResearch/hermes-agent/releases/tag/v2026.6.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/hermes-agent-sensitive-file-permission-vulnerability-in-store-files"&gt;https://www.vulncheck.com/advisories/hermes-agent-sensitive-file-permission-vulnerability-in-store-files&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-99f9-j8r3-p853"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4pqm-j46f-795x: Hermes Agent contains a DNS rebinding vulnerability in WebSocket endpoints that allows remote attackers to bypass Host and Origin validation</title>
+    <id>https://osv.dev/vulnerability/GHSA-4pqm-j46f-795x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4pqm-j46f-795x"/>
+    <published>2026-06-17T21:34:38Z</published>
+    <updated>2026-06-19T15:00:15Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-53869"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Hermes Agent contains a DNS rebinding vulnerability in WebSocket endpoints that allows remote attackers to bypass Host and Origin validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53869&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hermes-agent&lt;/code&gt; — fixed in 0.16.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Hermes Agent before 0.16.0 contains a DNS rebinding vulnerability in WebSocket endpoints that allows remote attackers to bypass Host and Origin validation. FastAPI HTTP middleware does not execute for WebSocket upgrade requests on /api/pty, /api/ws, /api/pub, and /api/events endpoints, enabling attackers to exploit DNS rebinding and inject malicious commands or read terminal output.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53869"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53869&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/pull/30221"&gt;https://github.com/NousResearch/hermes-agent/pull/30221&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/pull/31685"&gt;https://github.com/NousResearch/hermes-agent/pull/31685&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/commit/d9ec90585cf7616b5972e44cf8d92bb569fc3feb"&gt;https://github.com/NousResearch/hermes-agent/commit/d9ec90585cf7616b5972e44cf8d92bb569fc3feb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent"&gt;https://github.com/NousResearch/hermes-agent&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/releases/tag/v2026.6.5"&gt;https://github.com/NousResearch/hermes-agent/releases/tag/v2026.6.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/hermes-agent-dns-rebinding-bypass-via-websocket-endpoints"&gt;https://www.vulncheck.com/advisories/hermes-agent-dns-rebinding-bypass-via-websocket-endpoints&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4pqm-j46f-795x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-6208: Malicious code in fastercoding (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-6208</id>
@@ -643,7 +737,7 @@ class Kernel32Loader:
 This is a scanning bypass to `scan_pytorch` function in `picklescan`. As we can see in the implementation of [get_magic_number()](https://github.com/mmaitre314/picklescan/blob/2a8383cfeb4158567f9770d86597300c9e508d0f/src/picklescan/torch.py#L76C5-L84) that uses `pickletools.genops(data)` to get the `magic_number` with the condition `opcode.name` includes `INT` or `LONG`, but the PyTorch&amp;#x27;s implemtation simply uses [pickle_module.load()](https://github.com/pytorch/pytorch/blob/134179474539648ba7dee1317959529fbd0e7f89/torch/serialization.py#L1797) to get this `magic_number`. For this implementation difference, we then can embed the `magic_code` into the `PyTorch` file via dynamic `eval` on the `\_\_reduce\_\_` trick, which can make the `pickletools.genops(data)` cannot get the `ma…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/security/advisories/GHSA-97f8-7cmv-76j2"&gt;https://github.com/mmaitre314/picklescan/security/advisories/GHSA-97f8-7cmv-76j2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53875"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53875&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/commit/134179474539648ba7dee1317959529fbd0e7f89"&gt;https://github.com/mmaitre314/picklescan/commit/134179474539648ba7dee1317959529fbd0e7f89&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/commit/2a8383cfeb4158567f9770d86597300c9e508d0f"&gt;https://github.com/mmaitre314/picklescan/commit/2a8383cfeb4158567f9770d86597300c9e508d0f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/commit/b9997634683a4f4bd0c7e3701e7ce7e90fe70e8c"&gt;https://github.com/mmaitre314/picklescan/commit/b9997634683a4f4bd0c7e3701e7ce7e90fe70e8c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan"&gt;https://github.com/mmaitre314/picklescan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/picklescan-scanning-bypass-via-dynamic-eval-in-scan-pytorch"&gt;https://www.vulncheck.com/advisories/picklescan-scanning-bypass-via-dynamic-eval-in-scan-pytorch&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-97f8-7cmv-76j2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-qf38-jq28-3ccq: Apache Airflow SFTP provider: Path traversal in SFTPHook.retrieve_directory</title>
+    <title>[UPDATED] GHSA-qf38-jq28-3ccq: Apache Airflow SFTP provider: Path traversal in SFTPHook.retrieve_directory</title>
     <id>https://osv.dev/vulnerability/GHSA-qf38-jq28-3ccq</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qf38-jq28-3ccq"/>
     <published>2026-06-17T18:35:51Z</published>
@@ -665,7 +759,7 @@ This is a scanning bypass to `scan_pytorch` function in `picklescan`. As we can 
     <content type="html">&lt;p&gt;Aliases: CVE-2026-50203, GHSA-qf38-jq28-3ccq&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow-providers-sftp&lt;/code&gt; — fixed in 5.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A path traversal in the SFTP provider (`SFTPHook.retrieve_directory` / `SFTPOperator(operation=get)`) let a malicious or compromised remote SFTP server write files outside the configured local destination directory via crafted directory-entry names. No Airflow account is required — the attack surface is any deployment downloading directories from an untrusted SFTP server. Upgrade `apache-airflow-providers-sftp` to 5.8.1 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/16/3"&gt;http://www.openwall.com/lists/oss-security/2026/06/16/3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/7f4b284oh44c1n95oq8mh1qc7y1lr9dx"&gt;https://lists.apache.org/thread/7f4b284oh44c1n95oq8mh1qc7y1lr9dx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/67985"&gt;https://github.com/apache/airflow/pull/67985&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-218"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-6wrm-x65g-hr4p: OpenStack Horizon RC file generation does not escape special characters in project names</title>
+    <title>[UPDATED] GHSA-6wrm-x65g-hr4p: OpenStack Horizon RC file generation does not escape special characters in project names</title>
     <id>https://osv.dev/vulnerability/GHSA-6wrm-x65g-hr4p</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6wrm-x65g-hr4p"/>
     <published>2026-06-17T18:35:56Z</published>
@@ -764,7 +858,7 @@ Example:
     0: S    STRING     &amp;#x27;os&amp;#x27; --&amp;gt; arg 0: STRING (unt…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/security/advisories/GHSA-9gvj-pp9x-gcfr"&gt;https://github.com/mmaitre314/picklescan/security/advisories/GHSA-9gvj-pp9x-gcfr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-71325"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-71325&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/commit/2a8383cfeb4158567f9770d86597300c9e508d0f"&gt;https://github.com/mmaitre314/picklescan/commit/2a8383cfeb4158567f9770d86597300c9e508d0f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/commit/58983e1c20973ac42f2df7ff15d7c8cd32f9b688"&gt;https://github.com/mmaitre314/picklescan/commit/58983e1c20973ac42f2df7ff15d7c8cd32f9b688&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan"&gt;https://github.com/mmaitre314/picklescan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/blob/2a8383cfeb4158567f9770d86597300c9e508d0f/src/picklescan/scanner.py#L255"&gt;https://github.com/mmaitre314/picklescan/blob/2a8383cfeb4158567f9770d86597300c9e508d0f/src/picklescan/scanner.py#L255&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/blob/2a8383cfeb4158567f9770d86597300c9e508d0f/src/picklescan/scanner.py#L281"&gt;https://github.com/mmaitre314/picklescan/blob/2a8383cfeb4158567f9770d86597300c9e508d0f/src/picklescan/scanner.py#L281&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/releases/tag/v0.0.27"&gt;https://github.com/mmaitre314/picklescan/releases/tag/v0.0.27&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9gvj-pp9x-gcfr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-8jr5-v98p-w75m: vLLM: image EXIF Rotation &amp; PNG tRNS Transparency Not Normalized, Causing Mismatch Between Model Input and Expectations</title>
+    <title>[UPDATED] GHSA-8jr5-v98p-w75m: vLLM: image EXIF Rotation &amp; PNG tRNS Transparency Not Normalized, Causing Mismatch Between Model Input and Expectations</title>
     <id>https://osv.dev/vulnerability/GHSA-8jr5-v98p-w75m</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8jr5-v98p-w75m"/>
     <published>2026-06-17T14:02:42Z</published>
@@ -787,7 +881,7 @@ Issue 3 : Pillow only loads the first frame when loading APNG or GIF files.
 * **Transparency**: Only **RGBA→RG…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-8jr5-v98p-w75m"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-8jr5-v98p-w75m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-12491"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-12491&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/44974"&gt;https://github.com/vllm-project/vllm/pull/44974&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/cf1c90672404548aa3bc51f92c4745576a65ee26"&gt;https://github.com/vllm-project/vllm/commit/cf1c90672404548aa3bc51f92c4745576a65ee26&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-12491"&gt;https://access.redhat.com/security/cve/CVE-2026-12491&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2489786"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2489786&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8jr5-v98p-w75m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-9g3x-6x24-vf9f: pdfkit: Path traversal in from_string</title>
+    <title>[UPDATED] GHSA-9g3x-6x24-vf9f: pdfkit: Path traversal in from_string</title>
     <id>https://osv.dev/vulnerability/GHSA-9g3x-6x24-vf9f</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9g3x-6x24-vf9f"/>
     <published>2026-06-17T18:35:56Z</published>
@@ -1854,7 +1948,7 @@ On `import pystylish`, the package&amp;#x27;s __init__.py spawns a daemon thread
     <content type="html">&lt;p&gt;Aliases: CVE-2026-50589&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ironic&lt;/code&gt; — fixed in 37.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In OpenStack Ironic 32 before 37.0.0, an unauthenticated malicious user could submit a crafted JSON string to some endpoints on the API or JSON-RPC service and effect a service crash.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bugs.launchpad.net/ironic/+bug/2154288"&gt;https://bugs.launchpad.net/ironic/+bug/2154288&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/06/2"&gt;http://www.openwall.com/lists/oss-security/2026/06/06/2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://wiki.openstack.org/wiki/OSSN/OSSN-0099"&gt;https://wiki.openstack.org/wiki/OSSN/OSSN-0099&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-216"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-x223-p2gf-v735: Langflow: Unauthenticated file upload leads to DoS (space exhaustion) and information leak</title>
+    <title>[UPDATED] GHSA-x223-p2gf-v735: Langflow: Unauthenticated file upload leads to DoS (space exhaustion) and information leak</title>
     <id>https://osv.dev/vulnerability/GHSA-x223-p2gf-v735</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x223-p2gf-v735"/>
     <published>2026-06-17T18:43:12Z</published>
@@ -1885,508 +1979,5 @@ async def create_upload_file(
 ...
 ```
 As can be seen above, there is no authentication. There i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/langflow-ai/langflow/security/advisories/GHSA-x223-p2gf-v735"&gt;https://github.com/langflow-ai/langflow/security/advisories/GHSA-x223-p2gf-v735&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langflow-ai/langflow/pull/12831"&gt;https://github.com/langflow-ai/langflow/pull/12831&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langflow-ai/langflow"&gt;https://github.com/langflow-ai/langflow&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x223-p2gf-v735"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-mfg3-p6m3-gjgr: OpenStack Nova: Nova scheduler hint injection bypasses Placement resource claims and scheduling constraints</title>
-    <id>https://osv.dev/vulnerability/GHSA-mfg3-p6m3-gjgr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mfg3-p6m3-gjgr"/>
-    <published>2026-06-16T21:32:01Z</published>
-    <updated>2026-06-17T18:45:31Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-46448"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenStack Nova: Nova scheduler hint injection bypasses Placement resource claims and scheduling constraints&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46448&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nova&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;nova&lt;/code&gt; — fixed in 32.2.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;nova&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Affects
-
-- Nova: &amp;gt;=18.0.0 &amp;lt;31.3.1, &amp;gt;=32.0.0 &amp;lt;32.2.1, &amp;gt;=33.0.0 &amp;lt;33.0.2
-
-
-## Description
-Erichen from the Institute of Computing Technology, Chinese Academy of 
-Sciences reported that Nova&amp;#x27;s server create API does not strip internal 
-scheduler hints. An authenticated user can bypass Placement resource 
-claims and scheduling constraint enforcement, including availability 
-zone, host aggregate, and image trait restrictions. The resulting 
-instance has no Placement allocation, which can lead to compute node 
-resource exhaustion and cross-tenant data persistence on NVMe devices 
-after instance deletion. Deployments running Nova 18.0.0 or later are 
-affected.
-
-
-
-## Patches
-
-- https://review.opendev.org/993604 (2025.1/epoxy)
-- https://review.opendev.org/993603 (2025.2/flamingo)
-- https://review…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46448"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46448&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugs.launchpad.net/nova/+bug/2151252"&gt;https://bugs.launchpad.net/nova/+bug/2151252&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openstack/nova"&gt;https://github.com/openstack/nova&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://review.opendev.org/993601"&gt;https://review.opendev.org/993601&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://review.opendev.org/993602"&gt;https://review.opendev.org/993602&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://review.opendev.org/993603"&gt;https://review.opendev.org/993603&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://review.opendev.org/993604"&gt;https://review.opendev.org/993604&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.openwall.com/lists/oss-security/2026/06/16/5"&gt;https://www.openwall.com/lists/oss-security/2026/06/16/5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mfg3-p6m3-gjgr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-8788-j68r-3cgh: Open WebUI: Any authenticated user can read other users' private notes via Socket.IO</title>
-    <id>https://osv.dev/vulnerability/GHSA-8788-j68r-3cgh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8788-j68r-3cgh"/>
-    <published>2026-06-17T18:05:21Z</published>
-    <updated>2026-06-17T18:15:11Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54022"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Any authenticated user can read other users&amp;#x27; private notes via Socket.IO&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54022&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.8.11&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The `ydoc:document:join` Socket.IO handler checks note ownership only when the `document_id` starts with `note:` (colon). However, the `YdocManager` storage layer normalizes all document IDs by replacing colons with underscores (`document_id.replace(&amp;quot;:&amp;quot;, &amp;quot;_&amp;quot;)`). An attacker can join a document room using `note_&amp;lt;id&amp;gt;` (underscore) instead of `note:&amp;lt;id&amp;gt;` (colon), bypassing the authorization check entirely while accessing the same underlying Yjs document. The server then returns the full document state, leaking the victim&amp;#x27;s private note contents.
-
-### Details
-
-The `ydoc:document:join` handler in `socket/main.py` (line 511) only performs authorization for document IDs matching the `note:` prefix:
-
-```python
-@sio.on(&amp;quot;ydoc:document:join&amp;quot;)
-async def ydoc_document_join(sid, data):
-    …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-8788-j68r-3cgh"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-8788-j68r-3cgh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8788-j68r-3cgh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-9rpj-v7hf-vv2w: Open WebUI: Authenticated users can target arbitrary configured Ollama backends via unguarded url_idx path parameter</title>
-    <id>https://osv.dev/vulnerability/GHSA-9rpj-v7hf-vv2w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9rpj-v7hf-vv2w"/>
-    <published>2026-06-17T18:01:50Z</published>
-    <updated>2026-06-17T18:15:10Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54021"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Authenticated users can target arbitrary configured Ollama backends via unguarded url_idx path parameter&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54021&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Several direct, index-addressed Ollama proxy routes accept a caller-supplied `url_idx`
-path parameter and use it as a raw index into the admin-configured `OLLAMA_BASE_URLS`
-list. Access control on these routes validates only whether the user may use the
-requested *model*, never which *backend* the request is routed to. Any authenticated
-user can append an arbitrary `url_idx` to force their request onto an Ollama backend
-they were never authorized to reach, including internal, higher-privilege, or
-explicitly admin-disabled backends.
-
-## Affected endpoints
-
-All indexed Ollama routes that resolve the backend through `get_ollama_url()`:
-
-```
-POST /ollama/api/chat/{url_idx}
-POST /ollama/api/generate/{url_idx}
-POST /ollama/api/embed/{url_idx}
-POST /ollama/api/embeddings/{url_idx}
-POS…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-9rpj-v7hf-vv2w"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-9rpj-v7hf-vv2w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9rpj-v7hf-vv2w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-jrfp-m64g-pcwv: Open WebUI: SSRF Protection Bypass in Playwright Web Loader via HTTP Redirects</title>
-    <id>https://osv.dev/vulnerability/GHSA-jrfp-m64g-pcwv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jrfp-m64g-pcwv"/>
-    <published>2026-06-17T17:55:44Z</published>
-    <updated>2026-06-17T18:00:21Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54018"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: SSRF Protection Bypass in Playwright Web Loader via HTTP Redirects&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54018&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The SafePlaywrightURLLoader implements a validate_url function to prevent SSRF attacks by checking the IP address of the user-provided URL. However, this validation is performed only on the initial URL.
-
-Since Playwright automatically follows HTTP redirects (301/302) by default, an attacker can bypass the validation by providing a safe URL that redirects to a restricted internal network address (e.g., localhost, Docker container network, or Cloud Metadata).
-
-This allows the application to access internal services despite ENABLE_RAG_LOCAL_WEB_FETCH being set to False
-
-### Details
-Root Cause
-
-The application validates the initial user-provided URL using self._safe_process_url_sync(url). This correctly resolves the domain and ensures it does not point to a private IP.
-
-The applica…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-jrfp-m64g-pcwv"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-jrfp-m64g-pcwv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jrfp-m64g-pcwv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-r2wg-2mcr-66rv: Open WebUI: Path traversal / SSRF in terminal server proxy via encoded path traversal</title>
-    <id>https://osv.dev/vulnerability/GHSA-r2wg-2mcr-66rv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r2wg-2mcr-66rv"/>
-    <published>2026-06-17T17:55:28Z</published>
-    <updated>2026-06-17T18:00:21Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54017"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Path traversal / SSRF in terminal server proxy via encoded path traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54017&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The terminal-server reverse proxy in `backend/open_webui/routers/terminals.py` does not fully confine the user-controlled `path` segment before forwarding it to an admin-configured terminal server. An authenticated user who has been granted access to a terminal server can craft `path` values containing encoded `../` traversal sequences that escape the intended path (or policy) scope on that server, reaching unintended endpoints and files on the terminal-server host. Where the terminal server fans requests out to internal services, this also gives SSRF-style reach into those services.
-
-This is a separate code path from the `/api/v1/retrieval/process/web` SSRF (GHSA-c6xv-rcvw-v685), with its own input. Two distinct vectors are consolidated here:
-
-1. Raw path forwarding / single-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-r2wg-2mcr-66rv"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-r2wg-2mcr-66rv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r2wg-2mcr-66rv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-p5cp-r7rg-qpxc: Open WebUI: RAG ACL Bypass in Milvus Multitenancy Mode</title>
-    <id>https://osv.dev/vulnerability/GHSA-p5cp-r7rg-qpxc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p5cp-r7rg-qpxc"/>
-    <published>2026-06-17T17:57:43Z</published>
-    <updated>2026-06-17T18:00:21Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54019"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: RAG ACL Bypass in Milvus Multitenancy Mode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54019&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# RAG ACL Bypass in Milvus Multitenancy Mode
-
-## Summary
-
-This is a bypass of the fix for:
-
-- GHSA-h36f-rqpx-j5wx
-- CVE-2026-44560
-- &amp;quot;Unauthorized File and Knowledge Base Content Access via RAG Vector Search&amp;quot;
-
-Open WebUI added collection-level ACL checks, but the patch can still be bypassed when Milvus multitenancy mode is enabled. The ACL allows unknown non-KB collection names as legacy/ephemeral collections. In Milvus multitenancy mode, that user-controlled collection name becomes a `resource_id` and is interpolated into a Milvus expression without escaping.
-
-An authenticated non-admin user can query:
-
-```text
-x&amp;#x27; or resource_id != &amp;#x27;&amp;#x27; or resource_id == &amp;#x27;x
-```
-
-This passes the Open WebUI ACL as an unknown collection, but Milvus evaluates:
-
-```text
-resource_id == &amp;#x27;x&amp;#x27; or resource_id != &amp;#x27;&amp;#x27; or…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-p5cp-r7rg-qpxc"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-p5cp-r7rg-qpxc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p5cp-r7rg-qpxc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5rvq-cxj2-64vf: python-multipart: Quadratic-time querystring parsing with semicolon separators causes CPU denial of service</title>
-    <id>https://osv.dev/vulnerability/GHSA-5rvq-cxj2-64vf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5rvq-cxj2-64vf"/>
-    <published>2026-06-15T20:24:09Z</published>
-    <updated>2026-06-17T17:59:19Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-53539"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;python-multipart: Quadratic-time querystring parsing with semicolon separators causes CPU denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53539&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;python-multipart&lt;/code&gt; — fixed in 0.0.30&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-When parsing `application/x-www-form-urlencoded` bodies, `QuerystringParser` located the field separator with a two step lookup: it first scanned the entire remaining buffer for `&amp;amp;`, and only when no `&amp;amp;` existed anywhere ahead did it fall back to scanning for `;`. For a body that uses `;` as the separator and contains no `&amp;amp;`, every field iteration performed a full failed `&amp;amp;` scan over the entire remaining buffer before locating the nearby `;`. With N semicolon separated fields in a chunk of size B, this yields O(B^2) byte comparisons per chunk.
-
-An attacker can submit a small crafted body of the form `a;a;a;...` and cause the parser to spend seconds of CPU per request. A handful of concurrent requests can exhaust worker processes.
-
-### Details
-
-In `python_multipart/multipart.p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Kludex/python-multipart/security/advisories/GHSA-5rvq-cxj2-64vf"&gt;https://github.com/Kludex/python-multipart/security/advisories/GHSA-5rvq-cxj2-64vf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Kludex/python-multipart"&gt;https://github.com/Kludex/python-multipart&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5rvq-cxj2-64vf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-cx9v-4qj2-jrw6: Open WebUI BOLA: `search_knowledge_files` Allows Unauthorized Knowledge Base File Enumeration</title>
-    <id>https://osv.dev/vulnerability/GHSA-cx9v-4qj2-jrw6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cx9v-4qj2-jrw6"/>
-    <published>2026-06-17T14:31:16Z</published>
-    <updated>2026-06-17T14:45:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54016"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI BOLA: `search_knowledge_files` Allows Unauthorized Knowledge Base File Enumeration&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54016&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Open WebUI has a Broken Object Level Authorization (BOLA) vulnerability in the builtin `search_knowledge_files` tool.
-
-When native function calling is enabled and the selected model has no attached knowledge bases, an authenticated user can call `search_knowledge_files` with an arbitrary `knowledge_id`. The function then returns file metadata from that knowledge base without checking whether the user has read access.
-
-This allows unauthorized enumeration of private or restricted knowledge base files.
-
-## Details
-
-The vulnerable code is in:
-
-`backend/open_webui/tools/builtin.py`
-
-Affected function:
-
-```python
-async def search_knowledge_files(
-    query: str,
-    knowledge_id: Optional[str] = None,
-    count: int = 5,
-    skip: int = 0,
-    __request__: Request = None,
-    __user…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-cx9v-4qj2-jrw6"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-cx9v-4qj2-jrw6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cx9v-4qj2-jrw6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-v2qm-5wxj-qhj7: Open WebUI: Stored XSS to Account Takeover via Model Profile Images </title>
-    <id>https://osv.dev/vulnerability/GHSA-v2qm-5wxj-qhj7</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v2qm-5wxj-qhj7"/>
-    <published>2026-06-17T14:15:52Z</published>
-    <updated>2026-06-17T14:30:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54013"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Stored XSS to Account Takeover via Model Profile Images &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54013&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Stored XSS to Account Takeover via Model Profile Images in Open WebUI
-
-**Affected:** Open WebUI &amp;lt;= 0.9.5
-**Bypass of:** GHSA-3wgj-c2hg-vm6q, GHSA-3856-3vxq-m6fc
-
----
-
-## TL;DR
-
-Open WebUI patched SVG XSS in user profile images and webhook profile images  but forgot to apply the same fix to **model** profile images. The `ModelMeta` class has no `validate_profile_image_url` field validator, and the model image serving endpoint has no MIME allowlist or `nosniff` header. Any authenticated user with `workspace.models` permission (enabled by default) can store a `data:image/svg+xml;base64,...` payload in a model&amp;#x27;s profile image and achieve full account takeover of anyone who navigates to the image URL.
-
----
-
-## Past of the issue
-
-In early 2025, two security advisories landed for Open WebUI:
-
--…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-v2qm-5wxj-qhj7"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-v2qm-5wxj-qhj7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v2qm-5wxj-qhj7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-j2c8-v969-8r5c: Open WebUI: Sibling-Prefix Path Traversal via /cache/{path}</title>
-    <id>https://osv.dev/vulnerability/GHSA-j2c8-v969-8r5c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j2c8-v969-8r5c"/>
-    <published>2026-06-17T14:16:25Z</published>
-    <updated>2026-06-17T14:30:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54014"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Sibling-Prefix Path Traversal via /cache/{path}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54014&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-A path traversal vulnerability exists in open-webui&amp;#x27;s cache file serving endpoint that allows any authenticated user to read files from sibling directories outside the intended cache directory, by exploiting an incomplete `startswith` containment check that lacks a trailing path separator.
-
-The root cause is that `serve_cache_file()` in `open_webui/main.py` validates the resolved path with `file_path.startswith(os.path.abspath(CACHE_DIR))` — without appending `os.sep`. This allows any path resolving to a sibling directory whose name begins with `cache` (e.g. `cache_sibling`, `cache_backup`, `cached_models`) to pass validation.
-
-Deep traversal and absolute paths are correctly blocked. The bypass is narrow but confirmed — limited to sibling-prefix directories.
-
-### Exploitation c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-j2c8-v969-8r5c"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-j2c8-v969-8r5c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j2c8-v969-8r5c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4r4w-2wgp-w7cj: Open WebUI Prompt history IDOR: unbound history_id allows cross-prompt read and deletion</title>
-    <id>https://osv.dev/vulnerability/GHSA-4r4w-2wgp-w7cj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4r4w-2wgp-w7cj"/>
-    <published>2026-06-17T14:16:50Z</published>
-    <updated>2026-06-17T14:30:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54015"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI Prompt history IDOR: unbound history_id allows cross-prompt read and deletion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54015&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Open WebUI&amp;#x27;s prompt version-history endpoints authorize the `prompt_id` in the URL but then act on caller-supplied history IDs without verifying that the history row belongs to that prompt (`history_entry.prompt_id == prompt.id`). Three operations are affected:
-
-- `GET /api/v1/prompts/id/{prompt_id}/history/diff` — returns another prompt&amp;#x27;s history snapshots (read).
-- `POST /api/v1/prompts/id/{prompt_id}/update/version` — restores another prompt&amp;#x27;s snapshot into the caller&amp;#x27;s prompt, exposing its content (read).
-- `DELETE /api/v1/prompts/id/{prompt_id}/history/{history_id}` — deletes another prompt&amp;#x27;s history entry (delete).
-
-An authenticated user with access to any prompt they control, plus a victim `prompt_history.id`, can read or delete another user&amp;#x27;s private prompt history. The…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-4r4w-2wgp-w7cj"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-4r4w-2wgp-w7cj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4r4w-2wgp-w7cj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-v8qj-hxv7-mgvv: Open WebUI: Stored XSS in Mermaid Markdown Preview</title>
-    <id>https://osv.dev/vulnerability/GHSA-v8qj-hxv7-mgvv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v8qj-hxv7-mgvv"/>
-    <published>2026-06-17T14:14:05Z</published>
-    <updated>2026-06-17T14:30:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54011"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Stored XSS in Mermaid Markdown Preview&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54011&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Open WebUI renders Mermaid blocks from Markdown files in the file preview panel and inserts the generated SVG into the DOM using `innerHTML`.
-
-Because Mermaid is configured with `securityLevel: &amp;#x27;loose&amp;#x27;`, attacker-controlled Mermaid content can be rendered unsafely in this flow. A working payload was validated through the Markdown preview path, resulting in JavaScript execution in the victim’s browser under the application origin.
-
-This is a confirmed stored XSS vulnerability reachable through normal product functionality.
-
-## Affected Version
-
-- `main`
-- Reproduced on `v0.8.12`
-
-## Affected Code
-
-Mermaid is initialized in permissive mode:
-
-https://github.com/open-webui/open-webui/blob/9bd84258d09eefe7bf975878fb0e31a5dadfe0f8/src/lib/utils/index.ts#L1698
-The file preview path re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-v8qj-hxv7-mgvv"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-v8qj-hxv7-mgvv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v8qj-hxv7-mgvv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-vjqm-6gcc-62cr: Open WebUI: Forged model meta.knowledge allows cross-user file read and deletion</title>
-    <id>https://osv.dev/vulnerability/GHSA-vjqm-6gcc-62cr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vjqm-6gcc-62cr"/>
-    <published>2026-06-17T14:15:33Z</published>
-    <updated>2026-06-17T14:30:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54012"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Forged model meta.knowledge allows cross-user file read and deletion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54012&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Open WebUI lets a user who can create, update, or import workspace models store arbitrary `meta.knowledge` entries on their model without checking whether they own or can read the referenced files. Open WebUI then treats `meta.knowledge` entries of type `file` as an authorization source in two places: the built-in `view_file` tool reads the file&amp;#x27;s extracted text, and `has_access_to_file()`&amp;#x27;s model branch authorizes the file content and file delete endpoints. A malicious model owner can therefore attach another user&amp;#x27;s file ID to their model metadata and read or delete that private file.
-
-## Impact
-
-Security boundary crossed: file confidentiality and integrity.
-
-An authenticated attacker needs the `workspace.models` or `workspace.models_import` permission (or write access to an e…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-vjqm-6gcc-62cr"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-vjqm-6gcc-62cr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vjqm-6gcc-62cr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-f3g7-59qc-pqg6: Open WebUI IDOR: Calendar event re-parenting allows writing events into another user's calendar</title>
-    <id>https://osv.dev/vulnerability/GHSA-f3g7-59qc-pqg6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f3g7-59qc-pqg6"/>
-    <published>2026-06-17T14:09:53Z</published>
-    <updated>2026-06-17T14:15:09Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54006"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI IDOR: Calendar event re-parenting allows writing events into another user&amp;#x27;s calendar&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54006&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`POST /api/v1/calendars/events/{event_id}/update` validates that the caller has **write** access to the calendar the event *currently* belongs to, but does not validate the **destination** `calendar_id` supplied in the request body. The model layer then persists the new `calendar_id` unconditionally.
-
-A regular `user`-role account can therefore create an event in their own calendar and immediately move it into any other user&amp;#x27;s calendar whose ID they know — bypassing the authorization check that `create_event` correctly performs. This is reachable on **default configuration**: `ENABLE_CALENDAR` and `USER_PERMISSIONS_FEATURES_CALENDAR` both default to `True`.
-
-
-### Details
-### Sink — missing destination check
-
-`backend/open_webui/routers/calendar.py:283-297`
-
-```python
-@router.p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-f3g7-59qc-pqg6"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-f3g7-59qc-pqg6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f3g7-59qc-pqg6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-wch8-mhj5-9frg: Open WebUI: Cross-user file disclosure via /api/chat/completions image_url field</title>
-    <id>https://osv.dev/vulnerability/GHSA-wch8-mhj5-9frg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wch8-mhj5-9frg"/>
-    <published>2026-06-17T14:11:44Z</published>
-    <updated>2026-06-17T14:15:09Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54009"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Cross-user file disclosure via /api/chat/completions image_url field&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54009&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## summary
-
-`POST /api/chat/completions` accepts an `image_url.url` value that, when it does NOT start with `http://`, `https://`, or `data:image/`, is interpreted as a file id and resolved against the global file table with no ownership check. An authenticated user can therefore set `image_url.url` to another user&amp;#x27;s file id, the server reads that file from disk, base64-encodes it, and injects the data URI into the LLM request. The user then prompts the LLM to describe / OCR the file and reads the content back.
-
-Same class as CVE-2026-44560 (RAG cross-user access) and the multiple `has_access_to_file` checks added in `routers/files.py` -- the auth boundary was tightened on the file router but not on this conversion path.
-
-## affected code
-
-`backend/open_webui/utils/middleware.py:2113-2150`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-wch8-mhj5-9frg"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-wch8-mhj5-9frg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wch8-mhj5-9frg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-vrhc-3fr6-pc3c: Open WebUI: Forged chat-file link allows cross-user file read and deletion</title>
-    <id>https://osv.dev/vulnerability/GHSA-vrhc-3fr6-pc3c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vrhc-3fr6-pc3c"/>
-    <published>2026-06-17T14:12:20Z</published>
-    <updated>2026-06-17T14:15:09Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54010"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Forged chat-file link allows cross-user file read and deletion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54010&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Open WebUI `v0.9.5` lets an authenticated user attach arbitrary `file_id` values to their own chat message without checking whether they own or can read those files. If the attacker then shares that chat and grants themselves read access, `has_access_to_file()` treats the victim file as accessible through the shared chat, and the file endpoints read or delete the victim file.
-
-## Impact
-
-Security boundary crossed: file confidentiality and integrity.
-
-An authenticated attacker who knows or obtains a victim `file_id` can make Open WebUI authorize, through an attacker-owned shared chat:
-
-- reading the victim file via `GET /api/v1/files/{id}/content`, and
-- deleting the victim file via `DELETE /api/v1/files/{id}`.
-
-## Root Cause
-
-Client-controlled message file IDs are persisted wit…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-vrhc-3fr6-pc3c"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-vrhc-3fr6-pc3c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/24755"&gt;https://github.com/open-webui/open-webui/pull/24755&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/25054"&gt;https://github.com/open-webui/open-webui/pull/25054&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vrhc-3fr6-pc3c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-7h4p-rffg-7823: vLLM: temperature=NaN and temperature=Infinity bypass validation and propagate to GPU kernels</title>
-    <id>https://osv.dev/vulnerability/GHSA-7h4p-rffg-7823</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7h4p-rffg-7823"/>
-    <published>2026-06-17T14:02:22Z</published>
-    <updated>2026-06-17T14:15:09Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54235"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: temperature=NaN and temperature=Infinity bypass validation and propagate to GPU kernels&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54235&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-All temperature validation gates use comparison operators (`&amp;lt;`, `&amp;gt;`), which silently evaluate to `False` for `NaN` and for positive `Infinity` in Python&amp;#x27;s IEEE 754 float semantics. Both values pass every guard and propagate to GPU sampling kernels, where they produce undefined behavior or CUDA errors that can crash the inference worker. Note: `-Infinity` is correctly caught.
-
-## Root Cause
-
-`sampling_params.py:384`:
-```python
-if 0 &amp;lt; self.temperature &amp;lt; _MAX_TEMP:  # NaN → False; +Inf → False
-```
-
-`sampling_params.py:462`:
-```python
-if self.temperature &amp;lt; 0.0:            # NaN → False; +Inf → False
-    raise VLLMValidationError(...)
-```
-
-No `math.isnan()` or `math.isinf()` check exists anywhere in `sampling_params.py`.
-
-Python semantics (verified): `float(&amp;#x27;nan&amp;#x27;) &amp;lt; 0.0` → `False`, …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-7h4p-rffg-7823"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-7h4p-rffg-7823&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/45116"&gt;https://github.com/vllm-project/vllm/pull/45116&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/d598d239737cfa37bcfcb98886ec3f3557fc7198"&gt;https://github.com/vllm-project/vllm/commit/d598d239737cfa37bcfcb98886ec3f3557fc7198&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7h4p-rffg-7823"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-6pr9-rp53-2pmc: vLLM: OOM Denial of Service via Audio Decompression Bomb</title>
-    <id>https://osv.dev/vulnerability/GHSA-6pr9-rp53-2pmc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6pr9-rp53-2pmc"/>
-    <published>2026-06-17T14:06:22Z</published>
-    <updated>2026-06-17T14:15:09Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54233"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: OOM Denial of Service via Audio Decompression Bomb&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54233&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-vLLM&amp;#x27;s `/v1/audio/transcriptions` endpoint limits compressed upload size but not decoded PCM output. A 25MB OPUS file expands to ~14.9GB of float32 PCM at decode time. Tested on vLLM v0.19.0.
-
-### Details
-`SpeechToTextProcessor` rejects uploads over `VLLM_MAX_AUDIO_CLIP_FILESIZE_MB` (default 25MB) based on compressed byte length, but the audio decoder in `audio.py` accumulates all decoded frames into memory with no size limit before returning:
-
-```python
-# speech_to_text.py L184-189
-if len(audio_data) / 1024 ** 2 &amp;gt; self.max_audio_filesize_mb:
-    raise VLLMValidationError(...)
-y, sr = load_audio(buf, sr=self.asr_config.sample_rate)  # decoded size unchecked
-
-# audio.py L77-107
-chunks: list[npt.NDArray] = []
-for frame in container.decode(stream):
-    chunks.append(frame.to_ndarr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-6pr9-rp53-2pmc"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-6pr9-rp53-2pmc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/44970"&gt;https://github.com/vllm-project/vllm/pull/44970&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/1b1359c33269446f13c05da9a90c25174cbea590"&gt;https://github.com/vllm-project/vllm/commit/1b1359c33269446f13c05da9a90c25174cbea590&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/releases/tag/v0.23.1rc0"&gt;https://github.com/vllm-project/vllm/releases/tag/v0.23.1rc0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6pr9-rp53-2pmc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-hgg8-fqqc-vfmw: vLLM: incomplete CVE-2026-22778 fix leaks PIL repr addresses via Anthropic router</title>
-    <id>https://osv.dev/vulnerability/GHSA-hgg8-fqqc-vfmw</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hgg8-fqqc-vfmw"/>
-    <published>2026-06-17T14:04:09Z</published>
-    <updated>2026-06-17T14:15:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54236"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: incomplete CVE-2026-22778 fix leaks PIL repr addresses via Anthropic router&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54236&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# vLLM: incomplete CVE-2026-22778 fix leaks PIL repr addresses via the Anthropic API router
-
-**Researcher:** Kai Aizen — SnailSploit (@SnailSploit), Adversarial &amp;amp; Offensive Security Research
-**Severity:** CVSS 3.1 5.3 (Medium)  `AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N`
-**Target:** https://github.com/vllm-project/vllm
-
----
-
-## Summary
-
-The fix for CVE-2026-22778 / GHSA-4r2x-xpjr-7cvv (PRs #31987 and #32319) introduced `sanitize_message` and applied it at four FastAPI exception-handling sites in the OpenAI router. The sanitizer strips object-repr memory addresses (`&amp;lt;_io.BytesIO object at 0x7a95e299e750&amp;gt;` → `&amp;lt;_io.BytesIO object&amp;gt;`) before error messages reach the client, defeating the ASLR-bypass primitive that CVE-2026-22778 chained with a libopenjp2 heap overflow for RCE.
-
-The fix is incomplete:…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-hgg8-fqqc-vfmw"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-hgg8-fqqc-vfmw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/45119"&gt;https://github.com/vllm-project/vllm/pull/45119&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/94923629729381d7f7c9efde72071a2441f7fd82"&gt;https://github.com/vllm-project/vllm/commit/94923629729381d7f7c9efde72071a2441f7fd82&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hgg8-fqqc-vfmw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-5jv2-g5wq-cmr4: vLLM: GGUF dequantize kernel int truncation exposes uninitialized GPU memory in multi-tenant serving</title>
-    <id>https://osv.dev/vulnerability/GHSA-5jv2-g5wq-cmr4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5jv2-g5wq-cmr4"/>
-    <published>2026-06-17T14:03:11Z</published>
-    <updated>2026-06-17T14:15:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-53923"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: GGUF dequantize kernel int truncation exposes uninitialized GPU memory in multi-tenant serving&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53923&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Integer truncation of tensor dimensions in vLLM&amp;#x27;s GGUF dequantize kernels (`csrc/quantization/gguf/gguf_kernel.cu`) causes partial tensor processing. The output tensor is allocated at full size via `torch::empty` (uninitialized memory), but the dequantize CUDA kernel processes only a truncated number of elements. The unfilled portion of the output tensor retains whatever was previously in GPU memory. In multi-tenant inference deployments, this residual GPU memory may contain tensor data from other users&amp;#x27; inference requests, constituting information disclosure.
-
-## Root Cause
-
-The `to_cuda_ggml_t` function pointer type at `ggml-common.h:1067` declares its element count parameter as `int` (32-bit):
-
-```cpp
-using to_cuda_ggml_t = void (*)(const void * __restrict__ x,
-             …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-5jv2-g5wq-cmr4"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-5jv2-g5wq-cmr4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/44971"&gt;https://github.com/vllm-project/vllm/pull/44971&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/f219788f91952827132fa4fdf916427cd20d225e"&gt;https://github.com/vllm-project/vllm/commit/f219788f91952827132fa4fdf916427cd20d225e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5jv2-g5wq-cmr4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-226f-f24g-524w: Open WebUI: Redirect-Bypass SSRF in OAuth `_process_picture_url` (incomplete-fix sibling of CVE-2026-45401)</title>
-    <id>https://osv.dev/vulnerability/GHSA-226f-f24g-524w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-226f-f24g-524w"/>
-    <published>2026-06-17T14:10:56Z</published>
-    <updated>2026-06-17T14:15:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54008"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Redirect-Bypass SSRF in OAuth `_process_picture_url` (incomplete-fix sibling of CVE-2026-45401)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54008&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`backend/open_webui/utils/oauth.py::_process_picture_url` (v0.9.5, lines 1435-1470) calls `validate_url(picture_url)` on the initial URL only, then invokes `aiohttp.ClientSession.get(picture_url, ...)` without `allow_redirects=False`. aiohttp&amp;#x27;s default is `allow_redirects=True, max_redirects=10`; the function does not pass the project&amp;#x27;s `AIOHTTP_CLIENT_ALLOW_REDIRECTS` env constant either. An attacker with a valid OAuth IdP identity can therefore submit a public URL that 302-redirects to an internal address and read the internal response body via the attacker&amp;#x27;s own `profile_image_url` field.
-
-This is the same redirect-bypass class as CVE-2026-45401 (GHSA-rh5x-h6pp-cjj6), on a 6th call site that the v0.9.5 patch missed. CVE-2026-45401&amp;#x27;s advisory body enumerates exactly five affe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-226f-f24g-524w"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-226f-f24g-524w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-226f-f24g-524w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-3vv5-8xxp-4f55: Open WebUI: Cross-origin postMessage confirmation bypass via action:submit</title>
-    <id>https://osv.dev/vulnerability/GHSA-3vv5-8xxp-4f55</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3vv5-8xxp-4f55"/>
-    <published>2026-06-17T14:10:35Z</published>
-    <updated>2026-06-17T14:15:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54007"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Cross-origin postMessage confirmation bypass via action:submit&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54007&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.9.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The chat message listener allows non-same-origin `input:prompt` and `action:submit` messages, so an external site can set prompt text and trigger `submitPrompt()` in an authenticated victim session. I validated this with a cross-origin attacker page that auto-posted messages and caused unauthorized `POST /api/v1/chats/new` and `POST /api/chat/completions` requests containing attacker-controlled prompts. This enables cross-site forced actions and model/tool execution under victim privileges without consent.
-
-### Details
-
-The chat page&amp;#x27;s window message listener in `src/lib/components/chat/Chat.svelte` processes message types including `input:prompt` and `action:submit` without adequately enforcing same-origin restrictions. Based on code around lines ~597-616, input text is set d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-3vv5-8xxp-4f55"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-3vv5-8xxp-4f55&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3vv5-8xxp-4f55"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,410 @@
   <title>OSV — new &amp; updated vulnerabilities: RubyGems</title>
   <subtitle>Open-source vulns affecting RubyGems packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:rubygems</id>
-  <updated>2026-06-19T18:00:12Z</updated>
+  <updated>2026-06-19T21:00:19Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/rubygems.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-h8w8-99g7-qmvj: Concurrent Ruby : `AtomicReference#update` livelocks when the stored value is `Float::NAN`</title>
+    <id>https://osv.dev/vulnerability/GHSA-h8w8-99g7-qmvj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h8w8-99g7-qmvj"/>
+    <published>2026-06-19T20:47:35Z</published>
+    <updated>2026-06-19T21:00:19Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54904"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Concurrent Ruby : `AtomicReference#update` livelocks when the stored value is `Float::NAN`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54904&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;concurrent-ruby&lt;/code&gt; — fixed in 1.3.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`Concurrent::AtomicReference#update` can enter a permanent busy retry loop when the current value is `Float::NAN`.
+
+The issue is caused by the interaction between:
+- `AtomicReference#update`, which retries until `compare_and_set(old_value, new_value)` succeeds.
+- Numeric `compare_and_set`, which checks `old == old_value` before attempting the underlying atomic swap.
+- Ruby NaN semantics, where `Float::NAN == Float::NAN` is always `false`.
+
+As a result, once an `AtomicReference` contains `Float::NAN`, calling `#update` repeatedly evaluates the caller&amp;#x27;s block and never returns. In services that store externally derived numeric values in an `AtomicReference`, this can cause CPU exhaustion or permanent request/job hangs.
+
+### Version
+Software: concurrent-ruby
+Version: 1.3.6
+Commit:…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-h8w8-99g7-qmvj"&gt;https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-h8w8-99g7-qmvj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby"&gt;https://github.com/ruby-concurrency/concurrent-ruby&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h8w8-99g7-qmvj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9cv6-qcjw-4grx: Oj: Negative-Size memcpy in Oj::Parser create_id Attribute Handling</title>
+    <id>https://osv.dev/vulnerability/GHSA-9cv6-qcjw-4grx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9cv6-qcjw-4grx"/>
+    <published>2026-06-19T20:47:23Z</published>
+    <updated>2026-06-19T21:00:18Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54900"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Negative-Size memcpy in Oj::Parser create_id Attribute Handling&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54900&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj::Parser#parse` in usual mode with `create_id` enabled is vulnerable to heap corruption via a negative-size `memcpy`. When a JSON object key is exactly 65,535 bytes long, an integer truncation in `form_attr` (`usual.c:63`) converts the length to `-1` before passing it to `memcpy`. This causes `memcpy` to copy `SIZE_MAX` bytes (interpreted as a huge `size_t`), corrupting heap memory and crashing the process.
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/usual.c`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+`ext/oj/usual.c`, `form_attr`:
+
+```c
+// usual.c:55–64
+static ID form_attr(const char *str, size_t slen) {
+    char        buf[4096];
+    // ...
+    int  blen = (int)slen + 1;    // ← truncates: 65535 + 1 = 65536 → wraps to …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-9cv6-qcjw-4grx"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-9cv6-qcjw-4grx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9cv6-qcjw-4grx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6wx8-w4f5-wwcr: Concurrent Ruby: ReadWriteLock allows wrong-thread write release and stray read-release counter corruption</title>
+    <id>https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr"/>
+    <published>2026-06-19T20:47:41Z</published>
+    <updated>2026-06-19T21:00:18Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54906"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Concurrent Ruby: ReadWriteLock allows wrong-thread write release and stray read-release counter corruption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54906&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;concurrent-ruby&lt;/code&gt; — fixed in 1.3.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`Concurrent::ReadWriteLock#release_write_lock` does not verify that the calling thread acquired the write lock. Any thread with access to the lock object can release an active write lock held by another thread. A second writer can then enter its critical section while the first writer is still running.
+
+`Concurrent::ReadWriteLock#release_read_lock` also decrements the shared counter even when no read lock is held. Calling it on a fresh lock changes the counter from `0` to `-1`, after which normal read acquisition raises `Concurrent::ResourceLimitError`.
+
+This is a synchronization correctness issue in the public `Concurrent::ReadWriteLock` API. It should not be framed as an authorization bypass; the lock is an in-process concurrency primitive, not an access-control boundary.
+
+##…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-6wx8-w4f5-wwcr"&gt;https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-6wx8-w4f5-wwcr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby"&gt;https://github.com/ruby-concurrency/concurrent-ruby&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-475m-ph3x-64gp: Oj: Integer Overflow in Oj.load 2GB String Handling</title>
+    <id>https://osv.dev/vulnerability/GHSA-475m-ph3x-64gp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-475m-ph3x-64gp"/>
+    <published>2026-06-19T20:47:31Z</published>
+    <updated>2026-06-19T21:00:18Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54903"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Integer Overflow in Oj.load 2GB String Handling&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54903&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj.load` is vulnerable to heap corruption when parsing a JSON string longer than 2 GB. An integer overflow in `buf_append_string` (`buf.h:61`) converts the string length to a large negative `size_t`, causing `memcpy` to copy an astronomically large amount of data out of bounds. This crashes the process and can corrupt adjacent heap memory.
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/buf.h` and `ext/oj/parse.c`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+`ext/oj/buf.h`, line 61:
+
+```c
+inline static void buf_append_string(Buf buf, const char *s, size_t slen) {
+    // ...
+    memcpy(buf-&amp;gt;tail, s, slen);   // slen derived from 32-bit int that wrapped negative
+```
+
+In `parse.c`, escape sequence handling computes the remaining st…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-475m-ph3x-64gp"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-475m-ph3x-64gp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-475m-ph3x-64gp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wv3x-4vxv-whpp: Concurrent Ruby: `ReentrantReadWriteLock` read-count overflow grants a write lock without exclusivity</title>
+    <id>https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp"/>
+    <published>2026-06-19T20:47:38Z</published>
+    <updated>2026-06-19T21:00:17Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54905"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Concurrent Ruby: `ReentrantReadWriteLock` read-count overflow grants a write lock without exclusivity&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54905&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;concurrent-ruby&lt;/code&gt; — fixed in 1.3.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`Concurrent::ReentrantReadWriteLock` can incorrectly grant a write lock after one thread acquires the read lock 32,768 times.
+
+The lock stores a thread&amp;#x27;s local read and write hold counts in one integer. The low 15 bits are used for the read hold count, and bit 15 is used as `WRITE_LOCK_HELD`. After 32,768 reentrant read acquisitions, the local read count crosses into the write-lock bit. `try_write_lock` then treats the thread as already holding a write lock and returns `true` without setting the global `RUNNING_WRITER` bit.
+
+This breaks the core mutual-exclusion guarantee: the caller is told it has a write lock, but other threads can still hold or acquire read locks at the same time.
+
+### Version
+Software: concurrent-ruby
+Version: 1.3.6
+Commit: 7a1b78941c081106c20a9ca0144ac73a4…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-wv3x-4vxv-whpp"&gt;https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-wv3x-4vxv-whpp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby"&gt;https://github.com/ruby-concurrency/concurrent-ruby&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vwm4-62gf-x745: Oj: Use-After-Free in Oj::Parser array_class/hash_class GC Marking</title>
+    <id>https://osv.dev/vulnerability/GHSA-vwm4-62gf-x745</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vwm4-62gf-x745"/>
+    <published>2026-06-19T20:47:25Z</published>
+    <updated>2026-06-19T21:00:17Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54901"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Use-After-Free in Oj::Parser array_class/hash_class GC Marking&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54901&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj::Parser` in usual mode does not mark `array_class` and `hash_class` references during garbage collection. If GC runs after the class is assigned but before a parse, the class object is reclaimed, leaving the parser holding a dangling VALUE. The subsequent `parse` call dereferences the freed object, producing a segfault.
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/usual.c` / `ext/oj/parser.c`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+The `parser_mark` function in `ext/oj/parser.c` is registered as the GC mark callback for the parser&amp;#x27;s `TypedData`. If `array_class` (stored as `d-&amp;gt;array_class` in the `Usual` struct) is not passed to `rb_gc_mark`, the GC does not know it is referenced and may collect it.
+
+When `close_array…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-vwm4-62gf-x745"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-vwm4-62gf-x745&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vwm4-62gf-x745"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-m578-w5vf-rfcm: Oj: Use-After-Free in Oj::Parser SAJ Long Key Callback</title>
+    <id>https://osv.dev/vulnerability/GHSA-m578-w5vf-rfcm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m578-w5vf-rfcm"/>
+    <published>2026-06-19T20:47:28Z</published>
+    <updated>2026-06-19T21:00:15Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54902"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Use-After-Free in Oj::Parser SAJ Long Key Callback&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54902&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj::Parser` in SAJ mode does not protect cached object keys (≥ 35 bytes) from garbage collection. A Ruby callback that triggers GC inside `hash_end` can cause the key string to be reclaimed while the C parser still holds a pointer to it. The subsequent access to the freed string VALUE results in a segfault, confirmed by an RIP pointing to address `0x4242` (a canary-style pattern suggesting control over the freed memory&amp;#x27;s content).
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/saj2.c` / `ext/oj/parser.c`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+Short keys (≤ 34 bytes) are stored inline on the C stack and are safe. Long keys (≥ 35 bytes) are stored as heap-allocated Ruby String objects passed to `rb_funcall` as the `key` arg…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-m578-w5vf-rfcm"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-m578-w5vf-rfcm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m578-w5vf-rfcm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-98m9-hrrm-r99r: Faraday: Uncontrolled recursion in NestedParamsEncoder allows stack exhaustion DoS via deeply nested query parameters</title>
+    <id>https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r"/>
+    <published>2026-06-19T19:35:43Z</published>
+    <updated>2026-06-19T19:45:55Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54297"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Faraday: Uncontrolled recursion in NestedParamsEncoder allows stack exhaustion DoS via deeply nested query parameters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54297&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;faraday&lt;/code&gt; — fixed in 2.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Uncontrolled Recursion in NestedParamsEncoder Allows Stack Exhaustion DoS via Deeply Nested Query Parameters
+
+## Summary
+
+`Faraday::NestedParamsEncoder`, the default nested query parameter encoder/decoder in Faraday, decodes nested query strings without enforcing a maximum nesting depth.
+
+A crafted query string such as:
+
+```text
+a[x][x][x][x]...[x]=1
+```
+
+causes Faraday to build a deeply nested Ruby `Hash` structure. The internal `dehash` routine then recursively walks this attacker-controlled structure without a depth limit. At sufficient depth, Ruby raises an uncaught `SystemStackError` (`stack level too deep`), crashing the calling thread or worker.
+
+This can lead to denial of service in applications that pass attacker-controlled query strings to Faraday&amp;#x27;s nested query parsing or URL-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lostisland/faraday/security/advisories/GHSA-98m9-hrrm-r99r"&gt;https://github.com/lostisland/faraday/security/advisories/GHSA-98m9-hrrm-r99r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lostisland/faraday"&gt;https://github.com/lostisland/faraday&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3v45-f3vh-wg7m: Oj: Stack Buffer Overflow in Oj.dump via Large Indent</title>
+    <id>https://osv.dev/vulnerability/GHSA-3v45-f3vh-wg7m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3v45-f3vh-wg7m"/>
+    <published>2026-06-19T19:35:27Z</published>
+    <updated>2026-06-19T19:45:55Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54502"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Stack Buffer Overflow in Oj.dump via Large Indent&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54502&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj.dump` is vulnerable to a stack-based buffer overflow when a large `:indent` value is provided by the developer. `fill_indent` in `dump.h` calls `memset(indent_str, &amp;#x27; &amp;#x27;, (size_t)opts-&amp;gt;indent)` without validating the size. When `opts-&amp;gt;indent` is set to `INT_MAX` (2,147,483,647), the `(size_t)` cast preserves the large value and `memset` writes 2 GB into the stack-allocated `out` buffer (4,184 bytes), corrupting the stack and crashing the process.
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/dump.h`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+`ext/oj/dump.h`, line 77:
+
+```c
+static void fill_indent(Out out, int depth) {
+    if (0 &amp;lt; out-&amp;gt;opts-&amp;gt;indent) {
+        size_t len = (size_t)(out-&amp;gt;opts-&amp;gt;indent * depth);
+        // ...
+ …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-3v45-f3vh-wg7m"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-3v45-f3vh-wg7m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3v45-f3vh-wg7m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3m6q-jj5j-38c9: Oj: Stack Buffer Overflow in Oj::Doc#each_child via Deeply Nested Input</title>
+    <id>https://osv.dev/vulnerability/GHSA-3m6q-jj5j-38c9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3m6q-jj5j-38c9"/>
+    <published>2026-06-19T19:36:28Z</published>
+    <updated>2026-06-19T19:45:55Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54592"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Stack Buffer Overflow in Oj::Doc#each_child via Deeply Nested Input&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54592&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj::Doc#each_child`, when invoked recursively over a deeply nested JSON
+document, overflows a fixed-size stack buffer and aborts the process. This is a
+denial of service reachable from untrusted JSON.
+
+### Details
+
+Two-step chain in `ext/oj/fast.c`:
+
+1. **`doc_each_child` (~line 1501)** increments `doc-&amp;gt;where` past the
+   `where_path[MAX_STACK = 100]` array with no bounds check, and never restores
+   it (`doc-&amp;gt;where--` is missing). Calling `each_child` recursively from inside
+   the yield block therefore drives `doc-&amp;gt;where` beyond the array.
+
+2. **On the next entry (~line 1478)** the function copies the path into a
+   stack-local buffer:
+
+   ```c
+   Leaf  save_path[MAX_STACK];           // 800-byte stack buffer
+   size_t wlen = doc-&amp;gt;where - doc-&amp;gt;where_path;
+   if (0 &amp;lt; wlen) {…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-3m6q-jj5j-38c9"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-3m6q-jj5j-38c9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3m6q-jj5j-38c9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q2gm-54r6-8fwm: Oj: Use-After-Free in Oj::Parser SAJ Callback via Input Mutation</title>
+    <id>https://osv.dev/vulnerability/GHSA-q2gm-54r6-8fwm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q2gm-54r6-8fwm"/>
+    <published>2026-06-19T19:36:54Z</published>
+    <updated>2026-06-19T19:45:53Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54898"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Use-After-Free in Oj::Parser SAJ Callback via Input Mutation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54898&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj::Parser#parse` is vulnerable to a heap use-after-free when a SAJ/SAJ2 callback mutates the input JSON string during parsing. The C engine holds a raw `const byte *` pointer into the Ruby string&amp;#x27;s internal buffer. If a callback (e.g. `hash_start`) resizes the string — for example by calling `String#replace` with a longer value — Ruby reallocates the string buffer and frees the old one. The C parser&amp;#x27;s pointer is left dangling; the next character read at `parser.c:607` is a use-after-free.
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/parser.c`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+`ext/oj/parser.c`, `parser_parse` → `parse`:
+
+```c
+static VALUE parser_parse(VALUE self, VALUE json) {
+    const byte *ptr = (const byte *)S…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-q2gm-54r6-8fwm"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-q2gm-54r6-8fwm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q2gm-54r6-8fwm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fm7p-mprw-wjm9: Oj: intern.c form_attr (uninitialized stack read)</title>
+    <id>https://osv.dev/vulnerability/GHSA-fm7p-mprw-wjm9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fm7p-mprw-wjm9"/>
+    <published>2026-06-19T19:35:59Z</published>
+    <updated>2026-06-19T19:45:51Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54500"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: intern.c form_attr (uninitialized stack read)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54500&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj.load` in `:object` mode reads uninitialized stack memory (and, for long
+keys, reads out of bounds) when parsing a JSON object whose key is 254 bytes
+or longer. The interned bytes can surface to the caller, disclosing process
+stack memory.
+
+### Details
+
+In `ext/oj/intern.c`, `form_attr()` handles the long-key path by allocating a
+heap buffer `b`, populating it with the attribute name, and then freeing it —
+but it passed the **uninitialized stack buffer `buf`** (not `b`) to
+`rb_intern3()`:
+
+```c
+static VALUE form_attr(const char *str, size_t len) {
+    char buf[256];
+    if (sizeof(buf) - 2 &amp;lt;= len) {        // long-key path (len &amp;gt;= 254)
+        char *b = OJ_R_ALLOC_N(char, len + 2);
+        // ... b is filled correctly ...
+        id = rb_intern3(buf, len + 1, oj_utf8_encodi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-fm7p-mprw-wjm9"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-fm7p-mprw-wjm9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fm7p-mprw-wjm9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-35w3-pjm6-wj95: Oj: Heap Buffer Overflow in Oj.dump Exception Serialization via Large Indent</title>
+    <id>https://osv.dev/vulnerability/GHSA-35w3-pjm6-wj95</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-35w3-pjm6-wj95"/>
+    <published>2026-06-19T19:36:47Z</published>
+    <updated>2026-06-19T19:45:49Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54896"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Heap Buffer Overflow in Oj.dump Exception Serialization via Large Indent&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54896&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj.dump` in object mode is vulnerable to a heap buffer overflow when serializing Exception objects with a large `:indent` value. The serializer allocates a buffer sized for the object&amp;#x27;s attributes but does not account for the indent bytes added on each write. With `indent: 5000`, the accumulation of 5,000-byte indent strings overflows the 13,150-byte heap allocation, corrupting adjacent heap memory.
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/dump.h`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+`ext/oj/dump.h`, line 75–77:
+
+```c
+static void fill_indent(Out out, int depth) {
+    if (0 &amp;lt; out-&amp;gt;opts-&amp;gt;indent) {
+        memset(out-&amp;gt;buf + out-&amp;gt;cur, &amp;#x27; &amp;#x27;, (size_t)(out-&amp;gt;opts-&amp;gt;indent * depth));
+```
+
+When dumping an Exception object in …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-35w3-pjm6-wj95"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-35w3-pjm6-wj95&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-35w3-pjm6-wj95"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2cw7-v8ff-p88r: Oj: Use-After-Free in Oj::Parser Symbol Key Cache Toggle</title>
+    <id>https://osv.dev/vulnerability/GHSA-2cw7-v8ff-p88r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2cw7-v8ff-p88r"/>
+    <published>2026-06-19T19:34:30Z</published>
+    <updated>2026-06-19T19:45:39Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54899"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Use-After-Free in Oj::Parser Symbol Key Cache Toggle&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54899&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Disabling `symbol_keys` on a reused `Oj::Parser` instance triggers a heap use-after-free. When `symbol_keys` is toggled from `true` to `false`, `opt_symbol_keys_set` frees the internal key cache (`cache_free`) but does not clear the pointer. The next `parse` call reads from the freed cache via `cache_intern`, producing a use-after-free.
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/usual.c`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+`ext/oj/usual.c`, `opt_symbol_keys_set`:
+
+```c
+// usual.c:1043–1051
+if (symbol_keys) {
+    d-&amp;gt;key_cache = cache_create(...);   // allocate
+} else {
+    cache_free(d-&amp;gt;key_cache);           // free — but d-&amp;gt;key_cache pointer not NULLed
+}
+```
+
+On the next parse call, `cache_key` → `cache_intern` read…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-2cw7-v8ff-p88r"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-2cw7-v8ff-p88r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2cw7-v8ff-p88r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9ppp-w3g4-fh4q: Oj: Use-After-Free in Oj::Doc Iterators via Reentrant Close</title>
+    <id>https://osv.dev/vulnerability/GHSA-9ppp-w3g4-fh4q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9ppp-w3g4-fh4q"/>
+    <published>2026-06-19T19:36:50Z</published>
+    <updated>2026-06-19T19:45:39Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54897"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Oj: Use-After-Free in Oj::Doc Iterators via Reentrant Close&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54897&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oj&lt;/code&gt; — fixed in 3.17.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Oj::Doc` iterators (`each_value`, `each_child`, `each_leaf`) are vulnerable to a heap use-after-free. When a Ruby block yielded during iteration calls `doc.close` or `d.close`, the document&amp;#x27;s heap memory is freed while the C iterator is still running. When control returns from the block, the iterator reads from the freed region, producing a use-after-free accessible from pure Ruby.
+
+### Version
+
+- **Software**: oj gem
+- **Affected**: all versions with `ext/oj/fast.c`
+- **Latest tested**: 3.17.1 (confirmed present)
+
+### Details
+
+The iterators in `ext/oj/fast.c` follow the pattern:
+
+```c
+// fast.c:1505 (doc_each_child)
+static VALUE doc_each_child(VALUE self, ...) {
+    ...
+    while (cur != NULL) {
+        rb_yield(...);       // ← Ruby block executes here
+        cur = cur-&amp;gt;ne…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-9ppp-w3g4-fh4q"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-9ppp-w3g4-fh4q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9ppp-w3g4-fh4q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-mqq5-j7w8-2hgh: AlchemyCMS: Unauthenticated nested page API leaks restricted &amp; unpublished content</title>
     <id>https://osv.dev/vulnerability/GHSA-mqq5-j7w8-2hgh</id>
@@ -233,67 +631,5 @@ It is considered malicious because:
 
 - The package communicates with a domain associated with malicious activity.
 &lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6117"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-hm49-wcqc-g2xg: net-imap vulnerable to command Injection via "raw" arguments to multiple commands</title>
-    <id>https://osv.dev/vulnerability/GHSA-hm49-wcqc-g2xg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hm49-wcqc-g2xg"/>
-    <published>2026-05-04T22:04:41Z</published>
-    <updated>2026-06-17T20:00:10Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-42257"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;net-imap vulnerable to command Injection via &amp;quot;raw&amp;quot; arguments to multiple commands&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42257&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.6.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.5.14&lt;/li&gt;&lt;li&gt;&lt;code&gt;net-imap&lt;/code&gt; — fixed in 0.4.24&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-Several `Net::IMAP` commands accept a raw string argument that is sent to the server without validation or escaping.  If this string is derived from user-controlled input, it may contain contain `CRLF` sequences, which an attacker can use to inject arbitrary IMAP commands.
-
-### Details
-
-`Net::IMAP`&amp;#x27;s generic argument handling, used by most command arguments, interprets string arguments as an IMAP `astring`.  Depending on the string contents and the connection&amp;#x27;s UTF-8 support, this encodes strings as either a `atom`, `quoted`, or `literal`.  These are safe from command or argument injection.
-
-But the following commands transform specific String arguments to `Net::IMAP::RawData`, which bypasses normal argument validation and encoding and prints the string directly to the socket:
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/security/advisories/GHSA-hm49-wcqc-g2xg"&gt;https://github.com/ruby/net-imap/security/advisories/GHSA-hm49-wcqc-g2xg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42257"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42257&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/commit/0ec4fd351263e8b9a4f683713427827b7b1ad974"&gt;https://github.com/ruby/net-imap/commit/0ec4fd351263e8b9a4f683713427827b7b1ad974&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/commit/47c72186d272441878ca73c9499f66013829ca2f"&gt;https://github.com/ruby/net-imap/commit/47c72186d272441878ca73c9499f66013829ca2f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/commit/6bf02aef7e0b5931010c36e377f79a71636b306b"&gt;https://github.com/ruby/net-imap/commit/6bf02aef7e0b5931010c36e377f79a71636b306b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/commit/a4f7649c3da77dec7631f03a037a478eb4330048"&gt;https://github.com/ruby/net-imap/commit/a4f7649c3da77dec7631f03a037a478eb4330048&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap/commit/aec06996eb87a7e1bbcef1f9f8926e8add2b8c71"&gt;https://github.com/ruby/net-imap/commit/aec06996eb87a7e1bbcef1f9f8926e8add2b8c71&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/net-imap"&gt;https://github.com/ruby/net-imap&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hm49-wcqc-g2xg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8fq9-273g-6mrg: Avo: Missing Authorization in Avo Association Attach Endpoint Allows Unauthorized Relationship Manipulation and Privilege Escalation</title>
-    <id>https://osv.dev/vulnerability/GHSA-8fq9-273g-6mrg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8fq9-273g-6mrg"/>
-    <published>2026-06-17T18:49:11Z</published>
-    <updated>2026-06-17T19:00:18Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-55518"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Avo: Missing Authorization in Avo Association Attach Endpoint Allows Unauthorized Relationship Manipulation and Privilege Escalation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55518&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;avo&lt;/code&gt; — fixed in 3.32.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;avo&lt;/code&gt; — fixed in 4.0.0.beta.51&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-A critical missing authorization flaw exists in Avo&amp;#x27;s association attach workflow. The UI and `GET /resources/:resource/:id/:related/new` path can check `attach_&amp;lt;association&amp;gt;?`, but the actual write endpoint, `POST /resources/:resource/:id/:related`, does not run the same authorization check before mutating the association.
-
-As a result, an authenticated low-privileged Avo user can bypass hidden/disabled attach controls and directly attach related records to a parent record by sending a crafted POST request. In applications where associations represent teams, tenants, roles, projects, users, memberships, ownership, or other authorization-bearing relationships, this can lead to privilege escalation and cross-tenant data exposure.
-
-## Details
-
-The association attach route writes …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/avo-hq/avo/security/advisories/GHSA-8fq9-273g-6mrg"&gt;https://github.com/avo-hq/avo/security/advisories/GHSA-8fq9-273g-6mrg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/avo-hq/avo"&gt;https://github.com/avo-hq/avo&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8fq9-273g-6mrg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-c32j-vqhx-rx3x: ruby-jwt: Empty-key HMAC bypass; cross-language sibling of CVE-2026-44351</title>
-    <id>https://osv.dev/vulnerability/GHSA-c32j-vqhx-rx3x</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c32j-vqhx-rx3x"/>
-    <published>2026-05-18T17:24:55Z</published>
-    <updated>2026-06-16T05:15:09Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-45363"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;ruby-jwt: Empty-key HMAC bypass; cross-language sibling of CVE-2026-44351&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45363&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;jwt&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;jwt&lt;/code&gt; — fixed in 2.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`JWT.decode(token, &amp;#x27;&amp;#x27;, true, algorithm: &amp;#x27;HS256&amp;#x27;)` accepts an attacker-forged token.
-`OpenSSL::HMAC.digest(&amp;#x27;SHA256&amp;#x27;, &amp;#x27;&amp;#x27;, payload)` returns a valid digest under an empty key, and no `raise
-  InvalidKeyError if key.empty?` precondition exists in the HMAC algorithm.
-
-```
-JWT.decode(token, &amp;quot;&amp;quot;, true, algorithm: &amp;#x27;HS256&amp;#x27;)
-  -&amp;gt; JWA::Hmac.verify(verification_key: &amp;quot;&amp;quot;, ...)
-  -&amp;gt; OpenSSL::HMAC.digest(&amp;#x27;SHA256&amp;#x27;, &amp;quot;&amp;quot;, signing_input) == signature
-```
-
-The same path is reached when a keyfinder block or key_finder: argument returns &amp;quot;&amp;quot;, nil, or an
-array containing nil for an unknown key. JWT::Decode#find_key only rejects literal nil and empty
-arrays, and JWT::JWA::Hmac silently coerces nil to &amp;quot;&amp;quot; (signing_key ||= &amp;#x27;&amp;#x27;) before signing.
-
-```
-JWT.decode(token, nil, true, algorithms: [&amp;#x27;HS256&amp;#x27;]) { |_h| &amp;quot;&amp;quot; }
-  -&amp;gt; find_…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/security/advisories/GHSA-c32j-vqhx-rx3x"&gt;https://github.com/jwt/ruby-jwt/security/advisories/GHSA-c32j-vqhx-rx3x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/issues/724"&gt;https://github.com/jwt/ruby-jwt/issues/724&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/commit/db560b769a07bd9724e77ff505011ac01872106f"&gt;https://github.com/jwt/ruby-jwt/commit/db560b769a07bd9724e77ff505011ac01872106f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt"&gt;https://github.com/jwt/ruby-jwt&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/releases/tag/v2.10.3"&gt;https://github.com/jwt/ruby-jwt/releases/tag/v2.10.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jwt/ruby-jwt/releases/tag/v3.2.0"&gt;https://github.com/jwt/ruby-jwt/releases/tag/v3.2.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rubysec/ruby-advisory-db/blob/master/gems/jwt/CVE-2026-45363.yml"&gt;https://github.com/rubysec/ruby-advisory-db/blob/master/gems/jwt/CVE-2026-45363.yml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.cve.org/CVERecord?id=CVE-2026-45363"&gt;https://www.cve.org/CVERecord?id=CVE-2026-45363&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c32j-vqhx-rx3x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

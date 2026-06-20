@@ -3,12 +3,109 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-06-19T15:00:15Z</updated>
+  <updated>2026-06-19T22:15:17Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-cc8f-fcx3-gpjr: SurrealDB: Arbitrary file read via DEFINE ANALYZER mapper() filter</title>
+    <id>https://osv.dev/vulnerability/GHSA-cc8f-fcx3-gpjr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cc8f-fcx3-gpjr"/>
+    <published>2026-06-19T22:10:48Z</published>
+    <updated>2026-06-19T22:15:17Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Arbitrary file read via DEFINE ANALYZER mapper() filter&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SurrealDB&amp;#x27;s full-text search lets you define a text analyzer whose `mapper` filter loads a term-mapping file from disk (`DEFINE ANALYZER ... FILTERS mapper(&amp;#x27;&amp;lt;path&amp;gt;&amp;#x27;)`). A database user with the `EDITOR` or `OWNER` role could point that filter at any file the SurrealDB process can read and have its content returned in the query&amp;#x27;s error message.
+
+File access is meant to be restricted by the `SURREAL_FILE_ALLOWLIST` setting, but an empty allowlist applied no restriction at all — and empty is the default. 
+
+## Impact
+
+The file is read with the privileges of the SurrealDB process, so a database `EDITOR` or `OWNER` user can disclose the contents of any file the process can access. Only the **first line** of the file is returned, except for files with no newlines.
+
+However recovering the process&amp;#x27;…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-cc8f-fcx3-gpjr"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-cc8f-fcx3-gpjr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/5600"&gt;https://github.com/surrealdb/surrealdb/pull/5600&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cc8f-fcx3-gpjr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hv6h-hc26-q48p: SurrealDB: Field-level SELECT permissions bypassed via graph and reference traversals</title>
+    <id>https://osv.dev/vulnerability/GHSA-hv6h-hc26-q48p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hv6h-hc26-q48p"/>
+    <published>2026-06-19T22:10:53Z</published>
+    <updated>2026-06-19T22:15:16Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Field-level SELECT permissions bypassed via graph and reference traversals&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A record user could read field values hidden from them by field-level SELECT permissions by reaching the records through a graph-edge (`-&amp;gt;`) or back-reference (`&amp;lt;~`) traversal instead of a direct `SELECT`.
+
+When a table was readable at the table level but carried a field hidden by a field-level permission (`DEFINE FIELD secret ON knows PERMISSIONS FOR select NONE`), a direct `SELECT * FROM knows` hid `secret` — but reaching the same records through a traversal that yields full objects — `person:bob-&amp;gt;(SELECT * FROM knows)`, `person:bob&amp;lt;~(SELECT * FROM comment)`, or a projected target vertex `-&amp;gt;knows-&amp;gt;(SELECT * FROM person)` — returned it intact.
+
+The root cause: the shared `resolve_record_batch` helper used by `GraphEdgeScan` (`FullEdge`) and `ReferenceScan` (`FullRecord`) enforced only the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-hv6h-hc26-q48p"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-hv6h-hc26-q48p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hv6h-hc26-q48p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-h4h3-3rfj-x6fq: SurrealDB: Indexed ORDER BY leaks the value ordering of a SELECT-restricted field</title>
+    <id>https://osv.dev/vulnerability/GHSA-h4h3-3rfj-x6fq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h4h3-3rfj-x6fq"/>
+    <published>2026-06-19T22:10:50Z</published>
+    <updated>2026-06-19T22:15:16Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Indexed ORDER BY leaks the value ordering of a SELECT-restricted field&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A field can be hidden from a user with a field-level SELECT permission (`DEFINE FIELD code ON secret PERMISSIONS FOR select WHERE owner = $auth.id`). When that field is indexed, a record user who cannot read it could still recover the relative ordering of its values across every record by issuing `ORDER BY &amp;lt;field&amp;gt;`: the field came back `null` as intended, but the rows were returned in the hidden values&amp;#x27; true sorted order.
+
+To satisfy the sort, the planner selects the field&amp;#x27;s index and walks it in value order; the field-level permission is applied later, when the row is projected, so the value is nulled but the row order already encodes it. The guard that withholds restricted fields from the `WHERE` path was never applied to `ORDER BY`.
+
+## Impact
+
+What an attacker **can** do:
+
+- As a recor…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-h4h3-3rfj-x6fq"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-h4h3-3rfj-x6fq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h4h3-3rfj-x6fq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mh64-ph39-mrc9: Cloudflare Quiche: Use-after-free in connection ID iterator FFI functions</title>
+    <id>https://osv.dev/vulnerability/GHSA-mh64-ph39-mrc9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mh64-ph39-mrc9"/>
+    <published>2026-06-19T22:10:29Z</published>
+    <updated>2026-06-19T22:15:16Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-11941"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cloudflare Quiche: Use-after-free in connection ID iterator FFI functions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11941&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;quiche&lt;/code&gt; — fixed in 0.29.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Cloudflare Quiche was affected by 2 use-after-free vulnerabilities in the connection ID iterator FFI functions.
+
+The `quiche_connection_id_iter_next` and `quiche_conn_retired_scid_next` functions would return a pointer to a `ConnectionId` to the applications via function arguments, but the the owned `ConnectionId` would be dropped at the end of those functions&amp;#x27; scope.
+
+Only applications using those FFI functions are affected. The FFI API is disabled by default by a build-time feature flag.
+
+quiche 0.29.2 is the earliest version containing the fix for this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cloudflare/quiche/security/advisories/GHSA-mh64-ph39-mrc9"&gt;https://github.com/cloudflare/quiche/security/advisories/GHSA-mh64-ph39-mrc9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11941"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11941&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cloudflare/quiche"&gt;https://github.com/cloudflare/quiche&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mh64-ph39-mrc9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jv2j-mqmw-xvv5: SurrealDB: Denial of Service via deep operator chains</title>
+    <id>https://osv.dev/vulnerability/GHSA-jv2j-mqmw-xvv5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jv2j-mqmw-xvv5"/>
+    <published>2026-06-19T22:10:55Z</published>
+    <updated>2026-06-19T22:15:16Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Denial of Service via deep operator chains&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An authenticated user could crash a SurrealDB server with a single query containing a long chain of operators.
+
+Such a query — for example `RETURN 1 + 1 + 1 + ...` with tens of thousands of terms — is parsed into an expression tree one level deep per operator. Because the chain is flat and the pratt parser appends to it iteratively, the configured query- and object-recursion limits never fire, so the tree grows unbounded with the length of the query.
+
+The root cause: the over-deep tree is later walked recursively, one call per node, when it is dropped, formatted, or lowered for execution — overflowing the thread stack and aborting the process.
+
+### Impact
+
+An authenticated user with query-execution privileges can crash a SurrealDB server with a single query containing a long chain of opera…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-jv2j-mqmw-xvv5"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-jv2j-mqmw-xvv5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jv2j-mqmw-xvv5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-h5rg-8p7f-47g2: SurrealDB: SSRF via JWKS URL — Redirect Following in JWT Key Fetch</title>
+    <id>https://osv.dev/vulnerability/GHSA-h5rg-8p7f-47g2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h5rg-8p7f-47g2"/>
+    <published>2026-06-19T22:10:45Z</published>
+    <updated>2026-06-19T22:15:16Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: SSRF via JWKS URL — Redirect Following in JWT Key Fetch&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SurrealDB fetches the JWKS document for a JWT or record access method using a bare `reqwest` client that follows HTTP redirects by default. The network capability check in `core/src/iam/jwks.rs` (`check_capabilities_url`) is applied only to the originally configured URL; redirect targets are not re-validated. An `--allow-net`-permitted JWKS host that returns a `3xx Location` can therefore redirect the request to an address the allowlist was meant to block, resulting in a server-side request forgery (SSRF). The protected `HttpClient` used by `http::*` functions re-checks every redirect hop and was hardened in 3.1.0, but the JWKS fetcher uses its own client and was not covered.
+
+### Impact
+
+What an attacker **can** do:
+
+- With the **Owner** role at database level or above (the minimum requir…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-h5rg-8p7f-47g2"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-h5rg-8p7f-47g2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h5rg-8p7f-47g2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-h668-6x6g-f8r5: tract: Arbitrary file read via unsanitized ONNX external_data `location` (path traversal) on model load in tract-onnx</title>
     <id>https://osv.dev/vulnerability/GHSA-h668-6x6g-f8r5</id>
@@ -175,124 +272,5 @@ is enough to defeat `--deny-env`.**
 You are potentially affected if **all** of the following are true:
 
 1. You run Deno **v2.3.0 or ne…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/security/advisories/GHSA-4c8g-jvcx-v4hv"&gt;https://github.com/denoland/deno/security/advisories/GHSA-4c8g-jvcx-v4hv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno"&gt;https://github.com/denoland/deno&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4c8g-jvcx-v4hv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8xpq-cjcf-3wh9: Deno: Permission Bypass via Unicode Normalization Mismatch on macOS (APFS)</title>
-    <id>https://osv.dev/vulnerability/GHSA-8xpq-cjcf-3wh9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8xpq-cjcf-3wh9"/>
-    <published>2026-06-16T19:11:52Z</published>
-    <updated>2026-06-16T19:15:09Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-49401"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Deno: Permission Bypass via Unicode Normalization Mismatch on macOS (APFS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49401&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;deno&lt;/code&gt; — fixed in 2.7.14&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Deno&amp;#x27;s permission system enforces filesystem and execution restrictions by
-comparing the requested path against the path supplied to `--deny-read`,
-`--deny-write`, `--deny-run`, or `--deny-ffi`. On macOS, that comparison was
-done at the raw-byte level while the APFS filesystem treats different Unicode
-spellings of the same name as the same file.
-
-That means a program could reach a denied path by spelling it differently than
-the deny rule. For example, with `--deny-read=/secrets/passwörter.txt`, a
-script could still read the file by opening `/secrets/passwo\u0308rter.txt`
-(NFD instead of NFC), or `/SECRETS/PASSWÖRTER.txt` (different case, since
-default APFS volumes are case-insensitive). Other forms include ligature
-characters (`ﬁ` vs `fi`, `ﬀ` vs `ff`, …) and German `ß` vs `ss`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/security/advisories/GHSA-8xpq-cjcf-3wh9"&gt;https://github.com/denoland/deno/security/advisories/GHSA-8xpq-cjcf-3wh9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno"&gt;https://github.com/denoland/deno&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8xpq-cjcf-3wh9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-7xh3-mhg9-jcw8: Deno: Command Injection via spawnSync &amp; spawn on Windows</title>
-    <id>https://osv.dev/vulnerability/GHSA-7xh3-mhg9-jcw8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7xh3-mhg9-jcw8"/>
-    <published>2026-06-16T19:07:44Z</published>
-    <updated>2026-06-16T19:15:09Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-49402"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Deno: Command Injection via spawnSync &amp;amp; spawn on Windows&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49402&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;deno&lt;/code&gt; — fixed in 2.7.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Deno&amp;#x27;s `node:child_process` implementation provided an `escapeShellArg()` helper used when callers passed `shell: true` to `spawn` / `spawnSync` / `exec` and friends. On Windows, the helper failed to quote arguments that contained `cmd.exe` metacharacters such as `&amp;amp;`, `|`, `&amp;lt;`, `&amp;gt;`, `^`, `!`, `(`, `)`, and did not neutralize `%` (which `cmd.exe` expands even inside double-quoted strings). An attacker who controlled any portion of an argument passed to such a call could inject arbitrary additional commands into the spawned `cmd.exe` invocation.
-
-This was the Windows counterpart to CVE-2026-27190, which fixed the same class of bug in the Unix branch of `escapeShellArg`.
-
-## Details
-
-On Windows, `child_process` with `shell: true` ran the command via `cmd.exe /d /s /c &amp;quot;&amp;lt;command lin…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/security/advisories/GHSA-7xh3-mhg9-jcw8"&gt;https://github.com/denoland/deno/security/advisories/GHSA-7xh3-mhg9-jcw8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno"&gt;https://github.com/denoland/deno&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7xh3-mhg9-jcw8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-968w-xfqw-vp9q: Deno: BYONM module resolution allows `package.json` main path traversal to bypass `--allow-read` restrictions</title>
-    <id>https://osv.dev/vulnerability/GHSA-968w-xfqw-vp9q</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-968w-xfqw-vp9q"/>
-    <published>2026-06-16T19:11:26Z</published>
-    <updated>2026-06-16T19:15:08Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-49406"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Deno: BYONM module resolution allows `package.json` main path traversal to bypass `--allow-read` restrictions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49406&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;deno&lt;/code&gt; — fixed in 2.7.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-When Deno was run in BYONM mode (`nodeModulesDir: &amp;quot;manual&amp;quot;`), the module resolver did not validate that a package&amp;#x27;s resolved entrypoint stayed within its `node_modules/&amp;lt;pkg&amp;gt;/` directory. A malicious `package.json` whose `main` field contained `..` segments was able to resolve to an arbitrary path on disk, and the resolver then read that file without consulting the `--allow-read` allowlist. This let a `require(&amp;quot;evil-pkg&amp;quot;)` call return the contents of a file that a direct `Deno.readTextFileSync(...)` call would have been blocked from reading.
-
-## Details
-
-In BYONM mode, Deno resolved npm packages directly from a user-managed `node_modules` tree. Resolution of `require(&amp;quot;pkg&amp;quot;)` proceeded by reading `pkg/package.json`, taking the `main` field, joining it to the package directory, an…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/security/advisories/GHSA-968w-xfqw-vp9q"&gt;https://github.com/denoland/deno/security/advisories/GHSA-968w-xfqw-vp9q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno"&gt;https://github.com/denoland/deno&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-968w-xfqw-vp9q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-cpgj-f7g3-2pp2: Deno: `fetch()` API sandbox bypass via missing DNS resolution check</title>
-    <id>https://osv.dev/vulnerability/GHSA-cpgj-f7g3-2pp2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cpgj-f7g3-2pp2"/>
-    <published>2026-06-16T19:02:55Z</published>
-    <updated>2026-06-16T19:15:08Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-49859"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Deno: `fetch()` API sandbox bypass via missing DNS resolution check&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49859&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;deno&lt;/code&gt; — fixed in 2.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-When `fetch()` was called, Deno checked the destination hostname against
-`--deny-net` rules but did not re-check the IP addresses that hostname
-resolved to. An attacker-controlled script could use a specially crafted domain
-name that passes the hostname check yet resolves to a denied IP, bypassing the
-network restriction entirely.
-
-## Impact
-
-Code running under `--deny-net` could reach hosts that the user intended to
-block. In practice this means network isolation rules — for example, blocking
-access to `localhost` or internal services — could be silently circumvented by
-a malicious or compromised dependency.
-
-A companion advisory covers the same class of issue in the WebSocket API.
-
-## Who is affected
-
-Users who:
-
-- run untrusted or third-party code with `deno run`, and
-- rely…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/security/advisories/GHSA-cpgj-f7g3-2pp2"&gt;https://github.com/denoland/deno/security/advisories/GHSA-cpgj-f7g3-2pp2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno"&gt;https://github.com/denoland/deno&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cpgj-f7g3-2pp2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-v8fw-85r8-5m23: Deno: Node TCPWrap numeric hostname aliases bypass --deny-net resolved-IP deny checks</title>
-    <id>https://osv.dev/vulnerability/GHSA-v8fw-85r8-5m23</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v8fw-85r8-5m23"/>
-    <published>2026-06-16T19:09:46Z</published>
-    <updated>2026-06-16T19:15:08Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-49411"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Deno: Node TCPWrap numeric hostname aliases bypass --deny-net resolved-IP deny checks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49411&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;deno&lt;/code&gt; — fixed in 2.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Deno&amp;#x27;s network permission model is designed so that `--deny-net` rules apply to the **resolved IP address** of a destination, not just the literal string supplied by the caller. That means `--deny-net=127.0.0.1` (or `--deny-net=127.0.0.0/8`) is expected to block any attempt to reach loopback, regardless of how the hostname is spelled.
-
-On affected versions, the Node.js compatibility TCP path checked the permission against the **original hostname string** before resolution and then did not re-check after resolution. A caller could therefore pass a numeric alias of an IP address (for example the decimal integer `2130706433` or the hex form `0x7f000001`, both of which resolve to `127.0.0.1`) and reach the denied destination through `node:net.connect` or `node:http.request`&amp;#x27;s `{ ho…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/security/advisories/GHSA-v8fw-85r8-5m23"&gt;https://github.com/denoland/deno/security/advisories/GHSA-v8fw-85r8-5m23&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno"&gt;https://github.com/denoland/deno&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v8fw-85r8-5m23"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9xg4-qhm4-g43w: Deno: Miller-Rabin Primality Test Allows Zero Rounds</title>
-    <id>https://osv.dev/vulnerability/GHSA-9xg4-qhm4-g43w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9xg4-qhm4-g43w"/>
-    <published>2026-06-16T19:08:55Z</published>
-    <updated>2026-06-16T19:15:08Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-49440"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Deno: Miller-Rabin Primality Test Allows Zero Rounds&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49440&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;deno&lt;/code&gt; — fixed in 2.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`node:crypto.checkPrime(candidate[, options][, callback])` and `crypto.checkPrimeSync(candidate[, options])` ran no Miller-Rabin rounds at all when the caller left `options.checks` at its default of `0`. In that mode, the only test applied to the candidate was trial division by the primes up to `17,863`. Any composite whose smallest prime factor exceeds that bound — for example the product of two primes just above it, such as `17,881 × 17,891` — was reported as `true` (&amp;quot;probably prime&amp;quot;).
-
-The same divergence affected the lower-level `op_node_check_prime` / `op_node_check_prime_bytes` paths that the polyfill calls into.
-
-Node.js itself does not have this problem: it forwards `checks = 0` to OpenSSL&amp;#x27;s `BN_check_prime`, which substitutes a sensible default number of rounds based o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/security/advisories/GHSA-9xg4-qhm4-g43w"&gt;https://github.com/denoland/deno/security/advisories/GHSA-9xg4-qhm4-g43w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/pull/34391"&gt;https://github.com/denoland/deno/pull/34391&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno"&gt;https://github.com/denoland/deno&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9xg4-qhm4-g43w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

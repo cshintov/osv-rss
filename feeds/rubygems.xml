@@ -3,12 +3,130 @@
   <title>OSV — new &amp; updated vulnerabilities: RubyGems</title>
   <subtitle>Open-source vulns affecting RubyGems packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:rubygems</id>
-  <updated>2026-06-19T21:00:19Z</updated>
+  <updated>2026-06-21T00:59:20Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/rubygems.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-6wx8-w4f5-wwcr: Concurrent Ruby: ReadWriteLock allows wrong-thread write release and stray read-release counter corruption</title>
+    <id>https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr"/>
+    <published>2026-06-19T20:47:41Z</published>
+    <updated>2026-06-21T00:59:20Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54906"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Concurrent Ruby: ReadWriteLock allows wrong-thread write release and stray read-release counter corruption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54906&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;concurrent-ruby&lt;/code&gt; — fixed in 1.3.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`Concurrent::ReadWriteLock#release_write_lock` does not verify that the calling thread acquired the write lock. Any thread with access to the lock object can release an active write lock held by another thread. A second writer can then enter its critical section while the first writer is still running.
+
+`Concurrent::ReadWriteLock#release_read_lock` also decrements the shared counter even when no read lock is held. Calling it on a fresh lock changes the counter from `0` to `-1`, after which normal read acquisition raises `Concurrent::ResourceLimitError`.
+
+This is a synchronization correctness issue in the public `Concurrent::ReadWriteLock` API. It should not be framed as an authorization bypass; the lock is an in-process concurrency primitive, not an access-control boundary.
+
+##…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-6wx8-w4f5-wwcr"&gt;https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-6wx8-w4f5-wwcr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby"&gt;https://github.com/ruby-concurrency/concurrent-ruby&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5prr-v3j2-97mh: Nokogiri: Possible Out-of-Bounds Read in `Nokogiri::XML::NodeSet#[]`</title>
+    <id>https://osv.dev/vulnerability/GHSA-5prr-v3j2-97mh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5prr-v3j2-97mh"/>
+    <published>2026-06-19T16:36:42Z</published>
+    <updated>2026-06-21T00:59:19Z</updated>
+    <category term="RubyGems"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nokogiri: Possible Out-of-Bounds Read in `Nokogiri::XML::NodeSet#[]`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.19.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Nokogiri::XML::NodeSet#[]` (and its alias `#slice`) checked the requested index against the node set&amp;#x27;s bounds using a 32-bit-truncated copy of the index. A large negative index could pass the check and then be used at full width, reading outside the node set&amp;#x27;s storage. On CRuby this is an out-of-bounds read that typically crashes the process; on JRuby it is not memory-unsafe but returns an incorrect node.
+
+Nokogiri 1.19.4 performs the bounds check against the full-width index.
+
+### Severity
+
+The Nokogiri maintainers have evaluated this as medium severity.
+
+Exploitation requires an application to pass an attacker-controlled integer to `NodeSet#[]`. The primary impact is a controlled crash (denial of service), with potential for memory disclosure on CRuby.
+
+On JRuby, Nokogiri i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-5prr-v3j2-97mh"&gt;https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-5prr-v3j2-97mh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri"&gt;https://github.com/sparklemotion/nokogiri&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5prr-v3j2-97mh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wv3x-4vxv-whpp: Concurrent Ruby: `ReentrantReadWriteLock` read-count overflow grants a write lock without exclusivity</title>
+    <id>https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp"/>
+    <published>2026-06-19T20:47:38Z</published>
+    <updated>2026-06-21T00:59:19Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54905"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Concurrent Ruby: `ReentrantReadWriteLock` read-count overflow grants a write lock without exclusivity&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54905&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;concurrent-ruby&lt;/code&gt; — fixed in 1.3.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`Concurrent::ReentrantReadWriteLock` can incorrectly grant a write lock after one thread acquires the read lock 32,768 times.
+
+The lock stores a thread&amp;#x27;s local read and write hold counts in one integer. The low 15 bits are used for the read hold count, and bit 15 is used as `WRITE_LOCK_HELD`. After 32,768 reentrant read acquisitions, the local read count crosses into the write-lock bit. `try_write_lock` then treats the thread as already holding a write lock and returns `true` without setting the global `RUNNING_WRITER` bit.
+
+This breaks the core mutual-exclusion guarantee: the caller is told it has a write lock, but other threads can still hold or acquire read locks at the same time.
+
+### Version
+Software: concurrent-ruby
+Version: 1.3.6
+Commit: 7a1b78941c081106c20a9ca0144ac73a4…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-wv3x-4vxv-whpp"&gt;https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-wv3x-4vxv-whpp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby"&gt;https://github.com/ruby-concurrency/concurrent-ruby&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-98m9-hrrm-r99r: Faraday: Uncontrolled recursion in NestedParamsEncoder allows stack exhaustion DoS via deeply nested query parameters</title>
+    <id>https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r"/>
+    <published>2026-06-19T19:35:43Z</published>
+    <updated>2026-06-20T22:59:14Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-54297"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Faraday: Uncontrolled recursion in NestedParamsEncoder allows stack exhaustion DoS via deeply nested query parameters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54297&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;faraday&lt;/code&gt; — fixed in 2.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Uncontrolled Recursion in NestedParamsEncoder Allows Stack Exhaustion DoS via Deeply Nested Query Parameters
+
+## Summary
+
+`Faraday::NestedParamsEncoder`, the default nested query parameter encoder/decoder in Faraday, decodes nested query strings without enforcing a maximum nesting depth.
+
+A crafted query string such as:
+
+```text
+a[x][x][x][x]...[x]=1
+```
+
+causes Faraday to build a deeply nested Ruby `Hash` structure. The internal `dehash` routine then recursively walks this attacker-controlled structure without a depth limit. At sufficient depth, Ruby raises an uncaught `SystemStackError` (`stack level too deep`), crashing the calling thread or worker.
+
+This can lead to denial of service in applications that pass attacker-controlled query strings to Faraday&amp;#x27;s nested query parsing or URL-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lostisland/faraday/security/advisories/GHSA-98m9-hrrm-r99r"&gt;https://github.com/lostisland/faraday/security/advisories/GHSA-98m9-hrrm-r99r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lostisland/faraday"&gt;https://github.com/lostisland/faraday&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p67v-3w7g-wjg7: Nokogiri: Possible Use-After-Free when directly using `NokogirI::XML::XPathContext` beyond document lifetime</title>
+    <id>https://osv.dev/vulnerability/GHSA-p67v-3w7g-wjg7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p67v-3w7g-wjg7"/>
+    <published>2026-06-19T16:37:13Z</published>
+    <updated>2026-06-20T21:59:19Z</updated>
+    <category term="RubyGems"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nokogiri: Possible Use-After-Free when directly using `NokogirI::XML::XPathContext` beyond document lifetime&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:U/U:Clear&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.19.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Nokogiri::XML::XPathContext` did not keep its source document alive for garbage collection. If an `XPathContext` outlived its document and the document was collected, evaluating an XPath expression could read invalid memory and potentially segfault.
+
+This is only reachable when application code constructs an `XPathContext` directly and lets the document become unreachable while continuing to use the context. The normal `Document#xpath`, `#css`, and related search methods are not affected, and it is not triggerable by malicious document input.
+
+Nokogiri 1.19.4 makes `XPathContext` keep its source document alive for as long as the context exists.
+
+Only the CRuby implementation is affected. JRuby is not affected.
+
+### Severity
+
+The Nokogiri maintainers have evaluated this as low…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-p67v-3w7g-wjg7"&gt;https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-p67v-3w7g-wjg7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri"&gt;https://github.com/sparklemotion/nokogiri&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p67v-3w7g-wjg7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8678-w3jw-xfc2: Nokogiri: XML::Schema on JRuby allows network requests when NONET is set, bypassing CVE-2020-26247</title>
+    <id>https://osv.dev/vulnerability/GHSA-8678-w3jw-xfc2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8678-w3jw-xfc2"/>
+    <published>2026-06-19T16:36:11Z</published>
+    <updated>2026-06-20T21:59:19Z</updated>
+    <category term="RubyGems"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nokogiri: XML::Schema on JRuby allows network requests when NONET is set, bypassing CVE-2020-26247&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.19.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `NONET` parse option, which Nokogiri turns on by default for `Nokogiri::XML::Schema` (see [CVE-2020-26247](https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-vr8q-g5c7-m54m)), was not correctly enforced on the JRuby implementation. As a result, a schema parsed with default options could still cause external resources to be fetched over the network, potentially enabling SSRF or XXE attacks.
+
+Nokogiri 1.19.4 replaces the scheme denylist with an allowlist. When `NONET` is enabled, only local resources (a `file:` scheme, or a relative or absolute path with no scheme) are resolved, and every network scheme is blocked, case-insensitively. This brings the JRuby behavior in line with CRuby.
+
+Only the JRuby implementation is affected. CRuby is not affected, because …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-8678-w3jw-xfc2"&gt;https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-8678-w3jw-xfc2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri"&gt;https://github.com/sparklemotion/nokogiri&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8678-w3jw-xfc2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-h8w8-99g7-qmvj: Concurrent Ruby : `AtomicReference#update` livelocks when the stored value is `Float::NAN`</title>
     <id>https://osv.dev/vulnerability/GHSA-h8w8-99g7-qmvj</id>
@@ -62,23 +180,6 @@ static ID form_attr(const char *str, size_t slen) {
     int  blen = (int)slen + 1;    // ← truncates: 65535 + 1 = 65536 → wraps to …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-9cv6-qcjw-4grx"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-9cv6-qcjw-4grx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9cv6-qcjw-4grx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-6wx8-w4f5-wwcr: Concurrent Ruby: ReadWriteLock allows wrong-thread write release and stray read-release counter corruption</title>
-    <id>https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr"/>
-    <published>2026-06-19T20:47:41Z</published>
-    <updated>2026-06-19T21:00:18Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-54906"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Concurrent Ruby: ReadWriteLock allows wrong-thread write release and stray read-release counter corruption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54906&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;concurrent-ruby&lt;/code&gt; — fixed in 1.3.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-`Concurrent::ReadWriteLock#release_write_lock` does not verify that the calling thread acquired the write lock. Any thread with access to the lock object can release an active write lock held by another thread. A second writer can then enter its critical section while the first writer is still running.
-
-`Concurrent::ReadWriteLock#release_read_lock` also decrements the shared counter even when no read lock is held. Calling it on a fresh lock changes the counter from `0` to `-1`, after which normal read acquisition raises `Concurrent::ResourceLimitError`.
-
-This is a synchronization correctness issue in the public `Concurrent::ReadWriteLock` API. It should not be framed as an authorization bypass; the lock is an in-process concurrency primitive, not an access-control boundary.
-
-##…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-6wx8-w4f5-wwcr"&gt;https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-6wx8-w4f5-wwcr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby"&gt;https://github.com/ruby-concurrency/concurrent-ruby&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6wx8-w4f5-wwcr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] GHSA-475m-ph3x-64gp: Oj: Integer Overflow in Oj.load 2GB String Handling</title>
     <id>https://osv.dev/vulnerability/GHSA-475m-ph3x-64gp</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-475m-ph3x-64gp"/>
@@ -107,26 +208,6 @@ inline static void buf_append_string(Buf buf, const char *s, size_t slen) {
 ```
 
 In `parse.c`, escape sequence handling computes the remaining st…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-475m-ph3x-64gp"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-475m-ph3x-64gp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-475m-ph3x-64gp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-wv3x-4vxv-whpp: Concurrent Ruby: `ReentrantReadWriteLock` read-count overflow grants a write lock without exclusivity</title>
-    <id>https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp"/>
-    <published>2026-06-19T20:47:38Z</published>
-    <updated>2026-06-19T21:00:17Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-54905"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Concurrent Ruby: `ReentrantReadWriteLock` read-count overflow grants a write lock without exclusivity&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54905&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;concurrent-ruby&lt;/code&gt; — fixed in 1.3.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-`Concurrent::ReentrantReadWriteLock` can incorrectly grant a write lock after one thread acquires the read lock 32,768 times.
-
-The lock stores a thread&amp;#x27;s local read and write hold counts in one integer. The low 15 bits are used for the read hold count, and bit 15 is used as `WRITE_LOCK_HELD`. After 32,768 reentrant read acquisitions, the local read count crosses into the write-lock bit. `try_write_lock` then treats the thread as already holding a write lock and returns `true` without setting the global `RUNNING_WRITER` bit.
-
-This breaks the core mutual-exclusion guarantee: the caller is told it has a write lock, but other threads can still hold or acquire read locks at the same time.
-
-### Version
-Software: concurrent-ruby
-Version: 1.3.6
-Commit: 7a1b78941c081106c20a9ca0144ac73a4…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-wv3x-4vxv-whpp"&gt;https://github.com/ruby-concurrency/concurrent-ruby/security/advisories/GHSA-wv3x-4vxv-whpp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby-concurrency/concurrent-ruby"&gt;https://github.com/ruby-concurrency/concurrent-ruby&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wv3x-4vxv-whpp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GHSA-vwm4-62gf-x745: Oj: Use-After-Free in Oj::Parser array_class/hash_class GC Marking</title>
@@ -173,30 +254,6 @@ When `close_array…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;
 ### Details
 
 Short keys (≤ 34 bytes) are stored inline on the C stack and are safe. Long keys (≥ 35 bytes) are stored as heap-allocated Ruby String objects passed to `rb_funcall` as the `key` arg…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj/security/advisories/GHSA-m578-w5vf-rfcm"&gt;https://github.com/ohler55/oj/security/advisories/GHSA-m578-w5vf-rfcm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ohler55/oj"&gt;https://github.com/ohler55/oj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m578-w5vf-rfcm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-98m9-hrrm-r99r: Faraday: Uncontrolled recursion in NestedParamsEncoder allows stack exhaustion DoS via deeply nested query parameters</title>
-    <id>https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r"/>
-    <published>2026-06-19T19:35:43Z</published>
-    <updated>2026-06-19T19:45:55Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-54297"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Faraday: Uncontrolled recursion in NestedParamsEncoder allows stack exhaustion DoS via deeply nested query parameters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54297&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;faraday&lt;/code&gt; — fixed in 2.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Uncontrolled Recursion in NestedParamsEncoder Allows Stack Exhaustion DoS via Deeply Nested Query Parameters
-
-## Summary
-
-`Faraday::NestedParamsEncoder`, the default nested query parameter encoder/decoder in Faraday, decodes nested query strings without enforcing a maximum nesting depth.
-
-A crafted query string such as:
-
-```text
-a[x][x][x][x]...[x]=1
-```
-
-causes Faraday to build a deeply nested Ruby `Hash` structure. The internal `dehash` routine then recursively walks this attacker-controlled structure without a depth limit. At sufficient depth, Ruby raises an uncaught `SystemStackError` (`stack level too deep`), crashing the calling thread or worker.
-
-This can lead to denial of service in applications that pass attacker-controlled query strings to Faraday&amp;#x27;s nested query parsing or URL-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lostisland/faraday/security/advisories/GHSA-98m9-hrrm-r99r"&gt;https://github.com/lostisland/faraday/security/advisories/GHSA-98m9-hrrm-r99r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lostisland/faraday"&gt;https://github.com/lostisland/faraday&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-98m9-hrrm-r99r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GHSA-3v45-f3vh-wg7m: Oj: Stack Buffer Overflow in Oj.dump via Large Indent</title>
@@ -429,21 +486,6 @@ Appending `?elements=true` additionally dumps the element/ingredient **content**
 `Api::PagesController#nested` calls no `authorize!` and applies no `published`/`restricted` scoping, unlike `show` (`authorize! :show`) and `index` (`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/AlchemyCMS/alchemy_cms/security/advisories/GHSA-mqq5-j7w8-2hgh"&gt;https://github.com/AlchemyCMS/alchemy_cms/security/advisories/GHSA-mqq5-j7w8-2hgh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AlchemyCMS/alchemy_cms"&gt;https://github.com/AlchemyCMS/alchemy_cms&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mqq5-j7w8-2hgh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-8678-w3jw-xfc2: Nokogiri: XML::Schema on JRuby allows network requests when NONET is set, bypassing CVE-2020-26247</title>
-    <id>https://osv.dev/vulnerability/GHSA-8678-w3jw-xfc2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8678-w3jw-xfc2"/>
-    <published>2026-06-19T16:36:11Z</published>
-    <updated>2026-06-19T16:45:14Z</updated>
-    <category term="RubyGems"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nokogiri: XML::Schema on JRuby allows network requests when NONET is set, bypassing CVE-2020-26247&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.19.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The `NONET` parse option, which Nokogiri turns on by default for `Nokogiri::XML::Schema` (see [CVE-2020-26247](https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-vr8q-g5c7-m54m)), was not correctly enforced on the JRuby implementation. As a result, a schema parsed with default options could still cause external resources to be fetched over the network, potentially enabling SSRF or XXE attacks.
-
-Nokogiri 1.19.4 replaces the scheme denylist with an allowlist. When `NONET` is enabled, only local resources (a `file:` scheme, or a relative or absolute path with no scheme) are resolved, and every network scheme is blocked, case-insensitively. This brings the JRuby behavior in line with CRuby.
-
-Only the JRuby implementation is affected. CRuby is not affected, because …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-8678-w3jw-xfc2"&gt;https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-8678-w3jw-xfc2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri"&gt;https://github.com/sparklemotion/nokogiri&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8678-w3jw-xfc2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] GHSA-5v8h-3h3q-446p: Nokogiri: Possible Use-After-Free when `Nokogiri::XML::Document#encoding=` raises an exception</title>
     <id>https://osv.dev/vulnerability/GHSA-5v8h-3h3q-446p</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5v8h-3h3q-446p"/>
@@ -541,47 +583,5 @@ JRuby is not affected.
 ### Severity
 
 The Nokogiri maintainers have evaluated this as low severity. Reaching it requires an unusual API-usage pattern that does not arise during normal use. The application…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-phwj-rprq-35pp"&gt;https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-phwj-rprq-35pp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri"&gt;https://github.com/sparklemotion/nokogiri&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-phwj-rprq-35pp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-5prr-v3j2-97mh: Nokogiri: Possible Out-of-Bounds Read in `Nokogiri::XML::NodeSet#[]`</title>
-    <id>https://osv.dev/vulnerability/GHSA-5prr-v3j2-97mh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5prr-v3j2-97mh"/>
-    <published>2026-06-19T16:36:42Z</published>
-    <updated>2026-06-19T16:45:12Z</updated>
-    <category term="RubyGems"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nokogiri: Possible Out-of-Bounds Read in `Nokogiri::XML::NodeSet#[]`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.19.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`Nokogiri::XML::NodeSet#[]` (and its alias `#slice`) checked the requested index against the node set&amp;#x27;s bounds using a 32-bit-truncated copy of the index. A large negative index could pass the check and then be used at full width, reading outside the node set&amp;#x27;s storage. On CRuby this is an out-of-bounds read that typically crashes the process; on JRuby it is not memory-unsafe but returns an incorrect node.
-
-Nokogiri 1.19.4 performs the bounds check against the full-width index.
-
-### Severity
-
-The Nokogiri maintainers have evaluated this as medium severity.
-
-Exploitation requires an application to pass an attacker-controlled integer to `NodeSet#[]`. The primary impact is a controlled crash (denial of service), with potential for memory disclosure on CRuby.
-
-On JRuby, Nokogiri i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-5prr-v3j2-97mh"&gt;https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-5prr-v3j2-97mh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri"&gt;https://github.com/sparklemotion/nokogiri&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5prr-v3j2-97mh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-p67v-3w7g-wjg7: Nokogiri: Possible Use-After-Free when directly using `NokogirI::XML::XPathContext` beyond document lifetime</title>
-    <id>https://osv.dev/vulnerability/GHSA-p67v-3w7g-wjg7</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p67v-3w7g-wjg7"/>
-    <published>2026-06-19T16:37:13Z</published>
-    <updated>2026-06-19T16:45:12Z</updated>
-    <category term="RubyGems"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nokogiri: Possible Use-After-Free when directly using `NokogirI::XML::XPathContext` beyond document lifetime&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:U/U:Clear&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nokogiri&lt;/code&gt; — fixed in 1.19.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`Nokogiri::XML::XPathContext` did not keep its source document alive for garbage collection. If an `XPathContext` outlived its document and the document was collected, evaluating an XPath expression could read invalid memory and potentially segfault.
-
-This is only reachable when application code constructs an `XPathContext` directly and lets the document become unreachable while continuing to use the context. The normal `Document#xpath`, `#css`, and related search methods are not affected, and it is not triggerable by malicious document input.
-
-Nokogiri 1.19.4 makes `XPathContext` keep its source document alive for as long as the context exists.
-
-Only the CRuby implementation is affected. JRuby is not affected.
-
-### Severity
-
-The Nokogiri maintainers have evaluated this as low…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-p67v-3w7g-wjg7"&gt;https://github.com/sparklemotion/nokogiri/security/advisories/GHSA-p67v-3w7g-wjg7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sparklemotion/nokogiri"&gt;https://github.com/sparklemotion/nokogiri&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p67v-3w7g-wjg7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

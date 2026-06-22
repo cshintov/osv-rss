@@ -3,12 +3,50 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-06-22T10:29:19Z</updated>
+  <updated>2026-06-22T17:15:07Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-w6j9-vw59-27wv: Gogs has an Authentication Bypass via Unvalidated Reverse Proxy Headers</title>
+    <id>https://osv.dev/vulnerability/GHSA-w6j9-vw59-27wv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w6j9-vw59-27wv"/>
+    <published>2026-06-22T17:09:51Z</published>
+    <updated>2026-06-22T17:15:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-25119"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has an Authentication Bypass via Unvalidated Reverse Proxy Headers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25119&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+When `ENABLE_REVERSE_PROXY_AUTHENTICATION` is enabled, Gogs accepts the configured authentication header (default: `X-WEBAUTH-USER`) directly from client requests without validating that the request originated from a trusted reverse proxy. Any remote attacker who can reach the Gogs service can forge this header to impersonate any user or trigger automatic account creation, completely bypassing authentication.
+
+## Root Cause
+
+The vulnerability exists because Gogs reads the authentication header directly from the incoming HTTP request without any verification that the header was set by a trusted reverse proxy.
+
+### Vulnerable Code Flow
+
+In `internal/context/auth.go` lines 206-234:
+
+```go
+func authenticatedUser(store AuthStore, ctx *macaron.Context, sess session.Store) (_ *databas…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-w6j9-vw59-27wv"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-w6j9-vw59-27wv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8264"&gt;https://github.com/gogs/gogs/pull/8264&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/0089c4c8e5b8d99eb6e5c8727f8f40d765f1f58a"&gt;https://github.com/gogs/gogs/commit/0089c4c8e5b8d99eb6e5c8727f8f40d765f1f58a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w6j9-vw59-27wv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3qq3-668m-v9mj: Gogs has a Denial of Service in repository/wiki file listing web pages</title>
+    <id>https://osv.dev/vulnerability/GHSA-3qq3-668m-v9mj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3qq3-668m-v9mj"/>
+    <published>2026-06-22T16:58:31Z</published>
+    <updated>2026-06-22T17:15:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2025-64719"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has a Denial of Service in repository/wiki file listing web pages&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-64719&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A malicious user with rights to create a new file on a repository or wiki page can trigger a denial of service condition in which the pages containing the listing of files will return HTTP error 500 and render the web interface unusable for the repository or wiki.
+
+### Details
+The issue is present in file `internal/route/repo/wiki.go` and `internal/route/repo/view.go` where the pages try to recover commit information. If errors are returned while recovering commit information, the page will return a 500 error and stop rendering, resulting in a denial of service.
+In `view.go` the issue occurs at [line 56](https://github.com/gogs/gogs/blob/89f0f86c7e1a3be7f48d99e27818a79d17357558/internal/route/repo/view.go#L56) while a slightly different issue occurs in `wiki.go` at [line 174](h…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-3qq3-668m-v9mj"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-3qq3-668m-v9mj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8116"&gt;https://github.com/gogs/gogs/pull/8116&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/ae41bab5f28e4880edcef01c91d2cbb8839ec9e4"&gt;https://github.com/gogs/gogs/commit/ae41bab5f28e4880edcef01c91d2cbb8839ec9e4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3qq3-668m-v9mj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-4864: TOCTOU permits root escape on Linux via Root.Chmod in os in internal/syscall/unix</title>
     <id>https://osv.dev/vulnerability/GO-2026-4864</id>
@@ -224,57 +262,5 @@ containerd&amp;#x27;s CRI checkpoint import process contains a vulnerability whe
 
 ## Patches
 This bug has been fixed in the following contai…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/security/advisories/GHSA-cvxm-645q-p574"&gt;https://github.com/containerd/containerd/security/advisories/GHSA-cvxm-645q-p574&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd"&gt;https://github.com/containerd/containerd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cvxm-645q-p574"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rgh6-rfwx-v388: Arbitrary host CRI log file read via symlink following in CRI checkpoint restore</title>
-    <id>https://osv.dev/vulnerability/GHSA-rgh6-rfwx-v388</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rgh6-rfwx-v388"/>
-    <published>2026-06-19T19:35:36Z</published>
-    <updated>2026-06-20T15:59:21Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-53489"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Arbitrary host CRI log file read via symlink following in CRI checkpoint restore&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53489&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.1.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.2.5&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-A bug was found in containerd where the CRI plugin restores `container.log` from a checkpoint image without validating a symlinked path. This could result in reading an arbitrary file on the host via `kubectl logs`.
-
-### Patches
-This bug has been fixed in the following containerd versions:
-
-* 2.3.2
-* 2.2.5
-* 2.1.9
-
-Users should update to these versions to resolve the issue.
-
-### Workarounds
-Ensure that only trusted images and checkpoints are used.
-
-### Credits
-The containerd project would like to thank @gouldnicholas and @davidrxchester, Yuming Zhang and Song Li of Zhejiang University, Sangwon Ryu (@sangwon090), Henry Beberman (@hbeberman) of Microsoft, the GKE Security Team using Gemini, Anthropic Research, in collaboration with Claude, Robert Prast (@robertprast),
-Kyle Elliott…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/security/advisories/GHSA-rgh6-rfwx-v388"&gt;https://github.com/containerd/containerd/security/advisories/GHSA-rgh6-rfwx-v388&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd"&gt;https://github.com/containerd/containerd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rgh6-rfwx-v388"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-cf98-j28v-49v6: OpenFGA Improper Policy Enforcement</title>
-    <id>https://osv.dev/vulnerability/GHSA-cf98-j28v-49v6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cf98-j28v-49v6"/>
-    <published>2026-06-18T15:05:30Z</published>
-    <updated>2026-06-20T11:59:21Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-55170"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenFGA Improper Policy Enforcement&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55170&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:L/VI:L/VA:N/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openfga/openfga&lt;/code&gt; — fixed in 1.18.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
-
-In OpenFGA, when MySQL is being used as the datastore, two distinct check requests can return the same response.
-
-## Preconditions
-
-This applies if the following preconditions are met:
-
-1. You run OpenFGA with MySQL as the datastore
-2. Your authorization decisions rely on case-sensitive user strings.
-
-## Fix
-Upgrade to OpenFGA 1.18.0 or greater.
-
-## Acknowledgements
-OpenFGA would like to thank @sahajamoth for the detailed report.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openfga/openfga/security/advisories/GHSA-cf98-j28v-49v6"&gt;https://github.com/openfga/openfga/security/advisories/GHSA-cf98-j28v-49v6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openfga/openfga"&gt;https://github.com/openfga/openfga&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cf98-j28v-49v6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

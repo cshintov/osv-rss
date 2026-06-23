@@ -3,12 +3,261 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-06-22T18:31:23Z</updated>
+  <updated>2026-06-22T23:15:40Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-qc2x-6f54-m6h9: zeroconf: Unvalidated rdlength in record payload readers allows LAN-local cache corruption via crafted mDNS packet</title>
+    <id>https://osv.dev/vulnerability/GHSA-qc2x-6f54-m6h9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qc2x-6f54-m6h9"/>
+    <published>2026-06-22T23:07:44Z</published>
+    <updated>2026-06-22T23:15:40Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-48487"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zeroconf: Unvalidated rdlength in record payload readers allows LAN-local cache corruption via crafted mDNS packet&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48487&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N · CVSS_V4: CVSS:4.0/AV:A/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zeroconf&lt;/code&gt; — fixed in 0.149.16&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+`_read_character_string` and `_read_string` in `src/zeroconf/_protocol/incoming.py` sliced `self.data[self.offset : self.offset + length]` and advanced `self.offset` by the declared `length` without checking it against `self._data_len`. Python&amp;#x27;s slice silently returns fewer bytes when the end index runs past the buffer, so a record whose 16-bit RDLENGTH (RFC 1035 §3.2.1) over-advertised by tens of kilobytes was constructed from a truncated payload, appended to `DNSIncoming._answers`, and committed to the cache before any later parse failure surfaced. The follow-up `_read_name` for the next record then failed, but the corrupt record had already entered the answer list and propagated to `DNSCache` and `ServiceInfo`.
+
+Any unauthenticated host on the local link (UDP/5353, `224.0.0.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-zeroconf/python-zeroconf/security/advisories/GHSA-qc2x-6f54-m6h9"&gt;https://github.com/python-zeroconf/python-zeroconf/security/advisories/GHSA-qc2x-6f54-m6h9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-zeroconf/python-zeroconf/issues/1752"&gt;https://github.com/python-zeroconf/python-zeroconf/issues/1752&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-zeroconf/python-zeroconf/pull/1756"&gt;https://github.com/python-zeroconf/python-zeroconf/pull/1756&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-zeroconf/python-zeroconf"&gt;https://github.com/python-zeroconf/python-zeroconf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qc2x-6f54-m6h9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xp4f-hrf8-rxw7: Picklescan is missing detection when calling built-in python ensurepip._run_pip</title>
+    <id>https://osv.dev/vulnerability/GHSA-xp4f-hrf8-rxw7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xp4f-hrf8-rxw7"/>
+    <published>2025-08-26T21:34:37Z</published>
+    <updated>2026-06-22T22:30:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2025-71344"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Picklescan is missing detection when calling built-in python ensurepip._run_pip&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71344&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;picklescan&lt;/code&gt; — fixed in 0.0.30&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Using ensurepip._run_pip function, which is a built-in python library function to execute remote pickle file.
+
+### Details
+
+The attack payload executes in the following steps:
+
+First, the attacker craft the payload by calling to ensurepip._run_pip function in reduce method
+Then when the victim after checking whether the pickle file is safe by using Picklescan library and this library doesn&amp;#x27;t dectect any dangerous functions, decide to pickle.load() this malicious pickle file, thus lead to remote code execution.
+
+### PoC
+
+```
+from ensurepip import _run_pip
+
+class EvilEnsurepipRunpip:
+    def __reduce__(self):
+        payload = &amp;quot;[(__import__(&amp;#x27;os&amp;#x27;).system(&amp;#x27;whoami&amp;#x27;),)]&amp;quot;
+        return _run_pip, (payload,)
+```
+
+### Impact
+
+Who is impacted? Any organization or individual relying on p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/security/advisories/GHSA-xp4f-hrf8-rxw7"&gt;https://github.com/mmaitre314/picklescan/security/advisories/GHSA-xp4f-hrf8-rxw7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/commit/1931c2d04eaca8d20597705ff39cab78ba364e4b"&gt;https://github.com/mmaitre314/picklescan/commit/1931c2d04eaca8d20597705ff39cab78ba364e4b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan"&gt;https://github.com/mmaitre314/picklescan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xp4f-hrf8-rxw7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6556-fwc2-fg2p: Picklescan is vulnerable to RCE through missing detection when calling numpy.f2py.crackfortran._eval_length</title>
+    <id>https://osv.dev/vulnerability/GHSA-6556-fwc2-fg2p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6556-fwc2-fg2p"/>
+    <published>2025-12-30T15:20:14Z</published>
+    <updated>2026-06-22T22:30:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2025-71339"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Picklescan is vulnerable to RCE through missing detection when calling numpy.f2py.crackfortran._eval_length&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71339&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;picklescan&lt;/code&gt; — fixed in 0.0.33&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Picklescan uses the `numpy.f2py.crackfortran._eval_length` function (a NumPy F2PY helper) to execute arbitrary Python code during unpickling.
+
+### Details
+
+Picklescan fails to detect a malicious pickle that uses the gadget `numpy.f2py.crackfortran._eval_length` in `__reduce__`, allowing arbitrary command execution when the pickle is loaded. A crafted object returns this function plus attacker‑controlled arguments; the scan reports the file as safe, but pickle.load() triggers execution.
+
+### PoC
+```python
+class PoC:
+    def __reduce__(self):
+        from numpy.f2py.crackfortran import _eval_length
+        return _eval_length, (&amp;quot;__import__(&amp;#x27;os&amp;#x27;).system(&amp;#x27;whoami&amp;#x27;)&amp;quot;, None)
+```
+
+### Impact
+
+- Arbitrary code execution on the victim machine once they load the “scanned as safe” pickle …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/security/advisories/GHSA-6556-fwc2-fg2p"&gt;https://github.com/mmaitre314/picklescan/security/advisories/GHSA-6556-fwc2-fg2p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/pull/53"&gt;https://github.com/mmaitre314/picklescan/pull/53&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/commit/70c1c6c31beb6baaf52c8db1b6c3c0e84a6f9dab"&gt;https://github.com/mmaitre314/picklescan/commit/70c1c6c31beb6baaf52c8db1b6c3c0e84a6f9dab&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan"&gt;https://github.com/mmaitre314/picklescan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/releases/tag/v0.0.33"&gt;https://github.com/mmaitre314/picklescan/releases/tag/v0.0.33&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6556-fwc2-fg2p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6w4w-5w54-rjvr: Picklescan has a missing detection when calling built-in python idlelib.autocomplete.AutoComplete.get_entity</title>
+    <id>https://osv.dev/vulnerability/GHSA-6w4w-5w54-rjvr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6w4w-5w54-rjvr"/>
+    <published>2025-08-26T18:37:10Z</published>
+    <updated>2026-06-22T22:30:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2025-71358"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Picklescan has a missing detection when calling built-in python idlelib.autocomplete.AutoComplete.get_entity&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71358&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;picklescan&lt;/code&gt; — fixed in 0.0.29&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Using idlelib.autocomplete.AutoComplete.get_entity, which is a built-in python library function to execute remote pickle file.
+
+### Details
+
+The attack payload executes in the following steps:
+
+First, the attacker craft the payload by calling to idlelib.autocomplete.AutoComplete.get_entity function in reduce method
+Then when the victim after checking whether the pickle file is safe by using Picklescan library and this library doesn&amp;#x27;t dectect any dangerous functions, decide to pickle.load() this malicious pickle file, thus lead to remote code execution.
+
+### PoC
+
+```
+class EvilIdlelibAutocompleteGetEntity:
+    def __reduce__(self):
+        from idlelib.autocomplete import AutoComplete
+        return AutoComplete().get_entity, (&amp;quot;__import__(&amp;#x27;os&amp;#x27;).system(&amp;#x27;whoami&amp;#x27;)&amp;quot;,)
+```
+
+### Impa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/security/advisories/GHSA-6w4w-5w54-rjvr"&gt;https://github.com/mmaitre314/picklescan/security/advisories/GHSA-6w4w-5w54-rjvr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan/commit/aecd11be98702caa9ba9b12189d91ad596a36114"&gt;https://github.com/mmaitre314/picklescan/commit/aecd11be98702caa9ba9b12189d91ad596a36114&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mmaitre314/picklescan"&gt;https://github.com/mmaitre314/picklescan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6w4w-5w54-rjvr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-365w-hqf6-vxfg: Crawl4AI: Multiple Docker API Vulnerabilities - File Write, SSRF, Auth Bypass, XSS, JS Execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-365w-hqf6-vxfg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-365w-hqf6-vxfg"/>
+    <published>2026-06-16T20:13:30Z</published>
+    <updated>2026-06-22T22:30:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-56266"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Crawl4AI: Multiple Docker API Vulnerabilities - File Write, SSRF, Auth Bypass, XSS, JS Execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56266&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crawl4ai&lt;/code&gt; — fixed in 0.8.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Multiple security vulnerabilities in the Crawl4AI Docker API server affecting endpoints for crawling, markdown/LLM extraction, screenshots, PDFs, webhooks, monitoring, JavaScript execution, and configuration.
+
+### Vulnerabilities
+
+#### 1. Arbitrary File Write via /screenshot and /pdf (CWE-22, CVSS 9.1)
+
+The `output_path` parameter accepts arbitrary filesystem paths with no validation. An attacker can overwrite server files (DoS) or write to any appuser-writable location.
+
+**Fix:** Added `validate_output_path()` restricting writes to `CRAWL4AI_OUTPUT_DIR` (/tmp/crawl4ai-outputs by default). Added Pydantic `field_validator` rejecting `..` traversal sequences.
+
+#### 2. SSRF via Webhook URL (CWE-918, CVSS 8.6)
+
+Webhook URLs in `/crawl/job` and `/llm/job` accept internal/private IP…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/unclecode/crawl4ai/security/advisories/GHSA-365w-hqf6-vxfg"&gt;https://github.com/unclecode/crawl4ai/security/advisories/GHSA-365w-hqf6-vxfg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/unclecode/crawl4ai"&gt;https://github.com/unclecode/crawl4ai&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-365w-hqf6-vxfg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-w856-8p3r-p338: Glances: XML-RPC Server Missing Host Header Validation Enables DNS Rebinding Attack</title>
+    <id>https://osv.dev/vulnerability/GHSA-w856-8p3r-p338</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w856-8p3r-p338"/>
+    <published>2026-06-22T21:31:44Z</published>
+    <updated>2026-06-22T21:46:15Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-46611"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Glances: XML-RPC Server Missing Host Header Validation Enables DNS Rebinding Attack&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46611&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;glances&lt;/code&gt; — fixed in 4.5.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Glances XML-RPC server (`glances -s`, implemented in `glances/server.py`) does not validate the HTTP `Host` header, leaving it vulnerable to DNS rebinding attacks.  CVE-2026-32632 (patched in 4.5.2) added `TrustedHostMiddleware` to the REST/WebUI server; the MCP server has had equivalent protection since 4.5.1. The XML-RPC server received neither fix and has no `allowed-hosts` configuration key.  Combined with the unrestricted `Access-Control-Allow-Origin: *` header (see companion advisory for CVE-2026-33533 and its incomplete fix), an attacker can exploit DNS rebinding to exfiltrate the full system monitoring dataset from a victim&amp;#x27;s browser.
+
+---
+
+### Details
+
+**Affected component:** `glances/server.py` — `GlancesXMLRPCHandler` / `GlancesXMLRPCServer`
+
+**Direct URL (commi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances/security/advisories/GHSA-w856-8p3r-p338"&gt;https://github.com/nicolargo/glances/security/advisories/GHSA-w856-8p3r-p338&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances"&gt;https://github.com/nicolargo/glances&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances/releases/tag/v4.5.5"&gt;https://github.com/nicolargo/glances/releases/tag/v4.5.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w856-8p3r-p338"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9837-48hr-q32j: Glances has Insecure Pickle Deserialization in its Version Cache that Leads to Arbitrary Code Execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-9837-48hr-q32j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9837-48hr-q32j"/>
+    <published>2026-06-22T21:21:07Z</published>
+    <updated>2026-06-22T21:30:07Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-46607"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Glances has Insecure Pickle Deserialization in its Version Cache that Leads to Arbitrary Code Execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46607&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;glances&lt;/code&gt; — fixed in 4.5.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`glances/outdated.py` uses `pickle.load()` to read a version-check cache file stored at a predictable, world-accessible path (`~/.cache/glances/glances-version.db` or `$XDG_CACHE_HOME/glances/glances-version.db`). No integrity check, signature verification, or format validation is performed before deserialization.  An attacker with write access to that path — through any of several realistic local or container-level scenarios — can plant a malicious pickle file and achieve arbitrary code execution as the OS user running Glances the next time it starts with version checking enabled (the default).
+
+---
+
+### Details
+
+**Affected file:** `glances/outdated.py`, method `Outdated._load_cache()`, line 121
+
+**Direct URL (commit 04579778e733d705898a169e049dc84772c852da):**
+- https://gith…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances/security/advisories/GHSA-9837-48hr-q32j"&gt;https://github.com/nicolargo/glances/security/advisories/GHSA-9837-48hr-q32j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances"&gt;https://github.com/nicolargo/glances&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances/releases/tag/v4.5.5"&gt;https://github.com/nicolargo/glances/releases/tag/v4.5.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9837-48hr-q32j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-v5r2-qh84-fjx5: Glances is Vulnerable to Command Injection via KVM/QEMU VM Domain Names in glances/plugins/vms/engines/virsh.py</title>
+    <id>https://osv.dev/vulnerability/GHSA-v5r2-qh84-fjx5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v5r2-qh84-fjx5"/>
+    <published>2026-06-22T21:14:06Z</published>
+    <updated>2026-06-22T21:30:07Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-46606"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Glances is Vulnerable to Command Injection via KVM/QEMU VM Domain Names in glances/plugins/vms/engines/virsh.py&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46606&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;glances&lt;/code&gt; — fixed in 4.5.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Glances KVM/QEMU monitoring engine (`glances/plugins/vms/engines/virsh.py`) passes VM domain names, read directly from `virsh list --all` output, into f-string command templates that are processed by `secure_popen()`. `secure_popen()` is explicitly designed to interpret `&amp;amp;&amp;amp;`, `|`, and `&amp;gt;` as shell operators.  Because domain names are never sanitised before interpolation, any user with the ability to create or rename a KVM/QEMU virtual machine can execute arbitrary commands as the OS user running Glances — commonly root on hypervisor hosts.
+
+---
+
+### Details
+
+**Affected file:** `glances/plugins/vms/engines/virsh.py`
+
+**Direct URLs (commit 04579778e733d705898a169e049dc84772c852da):**
+- https://github.com/nicolargo/glances/blob/04579778e733d705898a169e049dc84772c852da/glances…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances/security/advisories/GHSA-v5r2-qh84-fjx5"&gt;https://github.com/nicolargo/glances/security/advisories/GHSA-v5r2-qh84-fjx5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances"&gt;https://github.com/nicolargo/glances&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances/releases/tag/v4.5.5"&gt;https://github.com/nicolargo/glances/releases/tag/v4.5.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v5r2-qh84-fjx5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-87qc-fj39-wccr: Glances: XML-RPC Multi-Origin CORS Configuration Silently Falls Back to Wildcard (Incomplete Fix for CVE-2026-33533)</title>
+    <id>https://osv.dev/vulnerability/GHSA-87qc-fj39-wccr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-87qc-fj39-wccr"/>
+    <published>2026-06-22T21:27:24Z</published>
+    <updated>2026-06-22T21:30:07Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-46608"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Glances: XML-RPC Multi-Origin CORS Configuration Silently Falls Back to Wildcard (Incomplete Fix for CVE-2026-33533)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46608&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;glances&lt;/code&gt; — fixed in 4.5.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Glances XML-RPC server (`glances -s`) introduced a configurable CORS origin list in version 4.5.3 as a mitigation for CVE 2026-33533.  However, the implementation silently falls back to `Access-Control-Allow-Origin: *` whenever `cors_origins` contains more than one entry.  An operator who configures an explicit two-entry allowlist (e.g. two internal dashboard origins) intending to restrict browser access instead receives the unrestricted wildcard — the same exposure that the original CVE described.  A malicious web page served from any origin can issue a CORS simple request to `/RPC2` and read the full system monitoring dataset without the victim&amp;#x27;s knowledge.
+
+---
+
+### Details
+
+**Affected file:** `glances/server.py`, class `GlancesXMLRPCServer`, line 113
+
+**Direct URL (com…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances/security/advisories/GHSA-87qc-fj39-wccr"&gt;https://github.com/nicolargo/glances/security/advisories/GHSA-87qc-fj39-wccr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances"&gt;https://github.com/nicolargo/glances&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nicolargo/glances/releases/tag/v4.5.5"&gt;https://github.com/nicolargo/glances/releases/tag/v4.5.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-87qc-fj39-wccr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-r3cw-c95m-wfh9: motionEye: Authentication possible via password hash</title>
+    <id>https://osv.dev/vulnerability/GHSA-r3cw-c95m-wfh9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r3cw-c95m-wfh9"/>
+    <published>2026-06-22T20:59:31Z</published>
+    <updated>2026-06-22T21:15:08Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-46488"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;motionEye: Authentication possible via password hash&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46488&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;motioneye&lt;/code&gt; — fixed in 0.44.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+An authentication bypass vulnerability exists due to improper trust in client-controlled cookies. The application accepts user-supplied cookie values containing a username and password-hash-derived value as sufficient authentication material. These cookies can be set or modified prior to login, allowing an unauthenticated attacker to impersonate arbitrary users without knowledge of the plaintext password. This issue stems from the absence of server-side validation of authentication state and reliance on attacker-controlled cookie data
+
+### Details
+The vulnerability arises because the application accepts the client-supplied cookies named `meye_password_hash` and `meye_username` as sufficient authentication material. The server does not validate these values against a server-side…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/motioneye-project/motioneye/security/advisories/GHSA-r3cw-c95m-wfh9"&gt;https://github.com/motioneye-project/motioneye/security/advisories/GHSA-r3cw-c95m-wfh9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/motioneye-project/motioneye"&gt;https://github.com/motioneye-project/motioneye&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r3cw-c95m-wfh9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-95pq-hr8p-f5g7: ComfyUI-Manager has an Unprotected Alternate Channel (CWE-420)</title>
+    <id>https://osv.dev/vulnerability/GHSA-95pq-hr8p-f5g7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-95pq-hr8p-f5g7"/>
+    <published>2026-06-22T19:58:24Z</published>
+    <updated>2026-06-22T20:15:14Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2025-67303"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ComfyUI-Manager has an Unprotected Alternate Channel (CWE-420)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-67303&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;comfyui-manager&lt;/code&gt; — fixed in 3.38&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+An **Unprotected Alternate Channel (CWE-420)** vulnerability was discovered in ComfyUI-Manager versions prior to 3.38.
+
+#### Vulnerability Details
+
+In affected versions, ComfyUI-Manager stored its configuration in the `user/default/ComfyUI-Manager/` directory, which was accessible via ComfyUI&amp;#x27;s web APIs without proper access control. This unprotected alternate channel allowed remote attackers to read and manipulate configuration files and critical data through the web interface.
+
+#### Potential Attack Scenarios
+
+An attacker exploiting this vulnerability could:
+- **Modify security settings**: Lower the security level from &amp;quot;strong&amp;quot; to &amp;quot;weak&amp;quot; to enable more dangerous operations
+- **Tamper with custom node sources**: Add malicious custom node repositories
+- **Manipulate snapshot da…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Comfy-Org/ComfyUI-Manager/security/advisories/GHSA-95pq-hr8p-f5g7"&gt;https://github.com/Comfy-Org/ComfyUI-Manager/security/advisories/GHSA-95pq-hr8p-f5g7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-67303"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-67303&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Comfy-Org/ComfyUI-Manager/pull/2338/commits/e44c5cef58fb4973670b86433b9d24d077b44a26"&gt;https://github.com/Comfy-Org/ComfyUI-Manager/pull/2338/commits/e44c5cef58fb4973670b86433b9d24d077b44a26&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Comfy-Org/ComfyUI-Manager"&gt;https://github.com/Comfy-Org/ComfyUI-Manager&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Comfy-Org/ComfyUI-Manager/blob/main/docs/en/v3.38-userdata-security-migration.md"&gt;https://github.com/Comfy-Org/ComfyUI-Manager/blob/main/docs/en/v3.38-userdata-security-migration.md&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-95pq-hr8p-f5g7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] MAL-2026-6245: Malicious code in request-cache-py (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-6245</id>
@@ -227,164 +476,5 @@ Reasons (based on the campaign):
 
  - Downloads and executes a remote malicious script.
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/bd77582bcc534db6a56f1471f8134296a5f39b90c7ec2761e14e7ccef4667ab4/detection"&gt;https://www.virustotal.com/gui/file/bd77582bcc534db6a56f1471f8134296a5f39b90c7ec2761e14e7ccef4667ab4/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/jsonschema-viewer"&gt;https://bad-packages.kam193.eu/pypi/package/jsonschema-viewer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6248"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6247: Malicious code in requests-enhancer (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6247</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6247"/>
-    <published>2026-06-20T23:24:02Z</published>
-    <updated>2026-06-20T23:45:58Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in requests-enhancer (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;requests-enhancer&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (950c9d9155d6ba10a8d63c365fc6c7cc97d8bc6210165f93282d9e198ed3dd62)
-Malicious package with a chain of multiple manual dependencies to finally download malicious code. During import, it manually downloads a dependency from GitHub repository &amp;quot;Hexa-devy/netflow-utils&amp;quot;, which then attempts to download &amp;quot;codexio-boop/platform_syslib&amp;quot;. The last one contains obfuscated code that during installation connects with node22.lunes[.]host:3258 and downloads encrypted payload. The payload is executed, and it then starts another loop of connections to node22.lunes[.]host:22240 and awaits next payloads to execute. During analysis, this stage did not deliver any payload. On every stage, short-living generated tokens are used.
-
-
---…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Hexa-devy/netflow-utils/blob/4f33b53019b11b99889ec860d486d550701f6e9d/pyproject.toml#L35"&gt;https://github.com/Hexa-devy/netflow-utils/blob/4f33b53019b11b99889ec860d486d550701f6e9d/pyproject.toml#L35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/codexio-boop/platform_syslib/blob/236340da65e23865eb1a9a6e4ed94d163ae80452/setup.py"&gt;https://github.com/codexio-boop/platform_syslib/blob/236340da65e23865eb1a9a6e4ed94d163ae80452/setup.py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/codexio-boop/platform_syslib/blob/236340da65e23865eb1a9a6e4ed94d163ae80452/connkit/__init__.py"&gt;https://github.com/codexio-boop/platform_syslib/blob/236340da65e23865eb1a9a6e4ed94d163ae80452/connkit/__init__.py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/requests-enhancer"&gt;https://bad-packages.kam193.eu/pypi/package/requests-enhancer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6247"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4xgf-cpjx-pc3j: pydantic-settings: NestedSecretsSettingsSource follows symlinks outside secrets_dir, enabling local file read and bypassing secrets_dir_max_size</title>
-    <id>https://osv.dev/vulnerability/GHSA-4xgf-cpjx-pc3j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4xgf-cpjx-pc3j"/>
-    <published>2026-06-19T22:10:42Z</published>
-    <updated>2026-06-20T20:59:19Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;pydantic-settings: NestedSecretsSettingsSource follows symlinks outside secrets_dir, enabling local file read and bypassing secrets_dir_max_size&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pydantic-settings&lt;/code&gt; — fixed in 2.14.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`NestedSecretsSettingsSource` reads secret values from files in a configured `secrets_dir`. When `secrets_nested_subdir=True`, a directory entry inside `secrets_dir` that is a symbolic link pointing **outside** `secrets_dir` is followed, so files outside the configured directory are read into settings values. The same code path bypasses the documented `secrets_dir_max_size` protection. An attacker or lower-privileged component able to influence entries in the configured secrets directory (for example, a writable or shared secrets mount) can turn this into an unintended local file read into settings and can defeat the advertised loading-size cap. This report does not claim network reachability by itself.
-
-### Details
-
-`NestedSecretsSettingsSource` performed two passes over `sec…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pydantic/pydantic-settings/security/advisories/GHSA-4xgf-cpjx-pc3j"&gt;https://github.com/pydantic/pydantic-settings/security/advisories/GHSA-4xgf-cpjx-pc3j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pydantic/pydantic-settings"&gt;https://github.com/pydantic/pydantic-settings&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4xgf-cpjx-pc3j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6244: Malicious code in d0rk3r-telemetry (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6244</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6244"/>
-    <published>2026-06-20T19:08:37Z</published>
-    <updated>2026-06-20T20:46:00Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in d0rk3r-telemetry (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;d0rk3r-telemetry&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (1f9f4d4943d02f9c78e513a75b4b0fcfd47d1e0486e79df9fe52f2112d840163)
-During import, package exfiltrates browsers data, SSH keys and other credential files, env variables and other sensitive data.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-06-request-cache-py
-
-
-Reasons (based on the campaign):
-
-
- - infostealer
-
-
- - exfiltration-env-variables
-
-
- - exfiltration-ssh-keys
-
-
- - impersonation
-
-
- - A Telegram webhook is used to send collected data.
-
-
- - exfiltration-browser-data
-
-
- - The package contains code to detect if it is running in a sandbox environment.
-
-
- - exfiltration-credentials
-
-
- - The malicious code is intentionally included in a dependency o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/d0rk3r-telemetry"&gt;https://bad-packages.kam193.eu/pypi/package/d0rk3r-telemetry&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6244"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6246: Malicious code in d0rk3r (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6246</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6246"/>
-    <published>2026-06-20T19:24:10Z</published>
-    <updated>2026-06-20T20:46:00Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in d0rk3r (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;d0rk3r&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (d0d4cf20ac250e3d7a23666cf8bc3ae722d555b982649dad3f615d9c7c8818d9)
-The package declares malicious dependencies. Their activity is however not triggered as since version 1.0.4, the packages releases lack any source code. Malicious dependency was first introduced in version 1.0.5, but the package is likely prepared to be a loader of malicious code from very begining.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-06-request-cache-py
-
-
-Reasons (based on the campaign):
-
-
- - infostealer
-
-
- - exfiltration-env-variables
-
-
- - exfiltration-ssh-keys
-
-
- - impersonation
-
-
- - A Telegram webhook is used to send collected data.
-
-
- - exfiltration-browser-data
-
-
- - Th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/d0rk3r"&gt;https://bad-packages.kam193.eu/pypi/package/d0rk3r&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6246"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f4xh-w4cj-qxq8: LangSmith SDK TracingMiddleware: Arbitrary server-side file read</title>
-    <id>https://osv.dev/vulnerability/GHSA-f4xh-w4cj-qxq8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f4xh-w4cj-qxq8"/>
-    <published>2026-06-19T22:10:34Z</published>
-    <updated>2026-06-20T19:59:25Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;LangSmith SDK TracingMiddleware: Arbitrary server-side file read&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;langsmith&lt;/code&gt; — fixed in 0.8.18&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Summary
-
-An attacker who can send an HTTP request to a server running the LangSmith SDK&amp;#x27;s `TracingMiddleware` can cause that server to read an arbitrary file from its local filesystem and upload the contents to LangSmith as a trace attachment. Depending on how the distributed trace system is deployed, triggering a read may not require authentication. Retrieving the contents requires read access to the LangSmith workspace the traces are sent to. The net effect is a trust-boundary crossing: a party with workspace trace-read access (for example a low-privilege workspace member, a contractor, or a compromised teammate account) gains the ability to read files from any server running `TracingMiddleware`, a capability outside that workspace&amp;#x27;s intended trust boundary.
-
-# Impact
-
-Confidentiality …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langsmith-sdk/security/advisories/GHSA-f4xh-w4cj-qxq8"&gt;https://github.com/langchain-ai/langsmith-sdk/security/advisories/GHSA-f4xh-w4cj-qxq8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langsmith-sdk"&gt;https://github.com/langchain-ai/langsmith-sdk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f4xh-w4cj-qxq8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-6230: Malicious code in django-auth-middleware-plus (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6230</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6230"/>
-    <published>2026-06-19T21:05:32Z</published>
-    <updated>2026-06-20T19:46:00Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in django-auth-middleware-plus (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;django-auth-middleware-plus&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (6cf58978ba5eec5220b4b4d85966efff31d31d164ff103f98dfd627381e061ec)
-On import, django_auth_middleware_plus/__init__.py spawns a daemon thread that POSTs a JSON payload containing the host&amp;#x27;s hostname, username, cwd, environment variables matching key/secret/token/pass/auth/api, and the contents of ~/.env, ~/.bashrc, ~/.config,.env, and../.env to a hardcoded plaintext HTTP endpoint at http://4.210.177.128:8080/callback. The same import path reads ~/.pypirc and ~/.netrc (up to 200 bytes each) and ships them in the same payload, leaking the installer&amp;#x27;s PyPI publishing token and machine credentials to the attacker. A _persistence() routine appends an alias overriding `django` to `pip install django-auth-mid…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/django-auth-middleware-plus"&gt;https://bad-packages.kam193.eu/pypi/package/django-auth-middleware-plus&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/django-auth-middleware-plus/99.99.99/"&gt;https://pypi.org/project/django-auth-middleware-plus/99.99.99/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6230"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

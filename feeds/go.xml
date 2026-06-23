@@ -3,12 +3,332 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-06-23T10:29:23Z</updated>
+  <updated>2026-06-23T18:29:29Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-xjvp-4fhw-gc47: runc: Malicious image with /dev symlink can trigger limited host filesystem integrity violations </title>
+    <id>https://osv.dev/vulnerability/GHSA-xjvp-4fhw-gc47</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xjvp-4fhw-gc47"/>
+    <published>2026-06-22T20:01:35Z</published>
+    <updated>2026-06-23T18:29:29Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41579"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;runc: Malicious image with /dev symlink can trigger limited host filesystem integrity violations &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41579&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/opencontainers/runc&lt;/code&gt; — fixed in 1.3.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/opencontainers/runc&lt;/code&gt; — fixed in 1.4.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/opencontainers/runc&lt;/code&gt; — fixed in 1.5.0-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+When setting up the container rootfs, `setupPtmx` and `setupDevSymlinks` call `os.Remove` and `os.Symlink` with a `filepath.Join` string which allow an image with `/dev` as a symlink to trick runc into deleting files called `ptmx` on the host or creating a hardcoded set of symlinks with specific names and targets in an arbitrary pre-existing host directory.
+
+Please note that this issue is not exploitable under Docker because [it creates a top-level `ro` layer that masks any malicious `/dev` symlink present in the container image](https://github.com/moby/moby/blob/docker-v29.4.1/daemon/initlayer/setup_unix.go) (this is also done without mounting the lower layers so there is no opportunity for the malicious `/dev` symlink to trick it into resolving to some other path). Unfortunate…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/opencontainers/runc/security/advisories/GHSA-xjvp-4fhw-gc47"&gt;https://github.com/opencontainers/runc/security/advisories/GHSA-xjvp-4fhw-gc47&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/opencontainers/runc"&gt;https://github.com/opencontainers/runc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xjvp-4fhw-gc47"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3w28-36p9-w929: Gogs's Unauthenticated Jupyter Notebook (ipynb) Sanitizer allows arbitrary data: URIs leading to XSS</title>
+    <id>https://osv.dev/vulnerability/GHSA-3w28-36p9-w929</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3w28-36p9-w929"/>
+    <published>2026-06-23T17:33:32Z</published>
+    <updated>2026-06-23T17:45:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52816"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs&amp;#x27;s Unauthenticated Jupyter Notebook (ipynb) Sanitizer allows arbitrary data: URIs leading to XSS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52816&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The Jupyter Notebook (ipynb) sanitizer endpoint at `POST /-/api/sanitize_ipynb` allows arbitrary `data:` URIs without proper restrictions, potentially leading to Cross-Site Scripting (XSS). The endpoint uses `bluemonday.UGCPolicy()` with `p.AllowURLSchemes(&amp;quot;data&amp;quot;)` which permits all data URI schemes including `data:text/html`, enabling attackers to inject malicious HTML/JavaScript. Additionally, the endpoint has no authentication middleware, allowing any registered user to exploit this vulnerability.
+
+## Severity
+
+**High**
+
+## Affected Versions
+
+All versions using the vulnerable endpoint
+
+## Vulnerability Details
+
+- **CVE ID**: (To be assigned)
+- **Entry Point**: `POST /-/api/sanitize_ipynb`
+- **Attack Vector**: Network
+- **Authentication Required**: No (only needs a registered…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-3w28-36p9-w929"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-3w28-36p9-w929&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8326"&gt;https://github.com/gogs/gogs/pull/8326&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/dd1bd9837aa196b3ed3a8ee21e5727b5d7a986a3"&gt;https://github.com/gogs/gogs/commit/dd1bd9837aa196b3ed3a8ee21e5727b5d7a986a3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3w28-36p9-w929"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wmfg-5p4h-5fw3: Gogs allows users to write to readonly repositories using receive-pack + service=git-upload-pack confusion</title>
+    <id>https://osv.dev/vulnerability/GHSA-wmfg-5p4h-5fw3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wmfg-5p4h-5fw3"/>
+    <published>2026-06-23T17:03:41Z</published>
+    <updated>2026-06-23T17:15:12Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52810"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs allows users to write to readonly repositories using receive-pack + service=git-upload-pack confusion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52810&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Git smart HTTP authorizes `POST …/git-receive-pack` using the client-supplied service query string (so `?service=git-upload-pack` is evaluated as read access) while routing still runs git receive-pack, allowing push where only read should be allowed.
+
+### Details
+
+Gogs&amp;#x27; Git Smart HTTP handler for repository RPCs relies on a client-supplied query parameter to decide which authorization policy to apply. The Git protocol exposes two primary RPCs over HTTP: `upload-pack` for fetch (read) and `receive-pack` for push (write).
+
+In the affected implementation, the code derives the access mode from the `service` query parameter (for example, `service=git-upload-pack`) instead of the actual RPC path being executed. As a result, a request sent to the `receive-pack` endpoint can be incorr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-wmfg-5p4h-5fw3"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-wmfg-5p4h-5fw3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8331"&gt;https://github.com/gogs/gogs/pull/8331&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/7c9cf53aca957959bcd98b0cc987d9901b7cb184"&gt;https://github.com/gogs/gogs/commit/7c9cf53aca957959bcd98b0cc987d9901b7cb184&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wmfg-5p4h-5fw3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5c3f-6486-3g7g: Gogs's password-reset tokens use account-activation lifetime, ignoring RESET_PASSWORD_CODE_LIVES</title>
+    <id>https://osv.dev/vulnerability/GHSA-5c3f-6486-3g7g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5c3f-6486-3g7g"/>
+    <published>2026-06-23T17:03:25Z</published>
+    <updated>2026-06-23T17:15:12Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52809"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs&amp;#x27;s password-reset tokens use account-activation lifetime, ignoring RESET_PASSWORD_CODE_LIVES&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52809&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Password-reset tokens are generated using `conf.Auth.ActivateCodeLives` (the account-activation lifetime), not `conf.Auth.ResetPasswordCodeLives`. The token lifetime is baked into the token itself at generation time and is re-extracted from the token at verification time, making `RESET_PASSWORD_CODE_LIVES` irrelevant to actual enforcement. When an administrator configures a shorter reset window (e.g., 10 minutes) for compliance or security reasons, reset tokens remain exploitable for the full activation lifetime instead, while the reset email falsely advertises the shorter expiry.
+
+## Severity
+
+**Medium** (CVSS 3.1: 6.8)
+
+`CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N`
+
+- **Attack Vector:** Network — the reset endpoint is reachable over HTTP/S.
+- **Attack Complexity:** High — su…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-5c3f-6486-3g7g"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-5c3f-6486-3g7g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8328"&gt;https://github.com/gogs/gogs/pull/8328&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/187e9c557930eb4a8b9b1502ee45cccf3255ee7f"&gt;https://github.com/gogs/gogs/commit/187e9c557930eb4a8b9b1502ee45cccf3255ee7f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5c3f-6486-3g7g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g2f5-gjr4-qjvm: Gogs has a Migration Redirect Bypass that Leads to Internal Repository Theft</title>
+    <id>https://osv.dev/vulnerability/GHSA-g2f5-gjr4-qjvm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g2f5-gjr4-qjvm"/>
+    <published>2026-06-23T17:01:35Z</published>
+    <updated>2026-06-23T17:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52805"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has a Migration Redirect Bypass that Leads to Internal Repository Theft&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52805&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Migration URL validation bypass via HTTP redirect to blocked internal endpoints
+
+## Summary
+
+A Server-Side Request Forgery (SSRF) vulnerability exists in the repository migration functionality. The application validates only the initially submitted URL hostname, but `git clone --mirror` follows HTTP redirects. An authenticated user can submit a public URL that redirects to a blocked internal endpoint (e.g., `127.0.0.1`), importing the internal repository&amp;#x27;s contents into an attacker-controlled repository.
+
+## Vulnerability Details
+
+The vulnerability is located in `internal/form/repo.go`. `ParseRemoteAddr()` validates the clone address hostname against a blocklist of local and private-network addresses. However, the actual migration is performed by `git clone --mirror` in `internal/databas…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-g2f5-gjr4-qjvm"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-g2f5-gjr4-qjvm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8324"&gt;https://github.com/gogs/gogs/pull/8324&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/b9a0093e9cd1b2b3c7f42f9feca396dc772c4f1b"&gt;https://github.com/gogs/gogs/commit/b9a0093e9cd1b2b3c7f42f9feca396dc772c4f1b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g2f5-gjr4-qjvm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-744x-3838-5r56: Gogs Vulnerable to Unauthenticated Organization Teams Information Disclosure via API</title>
+    <id>https://osv.dev/vulnerability/GHSA-744x-3838-5r56</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-744x-3838-5r56"/>
+    <published>2026-06-23T17:13:25Z</published>
+    <updated>2026-06-23T17:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52815"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs Vulnerable to Unauthenticated Organization Teams Information Disclosure via API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52815&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Gogs has an unauthenticated information disclosure vulnerability. The `GET /api/v1/orgs/:orgname/teams` endpoint at `internal/route/api/v1/org_team.go:8` returns all teams for any organization without requiring authentication. The route group at `internal/route/api/v1/api.go:380-385` lacks the `reqToken()` middleware, and the `listTeams()` handler performs no authentication check, exposing team IDs, names, descriptions, and permission levels to any unauthenticated caller.
+
+## Affected Versions
+
+Gogs (all current versions)
+
+## Vulnerability Details
+
+### Root Cause: Missing reqToken() middleware on org teams route group
+
+`internal/route/api/v1/api.go` lines 380-385:
+
+```go
+// Org teams route group — no reqToken() middleware
+m.Group(&amp;quot;/:orgname&amp;quot;, func() {
+    m.Get(&amp;quot;/teams&amp;quot;, org.Li…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-744x-3838-5r56"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-744x-3838-5r56&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8336"&gt;https://github.com/gogs/gogs/pull/8336&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/2ebc0e27069deade992219e10a89fbc44bec8bb9"&gt;https://github.com/gogs/gogs/commit/2ebc0e27069deade992219e10a89fbc44bec8bb9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-744x-3838-5r56"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-268j-37xf-pp52: Gogs's write-level collaborators can mutate admin-only repository settings via API</title>
+    <id>https://osv.dev/vulnerability/GHSA-268j-37xf-pp52</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-268j-37xf-pp52"/>
+    <published>2026-06-23T17:03:07Z</published>
+    <updated>2026-06-23T17:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52808"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs&amp;#x27;s write-level collaborators can mutate admin-only repository settings via API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52808&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Three API endpoints — `PATCH /api/v1/repos/:owner/:repo/issue-tracker`, `PATCH /api/v1/repos/:owner/:repo/wiki`, and `POST /api/v1/repos/:owner/:repo/mirror-sync` — are gated by `reqRepoWriter()` rather than `reqRepoAdmin()`. The equivalent operations in the web UI sit behind `reqRepoAdmin`, which requires `AccessMode &amp;gt;= AccessModeAdmin`. A write-level collaborator (who has `AccessMode == AccessModeWrite &amp;lt; AccessModeAdmin`) can therefore call these API endpoints directly to disable the native issue tracker or wiki, inject attacker-controlled external tracker/wiki URLs that redirect all repository visitors, or trigger mirror sync — none of which they are authorized to do.
+
+## Severity
+
+**High** (CVSS 3.1: 7.1)
+
+`CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L`
+
+- **Attack Vector:**…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-268j-37xf-pp52"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-268j-37xf-pp52&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8327"&gt;https://github.com/gogs/gogs/pull/8327&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/6283462119bd8894f1599d70339b5e823f99954a"&gt;https://github.com/gogs/gogs/commit/6283462119bd8894f1599d70339b5e823f99954a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-268j-37xf-pp52"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xp79-5mx3-jx52: Gogs has Unauthenticated Asymmetric Denial of Service (DoS) via SSH Handshake Stall (File Descriptor Exhaustion)</title>
+    <id>https://osv.dev/vulnerability/GHSA-xp79-5mx3-jx52</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xp79-5mx3-jx52"/>
+    <published>2026-06-23T17:12:33Z</published>
+    <updated>2026-06-23T17:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52814"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has Unauthenticated Asymmetric Denial of Service (DoS) via SSH Handshake Stall (File Descriptor Exhaustion)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52814&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The Gogs built-in Go SSH server is vulnerable to an unauthenticated, asymmetric Denial of Service (DoS) attack. The application accepts inbound TCP connections and passes them to `golang.org/x/crypto/ssh.NewServerConn` inside a new goroutine without enforcing any read/write deadlines on the underlying `net.Conn`.
+
+An unauthenticated attacker can open multiple TCP connections to the SSH port and simply withhold the SSH protocol banner. This forces the server to spawn an unbounded number of goroutines that block indefinitely waiting for socket I/O. This leads to complete File Descriptor (FD) exhaustion, preventing legitimate users from accessing the Git SSH service, and ultimately destabilizing the entire Gogs process (e.g., causing internal log rotation failures).
+
+### Vulnerability Details…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-xp79-5mx3-jx52"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-xp79-5mx3-jx52&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8335"&gt;https://github.com/gogs/gogs/pull/8335&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/7da9cda314054501e1a7938a9c4d7896f331b884"&gt;https://github.com/gogs/gogs/commit/7da9cda314054501e1a7938a9c4d7896f331b884&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xp79-5mx3-jx52"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qf6p-p7ww-cwr9: Gogs vulnerable to RCE via git rebase --exec argument injection in pull request merge</title>
+    <id>https://osv.dev/vulnerability/GHSA-qf6p-p7ww-cwr9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qf6p-p7ww-cwr9"/>
+    <published>2026-06-23T17:02:40Z</published>
+    <updated>2026-06-23T17:15:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52806"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs vulnerable to RCE via git rebase --exec argument injection in pull request merge&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52806&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Gogs: RCE via `git rebase --exec` Argument Injection in PR Merge
+
+## Summary
+
+Gogs allows authenticated users to achieve Remote Code Execution (RCE) on the server by creating a pull request with a specially crafted branch name that injects the `--exec` flag into the `git rebase` command during the &amp;quot;Rebase before merging&amp;quot; merge operation.
+
+## Severity
+
+**Critical** - CVSS 3.1 Base Score: 9.9 (AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H)
+
+## Affected Versions
+
+- **Gogs 0.14.2** (latest supported release)
+- Gogs 0.15.0+dev (commit `b53d3162`, main branch as of 2026-03-16)
+- All prior versions that support the &amp;quot;Rebase before merging&amp;quot; merge style
+
+## Impact
+
+This is a **privilege escalation from authenticated user to server-level code execution**. The attacker uses their own repository as the deliver…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-qf6p-p7ww-cwr9"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-qf6p-p7ww-cwr9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8301"&gt;https://github.com/gogs/gogs/pull/8301&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/a9dbafbfd8e1020bacc626420238c01d75d03364"&gt;https://github.com/gogs/gogs/commit/a9dbafbfd8e1020bacc626420238c01d75d03364&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qf6p-p7ww-cwr9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c39w-43gm-34h5: Gogs has Path Traversal in organization name that results in RCE through Git hooks</title>
+    <id>https://osv.dev/vulnerability/GHSA-c39w-43gm-34h5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c39w-43gm-34h5"/>
+    <published>2026-06-23T17:10:50Z</published>
+    <updated>2026-06-23T17:15:10Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52813"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has Path Traversal in organization name that results in RCE through Git hooks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52813&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Organization names containing path traversal sequences (`../`) are accepted by Gogs, and repositories under them are written to paths following these path traversals. This allows storing/retrieving data for repositories at arbitrary locations on the filesystem.
+By creating nested structure of Git repositories, one can overwrite the other&amp;#x27;s `hooks` configuration to result in Remote Code Execution (RCE).
+
+### Details
+
+During organization creation, `internal/database/org.go` calls `os.MkdirAll(repox.UserPath(org.Name))` without sanitizing `org.Name`. 
+
+https://github.com/gogs/gogs/blob/d7571322a04a29476d4241406ed50bf7eef0a5b7/internal/database/org.go#L165
+
+Repository creation uses this name to decide where to write the Git bare repository&amp;#x27;s (`org/name.git`). By setting the org na…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-c39w-43gm-34h5"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-c39w-43gm-34h5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8334"&gt;https://github.com/gogs/gogs/pull/8334&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/f6acd467305943aae8403cbac81f0118dd1235d7"&gt;https://github.com/gogs/gogs/commit/f6acd467305943aae8403cbac81f0118dd1235d7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c39w-43gm-34h5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6p9m-q3jp-47h4: Gogs: LFS dedupe path leaks private repo content across tenants</title>
+    <id>https://osv.dev/vulnerability/GHSA-6p9m-q3jp-47h4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6p9m-q3jp-47h4"/>
+    <published>2026-06-23T17:10:25Z</published>
+    <updated>2026-06-23T17:15:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52812"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs: LFS dedupe path leaks private repo content across tenants&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52812&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:L/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Summary
+
+Git LFS storage is content-addressed by OID alone (`&amp;lt;LFS-root&amp;gt;/&amp;lt;oid[0]&amp;gt;/&amp;lt;oid[1]&amp;gt;/&amp;lt;oid&amp;gt;`) but per-repo authorization lives in the `lfs_object` table keyed `(repo_id, oid)`. `serveUpload` skips re-uploading when the OID file already exists on disk and inserts a new `(repo_id, oid)` row pointing at it **without verifying the request body hashes to the OID being claimed**. Any user with write access to one repo can bind their repo to an OID owned by a private repo and download the original bytes via their own download endpoint.
+
+Details
+
+Dedupe shortcut at `internal/lfsx/storage.go:79-82`:
+
+```go
+if fi, err := os.Stat(fpath); err == nil {
+    _, _ = io.Copy(io.Discard, rc)
+    return fi.Size(), nil          // ← returns success with no hash check
+}
+```
+
+Hash verification at `internal/…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-6p9m-q3jp-47h4"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-6p9m-q3jp-47h4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8333"&gt;https://github.com/gogs/gogs/pull/8333&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/f35a767af74e05342bafc6fdda02c791816426f8"&gt;https://github.com/gogs/gogs/commit/f35a767af74e05342bafc6fdda02c791816426f8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6p9m-q3jp-47h4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-89mr-xqfv-758m: Gogs: UploadRepoFiles writes outside repo working tree via committed parent sym</title>
+    <id>https://osv.dev/vulnerability/GHSA-89mr-xqfv-758m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-89mr-xqfv-758m"/>
+    <published>2026-06-23T17:09:55Z</published>
+    <updated>2026-06-23T17:15:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52811"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs: UploadRepoFiles writes outside repo working tree via committed parent sym&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52811&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Summary
+
+`(*Repository).UploadRepoFiles` checks for symlinks only on the **leaf** of the upload target (`osx.IsSymlink(targetPath)`). The siblings `UpdateRepoFile`, `DeleteRepoFile`, and `GetDiffPreview` use `hasSymlinkInPath`, which lstats every component — `UploadRepoFiles` is the lone outlier. An attacker with repo-write access plus a multipart upload whose filename contains a literal backslash (preserved by `filepath.Base` on Linux, then converted to `/` by `pathx.Clean`) redirects the write through a previously-committed directory symlink. `iox.CopyFile` opens the destination with `os.Create` (no `O_NOFOLLOW`), so the kernel follows the parent symlink and writes attacker bytes anywhere the gogs UID can write — `~git/.ssh/authorized_keys` → SSH foothold, or `&amp;lt;repo&amp;gt;.git/hooks/post-recei…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-89mr-xqfv-758m"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-89mr-xqfv-758m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8332"&gt;https://github.com/gogs/gogs/pull/8332&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/04cb8afbb01d855454e59977a1cdbf522ea1db31"&gt;https://github.com/gogs/gogs/commit/04cb8afbb01d855454e59977a1cdbf522ea1db31&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-89mr-xqfv-758m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vcm5-gvmp-78mp: Gogs has DOM-based XSS via Milestone Name on New Issue Page</title>
+    <id>https://osv.dev/vulnerability/GHSA-vcm5-gvmp-78mp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vcm5-gvmp-78mp"/>
+    <published>2026-06-23T17:02:52Z</published>
+    <updated>2026-06-23T17:15:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52807"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has DOM-based XSS via Milestone Name on New Issue Page&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52807&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The fix for GHSA-vgjm-2cpf-4g7c (DOM-based XSS via milestone selection) was only applied to `templates/repo/issue/view_content.tmpl` but not to `templates/repo/issue/new_form.tmpl`. An attacker can store an HTML/JavaScript payload in a milestone name, and when any user opens the New Issue page and interacts with the milestone dropdown, the payload executes in their browser via Semantic UI&amp;#x27;s `preserveHTML` behavior.
+
+### Details
+GHSA-vgjm-2cpf-4g7c was patched by adding `| Sanitize` (bluemonday HTML tag stripping) to milestone name rendering in `view_content.tmpl`. However, the same milestone dropdown exists in `new_form.tmpl` and was **not** patched.
+
+In `new_form.tmpl`, milestone names are rendered with Go&amp;#x27;s default auto-escaping (`{{.Name}}`), which converts `&amp;lt;` to `&amp;amp;lt;` etc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-vcm5-gvmp-78mp"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-vcm5-gvmp-78mp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8325"&gt;https://github.com/gogs/gogs/pull/8325&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/573eacdc658641487f8ad883da96b29ec8e2852d"&gt;https://github.com/gogs/gogs/commit/573eacdc658641487f8ad883da96b29ec8e2852d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vcm5-gvmp-78mp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4565-r4x7-hg8j: Gogs Vulnerable to Privilege Escalation via Collaboration Access Mode Validation</title>
+    <id>https://osv.dev/vulnerability/GHSA-4565-r4x7-hg8j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4565-r4x7-hg8j"/>
+    <published>2026-06-23T16:52:30Z</published>
+    <updated>2026-06-23T17:00:12Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52804"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs Vulnerable to Privilege Escalation via Collaboration Access Mode Validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52804&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A repository admin collaborator can escalate their privileges to owner-level access by exploiting an off-by-one error in the `ChangeCollaborationAccessMode` function.
+
+## Vulnerable Code
+
+In `internal/database/repo_collaboration.go`, line 129:
+
+```go
+func (r *Repository) ChangeCollaborationAccessMode(userID int64, mode AccessMode) error {
+    // Discard invalid input
+    if mode &amp;lt;= AccessModeNone || mode &amp;gt; AccessModeOwner {
+        return nil
+    }
+```
+
+`AccessModeOwner` has value 4. The check `mode &amp;gt; AccessModeOwner` evaluates to `4 &amp;gt; 4 = false`, allowing `AccessModeOwner` to pass through. The correct check should be `mode &amp;gt;= AccessModeOwner`.
+
+The web route at `internal/route/repo/setting.go:413-416` takes the mode as a raw integer from query parameters:
+
+```go
+func ChangeCol…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-4565-r4x7-hg8j"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-4565-r4x7-hg8j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8227"&gt;https://github.com/gogs/gogs/pull/8227&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/1fdc9cc28e159135cfa4d6b11ecd5daa0f8ce22b"&gt;https://github.com/gogs/gogs/commit/1fdc9cc28e159135cfa4d6b11ecd5daa0f8ce22b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4565-r4x7-hg8j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xxhq-69mf-w8cr: Gogs has an Open Redirect via redirect_to</title>
+    <id>https://osv.dev/vulnerability/GHSA-xxhq-69mf-w8cr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xxhq-69mf-w8cr"/>
+    <published>2026-06-23T16:42:02Z</published>
+    <updated>2026-06-23T16:45:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52802"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has an Open Redirect via redirect_to&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52802&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+An open redirect vulnerability exists in Gogs where attacker-controlled `redirect_to` parameters can bypass validation, allowing redirection to arbitrary external sites.
+
+
+### Details
+All redirects in Gogs that are validated via the `IsSameSite` function are vulnerable:
+```go
+func IsSameSite(url string) bool {
+    return len(url) &amp;gt;= 2 &amp;amp;&amp;amp; url[0] == &amp;#x27;/&amp;#x27; &amp;amp;&amp;amp; url[1] != &amp;#x27;/&amp;#x27; &amp;amp;&amp;amp; url[1] != &amp;#x27;\\&amp;#x27;
+}
+```
+
+The function only inspects the first two characters of the URL string. This check fails to account for directory traversal sequences followed by backslashes. For example:
+```
+/a/../\example.com
+```
+
+The `IsSameSite` function checks the input supplied to the `redirect_to` query parameter value `/a/../\example.com` and considers it valid.
+
+Because web browsers normalize backslashes `\` to fo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-xxhq-69mf-w8cr"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-xxhq-69mf-w8cr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8322"&gt;https://github.com/gogs/gogs/pull/8322&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/c5da9631dc75f692f313373ae229c4d47ba6517f"&gt;https://github.com/gogs/gogs/commit/c5da9631dc75f692f313373ae229c4d47ba6517f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xxhq-69mf-w8cr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-4601: Incorrect parsing of IPv6 host literals in net/url</title>
     <id>https://osv.dev/vulnerability/GO-2026-4601</id>
@@ -356,19 +676,6 @@ When processing a build contexts or `add`/`copy` instructions, a malicious serve
 ### Patches
 
 Fixed in Buildah 1.44 and 1.43.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containers/buildah/security/advisories/GHSA-49p4-px3h-rq49"&gt;https://github.com/containers/buildah/security/advisories/GHSA-49p4-px3h-rq49&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/buildah/security/advisories/GHSA-49p4-px3h-rq49"&gt;https://github.com/podman-container-tools/buildah/security/advisories/GHSA-49p4-px3h-rq49&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/buildah"&gt;https://github.com/podman-container-tools/buildah&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-49p4-px3h-rq49"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-xjvp-4fhw-gc47: runc: Malicious image with /dev symlink can trigger limited host filesystem integrity violations </title>
-    <id>https://osv.dev/vulnerability/GHSA-xjvp-4fhw-gc47</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xjvp-4fhw-gc47"/>
-    <published>2026-06-22T20:01:35Z</published>
-    <updated>2026-06-22T20:15:14Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-41579"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;runc: Malicious image with /dev symlink can trigger limited host filesystem integrity violations &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41579&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/opencontainers/runc&lt;/code&gt; — fixed in 1.3.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/opencontainers/runc&lt;/code&gt; — fixed in 1.4.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/opencontainers/runc&lt;/code&gt; — fixed in 1.5.0-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-When setting up the container rootfs, `setupPtmx` and `setupDevSymlinks` call `os.Remove` and `os.Symlink` with a `filepath.Join` string which allow an image with `/dev` as a symlink to trick runc into deleting files called `ptmx` on the host or creating a hardcoded set of symlinks with specific names and targets in an arbitrary pre-existing host directory.
-
-Please note that this issue is not exploitable under Docker because [it creates a top-level `ro` layer that masks any malicious `/dev` symlink present in the container image](https://github.com/moby/moby/blob/docker-v29.4.1/daemon/initlayer/setup_unix.go) (this is also done without mounting the lower layers so there is no opportunity for the malicious `/dev` symlink to trick it into resolving to some other path). Unfortunate…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/opencontainers/runc/security/advisories/GHSA-xjvp-4fhw-gc47"&gt;https://github.com/opencontainers/runc/security/advisories/GHSA-xjvp-4fhw-gc47&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/opencontainers/runc"&gt;https://github.com/opencontainers/runc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xjvp-4fhw-gc47"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GHSA-w6j9-vw59-27wv: Gogs has an Authentication Bypass via Unvalidated Reverse Proxy Headers</title>

@@ -3,12 +3,67 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-06-24T10:29:19Z</updated>
+  <updated>2026-06-24T18:00:07Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-prj9-97mp-mwh2: OliveTin has Unvalidated `ot_`-prefixed Arguments that Bypass Input Filtering</title>
+    <id>https://osv.dev/vulnerability/GHSA-prj9-97mp-mwh2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-prj9-97mp-mwh2"/>
+    <published>2026-06-24T17:43:50Z</published>
+    <updated>2026-06-24T18:00:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53541"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OliveTin has Unvalidated `ot_`-prefixed Arguments that Bypass Input Filtering&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53541&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/OliveTin/OliveTin&lt;/code&gt; — fixed in 0.0.0-20260531214440-ebffd9f040f7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Description
+
+The `filterToDefinedArgumentsOnly` function in the executor is intended to discard any arguments not explicitly defined in the action&amp;#x27;s configuration. However, a special case allows any argument whose name starts with `ot_` to bypass this filter. While two system arguments (`ot_executionTrackingId` and `ot_username`) are injected by OliveTin and overridden, all other `ot_`-prefixed arguments supplied by the user pass through unmodified.
+
+These bypassed arguments are:
+
+1. **Not type-checked** — the validation loop only iterates over the action&amp;#x27;s defined arguments, so `ot_`-prefixed arguments skip all type safety checks entirely.
+2. **Set as environment variables** — via `buildEnv()`, with completely unvalidated values, and passed to the executed command.
+3. **Included in th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/security/advisories/GHSA-prj9-97mp-mwh2"&gt;https://github.com/OliveTin/OliveTin/security/advisories/GHSA-prj9-97mp-mwh2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/commit/ebffd9f040f791208aee1db2e5a8aecd1e3e603d"&gt;https://github.com/OliveTin/OliveTin/commit/ebffd9f040f791208aee1db2e5a8aecd1e3e603d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin"&gt;https://github.com/OliveTin/OliveTin&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-prj9-97mp-mwh2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-f637-w7p2-m7fx: OliveTin: ValidateArgumentType API Endpoint's Missing Authentication Allows Action and Argument Enumeration</title>
+    <id>https://osv.dev/vulnerability/GHSA-f637-w7p2-m7fx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f637-w7p2-m7fx"/>
+    <published>2026-06-24T17:41:01Z</published>
+    <updated>2026-06-24T17:45:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48709"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OliveTin: ValidateArgumentType API Endpoint&amp;#x27;s Missing Authentication Allows Action and Argument Enumeration&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48709&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/OliveTin/OliveTin&lt;/code&gt; — fixed in 0.0.0-20260521230847-a3865704c854&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `ValidateArgumentType` RPC endpoint in `service/internal/api/api.go` does not perform any authentication or authorization checks. Unlike all other data-returning API endpoints, it does not call `auth.UserFromApiCall` or `checkDashboardAccess`. When `AuthRequireGuestsToLogin` is enabled (the security-conscious configuration), this endpoint remains accessible to unauthenticated users and can be used as an oracle to enumerate valid action binding IDs and their argument configurations.
+
+## Details
+
+### Root Cause
+
+The `ValidateArgumentType` handler at `service/internal/api/api.go:726` has no authentication check:
+
+```go
+func (api *oliveTinAPI) ValidateArgumentType(ctx ctx.Context, req *connect.Request[apiv1.ValidateArgumentTypeRequest]) (*connect.Response[apiv1.ValidateArgument…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/security/advisories/GHSA-f637-w7p2-m7fx"&gt;https://github.com/OliveTin/OliveTin/security/advisories/GHSA-f637-w7p2-m7fx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-48709"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-48709&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/commit/a3865704c854061452a4ab5f6d95de3312698ccd"&gt;https://github.com/OliveTin/OliveTin/commit/a3865704c854061452a4ab5f6d95de3312698ccd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin"&gt;https://github.com/OliveTin/OliveTin&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/releases/tag/3000.13.0"&gt;https://github.com/OliveTin/OliveTin/releases/tag/3000.13.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f637-w7p2-m7fx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7fq5-7wr8-rjwj: OliveTin has a Concurrent Template Parsing Race Condition which Leads to Cross-Request Command Contamination</title>
+    <id>https://osv.dev/vulnerability/GHSA-7fq5-7wr8-rjwj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7fq5-7wr8-rjwj"/>
+    <published>2026-06-24T17:38:12Z</published>
+    <updated>2026-06-24T17:45:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48708"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OliveTin has a Concurrent Template Parsing Race Condition which Leads to Cross-Request Command Contamination&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48708&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/OliveTin/OliveTin&lt;/code&gt; — fixed in 0.0.0-20260521225117-d74da9314005&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+OliveTin&amp;#x27;s template engine uses a **single shared `text/template.Template` instance** (`tpl` package-level variable in `service/internal/tpl/templates.go`) across all goroutines. Every action execution calls `tpl.Parse(source)` followed by `t.Execute()` on this shared instance with no synchronization. When two or more actions execute concurrently (which is the normal case — each `ExecRequest` spawns a goroutine), a race condition occurs: one goroutine&amp;#x27;s `Parse` overwrites the template tree while another goroutine is calling `Execute`, causing:
+
+1. **Cross-user command contamination**: User A&amp;#x27;s arguments rendered in User B&amp;#x27;s shell command template
+2. **Go runtime panic**: Concurrent map writes in Go&amp;#x27;s `text/template` internal structures cause a fatal crash
+3. **Incorrect command…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/security/advisories/GHSA-7fq5-7wr8-rjwj"&gt;https://github.com/OliveTin/OliveTin/security/advisories/GHSA-7fq5-7wr8-rjwj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-48708"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-48708&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/commit/d74da9314005954dd49fa20dabf272247bc76519"&gt;https://github.com/OliveTin/OliveTin/commit/d74da9314005954dd49fa20dabf272247bc76519&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin"&gt;https://github.com/OliveTin/OliveTin&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/releases/tag/3000.13.0"&gt;https://github.com/OliveTin/OliveTin/releases/tag/3000.13.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7fq5-7wr8-rjwj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-4864: TOCTOU permits root escape on Linux via Root.Chmod in os in internal/syscall/unix</title>
     <id>https://osv.dev/vulnerability/GO-2026-4864</id>
@@ -772,43 +827,5 @@ When processing a build contexts or `add`/`copy` instructions, a malicious serve
 ### Patches
 
 Fixed in Buildah 1.44 and 1.43.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containers/buildah/security/advisories/GHSA-49p4-px3h-rq49"&gt;https://github.com/containers/buildah/security/advisories/GHSA-49p4-px3h-rq49&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/buildah/security/advisories/GHSA-49p4-px3h-rq49"&gt;https://github.com/podman-container-tools/buildah/security/advisories/GHSA-49p4-px3h-rq49&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/buildah"&gt;https://github.com/podman-container-tools/buildah&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-49p4-px3h-rq49"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-w6j9-vw59-27wv: Gogs has an Authentication Bypass via Unvalidated Reverse Proxy Headers</title>
-    <id>https://osv.dev/vulnerability/GHSA-w6j9-vw59-27wv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w6j9-vw59-27wv"/>
-    <published>2026-06-22T17:09:51Z</published>
-    <updated>2026-06-22T17:15:07Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-25119"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has an Authentication Bypass via Unvalidated Reverse Proxy Headers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25119&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-When `ENABLE_REVERSE_PROXY_AUTHENTICATION` is enabled, Gogs accepts the configured authentication header (default: `X-WEBAUTH-USER`) directly from client requests without validating that the request originated from a trusted reverse proxy. Any remote attacker who can reach the Gogs service can forge this header to impersonate any user or trigger automatic account creation, completely bypassing authentication.
-
-## Root Cause
-
-The vulnerability exists because Gogs reads the authentication header directly from the incoming HTTP request without any verification that the header was set by a trusted reverse proxy.
-
-### Vulnerable Code Flow
-
-In `internal/context/auth.go` lines 206-234:
-
-```go
-func authenticatedUser(store AuthStore, ctx *macaron.Context, sess session.Store) (_ *databas…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-w6j9-vw59-27wv"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-w6j9-vw59-27wv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8264"&gt;https://github.com/gogs/gogs/pull/8264&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/0089c4c8e5b8d99eb6e5c8727f8f40d765f1f58a"&gt;https://github.com/gogs/gogs/commit/0089c4c8e5b8d99eb6e5c8727f8f40d765f1f58a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w6j9-vw59-27wv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-3qq3-668m-v9mj: Gogs has a Denial of Service in repository/wiki file listing web pages</title>
-    <id>https://osv.dev/vulnerability/GHSA-3qq3-668m-v9mj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3qq3-668m-v9mj"/>
-    <published>2026-06-22T16:58:31Z</published>
-    <updated>2026-06-22T17:15:07Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2025-64719"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs has a Denial of Service in repository/wiki file listing web pages&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-64719&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-A malicious user with rights to create a new file on a repository or wiki page can trigger a denial of service condition in which the pages containing the listing of files will return HTTP error 500 and render the web interface unusable for the repository or wiki.
-
-### Details
-The issue is present in file `internal/route/repo/wiki.go` and `internal/route/repo/view.go` where the pages try to recover commit information. If errors are returned while recovering commit information, the page will return a 500 error and stop rendering, resulting in a denial of service.
-In `view.go` the issue occurs at [line 56](https://github.com/gogs/gogs/blob/89f0f86c7e1a3be7f48d99e27818a79d17357558/internal/route/repo/view.go#L56) while a slightly different issue occurs in `wiki.go` at [line 174](h…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-3qq3-668m-v9mj"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-3qq3-668m-v9mj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8116"&gt;https://github.com/gogs/gogs/pull/8116&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/ae41bab5f28e4880edcef01c91d2cbb8839ec9e4"&gt;https://github.com/gogs/gogs/commit/ae41bab5f28e4880edcef01c91d2cbb8839ec9e4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3qq3-668m-v9mj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

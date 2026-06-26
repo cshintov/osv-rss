@@ -3,12 +3,464 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-06-26T12:29:46Z</updated>
+  <updated>2026-06-26T18:45:22Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-48q5-w887-33wv: Incus has a restricted project bypass leading to arbitrary command execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-48q5-w887-33wv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-48q5-w887-33wv"/>
+    <published>2026-06-26T18:33:55Z</published>
+    <updated>2026-06-26T18:45:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48751"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Incus has a restricted project bypass leading to arbitrary command execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48751&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/lxc/incus/v7/cmd/incusd&lt;/code&gt; — fixed in 7.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Instance snapshots ignore the `restricted.containers.lowlevel=block` setting; allowing for arbitrary command execution on the Incus server by abusing lowlevel hooks such as `raw.lxc` and `raw.qemu`.
+
+
+### Details
+
+Instance snapshots ignore the `restricted.containers.lowlevel=block` setting; allowing for arbitrary command execution on the Incus server by abusing lowlevel hooks such as `raw.lxc` and `raw.qemu`.
+
+As snapshots can be moved from one server to another, a malicious instance+snapshot can be crafted locally, moved to a restricted project and the snapshot restored for arbitrary command execution.
+
+In practice, this allows a malicious actor to execute arbitrary commands on the host with root privileges.
+
+
+### PoC
+
+```
+# remote, restricted
+incus project set rem:project re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus/security/advisories/GHSA-48q5-w887-33wv"&gt;https://github.com/lxc/incus/security/advisories/GHSA-48q5-w887-33wv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus"&gt;https://github.com/lxc/incus&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-48q5-w887-33wv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2q3f-q5pq-g8wv: Incus has an arbitrary file read+write on host via rootfs/ symlink in malicious image</title>
+    <id>https://osv.dev/vulnerability/GHSA-2q3f-q5pq-g8wv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2q3f-q5pq-g8wv"/>
+    <published>2026-06-26T18:31:21Z</published>
+    <updated>2026-06-26T18:45:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48749"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Incus has an arbitrary file read+write on host via rootfs/ symlink in malicious image&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48749&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/lxc/incus/v7/cmd/incusd&lt;/code&gt; — fixed in 7.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A specially crafted image can be used to read or create/write arbitrary files on the host; possibly leading to arbitrary command execution.
+
+
+### Details
+
+Incus validates an image as soon as it sees a normal `metadata.yaml` and a `rootfs/` entry, but full extraction can later process a duplicate top-level `rootfs` symlink. Later, the stopped-container file API opens `d.RootfsPath()` and passes that file descriptor to `forkfile`, which chroots to it.
+
+```
+metadata.yaml
+rootfs/
+rootfs -&amp;gt; /
+```
+
+In practice, this allows a malicious actor to access the host&amp;#x27;s filesystem with root privileges.
+
+
+### PoC
+
+Below, we map the container&amp;#x27;s rootfs to `/` on the host, but it can be mapped anywhere. We then retrieve the host&amp;#x27;s `/etc/shadow` file and create a file in `/`.
+
+```
+#!/bin/sh
+set -…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus/security/advisories/GHSA-2q3f-q5pq-g8wv"&gt;https://github.com/lxc/incus/security/advisories/GHSA-2q3f-q5pq-g8wv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus"&gt;https://github.com/lxc/incus&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2q3f-q5pq-g8wv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-73hr-m85f-64v9: Incus has an arbitrary file write on host via `exec-output` symlink in crafted image</title>
+    <id>https://osv.dev/vulnerability/GHSA-73hr-m85f-64v9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-73hr-m85f-64v9"/>
+    <published>2026-06-26T18:32:52Z</published>
+    <updated>2026-06-26T18:45:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48750"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Incus has an arbitrary file write on host via `exec-output` symlink in crafted image&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48750&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/lxc/incus/v7/cmd/incusd&lt;/code&gt; — fixed in 7.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `record-output` parameter of the `/instances/$name/exec` endpoint stores the output of the command in the `exec-output` directory of the instance. If `exec-output` is a symlink, file named `exec_UUID.stdout` and `exec_UUID.stderr` can be written to an arbitrary location where the `.stdout` file will contain arbitrary content. This behavior can be abused for arbitrary command execution.
+
+
+### Details
+
+When an image is unpacked, top-level symlinks are extracted as is; allowing for `exec-output` to be placed on disk. In `instance_exec.go`, `os.Mkdir` continues of `exec-output` exists and `os.OpenFile` follows the `exec-output` symlink.
+
+
+### PoC
+
+Below, we place the `exec_UUID.stdout` file in `/etc/cron.d` on
+the host for arbitrary command execution.
+
+```
+#!/bin/sh
+# usage: $…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus/security/advisories/GHSA-73hr-m85f-64v9"&gt;https://github.com/lxc/incus/security/advisories/GHSA-73hr-m85f-64v9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus"&gt;https://github.com/lxc/incus&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-73hr-m85f-64v9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-78mq-xcr3-xm33: golang.org/x/crypto/ssh is vulnerable to invoking server panic during CheckHostKey/Authenticate flow</title>
+    <id>https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33"/>
+    <published>2026-06-25T22:15:17Z</published>
+    <updated>2026-06-26T18:29:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39835"/>
+    <category term="GO-2026-5015"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh is vulnerable to invoking server panic during CheckHostKey/Authenticate flow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39835, GO-2026-5015&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SSH servers which use CertChecker as a public key callback without setting IsUserAuthority or IsHostAuthority could be caused to panic by a client presenting a certificate. CertChecker now returns an error instead of panicking when these callbacks are nil.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39835"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39835&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781660"&gt;https://go.dev/cl/781660&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79563"&gt;https://go.dev/issue/79563&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5015"&gt;https://pkg.go.dev/vuln/GO-2026-5015&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5cgq-3rg8-m6cv: golang.org/x/crypto/ssh/knownhosts vulnerable to auth bypass via unenforced @revoked status</title>
+    <id>https://osv.dev/vulnerability/GHSA-5cgq-3rg8-m6cv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5cgq-3rg8-m6cv"/>
+    <published>2026-06-25T22:22:04Z</published>
+    <updated>2026-06-26T18:29:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-42508"/>
+    <category term="GO-2026-5021"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh/knownhosts vulnerable to auth bypass via unenforced @revoked status&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42508, GO-2026-5021&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh/knownhosts&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Previously, a revoked &amp;#x27;SignatureKey&amp;#x27; belonging to a CA was not correctly checked for revocation. Now, both the &amp;#x27;key&amp;#x27; and &amp;#x27;key.SignatureKey&amp;#x27; are checked for @revoked.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42508"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42508&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781220"&gt;https://go.dev/cl/781220&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79568"&gt;https://go.dev/issue/79568&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5021"&gt;https://pkg.go.dev/vuln/GO-2026-5021&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5cgq-3rg8-m6cv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jppx-rxg9-jmrx: golang.org/x/crypto/ssh/agent doesn't enforce invoking key constraints</title>
+    <id>https://osv.dev/vulnerability/GHSA-jppx-rxg9-jmrx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jppx-rxg9-jmrx"/>
+    <published>2026-06-25T22:13:31Z</published>
+    <updated>2026-06-26T18:29:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39833"/>
+    <category term="GO-2026-5005"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh/agent doesn&amp;#x27;t enforce invoking key constraints&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39833, GO-2026-5005&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh/agent&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The in-memory keyring returned by NewKeyring() silently accepted keys with the ConfirmBeforeUse constraint but never enforced it. The key would sign without any confirmation prompt, with no indication to the caller that the constraint was not in effect. NewKeyring() now returns an error when unsupported constraints are requested.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39833"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39833&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/778640"&gt;https://go.dev/cl/778640&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/778641"&gt;https://go.dev/cl/778641&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79436"&gt;https://go.dev/issue/79436&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5005"&gt;https://pkg.go.dev/vuln/GO-2026-5005&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jppx-rxg9-jmrx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-w879-237q-wc7r: golang.org/x/crypto/ssh: Invoking pathological RSA/DSA parameters may cause DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-w879-237q-wc7r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w879-237q-wc7r"/>
+    <published>2026-06-25T22:18:43Z</published>
+    <updated>2026-06-26T18:29:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39829"/>
+    <category term="GO-2026-5018"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh: Invoking pathological RSA/DSA parameters may cause DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39829, GO-2026-5018&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The RSA and DSA public key parsers did not enforce size limits on key parameters. A crafted public key with an excessively large modulus or DSA parameter could cause several minutes of CPU consumption during signature verification. This could be triggered by unauthenticated clients during public key authentication. RSA moduli are now limited to 8192 bits, and DSA parameters are validated per FIPS 186-2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39829"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39829&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781641"&gt;https://go.dev/cl/781641&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781661"&gt;https://go.dev/cl/781661&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79565"&gt;https://go.dev/issue/79565&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5018"&gt;https://pkg.go.dev/vuln/GO-2026-5018&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w879-237q-wc7r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q4h4-gmj2-qvw2: golang.org/x/crypto/ssh: Invoking byte arithmetic causes underflow and panic</title>
+    <id>https://osv.dev/vulnerability/GHSA-q4h4-gmj2-qvw2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q4h4-gmj2-qvw2"/>
+    <published>2026-06-25T22:14:22Z</published>
+    <updated>2026-06-26T18:29:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46597"/>
+    <category term="GO-2026-5013"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh: Invoking byte arithmetic causes underflow and panic&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46597, GO-2026-5013&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An incorrectly placed cast from bytes to int allowed for server-side panic in the AES-GCM packet decoder for well-crafted inputs.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46597"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46597&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781620"&gt;https://go.dev/cl/781620&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79561"&gt;https://go.dev/issue/79561&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5013"&gt;https://pkg.go.dev/vuln/GO-2026-5013&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q4h4-gmj2-qvw2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-f5wc-c3c7-36mc: golang.org/x/crypto/ssh/agent doesn't drop invoking agent constraints when forwarding keys</title>
+    <id>https://osv.dev/vulnerability/GHSA-f5wc-c3c7-36mc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f5wc-c3c7-36mc"/>
+    <published>2026-06-25T22:14:00Z</published>
+    <updated>2026-06-26T18:29:21Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39832"/>
+    <category term="GO-2026-5006"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh/agent doesn&amp;#x27;t drop invoking agent constraints when forwarding keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39832, GO-2026-5006&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh/agent&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When adding a key to a remote agent constraint extensions such as restrict-destination-v00@openssh.com were not serialized in the request. Destination restrictions were silently stripped when forwarding keys, allowing unrestricted use of the key on the remote host. The client now serializes all constraint extensions. Additionally, the in-memory keyring returned by NewKeyring() now rejects keys with unsupported constraint extensions instead of silently ignoring them.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39832"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39832&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/778642"&gt;https://go.dev/cl/778642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79435"&gt;https://go.dev/issue/79435&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5006"&gt;https://pkg.go.dev/vuln/GO-2026-5006&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f5wc-c3c7-36mc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-x527-x647-q7gg: golang.org/x/crypto/ssh: Invoking VerifiedPublicKeyCallback permissions skip enforcement</title>
+    <id>https://osv.dev/vulnerability/GHSA-x527-x647-q7gg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x527-x647-q7gg"/>
+    <published>2026-06-25T22:23:16Z</published>
+    <updated>2026-06-26T17:59:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46595"/>
+    <category term="GO-2026-5023"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh: Invoking VerifiedPublicKeyCallback permissions skip enforcement&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46595, GO-2026-5023&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Previously, CVE-2024-45337 fixed an authorization bypass for misused ssh server configurations; if any other type of callback is passed other than public key, then the source-address validation would be skipped.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-45337"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-45337&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46595"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46595&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781642"&gt;https://go.dev/cl/781642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79570"&gt;https://go.dev/issue/79570&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5023"&gt;https://pkg.go.dev/vuln/GO-2026-5023&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x527-x647-q7gg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rm3j-f69w-wqmq: golang.org/x/crypto/ssh vulnerable to infinite loop on large channel writes</title>
+    <id>https://osv.dev/vulnerability/GHSA-rm3j-f69w-wqmq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rm3j-f69w-wqmq"/>
+    <published>2026-06-25T22:21:40Z</published>
+    <updated>2026-06-26T17:59:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39834"/>
+    <category term="GO-2026-5020"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh vulnerable to infinite loop on large channel writes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39834, GO-2026-5020&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When writing data larger than 4GB in a single Write call on an SSH channel, an integer overflow in the internal payload size calculation caused the write loop to spin indefinitely, sending empty packets without making progress. The size comparison now uses int64 to prevent truncation.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39834"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781663"&gt;https://go.dev/cl/781663&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79567"&gt;https://go.dev/issue/79567&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5020"&gt;https://pkg.go.dev/vuln/GO-2026-5020&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rm3j-f69w-wqmq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9m57-25v3-79x9: golang.org/x/crypto/ssh/agent: Invoking pathological inputs can lead to client panic</title>
+    <id>https://osv.dev/vulnerability/GHSA-9m57-25v3-79x9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9m57-25v3-79x9"/>
+    <published>2026-06-25T22:12:52Z</published>
+    <updated>2026-06-26T17:59:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46598"/>
+    <category term="GO-2026-5033"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh/agent: Invoking pathological inputs can lead to client panic&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46598, GO-2026-5033&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh/agent&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;For certain crafted inputs, a &amp;#x27;ed25519.PrivateKey&amp;#x27; was created by casting malformed wire bytes, leading to a panic when used.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46598"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46598&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781360"&gt;https://go.dev/cl/781360&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79596"&gt;https://go.dev/issue/79596&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5033"&gt;https://pkg.go.dev/vuln/GO-2026-5033&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9m57-25v3-79x9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vgwf-h737-ff37: golang.org/x/crypto/ssh: Invoking client can cause server deadlock on unexpected responses</title>
+    <id>https://osv.dev/vulnerability/GHSA-vgwf-h737-ff37</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vgwf-h737-ff37"/>
+    <published>2026-06-25T22:18:17Z</published>
+    <updated>2026-06-26T17:59:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39830"/>
+    <category term="GO-2026-5017"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh: Invoking client can cause server deadlock on unexpected responses&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39830, GO-2026-5017&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A malicious SSH peer could send unsolicited global request responses to fill an internal buffer, blocking the connection&amp;#x27;s read loop. The blocked goroutine could not be released by calling Close(), resulting in a resource leak per connection. Unsolicited global responses are now discarded.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39830"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39830&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781640"&gt;https://go.dev/cl/781640&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781664"&gt;https://go.dev/cl/781664&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79564"&gt;https://go.dev/issue/79564&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5017"&gt;https://pkg.go.dev/vuln/GO-2026-5017&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vgwf-h737-ff37"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qpw4-5x99-6vjp: golang.org/x/crypto/ssh: Invoking memory leak when rejecting channels can lead to DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-qpw4-5x99-6vjp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qpw4-5x99-6vjp"/>
+    <published>2026-06-25T22:15:43Z</published>
+    <updated>2026-06-26T17:59:17Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39827"/>
+    <category term="GO-2026-5016"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh: Invoking memory leak when rejecting channels can lead to DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39827, GO-2026-5016&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An authenticated SSH client that repeatedly opened channels which were rejected by the server caused unbounded memory growth, eventually crashing the server process and affecting all connected users. Rejected channels are now properly removed from the connection&amp;#x27;s internal state and released for garbage collection.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39827"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39827&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781320"&gt;https://go.dev/cl/781320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/35127"&gt;https://go.dev/issue/35127&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5016"&gt;https://pkg.go.dev/vuln/GO-2026-5016&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qpw4-5x99-6vjp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4p9m-8gc4-rw2h: GoBGP vulnerable to a denial of service via the NEXT_HOP path attribute</title>
+    <id>https://osv.dev/vulnerability/GHSA-4p9m-8gc4-rw2h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4p9m-8gc4-rw2h"/>
+    <published>2026-03-16T18:32:03Z</published>
+    <updated>2026-06-26T16:44:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-30405"/>
+    <category term="GO-2026-4736"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoBGP vulnerable to a denial of service via the NEXT_HOP path attribute&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-30405, GO-2026-4736&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/osrg/gobgp/v4&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An issue in GoBGP gobgpd v.4.2.0 allows a remote attacker to cause a denial of service via the NEXT_HOP path attribute.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-30405"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-30405&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/osrg/gobgp/issues/3305"&gt;https://github.com/osrg/gobgp/issues/3305&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/osrg/gobgp/commit/583080a7258e22cc884162e15b078771aa2c2c80"&gt;https://github.com/osrg/gobgp/commit/583080a7258e22cc884162e15b078771aa2c2c80&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/osrg/gobgp"&gt;https://github.com/osrg/gobgp&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4p9m-8gc4-rw2h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-45gg-vh54-h5m9: golang.org/x/crypto/ssh vulnerable to invoking bypass of certificate restrictions</title>
+    <id>https://osv.dev/vulnerability/GHSA-45gg-vh54-h5m9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-45gg-vh54-h5m9"/>
+    <published>2026-06-25T22:14:38Z</published>
+    <updated>2026-06-26T16:44:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39828"/>
+    <category term="GO-2026-5014"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh vulnerable to invoking bypass of certificate restrictions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39828, GO-2026-5014&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When an SSH server authentication callback returned PartialSuccessError with non-nil Permissions, those permissions were silently discarded, potentially dropping certificate restrictions such as force-command after a second factor succeeded. Returning non-nil Permissions with PartialSuccessError now results in a connection error.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39828"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39828&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781621"&gt;https://go.dev/cl/781621&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79562"&gt;https://go.dev/issue/79562&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5014"&gt;https://pkg.go.dev/vuln/GO-2026-5014&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-45gg-vh54-h5m9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-89gr-r52h-f8rx:  golang.org/x/crypto/ssh: FIDO/U2F security key physical presence check can be bypassed</title>
+    <id>https://osv.dev/vulnerability/GHSA-89gr-r52h-f8rx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-89gr-r52h-f8rx"/>
+    <published>2026-06-25T22:21:12Z</published>
+    <updated>2026-06-26T16:44:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39831"/>
+    <category term="GO-2026-5019"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt; golang.org/x/crypto/ssh: FIDO/U2F security key physical presence check can be bypassed&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39831, GO-2026-5019&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The Verify() method for FIDO/U2F security key types (sk-ecdsa-sha2-nistp256@openssh.com, sk-ssh-ed25519@openssh.com) did not check the User Presence flag. Signatures generated without physical touch were accepted, allowing unattended use of a hardware security key. To restore the previous behavior, return a &amp;quot;no-touch-required&amp;quot; extension in Permissions.Extensions from PublicKeyCallback.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39831"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39831&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781662"&gt;https://go.dev/cl/781662&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79566"&gt;https://go.dev/issue/79566&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5019"&gt;https://pkg.go.dev/vuln/GO-2026-5019&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-89gr-r52h-f8rx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4736: GoBGP vulnerable to a denial of service via the NEXT_HOP path attribute in github.com/osrg/gobgp</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4736</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4736"/>
+    <published>2026-04-07T14:58:41Z</published>
+    <updated>2026-06-26T16:44:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-30405"/>
+    <category term="GHSA-4p9m-8gc4-rw2h"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoBGP vulnerable to a denial of service via the NEXT_HOP path attribute in github.com/osrg/gobgp&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-30405, GHSA-4p9m-8gc4-rw2h&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/osrg/gobgp&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/osrg/gobgp/v3&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/osrg/gobgp/v4&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;GoBGP vulnerable to a denial of service via the NEXT_HOP path attribute in github.com/osrg/gobgp&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-4p9m-8gc4-rw2h"&gt;https://github.com/advisories/GHSA-4p9m-8gc4-rw2h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/osrg/gobgp/commit/583080a7258e22cc884162e15b078771aa2c2c80"&gt;https://github.com/osrg/gobgp/commit/583080a7258e22cc884162e15b078771aa2c2c80&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/osrg/gobgp/issues/3305"&gt;https://github.com/osrg/gobgp/issues/3305&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4736"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5622: Arbitrary host CRI log file read via symlink following in CRI checkpoint restore in github.com/containerd/containerd</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5622</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5622"/>
+    <published>2026-06-25T22:34:34Z</published>
+    <updated>2026-06-26T15:44:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53489"/>
+    <category term="GHSA-rgh6-rfwx-v388"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Arbitrary host CRI log file read via symlink following in CRI checkpoint restore in github.com/containerd/containerd&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53489, GHSA-rgh6-rfwx-v388&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.1.9, 2.2.5, 2.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Arbitrary host CRI log file read via symlink following in CRI checkpoint restore in github.com/containerd/containerd&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/security/advisories/GHSA-rgh6-rfwx-v388"&gt;https://github.com/containerd/containerd/security/advisories/GHSA-rgh6-rfwx-v388&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5622"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5450: KubeVirt's authorization mechanism improperly truncates subresource names in kubevirt.io/kubevirt</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5450</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5450"/>
+    <published>2026-06-25T22:34:31Z</published>
+    <updated>2026-06-26T15:44:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-6383"/>
+    <category term="GHSA-j6cv-3w8p-vrg8"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;KubeVirt&amp;#x27;s authorization mechanism improperly truncates subresource names in kubevirt.io/kubevirt&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6383, GHSA-j6cv-3w8p-vrg8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;kubevirt.io/kubevirt&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;KubeVirt&amp;#x27;s authorization mechanism improperly truncates subresource names in kubevirt.io/kubevirt&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-j6cv-3w8p-vrg8"&gt;https://github.com/advisories/GHSA-j6cv-3w8p-vrg8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6383"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6383&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-6383"&gt;https://access.redhat.com/security/cve/CVE-2026-6383&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2458741"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2458741&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kubevirt/kubevirt/issues/17337"&gt;https://github.com/kubevirt/kubevirt/issues/17337&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5450"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5095: Grafana public dashboards disclose all direct mode datasources in github.com/grafana/grafana</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5095</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5095"/>
+    <published>2026-06-25T18:26:48Z</published>
+    <updated>2026-06-26T15:44:23Z</updated>
+    <category term="Go"/>
+    <category term="BIT-grafana-2026-27877"/>
+    <category term="CVE-2026-27877"/>
+    <category term="GHSA-3q27-7qjq-p9c5"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Grafana public dashboards disclose all direct mode datasources in github.com/grafana/grafana&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-grafana-2026-27877, CVE-2026-27877, GHSA-3q27-7qjq-p9c5&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Grafana public dashboards disclose all direct mode datasources in github.com/grafana/grafana.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: github.com/grafana/grafana from v1.9.2-0.20221116104934-4ee83a5f2bf4 before v1.9.2-0.20260325055210-3522153e07b4.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-3q27-7qjq-p9c5"&gt;https://github.com/advisories/GHSA-3q27-7qjq-p9c5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-27877"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-27877&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://grafana.com/security/security-advisories/cve-2026-27877"&gt;https://grafana.com/security/security-advisories/cve-2026-27877&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5095"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5148: Argo Workflows: Unchecked annotation parsing in pod informer crashes Argo Workflows Controller in github.com/argoproj/argo-workflows</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5148</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5148"/>
+    <published>2026-06-25T18:26:48Z</published>
+    <updated>2026-06-26T15:44:23Z</updated>
+    <category term="Go"/>
+    <category term="BIT-argo-workflows-2026-40886"/>
+    <category term="CVE-2026-40886"/>
+    <category term="GHSA-5jv8-h7qh-rf5p"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Argo Workflows: Unchecked annotation parsing in pod informer crashes Argo Workflows Controller in github.com/argoproj/argo-workflows&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-argo-workflows-2026-40886, CVE-2026-40886, GHSA-5jv8-h7qh-rf5p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-workflows&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-workflows/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-workflows/v3&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-workflows/v3&lt;/code&gt; — fixed in 3.7.14&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-workflows/v4&lt;/code&gt; — fixed in 4.0.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Argo Workflows: Unchecked annotation parsing in pod informer crashes Argo Workflows Controller in github.com/argoproj/argo-workflows&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-workflows/security/advisories/GHSA-5jv8-h7qh-rf5p"&gt;https://github.com/argoproj/argo-workflows/security/advisories/GHSA-5jv8-h7qh-rf5p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40886"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40886&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5148"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5594: Kyverno has unrestricted outbound requests in Kyverno apiCall enabling SSRF in github.com/kyverno/kyverno</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5594</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5594"/>
+    <published>2026-06-25T22:34:34Z</published>
+    <updated>2026-06-26T15:44:23Z</updated>
+    <category term="Go"/>
+    <category term="GHSA-qr4g-8hrp-c4rw"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Kyverno has unrestricted outbound requests in Kyverno apiCall enabling SSRF in github.com/kyverno/kyverno&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-qr4g-8hrp-c4rw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kyverno/kyverno&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Kyverno has unrestricted outbound requests in Kyverno apiCall enabling SSRF in github.com/kyverno/kyverno&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kyverno/kyverno/security/advisories/GHSA-qr4g-8hrp-c4rw"&gt;https://github.com/kyverno/kyverno/security/advisories/GHSA-qr4g-8hrp-c4rw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5594"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5708: Grafana: Users can generate Service Account tokens after permissions removal in github.com/grafana/grafana</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5708</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5708"/>
+    <published>2026-06-25T22:34:38Z</published>
+    <updated>2026-06-26T15:44:23Z</updated>
+    <category term="Go"/>
+    <category term="BIT-grafana-2026-33381"/>
+    <category term="CVE-2026-33381"/>
+    <category term="GHSA-wfhv-mj62-f5xh"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Grafana: Users can generate Service Account tokens after permissions removal in github.com/grafana/grafana&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-grafana-2026-33381, CVE-2026-33381, GHSA-wfhv-mj62-f5xh&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Grafana: Users can generate Service Account tokens after permissions removal in github.com/grafana/grafana.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: github.com/grafana/grafana before v1.9.2-0.20260513165311-fb7336fc36c1.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-wfhv-mj62-f5xh"&gt;https://github.com/advisories/GHSA-wfhv-mj62-f5xh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33381"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-33381&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/grafana/commit/fb7336fc36c14e1ff869482c5085ddb9f39e1b86"&gt;https://github.com/grafana/grafana/commit/fb7336fc36c14e1ff869482c5085ddb9f39e1b86&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://grafana.com/security/security-advisories/cve-2026-33381"&gt;https://grafana.com/security/security-advisories/cve-2026-33381&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5708"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5219: Grafana OSS: Authorization bypass allows users with Editor role to modify protected webhook URLs without permissions in github.com/grafana/grafana</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5219</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5219"/>
+    <published>2026-06-25T18:43:15Z</published>
+    <updated>2026-06-26T15:44:23Z</updated>
+    <category term="Go"/>
+    <category term="BIT-grafana-2026-21724"/>
+    <category term="CVE-2026-21724"/>
+    <category term="GHSA-7g92-g4vh-hp84"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Grafana OSS: Authorization bypass allows users with Editor role to modify protected webhook URLs without permissions in github.com/grafana/grafana&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-grafana-2026-21724, CVE-2026-21724, GHSA-7g92-g4vh-hp84&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Grafana OSS: Authorization bypass allows users with Editor role to modify protected webhook URLs without permissions in github.com/grafana/grafana.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: github.com/grafana/grafana before v1.9.2-0.20260323180334-daffe750de85.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-7g92-g4vh-hp84"&gt;https://github.com/advisories/GHSA-7g92-g4vh-hp84&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-21724"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-21724&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/grafana/commit/daffe750de85b0dbf79f206a35835cf66a83d6ca"&gt;https://github.com/grafana/grafana/commit/daffe750de85b0dbf79f206a35835cf66a83d6ca&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/grafana/releases/tag/v12.3.6"&gt;https://github.com/grafana/grafana/releases/tag/v12.3.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://grafana.com/security/security-advisories/cve-2026-21724"&gt;https://grafana.com/security/security-advisories/cve-2026-21724&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5219"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5409: Grafana: SQL Expressions Read File From Disk in github.com/grafana/grafana</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5409</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5409"/>
+    <published>2026-06-25T22:34:31Z</published>
+    <updated>2026-06-26T15:44:23Z</updated>
+    <category term="Go"/>
+    <category term="BIT-grafana-2026-33380"/>
+    <category term="CVE-2026-33380"/>
+    <category term="GHSA-gxcp-jjxh-rwp4"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Grafana: SQL Expressions Read File From Disk in github.com/grafana/grafana&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-grafana-2026-33380, CVE-2026-33380, GHSA-gxcp-jjxh-rwp4&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/grafana&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Grafana: SQL Expressions Read File From Disk in github.com/grafana/grafana.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: github.com/grafana/grafana before v1.9.2-0.20260513165311-fb7336fc36c1.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-gxcp-jjxh-rwp4"&gt;https://github.com/advisories/GHSA-gxcp-jjxh-rwp4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33380"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-33380&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/grafana/commit/fb7336fc36c14e1ff869482c5085ddb9f39e1b86"&gt;https://github.com/grafana/grafana/commit/fb7336fc36c14e1ff869482c5085ddb9f39e1b86&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://grafana.com/security/security-advisories/cve-2026-33380"&gt;https://grafana.com/security/security-advisories/cve-2026-33380&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5409"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5763: Sigstore Timestamp Authority has Improper Certificate Validation in verifier in github.com/sigstore/timestamp-authority</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5763</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5763"/>
+    <published>2026-06-25T22:34:41Z</published>
+    <updated>2026-06-26T15:44:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39984"/>
+    <category term="GHSA-xm5m-wgh2-rrg3"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Sigstore Timestamp Authority has Improper Certificate Validation in verifier in github.com/sigstore/timestamp-authority&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39984, GHSA-xm5m-wgh2-rrg3&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/sigstore/timestamp-authority&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/sigstore/timestamp-authority/v2&lt;/code&gt; — fixed in 2.0.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Sigstore Timestamp Authority has Improper Certificate Validation in verifier in github.com/sigstore/timestamp-authority&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/timestamp-authority/security/advisories/GHSA-xm5m-wgh2-rrg3"&gt;https://github.com/sigstore/timestamp-authority/security/advisories/GHSA-xm5m-wgh2-rrg3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39984"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39984&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/timestamp-authority/releases/tag/v2.0.6"&gt;https://github.com/sigstore/timestamp-authority/releases/tag/v2.0.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5763"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5662: Prometheus has Stored XSS via metric names and label values in Prometheus web UI tooltips and metrics explorer in github.com/prometheus/prometheus</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5662</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5662"/>
+    <published>2026-06-25T22:34:38Z</published>
+    <updated>2026-06-26T15:44:22Z</updated>
+    <category term="Go"/>
+    <category term="BIT-prometheus-2026-40179"/>
+    <category term="CVE-2026-40179"/>
+    <category term="GHSA-vffh-x6r8-xx99"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Prometheus has Stored XSS via metric names and label values in Prometheus web UI tooltips and metrics explorer in github.com/prometheus/prometheus&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-prometheus-2026-40179, CVE-2026-40179, GHSA-vffh-x6r8-xx99&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 0.311.2-0.20260410083055-07c6232d159b&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Prometheus has Stored XSS via metric names and label values in Prometheus web UI tooltips and metrics explorer in github.com/prometheus/prometheus.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: .&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99"&gt;https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40179"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c"&gt;https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18506"&gt;https://github.com/prometheus/prometheus/pull/18506&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5662"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5338: containerd: CRI checkpoint import allows local image tag poisoning in github.com/containerd/containerd</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5338</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5338"/>
+    <published>2026-06-25T18:43:19Z</published>
+    <updated>2026-06-26T15:44:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50195"/>
+    <category term="GHSA-cvxm-645q-p574"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;containerd: CRI checkpoint import allows local image tag poisoning in github.com/containerd/containerd&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50195, GHSA-cvxm-645q-p574&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.1.9, 2.2.5, 2.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;containerd: CRI checkpoint import allows local image tag poisoning in github.com/containerd/containerd&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/security/advisories/GHSA-cvxm-645q-p574"&gt;https://github.com/containerd/containerd/security/advisories/GHSA-cvxm-645q-p574&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5338"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5337: Kyverno: Cross-Namespace Read Bypasses RBAC Isolation (CVE-2026-22039 Incomplete Fix) in github.com/kyverno/kyverno</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5337</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5337"/>
+    <published>2026-06-25T18:43:19Z</published>
+    <updated>2026-06-26T15:44:22Z</updated>
+    <category term="Go"/>
+    <category term="BIT-kyverno-2026-41068"/>
+    <category term="CVE-2026-41068"/>
+    <category term="GHSA-cvq5-hhx3-f99p"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Kyverno: Cross-Namespace Read Bypasses RBAC Isolation (CVE-2026-22039 Incomplete Fix) in github.com/kyverno/kyverno&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-kyverno-2026-41068, CVE-2026-41068, GHSA-cvq5-hhx3-f99p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kyverno/kyverno&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Kyverno: Cross-Namespace Read Bypasses RBAC Isolation (CVE-2026-22039 Incomplete Fix) in github.com/kyverno/kyverno&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kyverno/kyverno/security/advisories/GHSA-cvq5-hhx3-f99p"&gt;https://github.com/kyverno/kyverno/security/advisories/GHSA-cvq5-hhx3-f99p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41068"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41068&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kyverno/kyverno/commit/bbf3e5c01391d612968440659028ae98e565a777"&gt;https://github.com/kyverno/kyverno/commit/bbf3e5c01391d612968440659028ae98e565a777&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5337"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5052: Vulnerability in software.sslmate.com/src/go-pkcs12</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5052</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5052"/>
+    <published>2026-06-22T21:24:28Z</published>
+    <updated>2026-06-26T13:44:19Z</updated>
+    <category term="Go"/>
+    <category term="GHSA-mpwr-8vm7-h73f"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vulnerability in software.sslmate.com/src/go-pkcs12&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-mpwr-8vm7-h73f&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;software.sslmate.com/src/go-pkcs12&lt;/code&gt; — fixed in 0.7.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Users who decode PKCS#12 files from untrusted sources and rely on the password for authentication can be tricked into accepting malicious PKCS#12 files.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/SSLMate/go-pkcs12/security/advisories/GHSA-mpwr-8vm7-h73f"&gt;https://github.com/SSLMate/go-pkcs12/security/advisories/GHSA-mpwr-8vm7-h73f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SSLMate/go-pkcs12/commit/03c441f6b0267f695ca02464133c0b373bf4dd55"&gt;https://github.com/SSLMate/go-pkcs12/commit/03c441f6b0267f695ca02464133c0b373bf4dd55&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5052"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5062: Lack of limit on tile sizes in x/image/tiff in golang.org/x/image</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5062</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5062"/>
+    <published>2026-06-18T22:50:55Z</published>
+    <updated>2026-06-26T13:44:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46602"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Lack of limit on tile sizes in x/image/tiff in golang.org/x/image&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46602&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/image&lt;/code&gt; — fixed in 0.43.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The TIFF decoder does not set a limit on the size of tiles in tiled images, permitting a malicious or corrupt image containing a very large tile to cause unbounded memory consumption.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/788422"&gt;https://go.dev/cl/788422&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79905"&gt;https://go.dev/issue/79905&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5062"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5061: Panic on VP8 alpha channel size mismatch in x/image/webp in golang.org/x/image</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5061</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5061"/>
+    <published>2026-06-18T22:46:58Z</published>
+    <updated>2026-06-26T13:44:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46601"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Panic on VP8 alpha channel size mismatch in x/image/webp in golang.org/x/image&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46601&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/image&lt;/code&gt; — fixed in 0.43.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The webp decoder can panic when processing a VP8 chunk with dimensions that do not match the canvas size.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/787681"&gt;https://go.dev/cl/787681&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79869"&gt;https://go.dev/issue/79869&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5061"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-4337: Unexpected session resumption in crypto/tls</title>
     <id>https://osv.dev/vulnerability/GO-2026-4337</id>
@@ -1037,24 +1489,6 @@ Stored cross-site scripting (XSS) via crafted metric names in the Prometheus web
 * **Old React UI + New Mantine UI:** When a user hovers over a chart tooltip on the Graph page, metric names containing HTML/JavaScript are injected into `innerHTML` without escaping, causing arbitrary script execution in the user&amp;#x27;s browser.
 * **Old React UI only:** When a user opens the Metric Explorer (globe icon next to the PromQL expression input field), and a metric name containing HTML/JavaScript is rendered in the fuzzy search results, it is injected into `innerHTML` without escaping, causing arbitrary script execution in the user&amp;#x27;s browser.
 * **Old React UI only:** When a user views a heatmap chart and hovers over a cell, the `le` label values of the underlying histogram buckets are in…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99"&gt;https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40179"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18506"&gt;https://github.com/prometheus/prometheus/pull/18506&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c"&gt;https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus"&gt;https://github.com/prometheus/prometheus&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vffh-x6r8-xx99"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GO-2026-5662: Prometheus has Stored XSS via metric names and label values in Prometheus web UI tooltips and metrics explorer in github.com/prometheus/prometheus</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5662</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5662"/>
-    <published>2026-06-25T22:34:38Z</published>
-    <updated>2026-06-25T23:11:46Z</updated>
-    <category term="Go"/>
-    <category term="BIT-prometheus-2026-40179"/>
-    <category term="CVE-2026-40179"/>
-    <category term="GHSA-vffh-x6r8-xx99"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Prometheus has Stored XSS via metric names and label values in Prometheus web UI tooltips and metrics explorer in github.com/prometheus/prometheus&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-prometheus-2026-40179, CVE-2026-40179, GHSA-vffh-x6r8-xx99&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 0.311.2-0.20260410083055-07c6232d159b&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Prometheus has Stored XSS via metric names and label values in Prometheus web UI tooltips and metrics explorer in github.com/prometheus/prometheus.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: .&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99"&gt;https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40179"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c"&gt;https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18506"&gt;https://github.com/prometheus/prometheus/pull/18506&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5662"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-q2pw-xx38-p64j: melange has Path Traversal via .PKGINFO in --persist-lint-results</title>
@@ -2187,625 +2621,5 @@ The Orbit agent&amp;#x27;s FileVault disk encryption key rotation flow on collec
 ## Impact
 
 - Local privilege escalation to root: Any unprivileged local user on a managed endpoint can execute arbitrary commands …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fleetdm/fleet/security/advisories/GHSA-rphv-h674-5hp2"&gt;https://github.com/fleetdm/fleet/security/advisories/GHSA-rphv-h674-5hp2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fleetdm/fleet"&gt;https://github.com/fleetdm/fleet&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rphv-h674-5hp2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-v549-xx3c-6pc8: Mattermost doesn't check the create_post channel permission during post edit operations</title>
-    <id>https://osv.dev/vulnerability/GHSA-v549-xx3c-6pc8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v549-xx3c-6pc8"/>
-    <published>2026-05-18T09:31:47Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-3637"/>
-    <category term="GO-2026-5651"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Mattermost doesn&amp;#x27;t check the create_post channel permission during post edit operations&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-3637, GO-2026-5651&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost/server/v8&lt;/code&gt; — fixed in 10.11.14&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost/server/v8&lt;/code&gt; — fixed in 11.4.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost/server/v8&lt;/code&gt; — fixed in 8.0.0-20260316171743-090408f09f53&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost/server/v8&lt;/code&gt; — fixed in 11.5.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 5.3.2-0.20260316171743-090408f09f53&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Mattermost versions 11.5.x &amp;lt;= 11.5.1, 10.11.x &amp;lt;= 10.11.13, 11.4.x &amp;lt;= 11.4.3 fail to check the create_post channel permission during post edit operations which allows an authenticated attacker with revoked posting privileges to modify their existing posts via direct API requests to the post update and patch endpoints.. Mattermost Advisory ID: MMSA-2026-00627&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-3637"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-3637&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattermost/mattermost/commit/090408f09f53ffc9afc6c65c7c7c1fd3a8cd22f3"&gt;https://github.com/mattermost/mattermost/commit/090408f09f53ffc9afc6c65c7c7c1fd3a8cd22f3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattermost/mattermost"&gt;https://github.com/mattermost/mattermost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://mattermost.com/security-updates"&gt;https://mattermost.com/security-updates&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v549-xx3c-6pc8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-xwcr-wm99-g9jc: Algernon: handler.lua discovery walks parent directories above the server root</title>
-    <id>https://osv.dev/vulnerability/GHSA-xwcr-wm99-g9jc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xwcr-wm99-g9jc"/>
-    <published>2026-05-19T14:36:18Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-45721"/>
-    <category term="GO-2026-5772"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Algernon: handler.lua discovery walks parent directories above the server root&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45721, GO-2026-5772&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/xyproto/algernon&lt;/code&gt; — fixed in 1.17.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-When Algernon is asked for any URL path that resolves to a directory *without* an index file, `DirPage` walks **upward through parent directories — past the configured server root** — looking for a file named `handler.lua` to execute as the request handler. The loop terminates only after 100 ancestor steps or when `filepath.Dir` returns `.`, so on any absolute server-root path the search reaches the filesystem root (`/` on Unix, drive letter on Windows). The first `handler.lua` it finds is loaded into the Lua interpreter with the full Algernon API exposed — including `run3()`, `httpclient`, `os.execute`, `io.popen`, `PQ`, `MSSQL`, raw filesystem access, and the userstate database. Any process that can write `handler.lua` anywhere in a parent directory of the server root obtain…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/xyproto/algernon/security/advisories/GHSA-xwcr-wm99-g9jc"&gt;https://github.com/xyproto/algernon/security/advisories/GHSA-xwcr-wm99-g9jc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/xyproto/algernon"&gt;https://github.com/xyproto/algernon&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xwcr-wm99-g9jc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-p9mg-74mg-cwwr: free5GC's SMF UPI DELETE /upi/v1/upNodesLinks/{ref} panics on AN-node deletion via nil UPF dereference; unauthenticated, state-mutating</title>
-    <id>https://osv.dev/vulnerability/GHSA-p9mg-74mg-cwwr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p9mg-74mg-cwwr"/>
-    <published>2026-05-08T23:01:56Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-44328"/>
-    <category term="GO-2026-5537"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;free5GC&amp;#x27;s SMF UPI DELETE /upi/v1/upNodesLinks/{ref} panics on AN-node deletion via nil UPF dereference; unauthenticated, state-mutating&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44328, GO-2026-5537&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/free5gc/smf&lt;/code&gt; — fixed in 1.4.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-free5GC&amp;#x27;s SMF mounts the `UPI` management route group without inbound OAuth2 middleware (same root cause as the broader UPI auth gap reported in free5gc/free5gc#887). On top of that, the `DELETE /upi/v1/upNodesLinks/{upNodeRef}` handler unconditionally dereferences `upNode.UPF` after the type-guarded async release, even though `AN`-typed nodes are constructed without a `UPF` object. As a result, a single unauthenticated `DELETE /upi/v1/upNodesLinks/gNB1` request crashes the handler with a nil-pointer panic AND mutates the in-memory user-plane topology before panicking (the `UpNodeDelete(upNodeRef)` line runs first). This is an unauthenticated, state-mutating panic-DoS sink that an off-path network attacker can trigger by name against any AN entry.
-
-### Details
-Validated against…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/free5gc/security/advisories/GHSA-p9mg-74mg-cwwr"&gt;https://github.com/free5gc/free5gc/security/advisories/GHSA-p9mg-74mg-cwwr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44328"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44328&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/free5gc/issues/905"&gt;https://github.com/free5gc/free5gc/issues/905&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/smf/pull/199"&gt;https://github.com/free5gc/smf/pull/199&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/smf/commit/b57bc48081c3d3a2f333d02eb78e4fd31a120deb"&gt;https://github.com/free5gc/smf/commit/b57bc48081c3d3a2f333d02eb78e4fd31a120deb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/free5gc"&gt;https://github.com/free5gc/free5gc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p9mg-74mg-cwwr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-w5cv-pw74-4rxc: opentelemetry-collector-contrib: githubreceiver silently ignores configured required_headers authentication</title>
-    <id>https://osv.dev/vulnerability/GHSA-w5cv-pw74-4rxc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w5cv-pw74-4rxc"/>
-    <published>2026-06-18T15:05:14Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-55701"/>
-    <category term="GO-2026-5690"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;opentelemetry-collector-contrib: githubreceiver silently ignores configured required_headers authentication&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55701, GO-2026-5690&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/open-telemetry/opentelemetry-collector-contrib/receiver/githubreceiver&lt;/code&gt; — fixed in 0.151.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## githubreceiver Silently Ignores Configured required_headers Authentication
-
-### Summary
-
-The githubreceiver webhook handler does not enforce the `required_headers` configuration. Headers are validated at startup (config rejects empty keys/values) but never checked on incoming requests. This follows the same pattern as [GHSA-prf6-xjxh-p698](https://github.com/open-telemetry/opentelemetry-collector-contrib/security/advisories/GHSA-prf6-xjxh-p698) (awsfirehosereceiver auth bypass). Verified against current main.
-
-### Details
-
-In `receiver/githubreceiver/config.go`, the `RequiredHeaders` field is defined (line 45) and validated at startup (lines 93-101). But `receiver/githubreceiver/trace_receiver.go` in `handleReq()` (lines 131-185) never references `RequiredHeaders`.
-
-The gitlabreceiver e…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/security/advisories/GHSA-w5cv-pw74-4rxc"&gt;https://github.com/open-telemetry/opentelemetry-collector-contrib/security/advisories/GHSA-w5cv-pw74-4rxc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-collector-contrib"&gt;https://github.com/open-telemetry/opentelemetry-collector-contrib&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w5cv-pw74-4rxc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-wjxp-xrpv-xpff: Tekton Pipelines: Git resolver API mode leaks system-configured API token to user-controlled serverURL</title>
-    <id>https://osv.dev/vulnerability/GHSA-wjxp-xrpv-xpff</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wjxp-xrpv-xpff"/>
-    <published>2026-04-21T18:52:18Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-40161"/>
-    <category term="GO-2026-5711"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Tekton Pipelines: Git resolver API mode leaks system-configured API token to user-controlled serverURL&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40161, GO-2026-5711&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.3.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.6.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.9.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/tektoncd/pipeline&lt;/code&gt; — fixed in 1.11.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The Tekton Pipelines git resolver in API mode sends the system-configured Git API token to a user-controlled `serverURL` when the user omits the `token` parameter. A tenant with TaskRun or PipelineRun create permission can exfiltrate the shared API token (GitHub PAT, GitLab token, etc.) by pointing `serverURL` to an attacker-controlled endpoint.
-
-### Details
-
-The git resolver&amp;#x27;s `ResolveAPIGit()` function in `pkg/resolution/resolver/git/resolver.go` constructs an SCM client using the user-supplied `serverURL` and a token obtained via `getAPIToken()`.
-
-When the user provides `serverURL` but omits the `token` parameter:
-
-1. `getSCMTypeAndServerURL()` reads `serverURL` directly from user params (`params[ServerURLParam]`) with no validation against the system-configured URL.
-
-2. `s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline/security/advisories/GHSA-wjxp-xrpv-xpff"&gt;https://github.com/tektoncd/pipeline/security/advisories/GHSA-wjxp-xrpv-xpff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40161"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40161&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline/issues/9608"&gt;https://github.com/tektoncd/pipeline/issues/9608&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline/issues/9609"&gt;https://github.com/tektoncd/pipeline/issues/9609&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tektoncd/pipeline"&gt;https://github.com/tektoncd/pipeline&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wjxp-xrpv-xpff"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rx4h-526q-4458: SiYuan: Stored XSS in Attribute View Gallery/Kanban Cover Rendering Allows Arbitrary Command Execution in Desktop Client</title>
-    <id>https://osv.dev/vulnerability/GHSA-rx4h-526q-4458</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rx4h-526q-4458"/>
-    <published>2026-03-31T23:28:23Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-34448"/>
-    <category term="GO-2026-5644"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Stored XSS in Attribute View Gallery/Kanban Cover Rendering Allows Arbitrary Command Execution in Desktop Client&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34448, GO-2026-5644&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 3.6.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-An attacker who can place a malicious URL in an Attribute View `mAsse` field can trigger stored XSS when a victim opens the Gallery or Kanban view with “Cover From -&amp;gt; Asset Field” enabled. The vulnerable code accepts arbitrary `http(s)` URLs without extensions as images, stores the attacker-controlled string in `coverURL`, and injects it directly into an `&amp;lt;img src=&amp;quot;...&amp;quot;&amp;gt;` attribute without escaping. In the Electron desktop client, the injected JavaScript executes with `nodeIntegration` enabled and `contextIsolation` disabled, so the XSS reaches arbitrary OS command execution under the victim’s account.
-
-### Details
-The vulnerable flow is:
-
-1. `IsPossiblyImage(assetPath)` accepts arbitrary `http(s)` URLs without validating that they are safe image URLs.
-2. When an Attribute View…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-rx4h-526q-4458"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-rx4h-526q-4458&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34448"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34448&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/issues/17246"&gt;https://github.com/siyuan-note/siyuan/issues/17246&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/releases/tag/v3.6.2"&gt;https://github.com/siyuan-note/siyuan/releases/tag/v3.6.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rx4h-526q-4458"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-v7xq-3wx6-fqc2: In monetr, unauthenticated Stripe webhook reads attacker-sized request bodies before signature validation</title>
-    <id>https://osv.dev/vulnerability/GHSA-v7xq-3wx6-fqc2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v7xq-3wx6-fqc2"/>
-    <published>2026-04-14T00:03:36Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-40481"/>
-    <category term="GO-2026-5654"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;In monetr, unauthenticated Stripe webhook reads attacker-sized request bodies before signature validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40481, GO-2026-5654&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/monetr/monetr&lt;/code&gt; — fixed in 1.12.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The public Stripe webhook endpoint fully reads the request body into memory before validating the Stripe signature. A remote unauthenticated attacker can send oversized POST bodies and cause substantial memory growth, leading to denial of service.
-
-### Details
-
-When Stripe webhooks are enabled, the Stripe webhook route is reachable without authentication. The handler only requires that a `Stripe-Signature` header be present, then buffers the entire request body in memory and only afterward attempts Stripe signature verification.
-
-Because body buffering happens before signature validation, memory consumption is controlled by the attacker-supplied payload size even when the signature is invalid. Large requests or repeated requests can exhaust available memory and make the servic…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/monetr/monetr/security/advisories/GHSA-v7xq-3wx6-fqc2"&gt;https://github.com/monetr/monetr/security/advisories/GHSA-v7xq-3wx6-fqc2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40481"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40481&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/monetr/monetr"&gt;https://github.com/monetr/monetr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/monetr/monetr/releases/tag/v1.12.4"&gt;https://github.com/monetr/monetr/releases/tag/v1.12.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v7xq-3wx6-fqc2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-r48c-v28r-pf6v: MCP Registry has an unauthenticated SSRF: HTTP namespace verification dials 6to4 / NAT64 / site-local IPv6 addresses, bypassing private-address allowlist</title>
-    <id>https://osv.dev/vulnerability/GHSA-r48c-v28r-pf6v</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r48c-v28r-pf6v"/>
-    <published>2026-05-08T17:20:56Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-44430"/>
-    <category term="GO-2026-5607"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;MCP Registry has an unauthenticated SSRF: HTTP namespace verification dials 6to4 / NAT64 / site-local IPv6 addresses, bypassing private-address allowlist&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44430, GO-2026-5607&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:L/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/modelcontextprotocol/registry&lt;/code&gt; — fixed in 1.7.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The Registry&amp;#x27;s HTTP-based namespace verification (`POST /v0/auth/http`, `POST /v0.1/auth/http`) uses `safeDialContext` (`internal/api/handlers/v0/auth/http.go:67-110`) to refuse dialling private/internal addresses when fetching the well-known public-key file from a publisher-supplied domain. The blocklist (`isBlockedIP`, lines 125-133) relies entirely on Go stdlib&amp;#x27;s `IsLoopback / IsPrivate / IsLinkLocalUnicast / IsMulticast / IsUnspecified` plus a manual CGNAT range. **None of these cover IPv6 6to4 (`2002::/16`), NAT64 (`64:ff9b::/96` and `64:ff9b:1::/48` per RFC 8215), or deprecated site-local (`fec0::/10`)** — all of which encode arbitrary IPv4 in the address bits and tunnel to RFC1918 / cloud-metadata services on dual-stack / NAT64-enabled hosts.
-
-This is the same CWE-918 S…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/registry/security/advisories/GHSA-r48c-v28r-pf6v"&gt;https://github.com/modelcontextprotocol/registry/security/advisories/GHSA-r48c-v28r-pf6v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44430"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44430&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/registry/pull/1250"&gt;https://github.com/modelcontextprotocol/registry/pull/1250&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/registry/commit/f5f40bd98084466eaf18fe48ea62a0d534caa774"&gt;https://github.com/modelcontextprotocol/registry/commit/f5f40bd98084466eaf18fe48ea62a0d534caa774&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/registry"&gt;https://github.com/modelcontextprotocol/registry&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.7"&gt;https://github.com/modelcontextprotocol/registry/releases/tag/v1.7.7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r48c-v28r-pf6v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-pwx3-qcgw-vh7h: Gogs Vulnerable to CSRF Leading to Organization Owner Takeover</title>
-    <id>https://osv.dev/vulnerability/GHSA-pwx3-qcgw-vh7h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pwx3-qcgw-vh7h"/>
-    <published>2026-06-23T00:02:44Z</published>
-    <updated>2026-06-25T23:11:38Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-52800"/>
-    <category term="GO-2026-5556"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Gogs Vulnerable to CSRF Leading to Organization Owner Takeover&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52800, GO-2026-5556&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gogs.io/gogs&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-In **Gogs 0.14.1**, organization team member management can be performed via **GET requests without CSRF protection**.
-If a victim who is an **organization owner** is logged in and is tricked into visiting a crafted link, an attacker-controlled user can be added to the **Owners** team. As a result, the attacker gains **organization owner–equivalent privileges**.
-
----
-
-## Description
-
-When a victim is logged in as an organization owner, **team member management endpoints are exposed via routes reachable by GET requests**, allowing state-changing operations without a CSRF token.
-
-### Team action route allows GET
-
-`internal/cmd/web.go:390`
-
-```go
-m.Route(&amp;quot;/teams/:team/action/:action&amp;quot;, &amp;quot;GET,POST&amp;quot;, org.TeamsAction)
-```
-
-### CSRF validation is applied only to POST requests
-
-Because t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/security/advisories/GHSA-pwx3-qcgw-vh7h"&gt;https://github.com/gogs/gogs/security/advisories/GHSA-pwx3-qcgw-vh7h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/pull/8321"&gt;https://github.com/gogs/gogs/pull/8321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/commit/070df61ecd14c75b0aca93090f860b87ab17ac19"&gt;https://github.com/gogs/gogs/commit/070df61ecd14c75b0aca93090f860b87ab17ac19&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs"&gt;https://github.com/gogs/gogs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gogs/gogs/releases/tag/v0.14.3"&gt;https://github.com/gogs/gogs/releases/tag/v0.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pwx3-qcgw-vh7h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-r7w7-mmxr-47r9: Incus has a Nil-Pointer Dereference via Custom Volume Import</title>
-    <id>https://osv.dev/vulnerability/GHSA-r7w7-mmxr-47r9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r7w7-mmxr-47r9"/>
-    <published>2026-05-04T17:45:21Z</published>
-    <updated>2026-06-25T23:11:37Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-40197"/>
-    <category term="GO-2026-5612"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Incus has a Nil-Pointer Dereference via Custom Volume Import&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40197, GO-2026-5612&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/lxc/incus/v6/cmd/incusd&lt;/code&gt; — fixed in 7.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-Missing validation logic in the storage volume import logic allows an authenticated user with access to Incus&amp;#x27; storage volume feature to cause the Incus daemon to crash. Repeated use of this issue can be used to keep Incus offline causing a denial of service.
-
-### Details
-The custom volume backup import subsystem contains a nil-pointer dereference vulnerability that allows an authenticated attacker to crash the daemon during import operations.
-
-In the snapshot import loop, the daemon iterates over entries from srcBackup.Config.VolumeSnapshots, which is a slice of pointers. The implementation assumes that each slice element is non-nil and immediately dereferences it through expressions such as snapshot.Name, snapshot.Config, snapshot.Description, snapshot.CreatedAt, and *snapsho…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus/security/advisories/GHSA-r7w7-mmxr-47r9"&gt;https://github.com/lxc/incus/security/advisories/GHSA-r7w7-mmxr-47r9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40197"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40197&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus"&gt;https://github.com/lxc/incus&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r7w7-mmxr-47r9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-xhf5-7wjv-pqxp: containerd CRI — image-config `LABEL` flows to restart-monitor `binary://` logger: host-root command execution from an image pull</title>
-    <id>https://osv.dev/vulnerability/GHSA-xhf5-7wjv-pqxp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xhf5-7wjv-pqxp"/>
-    <published>2026-06-19T19:35:31Z</published>
-    <updated>2026-06-25T23:11:37Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-53488"/>
-    <category term="GO-2026-5758"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;containerd CRI — image-config `LABEL` flows to restart-monitor `binary://` logger: host-root command execution from an image pull&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53488, GO-2026-5758&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd&lt;/code&gt; — fixed in 1.7.33&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.0.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.1.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.2.5&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-A bug was found in containerd where the CRI plugin propagates labels from an image config (`LABEL` instruction in Dockerfile) to a container without validation. This may result in executing an arbitrary command on the host, via a plugin that consumes container labels for some operations.
-
-### Patches
-This bug has been fixed in the following containerd versions:
-
-* 2.3.2
-* 2.2.5
-* 2.1.9
-* 2.0.10
-* 1.7.33
-
-Users should update to these versions to resolve the issue.
-
-### Workarounds
-Ensure that only trusted images are used.
-
-### Credits
-The containerd project would like to thank Anthropic Research, in collaboration with Claude, the GKE Security Team using Gemini, and Robert Prast (@robertprast) for independently discovering and responsibly disclosing this issue in accordance with t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/security/advisories/GHSA-xhf5-7wjv-pqxp"&gt;https://github.com/containerd/containerd/security/advisories/GHSA-xhf5-7wjv-pqxp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd"&gt;https://github.com/containerd/containerd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xhf5-7wjv-pqxp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-j9jx-hp4c-ghhh: File Browser has incorrect access control for public directory shares via rule path rebasing</title>
-    <id>https://osv.dev/vulnerability/GHSA-j9jx-hp4c-ghhh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j9jx-hp4c-ghhh"/>
-    <published>2026-06-12T21:53:28Z</published>
-    <updated>2026-06-25T23:11:37Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54091"/>
-    <category term="GO-2026-5458"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;File Browser has incorrect access control for public directory shares via rule path rebasing&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54091, GO-2026-5458&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/filebrowser/filebrowser/v2&lt;/code&gt; — fixed in 2.63.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/filebrowser/filebrowser&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-File Browser&amp;#x27;s public share handlers rebase the share owner&amp;#x27;s filesystem root to the shared directory and then evaluate descendant paths against the owner&amp;#x27;s global and per-user rules using the rebased relative path instead of the original path relative to the owner&amp;#x27;s scope.
-
-As a result, an attacker who knows a public directory share URL can access files and subdirectories that the owner explicitly blocked with rules, as long as those blocked paths are located underneath the shared directory. In the simplest case this is an unauthenticated information disclosure through `GET /api/public/share/*` and `GET /api/public/dl/*`.
-
-### Details
-The public share flow first resolves the original shared path under the owner&amp;#x27;s filesystem, but then switches `d.user.Fs` to a new `BasePathFs` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/security/advisories/GHSA-j9jx-hp4c-ghhh"&gt;https://github.com/filebrowser/filebrowser/security/advisories/GHSA-j9jx-hp4c-ghhh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/commit/e07c59df0b850f5924d5b1683e8609661ddcf534"&gt;https://github.com/filebrowser/filebrowser/commit/e07c59df0b850f5924d5b1683e8609661ddcf534&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser"&gt;https://github.com/filebrowser/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/releases/tag/v2.63.6"&gt;https://github.com/filebrowser/filebrowser/releases/tag/v2.63.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j9jx-hp4c-ghhh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-v8j7-hp7c-738f: Kubetail has a Cross-Site WebSocket Hijacking issue that allows attacker to read Kubernetes logs from authenticated users</title>
-    <id>https://osv.dev/vulnerability/GHSA-v8j7-hp7c-738f</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v8j7-hp7c-738f"/>
-    <published>2026-05-07T02:34:32Z</published>
-    <updated>2026-06-25T23:11:37Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-44514"/>
-    <category term="GO-2026-5656"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Kubetail has a Cross-Site WebSocket Hijacking issue that allows attacker to read Kubernetes logs from authenticated users&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44514, GO-2026-5656&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kubetail-org/kubetail/modules/dashboard&lt;/code&gt; — fixed in 0.14.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/kubetail-org/kubetail/modules/cli&lt;/code&gt; — fixed in 0.16.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Kubetail&amp;#x27;s dashboard exposes WebSocket endpoints that did not adequately validate the Origin header on connection upgrade. A malicious web page visited by a user with an active Kubetail session could open a WebSocket to the user&amp;#x27;s dashboard and read their Kubernetes logs in real time. This is a Cross-Site WebSocket Hijacking (CSWSH) vulnerability and affects both the desktop deployment (default http://localhost:7500) and cluster deployments (typically behind an Ingress with HTTP basic auth).
-
-### Impact
-
-An attacker who can convince an authenticated Kubetail user to visit a page they control can:
-
-- Establish a WebSocket connection to the victim&amp;#x27;s dashboard from the attacker&amp;#x27;s origin
-- Stream container logs the victim has access to via the Kubernetes API
-- Exfiltrate the conte…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kubetail-org/kubetail/security/advisories/GHSA-v8j7-hp7c-738f"&gt;https://github.com/kubetail-org/kubetail/security/advisories/GHSA-v8j7-hp7c-738f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44514"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44514&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kubetail-org/kubetail"&gt;https://github.com/kubetail-org/kubetail&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v8j7-hp7c-738f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-q4gv-pjmh-c735: Open Cluster Management (OCM): Cross-cluster privilege escalation via improper Kubernetes client certificate renewal validation</title>
-    <id>https://osv.dev/vulnerability/GHSA-q4gv-pjmh-c735</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q4gv-pjmh-c735"/>
-    <published>2026-04-07T15:30:52Z</published>
-    <updated>2026-06-25T23:11:37Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-4740"/>
-    <category term="GO-2026-5564"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open Cluster Management (OCM): Cross-cluster privilege escalation via improper Kubernetes client certificate renewal validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-4740, GO-2026-5564&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-cluster-management.io/ocm&lt;/code&gt; — fixed in 1.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A flaw was found in Open Cluster Management (OCM), the technology underlying Red Hat Advanced Cluster Management (ACM). Improper validation of Kubernetes client certificate renewal allows a managed cluster administrator to forge a client certificate that can be approved by the OCM controller. This enables cross-cluster privilege escalation and may allow an attacker to gain control over other managed clusters, including the hub cluster.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-4740"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-4740&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-cluster-management-io/ocm/commit/9e70cc1e21a15239c81111062c0b37df4b5a8026"&gt;https://github.com/open-cluster-management-io/ocm/commit/9e70cc1e21a15239c81111062c0b37df4b5a8026&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-4740"&gt;https://access.redhat.com/security/cve/CVE-2026-4740&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.arfevrier.fr/open-cluster-management-cross-cluster-escape"&gt;https://blog.arfevrier.fr/open-cluster-management-cross-cluster-escape&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2450590"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2450590&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-cluster-management-io/OCM"&gt;https://github.com/open-cluster-management-io/OCM&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q4gv-pjmh-c735"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rpgq-m5fp-32wr: Portainer Has an Arbitrary File Read via Git Symlink Injection in Stack Auto-Update</title>
-    <id>https://osv.dev/vulnerability/GHSA-rpgq-m5fp-32wr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rpgq-m5fp-32wr"/>
-    <published>2026-05-14T16:23:56Z</published>
-    <updated>2026-06-25T23:11:37Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-44881"/>
-    <category term="GO-2026-5633"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Portainer Has an Arbitrary File Read via Git Symlink Injection in Stack Auto-Update&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44881, GO-2026-5633&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/portainer/portainer&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/portainer/portainer&lt;/code&gt; — fixed in 2.39.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/portainer/portainer&lt;/code&gt; — fixed in 2.41.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-Portainer supports deploying stacks from Git repositories. When a Git-backed stack is created or updated, Portainer clones the repository using `go-git` v5, which translates Git blob entries with mode `0o120000` (symlink) into real OS symlinks on the host filesystem via `os.Symlink`. The only entry blocked from becoming a symlink is `.gitmodules`; every other path — including `docker-compose.yml`, which Portainer treats as the stack entry point — is created as a symlink without validation.
-
-Portainer&amp;#x27;s `GET /api/stacks/{id}/file` endpoint then reads the stack entry point with `os.ReadFile`, which follows OS symlinks transparently. A repository containing `docker-compose.yml` as a symlink to an arbitrary filesystem path (for example `/etc/passwd` or a mounted Kubernetes service a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/portainer/portainer/security/advisories/GHSA-rpgq-m5fp-32wr"&gt;https://github.com/portainer/portainer/security/advisories/GHSA-rpgq-m5fp-32wr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44881"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44881&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/portainer/portainer"&gt;https://github.com/portainer/portainer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/portainer/portainer/releases/tag/2.33.8"&gt;https://github.com/portainer/portainer/releases/tag/2.33.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/portainer/portainer/releases/tag/2.39.2"&gt;https://github.com/portainer/portainer/releases/tag/2.39.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/portainer/portainer/releases/tag/2.41.0"&gt;https://github.com/portainer/portainer/releases/tag/2.41.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rpgq-m5fp-32wr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-xw59-hvm2-8pj6: DNS Rebinding Protection Disabled by Default in Model Context Protocol Go SDK for Servers Running on Localhost</title>
-    <id>https://osv.dev/vulnerability/GHSA-xw59-hvm2-8pj6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xw59-hvm2-8pj6"/>
-    <published>2026-04-01T21:09:09Z</published>
-    <updated>2026-06-25T23:11:36Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-34742"/>
-    <category term="GO-2026-5771"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;DNS Rebinding Protection Disabled by Default in Model Context Protocol Go SDK for Servers Running on Localhost&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34742, GO-2026-5771&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/modelcontextprotocol/go-sdk&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The Model Context Protocol (MCP) Go SDK does not enable DNS rebinding protection by default for HTTP-based servers. When an HTTP-based MCP server is run on localhost without authentication with `StreamableHTTPHandler` or `SSEHandler`, a malicious website could exploit DNS rebinding to bypass same-origin policy restrictions and send requests to the local MCP server. This could allow an attacker to invoke tools or access resources exposed by the MCP server on behalf of the user in those limited circumstances.
-
-Note that running HTTP-based MCP servers locally without authentication is not recommended per MCP security best practices. This issue does not affect servers using stdio transport.
-
-Servers created via `StreamableHTTPHandler` or `SSEHandler` now have this protection enabled by default…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/go-sdk/security/advisories/GHSA-xw59-hvm2-8pj6"&gt;https://github.com/modelcontextprotocol/go-sdk/security/advisories/GHSA-xw59-hvm2-8pj6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34742"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34742&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/go-sdk/pull/760"&gt;https://github.com/modelcontextprotocol/go-sdk/pull/760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/go-sdk/commit/67bd3f2e2b53ce11a16db8d976cdb8ff1e986b6d"&gt;https://github.com/modelcontextprotocol/go-sdk/commit/67bd3f2e2b53ce11a16db8d976cdb8ff1e986b6d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/go-sdk"&gt;https://github.com/modelcontextprotocol/go-sdk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/go-sdk/releases/tag/v1.4.0"&gt;https://github.com/modelcontextprotocol/go-sdk/releases/tag/v1.4.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xw59-hvm2-8pj6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-gx38-8h33-pmxr: free5gc UDR fail-open request handling in PolicyDataSubsToNotifySubsIdPut may allow unintended subscription updates after input errors</title>
-    <id>https://osv.dev/vulnerability/GHSA-gx38-8h33-pmxr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gx38-8h33-pmxr"/>
-    <published>2026-04-14T20:00:59Z</published>
-    <updated>2026-06-25T23:11:36Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-40249"/>
-    <category term="GO-2026-5407"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;free5gc UDR fail-open request handling in PolicyDataSubsToNotifySubsIdPut may allow unintended subscription updates after input errors&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40249, GO-2026-5407&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/free5gc/udr&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-A fail-open request handling flaw in the UDR service causes the `/nudr-dr/v2/policy-data/subs-to-notify/{subsId}` PUT handler to continue processing requests even after request body retrieval or deserialization errors.
-
-This may allow unintended modification of existing Policy Data notification subscriptions with invalid, empty, or partially processed input, depending on downstream processor behavior.
-
-### Details
-The endpoint `PUT /nudr-dr/v2/policy-data/subs-to-notify/{subsId}` is intended to update an existing Policy Data notification subscription only after the HTTP request body has been successfully read and parsed into a valid `PolicyDataSubscription` object. [file:93]
-
-In the free5GC UDR implementation, the function `HandlePolicyDataSubsToNotifySubsIdPut` in`NFs/udr/inte…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/free5gc/security/advisories/GHSA-gx38-8h33-pmxr"&gt;https://github.com/free5gc/free5gc/security/advisories/GHSA-gx38-8h33-pmxr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40249"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40249&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/udr"&gt;https://github.com/free5gc/udr&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gx38-8h33-pmxr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-m9hq-h476-h2g8: Pyroscope Exposes Storage Secret</title>
-    <id>https://osv.dev/vulnerability/GHSA-m9hq-h476-h2g8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m9hq-h476-h2g8"/>
-    <published>2026-04-15T21:30:18Z</published>
-    <updated>2026-06-25T23:11:36Z</updated>
-    <category term="Go"/>
-    <category term="BIT-grafana-pyroscope-2025-41118"/>
-    <category term="CVE-2025-41118"/>
-    <category term="GO-2026-5501"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pyroscope Exposes Storage Secret&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-grafana-pyroscope-2025-41118, CVE-2025-41118, GO-2026-5501&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/pyroscope&lt;/code&gt; — fixed in 1.15.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/pyroscope&lt;/code&gt; — fixed in 1.16.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pyroscope is an open-source continuous profiling database. The database supports various storage backends, including Tencent Cloud Object Storage (COS).
-
-If the database is configured to use Tencent COS as the storage backend, an attacker could extract the secret_key configuration value from the Pyroscope API.
-
-To exploit this vulnerability, an attacker needs direct access to the Pyroscope API. We highly recommend limiting the public internet exposure of all our databases, such that they are only accessible by trusted users or internal systems.
-
-This vulnerability is fixed in versions:
-
-1.15.x: 1.15.2 and above.
-1.16.x: 1.16.1 and above.
-1.17.x: 1.17.0 and above (i.e. all versions).
-
-Thanks to Théo Cusnir for reporting this vulnerability to us via our bug bounty program.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-41118"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-41118&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/pyroscope"&gt;https://github.com/grafana/pyroscope&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://grafana.com/security/security-advisories/cve-2025-41118"&gt;https://grafana.com/security/security-advisories/cve-2025-41118&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m9hq-h476-h2g8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GO-2026-5501: Pyroscope Exposes Storage Secret in github.com/grafana/pyroscope</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5501</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5501"/>
-    <published>2026-06-25T22:34:31Z</published>
-    <updated>2026-06-25T23:11:36Z</updated>
-    <category term="Go"/>
-    <category term="BIT-grafana-pyroscope-2025-41118"/>
-    <category term="CVE-2025-41118"/>
-    <category term="GHSA-m9hq-h476-h2g8"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pyroscope Exposes Storage Secret in github.com/grafana/pyroscope&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-grafana-pyroscope-2025-41118, CVE-2025-41118, GHSA-m9hq-h476-h2g8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/pyroscope&lt;/code&gt; — fixed in 1.15.2, 1.16.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pyroscope Exposes Storage Secret in github.com/grafana/pyroscope&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-m9hq-h476-h2g8"&gt;https://github.com/advisories/GHSA-m9hq-h476-h2g8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-41118"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-41118&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://grafana.com/security/security-advisories/cve-2025-41118"&gt;https://grafana.com/security/security-advisories/cve-2025-41118&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5501"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-q4w7-56hr-83rm: Nginx-UI Settings API Exposes Protected Secrets</title>
-    <id>https://osv.dev/vulnerability/GHSA-q4w7-56hr-83rm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q4w7-56hr-83rm"/>
-    <published>2026-05-06T17:01:04Z</published>
-    <updated>2026-06-25T23:11:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-42223"/>
-    <category term="GO-2026-5565"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx-UI Settings API Exposes Protected Secrets&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42223, GO-2026-5565&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/nginx-ui&lt;/code&gt; — fixed in 2.3.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The `GetSettings` API handler (`api/settings/settings.go:24-65`) serializes all settings structs to JSON and returns them to authenticated users. Many sensitive fields are tagged with `protected:&amp;quot;true&amp;quot;` - however, this tag is only enforced during writes (via `ProtectedFill` in `SaveSettings`) and is completely ignored during reads. This exposes 40+ protected fields including `JwtSecret` (enabling auth token forgery), `NodeSecret` (enabling cluster node impersonation), OIDC `ClientSecret` (enabling OAuth account takeover), and the IP whitelist configuration.
-
-### Details
-#### Vulnerable Code
-
-**`api/settings/settings.go:49-64` - GetSettings serializes all fields**
-
-```go
-c.JSON(http.StatusOK, gin.H{
-    &amp;quot;app&amp;quot;:       cSettings.AppSettings,
-    &amp;quot;server&amp;quot;:    cSettings.ServerSetting…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-q4w7-56hr-83rm"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-q4w7-56hr-83rm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42223"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.3.8"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.3.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q4w7-56hr-83rm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-vph7-r229-qxpf: Focalboard doesn't validate file ownership when serving uploaded files</title>
-    <id>https://osv.dev/vulnerability/GHSA-vph7-r229-qxpf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vph7-r229-qxpf"/>
-    <published>2026-04-03T15:30:31Z</published>
-    <updated>2026-06-25T23:11:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-28736"/>
-    <category term="GO-2026-5670"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Focalboard doesn&amp;#x27;t validate file ownership when serving uploaded files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-28736, GO-2026-5670&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/focalboard&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;** UNSUPPORTED WHEN ASSIGNED ** Focalboard version 8.0 fails to validate file ownership when serving uploaded files. This allows an authenticated attacker who knows a victim&amp;#x27;s fileID to read the content of the file. NOTE: Focalboard as a standalone product is not maintained and no fix will be issued.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-28736"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-28736&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattermost-community/focalboard"&gt;https://github.com/mattermost-community/focalboard&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vph7-r229-qxpf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-m5j3-4634-c2vq: Dasel: Index-out-of-range panic in dasel selector lexer on trailing backslash in quoted string</title>
-    <id>https://osv.dev/vulnerability/GHSA-m5j3-4634-c2vq</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m5j3-4634-c2vq"/>
-    <published>2026-05-19T20:08:12Z</published>
-    <updated>2026-06-25T23:11:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-46377"/>
-    <category term="GO-2026-5491"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Dasel: Index-out-of-range panic in dasel selector lexer on trailing backslash in quoted string&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46377, GO-2026-5491&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/tomwright/dasel/v3&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`dasel`&amp;#x27;s selector lexer panics with an index-out-of-range error when tokenizing a quoted string that ends with a trailing backslash (e.g., `&amp;quot;\` or `&amp;#x27;\`). A 2-byte input causes an immediate process crash via Go runtime panic.
-
-I confirmed the issue on `v3.3.1` (`fba653c7f248aff10f2b89fca93929b64707dfc8`) and on `master` commit `0dd6132e0c58edbd9b1a5f7ffd00dfab1e6085ad`. I also verified the same code path is present in `v3.0.0` (`648f83baf070d9e00db8ff312febef857ec090a3`). No fix is available yet.
-
-### Details
-
-The bug is in the escape sequence handler within `(*Tokenizer).parseCurRune` in [`selector/lexer/tokenize.go#L191-L194`](https://github.com/TomWright/dasel/blob/fba653c7f248aff10f2b89fca93929b64707dfc8/selector/lexer/tokenize.go#L191-L194):
-
-```go
-if p.src[pos] == &amp;#x27;\\&amp;#x27; {…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel/security/advisories/GHSA-m5j3-4634-c2vq"&gt;https://github.com/TomWright/dasel/security/advisories/GHSA-m5j3-4634-c2vq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel"&gt;https://github.com/TomWright/dasel&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m5j3-4634-c2vq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-98vh-x9cx-9cfp: Incus is affected by unbounded binary import disk exhaustion</title>
-    <id>https://osv.dev/vulnerability/GHSA-98vh-x9cx-9cfp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-98vh-x9cx-9cfp"/>
-    <published>2026-05-04T19:46:32Z</published>
-    <updated>2026-06-25T23:11:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-41685"/>
-    <category term="GO-2026-5280"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Incus is affected by unbounded binary import disk exhaustion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41685, GO-2026-5280&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/lxc/incus/v6/cmd/incusd&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-Uploads of large amount of data by authenticated users can run the Incus server out of disk space, potentially taking down the host system.
-
-The impact here is limited for anyone using `storage.images_volume` and `storage.backups_volume` as those users will have large uploads be stored on those volumes rather than directly on the host filesystem. This is the default behavior on IncusOS.
-
-### Details
-Multiple binary import paths accept application/octet-stream requests and stream the HTTP request body directly into temporary files on the host without any visible request-size limit on the upload path.
-
-When these endpoints receive binary content, the daemon routes the request body into import routines that create temporary files under daemon-controlled host storage locations and …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus/security/advisories/GHSA-98vh-x9cx-9cfp"&gt;https://github.com/lxc/incus/security/advisories/GHSA-98vh-x9cx-9cfp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41685"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41685&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus"&gt;https://github.com/lxc/incus&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lxc/incus/releases/tag/v7.0.0"&gt;https://github.com/lxc/incus/releases/tag/v7.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-98vh-x9cx-9cfp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-q8ch-jx67-q52x: Apache Camel K: Kubernetes namespace authorized users can create a Build resource</title>
-    <id>https://osv.dev/vulnerability/GHSA-q8ch-jx67-q52x</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q8ch-jx67-q52x"/>
-    <published>2026-05-21T15:34:09Z</published>
-    <updated>2026-06-25T23:11:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-45760"/>
-    <category term="GO-2026-5573"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Camel K: Kubernetes namespace authorized users can create a Build resource&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45760, GO-2026-5573&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/apache/camel-k/v2&lt;/code&gt; — fixed in 2.8.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/apache/camel-k/v2&lt;/code&gt; — fixed in 2.9.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/apache/camel-k/v2&lt;/code&gt; — fixed in 2.10.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(Externally Controlled Reference to a Resource in Another Sphere), (Authorization Bypass Through User-Controlled Key) vulnerability in Apache Camel K. Authorized users in a Kubernetes namespace can create a Build resource, controlling the Pod generation in a namespace of their choice, including the operator namespace.
-
-This issue affects Apache Camel K: from 2.0.0 before 2.8.1, from 2.9.0 before 2.9.2, from 2.10.0 before 2.10.1.
-
-Users are recommended to upgrade to version 2.10.1 (or 2.8.1 or 2.9.2), which fixes the issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45760"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/camel-k/pull/6626"&gt;https://github.com/apache/camel-k/pull/6626&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/camel-k/pull/6627"&gt;https://github.com/apache/camel-k/pull/6627&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/camel-k/pull/6629"&gt;https://github.com/apache/camel-k/pull/6629&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/camel-k/commit/1271df076f3123f5e4ec58e066e284236b1a8fb5"&gt;https://github.com/apache/camel-k/commit/1271df076f3123f5e4ec58e066e284236b1a8fb5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/camel-k/commit/1efa3982f4dbce0ae1f896f4003a16cae6d81ba2"&gt;https://github.com/apache/camel-k/commit/1efa3982f4dbce0ae1f896f4003a16cae6d81ba2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/camel-k/commit/35dd387f58464608ab4764f67bde786cf09bc39d"&gt;https://github.com/apache/camel-k/commit/35dd387f58464608ab4764f67bde786cf09bc39d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://camel.apache.org/security/CVE-2026-45760.html"&gt;https://camel.apache.org/security/CVE-2026-45760.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q8ch-jx67-q52x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jwch-w7wh-gqjm: free5GC UDR: Fail-open handling in PolicyDataSubsToNotifyPost allows unintended subscription creation</title>
-    <id>https://osv.dev/vulnerability/GHSA-jwch-w7wh-gqjm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jwch-w7wh-gqjm"/>
-    <published>2026-04-21T19:05:18Z</published>
-    <updated>2026-06-25T23:11:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-40343"/>
-    <category term="GO-2026-5482"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;free5GC UDR: Fail-open handling in PolicyDataSubsToNotifyPost allows unintended subscription creation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40343, GO-2026-5482&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/free5gc/udr&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-A fail-open request handling flaw in the UDR service causes the `/nudr-dr/v2/policy-data/subs-to-notify` POST handler to continue processing requests even after request body retrieval or deserialization errors.
-
-This may allow unintended creation of Policy Data notification subscriptions with invalid, empty, or partially processed input, depending on downstream processor behavior.
-
-### Details
-The endpoint `POST /nudr-dr/v2/policy-data/subs-to-notify` is intended to create a Policy Data notification subscription only after the HTTP request body has been successfully read and parsed into a valid `PolicyDataSubscription` object. [file:93]
-
-In the free5GC UDR implementation, the function `HandlePolicyDataSubsToNotifyPost` in `NFs/udr/internal/sbi/api_datarepository.go` does not te…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/free5gc/security/advisories/GHSA-jwch-w7wh-gqjm"&gt;https://github.com/free5gc/free5gc/security/advisories/GHSA-jwch-w7wh-gqjm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40343"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40343&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/free5gc/free5gc"&gt;https://github.com/free5gc/free5gc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jwch-w7wh-gqjm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rw2c-8rfq-gwfv: Daptin: SQL injection via unvalidated goqu.L() calls in aggregate API</title>
-    <id>https://osv.dev/vulnerability/GHSA-rw2c-8rfq-gwfv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rw2c-8rfq-gwfv"/>
-    <published>2026-04-22T17:38:02Z</published>
-    <updated>2026-06-25T23:11:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-41422"/>
-    <category term="GO-2026-5640"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Daptin: SQL injection via unvalidated goqu.L() calls in aggregate API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41422, GO-2026-5640&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/daptin/daptin&lt;/code&gt; — fixed in 0.11.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The `/aggregate/:typename` endpoint accepted `column` and `group` query parameters that were passed verbatim to `goqu.L()` — a raw SQL literal expression builder — without any validation. This bypassed all parameterization and allowed authenticated users with any valid session to inject arbitrary SQL expressions.
-
-## Impact
-
-An authenticated low-privilege user could:
-- Extract data from any table via subquery: `(SELECT group_concat(email) FROM user_account) as leak`
-- Disclose database internals: `sqlite_version()`, `(SELECT sql FROM sqlite_master)`
-- Exfiltrate cross-table data via correlated subqueries
-
-The vulnerability was confirmed locally; `user_account.email` values were extracted via a crafted `column` parameter by a non-admin user.
-
-## Root Cause
-
-`goqu.L(userInput)` i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/daptin/daptin/security/advisories/GHSA-rw2c-8rfq-gwfv"&gt;https://github.com/daptin/daptin/security/advisories/GHSA-rw2c-8rfq-gwfv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41422"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41422&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/daptin/daptin"&gt;https://github.com/daptin/daptin&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/daptin/daptin/releases/tag/v0.11.4"&gt;https://github.com/daptin/daptin/releases/tag/v0.11.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rw2c-8rfq-gwfv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-x2xq-qhjf-5mvg: DDEV has ZipSlip path traversal in tar and zip archive extraction</title>
-    <id>https://osv.dev/vulnerability/GHSA-x2xq-qhjf-5mvg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x2xq-qhjf-5mvg"/>
-    <published>2026-04-22T19:06:36Z</published>
-    <updated>2026-06-25T23:11:35Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-32885"/>
-    <category term="GO-2026-5735"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;DDEV has ZipSlip path traversal in tar and zip archive extraction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-32885, GO-2026-5735&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/ddev/ddev&lt;/code&gt; — fixed in 1.25.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The DDEV local dev tool has unsanitized extraction in both `Untar()` and `Unzip()` functions in `pkg/archive/archive.go`. This flaw allows users to download and extract archives from remote sources without path validation.
-
-## Vulnerable Code
-
-`pkg/archive/archive.go:235` (Untar):
-```go
-fullPath := filepath.Join(dest, file.Name)  // NO SANITIZATION
-```
-
-`pkg/archive/archive.go:342` (Unzip):
-```go
-fullPath := filepath.Join(dest, file.Name)  // NO SANITIZATION
-```
-
-Both functions create directories via `os.MkdirAll` and files via `os.Create` using the unsanitized path.
-
-## Impact
-
-Local development tool that downloads and extracts archives from remote sources (add-ons, updates). Malicious archive → arbitrary file write on developer machine.
-
-## Proof of Concept
-
-```go
-package mai…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ddev/ddev/security/advisories/GHSA-x2xq-qhjf-5mvg"&gt;https://github.com/ddev/ddev/security/advisories/GHSA-x2xq-qhjf-5mvg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-32885"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-32885&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ddev/ddev/pull/8213"&gt;https://github.com/ddev/ddev/pull/8213&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ddev/ddev/commit/05cbe299770a590b89bfc8dddab33e61b4302e43"&gt;https://github.com/ddev/ddev/commit/05cbe299770a590b89bfc8dddab33e61b4302e43&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ddev/ddev"&gt;https://github.com/ddev/ddev&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ddev/ddev/releases/tag/v1.25.2"&gt;https://github.com/ddev/ddev/releases/tag/v1.25.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x2xq-qhjf-5mvg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rpfr-x88x-xwcw: Pelican Web UI Affected by a Privilege Escalation Attack</title>
-    <id>https://osv.dev/vulnerability/GHSA-rpfr-x88x-xwcw</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rpfr-x88x-xwcw"/>
-    <published>2026-05-04T21:24:50Z</published>
-    <updated>2026-06-25T23:11:34Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-42571"/>
-    <category term="GO-2026-5632"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pelican Web UI Affected by a Privilege Escalation Attack&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42571, GO-2026-5632&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/pelicanplatform/pelican&lt;/code&gt; — fixed in 0.0.0-20260408120501-7f73b9c3e677&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Background
-
-On April 2nd, 2026, a Claude coding agent alerted Pelican PI Brian Bockelman to a privilege escalation vulnerability affecting Pelican&amp;#x27;s Web User Interface (WebUI) for various versions between `v7.21` and `v7.24`. Upon further investigation, the Pelican team discovered this attack allows any user authenticated to the WebUI via OAuth to gain admin privileges under certain configurations.  These may include servers with the following configuration variables enabled:
-
-- **Server.UIAdminUsers**: Affected if any of the listed admin users or the default admin account have not previously logged in to the server.
-- **Server.AdminGroups**: Affected if `Issuer.GroupSource` is set to `internal` and an admin of the group has not previously logged in to the server.
-
-The OSDF operations t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/PelicanPlatform/pelican/security/advisories/GHSA-rpfr-x88x-xwcw"&gt;https://github.com/PelicanPlatform/pelican/security/advisories/GHSA-rpfr-x88x-xwcw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42571"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42571&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PelicanPlatform/pelican/commit/7f73b9c3e677a0ae4a0ec465c5d98bb8bd948854"&gt;https://github.com/PelicanPlatform/pelican/commit/7f73b9c3e677a0ae4a0ec465c5d98bb8bd948854&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PelicanPlatform/pelican"&gt;https://github.com/PelicanPlatform/pelican&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rpfr-x88x-xwcw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-q2pj-8v84-9mh5: Arcane Backend: Unauthenticated reflected XSS via SVG color parameter enables admin account takeover</title>
-    <id>https://osv.dev/vulnerability/GHSA-q2pj-8v84-9mh5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q2pj-8v84-9mh5"/>
-    <published>2026-05-18T14:19:26Z</published>
-    <updated>2026-06-25T23:11:34Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-45627"/>
-    <category term="GO-2026-5561"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Arcane Backend: Unauthenticated reflected XSS via SVG color parameter enables admin account takeover&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45627, GO-2026-5561&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getarcaneapp/arcane/backend&lt;/code&gt; — fixed in 1.19.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The unauthenticated `GET /api/app-images/logo` endpoint reflects a user-supplied `color` query parameter into the body of an SVG document via `strings.ReplaceAll` with no escaping. The substitution lands inside a `&amp;lt;style&amp;gt;` element of the embedded `logo.svg`, allowing an attacker to close the style block and inject executable `&amp;lt;script&amp;gt;` content. Because the response is served as `image/svg+xml` and Arcane sets no Content-Security-Policy or `X-Content-Type-Options` headers, navigating a logged-in admin victim to a crafted URL executes attacker-controlled JavaScript in Arcane&amp;#x27;s origin and rides the victim&amp;#x27;s HttpOnly JWT cookie to fully compromise the admin account.
-
-## Details
-
-The route is registered in `backend/internal/huma/handlers/appimages.go:53-61` with an explicitly empty …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/security/advisories/GHSA-q2pj-8v84-9mh5"&gt;https://github.com/getarcaneapp/arcane/security/advisories/GHSA-q2pj-8v84-9mh5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45627"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45627&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane"&gt;https://github.com/getarcaneapp/arcane&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q2pj-8v84-9mh5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-xhjw-95fp-8vgq: Traefik Kubernetes CRD allows unauthorized cross-namespace middleware binding</title>
-    <id>https://osv.dev/vulnerability/GHSA-xhjw-95fp-8vgq</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xhjw-95fp-8vgq"/>
-    <published>2026-04-24T20:12:10Z</published>
-    <updated>2026-06-25T23:11:34Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-41174"/>
-    <category term="GO-2026-5760"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik Kubernetes CRD allows unauthorized cross-namespace middleware binding&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41174, GO-2026-5760&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.7.0-rc.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.6.14&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt; — fixed in 2.11.43&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-There is a vulnerability in Traefik&amp;#x27;s Kubernetes CRD provider cross-namespace isolation enforcement.
-
-When `providers.kubernetesCRD.allowCrossNamespace=false`, Traefik correctly rejects direct cross-namespace middleware references from `IngressRoute` objects, but fails to apply the same restriction to middleware references nested inside a `Chain` middleware&amp;#x27;s `spec.chain.middlewares[]`. An actor with permission to create or update Traefik CRDs in their own namespace can exploit this to cause Traefik to resolve and apply middleware objects from another namespace, bypassing the documented isolation boundary.
-
-## Patches
-
-- https://github.com/traefik/traefik/releases/tag/v2.11.43
-- https://github.com/traefik/traefik/releases/tag/v3.6.14
-- https://github.com/traefik/traefik/release…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-xhjw-95fp-8vgq"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-xhjw-95fp-8vgq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41174"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41174&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/commit/df00d82fc7f12e07199551832b54de6d0e55414d"&gt;https://github.com/traefik/traefik/commit/df00d82fc7f12e07199551832b54de6d0e55414d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v2.11.43"&gt;https://github.com/traefik/traefik/releases/tag/v2.11.43&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.6.14"&gt;https://github.com/traefik/traefik/releases/tag/v3.6.14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.0-rc.2"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.0-rc.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xhjw-95fp-8vgq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-hqwm-7x7x-8379: DevSpace UI Server WebSocket CheckOrigin does not validate source</title>
-    <id>https://osv.dev/vulnerability/GHSA-hqwm-7x7x-8379</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hqwm-7x7x-8379"/>
-    <published>2026-05-06T17:05:57Z</published>
-    <updated>2026-06-25T23:11:34Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-42283"/>
-    <category term="GO-2026-5433"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;DevSpace UI Server WebSocket CheckOrigin does not validate source&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42283, GO-2026-5433&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/loft-sh/devspace&lt;/code&gt; — fixed in 6.3.21&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Description
-
-DevSpace&amp;#x27;s UI server WebSocket accepts connections from all origins by default, and therefore several endpoints are exposed via this WebSocket. When a developer runs the DevSpace UI and at the same time uses a browser to access the internet, a malicious website they visit can use their browser to establish a cross-origin WebSocket connection to `ws://127.0.0.1:8090`. This allows an attacker to access: 
-* `/api/logs` to stream real-time pod logs
-* `/api/enter` to open an interactive shell inside the running pod
-* `/api/command` to execute pre-defined pipeline commands
-
-### Patches
-
-Versions 6.3.21 and above are patched.
-
-### Resources
-
-[gorilla/websocket CheckOrigin documentation](https://pkg.go.dev/github.com/gorilla/websocket#hdr-Origin_Considerations)
-
-### Installation O…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/devspace-sh/devspace/security/advisories/GHSA-hqwm-7x7x-8379"&gt;https://github.com/devspace-sh/devspace/security/advisories/GHSA-hqwm-7x7x-8379&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42283"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42283&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/devspace-sh/devspace"&gt;https://github.com/devspace-sh/devspace&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hqwm-7x7x-8379"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jrq5-hg6x-j6g3: goshs has CSRF in state-changing GET routes enables authenticated file deletion and directory creation</title>
-    <id>https://osv.dev/vulnerability/GHSA-jrq5-hg6x-j6g3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jrq5-hg6x-j6g3"/>
-    <published>2026-04-14T22:28:44Z</published>
-    <updated>2026-06-25T23:11:34Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-40883"/>
-    <category term="GO-2026-5479"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;goshs has CSRF in state-changing GET routes enables authenticated file deletion and directory creation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40883, GO-2026-5479&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs/v2&lt;/code&gt; — fixed in 2.0.0-beta.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-goshs contains a cross-site request forgery issue in its state-changing HTTP GET routes. An external attacker can cause an already authenticated browser to trigger destructive actions such as `?delete` and `?mkdir` because goshs relies on HTTP basic auth alone and performs no CSRF, `Origin`, or `Referer` validation for those routes. I reproduced this on `v2.0.0-beta.5`.
-
-### Details
-The vulnerable request handling is reachable through normal GET requests:
-
-- `httpserver/handler.go:118-123` dispatches `?mkdir` directly to `handleMkdir()`
-- `httpserver/handler.go:180-186` dispatches `?delete` directly to `deleteFile()`
-
-Authentication is enforced only by HTTP basic auth:
-
-- `httpserver/middleware.go:20-87` accepts any request that presents valid cached or replayed basic-auth cred…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patrickhener/goshs/security/advisories/GHSA-jrq5-hg6x-j6g3"&gt;https://github.com/patrickhener/goshs/security/advisories/GHSA-jrq5-hg6x-j6g3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40883"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40883&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patrickhener/goshs"&gt;https://github.com/patrickhener/goshs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jrq5-hg6x-j6g3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

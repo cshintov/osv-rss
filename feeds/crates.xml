@@ -3,12 +3,108 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-06-29T13:14:15Z</updated>
+  <updated>2026-06-29T15:46:31Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-r5fr-9gmv-jggh: scim_proto and kanidm_proto have an authenticated process abort via SCIM filter stack exhaustion</title>
+    <id>https://osv.dev/vulnerability/GHSA-r5fr-9gmv-jggh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r5fr-9gmv-jggh"/>
+    <published>2026-05-06T23:38:49Z</published>
+    <updated>2026-06-29T15:46:31Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-46689"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;scim_proto and kanidm_proto have an authenticated process abort via SCIM filter stack exhaustion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46689&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;scim_proto&lt;/code&gt; — fixed in 1.9.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;kanidm_proto&lt;/code&gt; — fixed in 1.9.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A single unauthenticated `GET` to any `/scim/v1/...` endpoint with a `?filter=` query string of a few thousand nested parentheses (≈ 4–12 KB) drives the recursive-descent PEG parser past the worker thread&amp;#x27;s stack guard page. Rust responds to stack overflow with `std::process::abort()` — the entire `kanidmd` process exits. The parse runs inside axum&amp;#x27;s `Query&amp;lt;ScimEntryGetQuery&amp;gt;` extractor, before any handler body and therefore before any ACL check.
+
+### Details
+
+The SCIM filter grammar recurses on `(` and `not (` with no depth bound.
+
+**`proto/src/scim_v1/mod.rs:263-433`** — `peg::parser! { grammar scimfilter() ... }`:
+
+```rust
+// line 281
+&amp;quot;not&amp;quot; separator()+ &amp;quot;(&amp;quot; e:parse() &amp;quot;)&amp;quot; { ScimFilter::Not(Box::new(e)) }
+// line 293
+&amp;quot;(&amp;quot; e:parse() &amp;quot;)&amp;quot; { e }
+```
+
+Both rules re-enter `parse()` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kanidm/kanidm/security/advisories/GHSA-r5fr-9gmv-jggh"&gt;https://github.com/kanidm/kanidm/security/advisories/GHSA-r5fr-9gmv-jggh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46689"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46689&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kanidm/kanidm"&gt;https://github.com/kanidm/kanidm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kanidm/kanidm/releases/tag/v1.9.3"&gt;https://github.com/kanidm/kanidm/releases/tag/v1.9.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r5fr-9gmv-jggh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2025-0165: i_tree allowed out-of-bounds access through safe public node accessors</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0165</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0165"/>
+    <published>2025-07-04T12:00:00Z</published>
+    <updated>2026-06-29T15:15:03Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;i_tree allowed out-of-bounds access through safe public node accessors&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;i_tree&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `i_tree` exposed safe public `Tree::node` and `Tree::mut_node` methods in the public `tree` module. These methods accepted an arbitrary `u32` index and passed it directly to `Vec::get_unchecked` / `get_unchecked_mut` on the internal node buffer, without validating that the index was in bounds.
+
+Because these methods were safe and public, a caller could pass an out-of-bounds index without writing any `unsafe` code, producing an out-of-bounds shared or mutable reference and triggering undefined behavior.
+
+Starting with `0.10.0` the crate was restructured and these accessors are no longer reachable from outside the crate.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/i_tree"&gt;https://crates.io/crates/i_tree&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0165.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0165.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iShape-Rust/iTree/issues/1"&gt;https://github.com/iShape-Rust/iTree/issues/1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iShape-Rust/iTree/commit/a948b891cf159233bfed5b16bf185268fd9e1985"&gt;https://github.com/iShape-Rust/iTree/commit/a948b891cf159233bfed5b16bf185268fd9e1985&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iShape-Rust/iTree/compare/0.9.0...0.10.0"&gt;https://github.com/iShape-Rust/iTree/compare/0.9.0...0.10.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0165"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0191: `EbpfVm::invoke_function` performs out-of-bounds pointer arithmetic</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0191</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0191"/>
+    <published>2026-05-28T12:00:00Z</published>
+    <updated>2026-06-29T14:45:04Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`EbpfVm::invoke_function` performs out-of-bounds pointer arithmetic&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;solana_rbpf&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `solana_rbpf` expose the safe method
+`EbpfVm::invoke_function`. This method computes an obfuscated VM pointer by
+casting `self` to `*mut u64` and applying a randomized offset derived from
+`get_runtime_environment_key()`.
+
+The resulting pointer arithmetic is performed with `ptr::offset`, which
+requires the computed pointer to remain within the same allocation. In practice,
+the randomized offset can move the pointer far outside the allocation
+containing the `EbpfVm`, causing undefined behavior before the supplied builtin
+function is invoked.
+
+## Unmaintained
+
+The upstream `solana_rbpf` repository is archived, and no patched version of
+this crate is currently available.
+
+Users should migrate to the maintained [`solana-sbpf`](https://crates.io/crates/solana-sbpf)
+crate. Th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/solana_rbpf"&gt;https://crates.io/crates/solana_rbpf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0191.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0191.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/solana-labs/rbpf"&gt;https://github.com/solana-labs/rbpf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anza-xyz/sbpf/pull/151"&gt;https://github.com/anza-xyz/sbpf/pull/151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/solana-sbpf"&gt;https://crates.io/crates/solana-sbpf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0191"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0190: Unsoundness in `Error::downcast_mut()`</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0190</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0190"/>
+    <published>2026-06-25T12:00:00Z</published>
+    <updated>2026-06-29T14:15:03Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unsoundness in `Error::downcast_mut()`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;anyhow&lt;/code&gt; — fixed in 1.0.103&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of this crate violate borrow rules, resulting in undefined behavior, when the user adds context to an error via `Error::context` and then later calls `Error::downcast_mut` on the returned `Error`.
+
+The flaw was corrected in commit `6e8c000` by revising how the mutable reference is constructed, avoiding inclusion of a shared reference in the resulting borrow chain.
+
+## Example
+
+```rust
+use anyhow::Error;
+use std::fmt;
+
+#[derive(Debug)]
+struct ErrorContext(&amp;amp;&amp;#x27;static str);
+
+impl fmt::Display for ErrorContext {
+    fn fmt(&amp;amp;self, f: &amp;amp;mut fmt::Formatter&amp;lt;&amp;#x27;_&amp;gt;) -&amp;gt; fmt::Result {
+        fmt::Display::fmt(&amp;amp;self.0, f)
+    }
+}
+
+fn main() {
+    let mut error = Error::msg(&amp;quot;inner error&amp;quot;).context(ErrorContext(&amp;quot;old context&amp;quot;));
+    let context: &amp;amp;mut ErrorContext = error.downcast_mut().unwrap…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/anyhow"&gt;https://crates.io/crates/anyhow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0190.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0190.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dtolnay/anyhow/issues/451"&gt;https://github.com/dtolnay/anyhow/issues/451&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0190"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0189: DNS rebinding vulnerability in rmcp Streamable HTTP server transport</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0189</id>
@@ -255,87 +351,5 @@ This vulnerability is tracked as CVE-2026-5223. The severity of the vulnerabilit
 When building a crate, Cargo extracts its source code in a local cache (stored within `~/.cargo`), reusing it for any future build. Cargo includes protections to prevent any file from being extracted outside of the crate&amp;#x27;s own cache directory.
 
 It was discovered that it&amp;#x27;s possible to craft a malicious …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rust-lang/cargo/security/advisories/GHSA-jq42-7mfv-hm57"&gt;https://github.com/rust-lang/cargo/security/advisories/GHSA-jq42-7mfv-hm57&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-5223"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-5223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-lang/cargo/pull/17031"&gt;https://github.com/rust-lang/cargo/pull/17031&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.rust-lang.org/2026/05/25/cve-2026-5223"&gt;https://blog.rust-lang.org/2026/05/25/cve-2026-5223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-lang/cargo"&gt;https://github.com/rust-lang/cargo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/rustlang-security-announcements/c/IB74S7Yksg8"&gt;https://groups.google.com/g/rustlang-security-announcements/c/IB74S7Yksg8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jq42-7mfv-hm57"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-p688-r7jv-fm6f: Cargo can be coerced to share credentials between registries</title>
-    <id>https://osv.dev/vulnerability/GHSA-p688-r7jv-fm6f</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p688-r7jv-fm6f"/>
-    <published>2026-06-26T21:47:54Z</published>
-    <updated>2026-06-26T22:00:10Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-5222"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Cargo can be coerced to share credentials between registries&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-5222&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:L/VI:N/VA:N/SC:L/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cargo&lt;/code&gt; — fixed in 0.97.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The Rust Security Response Team was notified that Cargo incorrectly normalized the URLs of third-party registries using the [sparse index protocol][1]. If a hosting provider allowed multiple registries to be hosted with arbitrary names within the same domain, an attacker able to publish crates in a registry could obtain the credentials of others users of the same registry.
-
-This vulnerability is tracked as CVE-2026-5222. The severity of the vulnerability is **low**, due to the extremely niche requirements needed to achieve the attack.
-
-## Overview
-
-Originally Cargo only supported storing a registry&amp;#x27;s index within git repositories. Most git hosting solutions allow accessing a git repository with or without the `.git` suffix, so Cargo mirrored this behavior when normalizing registry URLs. Th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rust-lang/cargo/security/advisories/GHSA-p688-r7jv-fm6f"&gt;https://github.com/rust-lang/cargo/security/advisories/GHSA-p688-r7jv-fm6f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-5222"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-5222&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-lang/cargo/pull/17031"&gt;https://github.com/rust-lang/cargo/pull/17031&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.rust-lang.org/2026/05/25/cve-2026-5222"&gt;https://blog.rust-lang.org/2026/05/25/cve-2026-5222&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-lang/cargo"&gt;https://github.com/rust-lang/cargo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/rustlang-security-announcements/c/SfUxOiIdY5s"&gt;https://groups.google.com/g/rustlang-security-announcements/c/SfUxOiIdY5s&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p688-r7jv-fm6f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0187: Stack overflow in lopdf via deeply nested PDF objects</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0187</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0187"/>
-    <published>2026-06-21T12:00:00Z</published>
-    <updated>2026-06-26T12:16:12Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Stack overflow in lopdf via deeply nested PDF objects&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;lopdf&lt;/code&gt; — fixed in 0.42.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`lopdf::Document::load_mem` (and the other `load*` entry points) parses nested PDF arrays and dictionaries with unbounded recursion. A small crafted PDF whose Catalog contains a deeply nested array (`/X [[[ … ]]]`, on the order of 10,000 levels) exhausts the call stack and aborts the process with `SIGABRT`.
-
-Because this is a stack-overflow abort rather than a `panic!`, it cannot be caught with `catch_unwind`: any service that parses untrusted PDF input with lopdf can be crashed by a ~21 KB file, resulting in a denial of service.
-
-Confirmed on lopdf 0.41.0 and earlier; fixed in 0.42.0. Default configuration, no features changed.
-
-## Proof of concept
-
-```rust
-fn main() {
-    let bytes = std::fs::read(&amp;quot;poc.pdf&amp;quot;).unwrap(); // ~10,380-deep nested array in the Catalog
-    let _ = lopdf::Documen…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/lopdf"&gt;https://crates.io/crates/lopdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0187.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0187.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/J-F-Liu/lopdf/issues/502"&gt;https://github.com/J-F-Liu/lopdf/issues/502&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/J-F-Liu/lopdf/pull/503"&gt;https://github.com/J-F-Liu/lopdf/pull/503&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/J-F-Liu/lopdf/commit/c755394"&gt;https://github.com/J-F-Liu/lopdf/commit/c755394&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0187"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-w9wp-h8wv-79jx: opentelemetry_sdk has unbounded memory allocation in W3C Baggage propagation</title>
-    <id>https://osv.dev/vulnerability/GHSA-w9wp-h8wv-79jx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w9wp-h8wv-79jx"/>
-    <published>2026-06-25T18:40:04Z</published>
-    <updated>2026-06-25T18:45:28Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-48504"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;opentelemetry_sdk has unbounded memory allocation in W3C Baggage propagation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48504&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;opentelemetry_sdk&lt;/code&gt; — fixed in 0.32.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`BaggagePropagator::extract_with_context` in `opentelemetry_sdk` did not enforce the W3C Baggage size limits before parsing an inbound `baggage` header. A large attacker-controlled header could cause unnecessary CPU work and short-lived heap allocations while parsing entries that would later be discarded by the SDK&amp;#x27;s baggage storage limits.
-
-The SDK now applies limits aligned with the W3C Baggage limits:
-
-  - 64 list-members
-  - 8192 bytes total
-
-## Impact
-
-Services that accept untrusted inbound propagation headers may experience increased per-request resource usage when processing oversized `baggage` headers. This can contribute to denial-of-service risk, especially when application or transport-level header limits are absent or configured above the W3C Baggage limits.
- 
-The i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-rust/security/advisories/GHSA-w9wp-h8wv-79jx"&gt;https://github.com/open-telemetry/opentelemetry-rust/security/advisories/GHSA-w9wp-h8wv-79jx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-rust"&gt;https://github.com/open-telemetry/opentelemetry-rust&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w9wp-h8wv-79jx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-fq3w-p4fg-mw73: fixurjavainstall: Previous Fuji versions can accidentally wipe `/usr/share/man/man8`</title>
-    <id>https://osv.dev/vulnerability/GHSA-fq3w-p4fg-mw73</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fq3w-p4fg-mw73"/>
-    <published>2026-06-25T18:00:18Z</published>
-    <updated>2026-06-25T18:15:09Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;fixurjavainstall: Previous Fuji versions can accidentally wipe `/usr/share/man/man8`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fixurjavainstall&lt;/code&gt; — fixed in 0.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-Affects: Anyone who generates the UNIX man pages in Fuji &amp;lt;= `0.8.0` build with the `dev` crate feature.
-Consequences: `/usr/share/man/man8` may be entirely removed &amp;amp; re-created without any of the previous entries.
-
-### Patches
-At the time of writing, no new version has been released on crates.io, due to an unrelated CI/CD publishing issue.
-Due to the same unrelated publishing issue, no new GitHub Releases version has been released.
-
-### Workarounds
-Do not run `fuji manual` on non-`dev` builds for versions &amp;lt;= `0.8.0`.
-
-### Additional Information
-This bug results from development-only code being accidentally left in for release use.
-Previous versions of Fuji are still &amp;quot;safe&amp;quot; to use, provided that you do not run `fuji manual`.
-There is no malicious potential from this, it&amp;#x27;s just a …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/EpicVon2468/fixurjavainstall/security/advisories/GHSA-fq3w-p4fg-mw73"&gt;https://github.com/EpicVon2468/fixurjavainstall/security/advisories/GHSA-fq3w-p4fg-mw73&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/EpicVon2468/fixurjavainstall"&gt;https://github.com/EpicVon2468/fixurjavainstall&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fq3w-p4fg-mw73"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

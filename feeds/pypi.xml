@@ -3,12 +3,330 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-06-30T18:00:17Z</updated>
+  <updated>2026-06-30T23:56:31Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-4qqr-vv2q-cmr5: Crawl4AI: SSRF filter bypass in Docker server via IPv6 transition forms (NAT64 / 6to4 / unspecified / v4-mapped)</title>
+    <id>https://osv.dev/vulnerability/GHSA-4qqr-vv2q-cmr5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4qqr-vv2q-cmr5"/>
+    <published>2026-06-16T21:00:04Z</published>
+    <updated>2026-06-30T23:56:31Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-53754"/>
+    <category term="PYSEC-2026-587"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Crawl4AI: SSRF filter bypass in Docker server via IPv6 transition forms (NAT64 / 6to4 / unspecified / v4-mapped)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53754, PYSEC-2026-587&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crawl4ai&lt;/code&gt; — fixed in 0.8.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Docker API server&amp;#x27;s SSRF protection (`validate_webhook_url` / `validate_url_destination` in `deploy/docker/utils.py`) used an explicit IPv4/IPv6 CIDR blocklist that missed several address families. An attacker could reach internal services and cloud metadata endpoints (e.g. `169.254.169.254`) despite the filter by encoding an internal IPv4 address inside an IPv6 transition form, or by using the IPv6 unspecified address.
+
+Because the Docker API is unauthenticated by default (`jwt_enabled: false`), no credentials are required.
+
+### Affected paths
+
+The blocklist was applied to crawl URLs (`POST /crawl`, `/md`, `/html`, `/screenshot`, `/pdf`, `/execute_js`) and webhook URLs (`/crawl/job`, `/llm/job`). All shared the same incomplete check.
+
+### Bypasses
+
+The following all resol…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/unclecode/crawl4ai/security/advisories/GHSA-4qqr-vv2q-cmr5"&gt;https://github.com/unclecode/crawl4ai/security/advisories/GHSA-4qqr-vv2q-cmr5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/unclecode/crawl4ai"&gt;https://github.com/unclecode/crawl4ai&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4qqr-vv2q-cmr5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6qhc-x826-342c: Crawl4AI: SSRF via proxy settings in the Docker server bypasses the crawl-URL SSRF check</title>
+    <id>https://osv.dev/vulnerability/GHSA-6qhc-x826-342c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6qhc-x826-342c"/>
+    <published>2026-06-16T21:02:55Z</published>
+    <updated>2026-06-30T23:56:11Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-53755"/>
+    <category term="PYSEC-2026-588"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Crawl4AI: SSRF via proxy settings in the Docker server bypasses the crawl-URL SSRF check&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53755, PYSEC-2026-588&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crawl4ai&lt;/code&gt; — fixed in 0.8.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Docker API server applied its SSRF destination check to the crawl target URL only, not to the proxy address. An unauthenticated request could supply a proxy pointing at an internal IP and route the browser through it, reaching internal services and cloud-metadata endpoints, while using a perfectly valid crawl URL. The Docker API is unauthenticated by default.
+
+### Affected paths
+
+`/crawl`, `/crawl/stream`, and `/crawl/job` accept a `browser_config` (and `crawler_config`). The following all feed Chromium&amp;#x27;s egress and were unchecked:
+- `browser_config.proxy_config.server`
+- `browser_config.proxy` (deprecated field)
+- `crawler_config.proxy_config.server`
+- `--proxy-server` / `--proxy-pac-url` / `--proxy-bypass-list` / `--host-resolver-rules` flags in `browser_config.extra_arg…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/unclecode/crawl4ai/security/advisories/GHSA-6qhc-x826-342c"&gt;https://github.com/unclecode/crawl4ai/security/advisories/GHSA-6qhc-x826-342c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/unclecode/crawl4ai"&gt;https://github.com/unclecode/crawl4ai&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6qhc-x826-342c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-588: Crawl4AI is an open-source LLM friendly web crawler &amp; scraper. Prior to 0.8.9, the Docker API server applied its SSRF de</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-588</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-588"/>
+    <published>2026-06-23T19:17:07Z</published>
+    <updated>2026-06-30T23:45:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-53755"/>
+    <category term="GHSA-6qhc-x826-342c"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-53755, GHSA-6qhc-x826-342c&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crawl4ai&lt;/code&gt; — fixed in 0.8.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Crawl4AI is an open-source LLM friendly web crawler &amp;amp; scraper. Prior to 0.8.9, the Docker API server applied its SSRF destination check to the crawl target URL only, not to the proxy address. An unauthenticated request could supply a proxy pointing at an internal IP and route the browser through it, reaching internal services and cloud-metadata endpoints, while using a perfectly valid crawl URL. The Docker API is unauthenticated by default. /crawl, /crawl/stream, and /crawl/job accept a browser_config (and crawler_config). The following all feed Chromium&amp;#x27;s egress and were unchecked: browser_config.proxy_config.server, browser_config.proxy (deprecated field), crawler_config.proxy_config.server, and --proxy-server / --proxy-pac-url / --proxy-bypass-list / --host-resolver-rules flags in brows…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/unclecode/crawl4ai/security/advisories/GHSA-6qhc-x826-342c"&gt;https://github.com/unclecode/crawl4ai/security/advisories/GHSA-6qhc-x826-342c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-588"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-587: Crawl4AI is an open-source LLM friendly web crawler &amp; scraper. Prior to 0.8.8, the Docker API server's SSRF protection (</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-587</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-587"/>
+    <published>2026-06-23T19:17:07Z</published>
+    <updated>2026-06-30T23:45:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-53754"/>
+    <category term="GHSA-4qqr-vv2q-cmr5"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-53754, GHSA-4qqr-vv2q-cmr5&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crawl4ai&lt;/code&gt; — fixed in 0.8.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Crawl4AI is an open-source LLM friendly web crawler &amp;amp; scraper. Prior to 0.8.8, the Docker API server&amp;#x27;s SSRF protection (validate_webhook_url / validate_url_destination in deploy/docker/utils.py) used an explicit IPv4/IPv6 CIDR blocklist that missed several address families. An attacker could reach internal services and cloud metadata endpoints (e.g. 169.254.169.254) despite the filter by encoding an internal IPv4 address inside an IPv6 transition form, or by using the IPv6 unspecified address. Because the Docker API is unauthenticated by default (jwt_enabled: false), no credentials are required. This vulnerability is fixed in 0.8.8.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/unclecode/crawl4ai/security/advisories/GHSA-4qqr-vv2q-cmr5"&gt;https://github.com/unclecode/crawl4ai/security/advisories/GHSA-4qqr-vv2q-cmr5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-587"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-m5gw-83w2-7749: Apache Fory PyFory Deserialization of Untrusted Data </title>
+    <id>https://osv.dev/vulnerability/GHSA-m5gw-83w2-7749</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m5gw-83w2-7749"/>
+    <published>2026-05-21T18:33:09Z</published>
+    <updated>2026-06-30T22:00:17Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-48207"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Fory PyFory Deserialization of Untrusted Data &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48207&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pyfory&lt;/code&gt; — fixed in 1.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Fory PyFory&amp;#x27;s ReduceSerializer could bypass documented DeserializationPolicy validation hooks during reduce-state restoration and global-name resolution. An application is vulnerable if it deserializes attacker-controlled data using PyFory Python-native mode with strict mode disabled and relies on DeserializationPolicy to restrict unsafe classes, functions, or module attributes.
+
+This issue affects Apache Fory: from before 1.0.0.
+
+Mitigation: Users of Apache Fory are recommended to upgrade to version 1.0.0 or later, which enforces DeserializationPolicy validation for the affected ReduceSerializer paths and thus fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-48207"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-48207&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://fory.apache.org/security/#cve-2026-48207-pyfory-reduceserializer-deserializationpolicy-bypass"&gt;https://fory.apache.org/security/#cve-2026-48207-pyfory-reduceserializer-deserializationpolicy-bypass&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/fory"&gt;https://github.com/apache/fory&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/05/21/10"&gt;http://www.openwall.com/lists/oss-security/2026/05/21/10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m5gw-83w2-7749"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7g5w-pq96-8c5w: flash-attention contains an insecure deserialization vulnerability in its checkpoint loading mechanism</title>
+    <id>https://osv.dev/vulnerability/GHSA-7g5w-pq96-8c5w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7g5w-pq96-8c5w"/>
+    <published>2026-05-11T18:31:44Z</published>
+    <updated>2026-06-30T22:00:17Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-31253"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;flash-attention contains an insecure deserialization vulnerability in its checkpoint loading mechanism&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-31253&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flash-attn&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The flash-attention training framework thru commit e724e2588cbe754beb97cf7c011b5e7e34119e62 (2025-13-04) contains an insecure deserialization vulnerability (CWE-502) in its checkpoint loading mechanism. The load_checkpoint() function in checkpoint.py and the checkpoint loading code in eval.py use torch.load() without enabling the security-restrictive weights_only=True parameter. This allows the deserialization of arbitrary Python objects via the pickle module. An attacker can exploit this by providing a maliciously crafted checkpoint file. When a victim loads this checkpoint during model warmstarting or evaluation, arbitrary code is executed on the victim&amp;#x27;s system.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-31253"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-31253&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Dao-AILab/flash-attention"&gt;https://github.com/Dao-AILab/flash-attention&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.notion.so/CVE-2026-31253-35d1e1393188813f9e77e2038104bc49"&gt;https://www.notion.so/CVE-2026-31253-35d1e1393188813f9e77e2038104bc49&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7g5w-pq96-8c5w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-8qw9-gf7w-42x5: Minor fix to previous patch for CVE-2022-35918</title>
+    <id>https://osv.dev/vulnerability/GHSA-8qw9-gf7w-42x5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8qw9-gf7w-42x5"/>
+    <published>2024-01-12T17:35:21Z</published>
+    <updated>2026-06-30T21:45:25Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Minor fix to previous patch for CVE-2022-35918&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;streamlit&lt;/code&gt; — fixed in 1.30.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+The initial vulnerability identified in Streamlit apps using custom components, allowing for directory traversal attacks, was addressed in version 1.11.1. However, a minor issue persisted, which could still potentially expose certain files on the server file-system under specific conditions.
+
+### Patches
+
+We released an update in version 1.30.0 to further tighten security measures. Users are strongly advised to update to version 1.30.0 immediately for optimal security.
+
+### Workarounds
+
+No additional workarounds are necessary once the update to version 1.30.0 is applied.
+
+### For more information
+
+If you have any questions or comments about this advisory:
+* Email us at [security@streamlit.io](mailto:security@streamlit.io)&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/streamlit/streamlit/security/advisories/GHSA-8qw9-gf7w-42x5"&gt;https://github.com/streamlit/streamlit/security/advisories/GHSA-8qw9-gf7w-42x5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/streamlit/streamlit/commit/bd0a8996c4c7ec55b9c6557e7b168b0c13a25b90"&gt;https://github.com/streamlit/streamlit/commit/bd0a8996c4c7ec55b9c6557e7b168b0c13a25b90&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-v4hr-4jpx-56gc"&gt;https://github.com/advisories/GHSA-v4hr-4jpx-56gc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/streamlit/streamlit"&gt;https://github.com/streamlit/streamlit&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.cve.org/CVERecord?id=CVE-2022-35918"&gt;https://www.cve.org/CVERecord?id=CVE-2022-35918&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8qw9-gf7w-42x5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-m3v4-v5gx-7wf5: OpenMed vulnerable to remote code injection through privacy-filter model loading path</title>
+    <id>https://osv.dev/vulnerability/GHSA-m3v4-v5gx-7wf5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m3v4-v5gx-7wf5"/>
+    <published>2026-06-02T18:31:33Z</published>
+    <updated>2026-06-30T21:45:25Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-47117"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenMed vulnerable to remote code injection through privacy-filter model loading path&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47117&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openmed&lt;/code&gt; — fixed in 1.5.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenMed before 1.5.2 contains a remote code execution vulnerability in the PII privacy-filter model loading path. The privacy-filter dispatcher used broad substring matching on the user-supplied `model_name` parameter, allowing a value such as `attacker/foo-privacy-filter-bar` to route through a path that loads Hugging Face models with `trust_remote_code=True`. An unauthenticated attacker can supply a malicious model repository containing custom Transformers code via auto_map in `config.json` or `tokenizer_config.json`, which is imported and executed with the privileges of the OpenMed service process.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-47117"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-47117&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/maziyarpanahi/openmed/pull/59"&gt;https://github.com/maziyarpanahi/openmed/pull/59&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/maziyarpanahi/openmed/commit/98724f65df98d7518b9006e6356740aa36c2f224"&gt;https://github.com/maziyarpanahi/openmed/commit/98724f65df98d7518b9006e6356740aa36c2f224&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/maziyarpanahi/openmed/releases/tag/v1.5.2"&gt;https://github.com/maziyarpanahi/openmed/releases/tag/v1.5.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openmed-remote-code-execution-via-pii-model-loading"&gt;https://www.vulncheck.com/advisories/openmed-remote-code-execution-via-pii-model-loading&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="github.com/maziyarpanahi/openmed"&gt;github.com/maziyarpanahi/openmed&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m3v4-v5gx-7wf5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-j35x-w4gj-pf7w: Open Babel has heap buffer overflow in SMILES OBSmilesParser::ParseSmiles</title>
+    <id>https://osv.dev/vulnerability/GHSA-j35x-w4gj-pf7w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j35x-w4gj-pf7w"/>
+    <published>2026-06-30T21:27:29Z</published>
+    <updated>2026-06-30T21:30:22Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2025-10996"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Open Babel has heap buffer overflow in SMILES OBSmilesParser::ParseSmiles&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-10996&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openbabel&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A memory-safety vulnerability in Open Babel&amp;#x27;s SMILES parser caused a
+heap buffer overflow when reading a crafted input string.
+
+### Details
+
+The flaw was in `OBSmilesParser::ParseSmiles`. A malformed SMILES
+input caused the parser to write past the end of a heap-allocated
+buffer.
+
+### Impact
+
+Open Babel is a C++ library and CLI used to read and write chemistry
+file formats; it is shipped by Linux distributions and embedded in
+services that may parse untrusted input. Triggering this vulnerability
+requires the victim to parse a malicious SMILES string with the
+`obabel` tool, the `OBConversion` API, or any of the language
+bindings (Python, Ruby, Java, R, Perl, C#, PHP). SMILES strings are
+commonly passed on the command line and through scripted pipelines,
+so this primitive is esp…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/security/advisories/GHSA-j35x-w4gj-pf7w"&gt;https://github.com/openbabel/openbabel/security/advisories/GHSA-j35x-w4gj-pf7w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-10996"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-10996&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/issues/2831"&gt;https://github.com/openbabel/openbabel/issues/2831&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/pull/2913"&gt;https://github.com/openbabel/openbabel/pull/2913&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/commit/b34cd604"&gt;https://github.com/openbabel/openbabel/commit/b34cd604&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel"&gt;https://github.com/openbabel/openbabel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/user-attachments/files/22318556/poc.zip"&gt;https://github.com/user-attachments/files/22318556/poc.zip&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/?ctiid.325924"&gt;https://vuldb.com/?ctiid.325924&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j35x-w4gj-pf7w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8j3x-m868-cpw8: Open Babel has out-of-bounds write (overlapping memcpy) in zipstream basic_unzip_streambuf::underflow</title>
+    <id>https://osv.dev/vulnerability/GHSA-8j3x-m868-cpw8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8j3x-m868-cpw8"/>
+    <published>2026-06-30T21:25:25Z</published>
+    <updated>2026-06-30T21:30:22Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2025-10995"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Open Babel has out-of-bounds write (overlapping memcpy) in zipstream basic_unzip_streambuf::underflow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-10995&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openbabel&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A memory-safety vulnerability in Open Babel&amp;#x27;s bundled zipstream
+decompression code caused an out-of-bounds write via overlapping
+`memcpy` when reading a crafted gzip-compressed chemistry file.
+
+### Details
+
+The flaw was in `basic_unzip_streambuf::underflow`. The decompression
+buffer refill path invoked `memcpy` with overlapping source and
+destination regions, which is undefined behavior and produced
+out-of-bounds writes in practice. Any file format read through the
+gzip-wrapped reader was a potential trigger.
+
+### Impact
+
+Open Babel is a C++ library and CLI used to read and write chemistry
+file formats; it is shipped by Linux distributions and embedded in
+services that may parse untrusted input. Triggering this vulnerability
+requires the victim to open a malicious gzip-compres…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/security/advisories/GHSA-8j3x-m868-cpw8"&gt;https://github.com/openbabel/openbabel/security/advisories/GHSA-8j3x-m868-cpw8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-10995"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-10995&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/issues/2832"&gt;https://github.com/openbabel/openbabel/issues/2832&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/issues/2913"&gt;https://github.com/openbabel/openbabel/issues/2913&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/commit/d4621d417c167b50cc8ce7aa3a02557e5b2b81c5"&gt;https://github.com/openbabel/openbabel/commit/d4621d417c167b50cc8ce7aa3a02557e5b2b81c5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel"&gt;https://github.com/openbabel/openbabel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/user-attachments/files/22318572/poc.zip"&gt;https://github.com/user-attachments/files/22318572/poc.zip&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/?ctiid.325923"&gt;https://vuldb.com/?ctiid.325923&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8j3x-m868-cpw8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4w5w-4fhm-q483: Open Babel has NULL pointer dereference in MOL2 OBAtom::SetFormalCharge</title>
+    <id>https://osv.dev/vulnerability/GHSA-4w5w-4fhm-q483</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4w5w-4fhm-q483"/>
+    <published>2026-06-30T18:47:00Z</published>
+    <updated>2026-06-30T19:00:31Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-2705"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Open Babel has NULL pointer dereference in MOL2 OBAtom::SetFormalCharge&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-2705&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openbabel&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A memory-safety vulnerability in Open Babel&amp;#x27;s MOL2 file format parser
+caused a NULL pointer dereference when reading a crafted input file.
+
+### Details
+
+The flaw was in `OBAtom::SetFormalCharge` as called from the MOL2
+parser. A malformed atom record caused the parser to call the method
+on a NULL atom pointer.
+
+### Impact
+
+Open Babel is a C++ library and CLI used to read and write chemistry
+file formats; it is shipped by Linux distributions and embedded in
+services that may parse untrusted input. Triggering this vulnerability
+requires the victim to open a malicious MOL2 file with the `obabel`
+tool, the `OBConversion` API, or any of the language bindings (Python,
+Ruby, Java, R, Perl, C#, PHP).
+
+### Affected versions
+
+All releases up to and including 3.1.1.
+
+### Patched version
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/security/advisories/GHSA-4w5w-4fhm-q483"&gt;https://github.com/openbabel/openbabel/security/advisories/GHSA-4w5w-4fhm-q483&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-2705"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-2705&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/issues/2848"&gt;https://github.com/openbabel/openbabel/issues/2848&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/pull/2862"&gt;https://github.com/openbabel/openbabel/pull/2862&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VedantMadane/openbabel/commit/e23a224b8fd9d7c2a7cde9ef4ec6afb4c05aa08a"&gt;https://github.com/VedantMadane/openbabel/commit/e23a224b8fd9d7c2a7cde9ef4ec6afb4c05aa08a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oneafter/0128/blob/main/ob2/repro.mol2"&gt;https://github.com/oneafter/0128/blob/main/ob2/repro.mol2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel"&gt;https://github.com/openbabel/openbabel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/?ctiid.346651"&gt;https://vuldb.com/?ctiid.346651&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4w5w-4fhm-q483"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6xw4-2g22-26h8: Open Babel has an out-of-bounds read in CIF transform3d::DescribeAsString</title>
+    <id>https://osv.dev/vulnerability/GHSA-6xw4-2g22-26h8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6xw4-2g22-26h8"/>
+    <published>2026-06-30T18:46:12Z</published>
+    <updated>2026-06-30T19:00:30Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-2704"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Open Babel has an out-of-bounds read in CIF transform3d::DescribeAsString&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-2704&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openbabel&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&amp;gt; ### Summary
+&amp;gt;
+&amp;gt; A memory-safety vulnerability in Open Babel&amp;#x27;s CIF file format parser
+&amp;gt; allowed an out-of-bounds read when reading a crafted input file.
+&amp;gt;
+&amp;gt; ### Details
+&amp;gt;
+&amp;gt; The flaw was in `OpenBabel::transform3d::DescribeAsString`. A malformed
+&amp;gt; symmetry-operation string caused the parser to read past the end of its
+&amp;gt; internal buffer while formatting the description.
+&amp;gt;
+&amp;gt; ### Impact
+&amp;gt;
+&amp;gt; Open Babel is a C++ library and CLI used to read and write chemistry
+&amp;gt; file formats; it is shipped by Linux distributions and embedded in
+&amp;gt; services that may parse untrusted input. Triggering this vulnerability
+&amp;gt; requires the victim to open a malicious CIF file with the `obabel`
+&amp;gt; tool, the OBConversion API, or any of the language bindings.
+&amp;gt;
+&amp;gt; ### Affected versions
+&amp;gt;
+&amp;gt; All releases up to and including 3.1…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/security/advisories/GHSA-6xw4-2g22-26h8"&gt;https://github.com/openbabel/openbabel/security/advisories/GHSA-6xw4-2g22-26h8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-2704"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-2704&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/issues/2848"&gt;https://github.com/openbabel/openbabel/issues/2848&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/pull/2862"&gt;https://github.com/openbabel/openbabel/pull/2862&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VedantMadane/openbabel/commit/e23a224b8fd9d7c2a7cde9ef4ec6afb4c05aa08a"&gt;https://github.com/VedantMadane/openbabel/commit/e23a224b8fd9d7c2a7cde9ef4ec6afb4c05aa08a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oneafter/0128/blob/main/ob1/repro.cif"&gt;https://github.com/oneafter/0128/blob/main/ob1/repro.cif&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel"&gt;https://github.com/openbabel/openbabel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/releases/tag/openbabel-3-2-0"&gt;https://github.com/openbabel/openbabel/releases/tag/openbabel-3-2-0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6xw4-2g22-26h8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rxpr-wq63-jr7p: Open Babel has a NULL pointer dereference in CDXML OBAtom::GetExplicitValence</title>
+    <id>https://osv.dev/vulnerability/GHSA-rxpr-wq63-jr7p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rxpr-wq63-jr7p"/>
+    <published>2026-06-30T18:47:28Z</published>
+    <updated>2026-06-30T19:00:30Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-3408"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Open Babel has a NULL pointer dereference in CDXML OBAtom::GetExplicitValence&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-3408&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openbabel&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A memory-safety vulnerability in Open Babel&amp;#x27;s CDXML file format parser
+caused a NULL pointer dereference when reading a crafted input file.
+
+### Details
+
+The flaw was in `OBAtom::GetExplicitValence` as called from the CDXML
+parser. A malformed fragment caused the parser to invoke the method
+on a NULL atom pointer.
+
+### Impact
+
+Open Babel is a C++ library and CLI used to read and write chemistry
+file formats; it is shipped by Linux distributions and embedded in
+services that may parse untrusted input. Triggering this vulnerability
+requires the victim to open a malicious CDXML file with the `obabel`
+tool, the `OBConversion` API, or any of the language bindings (Python,
+Ruby, Java, R, Perl, C#, PHP).
+
+### Affected versions
+
+All releases up to and including 3.1.1.
+
+### Patched ver…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/security/advisories/GHSA-rxpr-wq63-jr7p"&gt;https://github.com/openbabel/openbabel/security/advisories/GHSA-rxpr-wq63-jr7p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-3408"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-3408&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/issues/2848"&gt;https://github.com/openbabel/openbabel/issues/2848&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/pull/2862"&gt;https://github.com/openbabel/openbabel/pull/2862&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VedantMadane/openbabel/commit/e23a224b8fd9d7c2a7cde9ef4ec6afb4c05aa08a"&gt;https://github.com/VedantMadane/openbabel/commit/e23a224b8fd9d7c2a7cde9ef4ec6afb4c05aa08a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oneafter/0128/blob/main/ob3/repro.cdxml"&gt;https://github.com/oneafter/0128/blob/main/ob3/repro.cdxml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel"&gt;https://github.com/openbabel/openbabel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/?ctiid.348303"&gt;https://vuldb.com/?ctiid.348303&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rxpr-wq63-jr7p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-pp85-5j63-xpq3: Open Babel has Use-after-free in GAMESS GAMESSOutputFormat::ReadMolecule</title>
+    <id>https://osv.dev/vulnerability/GHSA-pp85-5j63-xpq3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pp85-5j63-xpq3"/>
+    <published>2026-06-30T18:48:57Z</published>
+    <updated>2026-06-30T19:00:30Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2025-10994"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Open Babel has Use-after-free in GAMESS GAMESSOutputFormat::ReadMolecule&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-10994&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openbabel&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A memory-safety vulnerability in Open Babel&amp;#x27;s GAMESS output parser
+caused a use-after-free when reading a crafted input file.
+
+### Details
+
+The flaw was in `GAMESSOutputFormat::ReadMolecule`. A malformed input
+caused the parser to dereference a stale pointer after the underlying
+object had been freed.
+
+### Impact
+
+Open Babel is a C++ library and CLI used to read and write chemistry
+file formats; it is shipped by Linux distributions and embedded in
+services that may parse untrusted input. Triggering this vulnerability
+requires the victim to open a malicious GAMESS output file with the
+`obabel` tool, the `OBConversion` API, or any of the language
+bindings (Python, Ruby, Java, R, Perl, C#, PHP).
+
+### Affected versions
+
+All releases up to and including 3.1.1.
+
+### Patched version
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/security/advisories/GHSA-pp85-5j63-xpq3"&gt;https://github.com/openbabel/openbabel/security/advisories/GHSA-pp85-5j63-xpq3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-10994"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-10994&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/issues/2834"&gt;https://github.com/openbabel/openbabel/issues/2834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/commit/95033d27d23c07f98daa92d3cd3ae5ea07594a91"&gt;https://github.com/openbabel/openbabel/commit/95033d27d23c07f98daa92d3cd3ae5ea07594a91&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel"&gt;https://github.com/openbabel/openbabel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/user-attachments/files/22318611/poc.zip"&gt;https://github.com/user-attachments/files/22318611/poc.zip&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/?ctiid.325922"&gt;https://vuldb.com/?ctiid.325922&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/?id.325922"&gt;https://vuldb.com/?id.325922&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pp85-5j63-xpq3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-98f3-hwg4-4rf7: vllm has Improper Resource Shutdown or Release </title>
     <id>https://osv.dev/vulnerability/GHSA-98f3-hwg4-4rf7</id>
@@ -2094,304 +2412,5 @@ When `--auth user:pass` is passed, the CLI prints `Auth: enabled (user: &amp;lt;
     <category term="PYSEC-2026-268"/>
     <category term="PYSEC-2026-279"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Command Injection in Apache Airflow and Apache Airflow MySQL Provider&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-airflow-2023-22884, CVE-2023-22884, PYSEC-2026-268, PYSEC-2026-279&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow&lt;/code&gt; — fixed in 2.5.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;apache-airflow-providers-mysql&lt;/code&gt; — fixed in 4.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper Neutralization of Special Elements used in a Command (&amp;#x27;Command Injection&amp;#x27;) vulnerability in Apache Software Foundation Apache Airflow, Apache Software Foundation Apache Airflow MySQL Provider.This issue affects Apache Airflow: before 2.5.1; Apache Airflow MySQL Provider: before 4.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-22884"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-22884&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/28811"&gt;https://github.com/apache/airflow/pull/28811&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/0l0j3nt0t7fzrcjl2ch0jgj6c58kxs5h"&gt;https://lists.apache.org/thread/0l0j3nt0t7fzrcjl2ch0jgj6c58kxs5h&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c732-xvv8-g94c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-268: Command Injection in Apache Airflow and Apache Airflow MySQL Provider</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-268</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-268"/>
-    <published>2026-06-29T11:50:44Z</published>
-    <updated>2026-06-29T12:26:39Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-airflow-2023-22884"/>
-    <category term="CVE-2023-22884"/>
-    <category term="GHSA-c732-xvv8-g94c"/>
-    <category term="PYSEC-2026-279"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Command Injection in Apache Airflow and Apache Airflow MySQL Provider&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-airflow-2023-22884, CVE-2023-22884, GHSA-c732-xvv8-g94c, PYSEC-2026-279&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow&lt;/code&gt; — fixed in 2.5.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper Neutralization of Special Elements used in a Command (&amp;#x27;Command Injection&amp;#x27;) vulnerability in Apache Software Foundation Apache Airflow, Apache Software Foundation Apache Airflow MySQL Provider.This issue affects Apache Airflow: before 2.5.1; Apache Airflow MySQL Provider: before 4.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-22884"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-22884&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/28811"&gt;https://github.com/apache/airflow/pull/28811&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/0l0j3nt0t7fzrcjl2ch0jgj6c58kxs5h"&gt;https://lists.apache.org/thread/0l0j3nt0t7fzrcjl2ch0jgj6c58kxs5h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow"&gt;https://pypi.org/project/apache-airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-c732-xvv8-g94c"&gt;https://github.com/advisories/GHSA-c732-xvv8-g94c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-268"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-279: Command Injection in Apache Airflow and Apache Airflow MySQL Provider</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-279</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-279"/>
-    <published>2026-06-29T11:50:44Z</published>
-    <updated>2026-06-29T12:26:39Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-airflow-2023-22884"/>
-    <category term="CVE-2023-22884"/>
-    <category term="GHSA-c732-xvv8-g94c"/>
-    <category term="PYSEC-2026-268"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Command Injection in Apache Airflow and Apache Airflow MySQL Provider&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-airflow-2023-22884, CVE-2023-22884, GHSA-c732-xvv8-g94c, PYSEC-2026-268&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow-providers-mysql&lt;/code&gt; — fixed in 4.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper Neutralization of Special Elements used in a Command (&amp;#x27;Command Injection&amp;#x27;) vulnerability in Apache Software Foundation Apache Airflow, Apache Software Foundation Apache Airflow MySQL Provider.This issue affects Apache Airflow: before 2.5.1; Apache Airflow MySQL Provider: before 4.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-22884"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-22884&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/28811"&gt;https://github.com/apache/airflow/pull/28811&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/0l0j3nt0t7fzrcjl2ch0jgj6c58kxs5h"&gt;https://lists.apache.org/thread/0l0j3nt0t7fzrcjl2ch0jgj6c58kxs5h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow-providers-mysql"&gt;https://pypi.org/project/apache-airflow-providers-mysql&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-c732-xvv8-g94c"&gt;https://github.com/advisories/GHSA-c732-xvv8-g94c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-279"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-fxmw-jcgr-w44v: pgadmin4 has a Meta-Command Filter Command Execution</title>
-    <id>https://osv.dev/vulnerability/GHSA-fxmw-jcgr-w44v</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fxmw-jcgr-w44v"/>
-    <published>2025-12-11T21:31:28Z</published>
-    <updated>2026-06-29T12:26:39Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2025-13780"/>
-    <category term="PYSEC-2026-450"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;pgadmin4 has a Meta-Command Filter Command Execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-13780, PYSEC-2026-450&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pgadmin4&lt;/code&gt; — fixed in 9.11&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The PLAIN restore meta-command filter introduced in pgAdmin as part of the fix for CVE-2025-12762 does not detect meta-commands when a SQL file begins with a UTF-8 Byte Order Mark (EF BB BF) or other special byte sequences. The implemented filter uses the function `has_meta_commands()`, which scans raw bytes using a regular expression. The regex does not treat the bytes as ignorable, so meta-commands such as `\\!` remain undetected. When pgAdmin invokes psql with --file, psql strips the bytes and executes the command. This can result in remote command execution during a restore operation.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-13780"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-13780&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pgadmin-org/pgadmin4/issues/9368"&gt;https://github.com/pgadmin-org/pgadmin4/issues/9368&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pgadmin-org/pgadmin4/pull/9426"&gt;https://github.com/pgadmin-org/pgadmin4/pull/9426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pgadmin-org/pgadmin4/commit/1d397395f75320ca1d4ed5e9ca721c603415e836"&gt;https://github.com/pgadmin-org/pgadmin4/commit/1d397395f75320ca1d4ed5e9ca721c603415e836&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pgadmin-org/pgadmin4/commit/d5a909f14cb9713d89b49481ad1929fad89f4576"&gt;https://github.com/pgadmin-org/pgadmin4/commit/d5a909f14cb9713d89b49481ad1929fad89f4576&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pgadmin-org/pgadmin4"&gt;https://github.com/pgadmin-org/pgadmin4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fxmw-jcgr-w44v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-g82g-j283-hj97: imgaug contains an insecure deserialization vulnerability in BackgroundAugmenter class within multicore.py module</title>
-    <id>https://osv.dev/vulnerability/GHSA-g82g-j283-hj97</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g82g-j283-hj97"/>
-    <published>2026-05-12T18:30:41Z</published>
-    <updated>2026-06-29T12:26:38Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-31235"/>
-    <category term="PYSEC-2026-356"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;imgaug contains an insecure deserialization vulnerability in BackgroundAugmenter class within multicore.py module&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-31235, PYSEC-2026-356&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;imgaug&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The imgaug library thru 0.4.0 contains an insecure deserialization vulnerability in its BackgroundAugmenter class within the multicore.py module. The class uses Python&amp;#x27;s pickle module to deserialize data received via a multiprocessing queue in the _augment_images_worker() method without any safety checks. An attacker who can influence the data placed into this queue (e.g., through social engineering, malicious input scripts, or a compromised shared queue) can provide a malicious pickle payload. When deserialized, this payload can execute arbitrary code in the context of the worker process, leading to remote or local code execution depending on the deployment scenario.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-31235"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-31235&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aleju/imgaug"&gt;https://github.com/aleju/imgaug&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.notion.so/CVE-2026-31235-35d1e139318881efb701d814228424a9"&gt;https://www.notion.so/CVE-2026-31235-35d1e139318881efb701d814228424a9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g82g-j283-hj97"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-75px-35p4-qq6h: Aim External Control of File Name or Path vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-75px-35p4-qq6h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-75px-35p4-qq6h"/>
-    <published>2025-03-20T12:32:45Z</published>
-    <updated>2026-06-29T12:26:38Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2024-6829"/>
-    <category term="PYSEC-2026-259"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Aim External Control of File Name or Path vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-6829, PYSEC-2026-259&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aim&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability in aimhubio/aim version 3.19.3 allows an attacker to exploit the `tarfile.extractall()` function to extract the contents of a maliciously crafted tarfile to arbitrary locations on the host server. The attacker can control `repo.path` and `run_hash` to bypass directory existence checks and extract files to unintended locations, potentially overwriting critical files. This can lead to arbitrary data being written to arbitrary locations on the remote tracking server, which could be used for further attacks such as writing a new SSH key to the target server.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-6829"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-6829&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aimhubio/aim"&gt;https://github.com/aimhubio/aim&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://huntr.com/bounties/7c97065c-1b63-4982-82c1-8038be0ed570"&gt;https://huntr.com/bounties/7c97065c-1b63-4982-82c1-8038be0ed570&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-75px-35p4-qq6h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-7pq6-v88g-wf3w: Sentry's improper authentication on SAML SSO process allows user impersonation</title>
-    <id>https://osv.dev/vulnerability/GHSA-7pq6-v88g-wf3w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7pq6-v88g-wf3w"/>
-    <published>2025-01-15T21:25:27Z</published>
-    <updated>2026-06-29T12:26:38Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2025-22146"/>
-    <category term="PYSEC-2026-532"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Sentry&amp;#x27;s improper authentication on SAML SSO process allows user impersonation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-22146, PYSEC-2026-532&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;sentry&lt;/code&gt; — fixed in 25.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-A critical vulnerability was discovered in the SAML SSO implementation of Sentry. It was reported to us via our private bug bounty program.
-
-The vulnerability allows an attacker to take over any user account by using a malicious SAML Identity Provider and another organization on the same Sentry instance. The victim email address must be known in order to exploit this vulnerability.
-
-### Patches
-- [Sentry SaaS](https://sentry.io): The fix was deployed on Jan 14, 2025.
-- [Self-Hosted Sentry](https://github.com/getsentry/self-hosted): If only a single organization is allowed (`SENTRY_SINGLE_ORGANIZATION = True`), then no action is needed. Otherwise, users should upgrade to version 25.1.0 or higher.
-
-### Workarounds
-No known workarounds.
-
-### References
-- https://github.com/getsentr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getsentry/sentry/security/advisories/GHSA-7pq6-v88g-wf3w"&gt;https://github.com/getsentry/sentry/security/advisories/GHSA-7pq6-v88g-wf3w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-22146"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-22146&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getsentry/sentry/pull/83407"&gt;https://github.com/getsentry/sentry/pull/83407&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getsentry/sentry/commit/6db508f7949d117c7dff748a3c82c3a272bf7cfd"&gt;https://github.com/getsentry/sentry/commit/6db508f7949d117c7dff748a3c82c3a272bf7cfd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getsentry/sentry"&gt;https://github.com/getsentry/sentry&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7pq6-v88g-wf3w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-q2rq-qgcf-m22w: web2py remote code execution via hardcoded encryption key in session.connect function</title>
-    <id>https://osv.dev/vulnerability/GHSA-q2rq-qgcf-m22w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q2rq-qgcf-m22w"/>
-    <published>2022-05-14T00:57:47Z</published>
-    <updated>2026-06-29T12:26:38Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2016-3953"/>
-    <category term="PYSEC-2026-570"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;web2py remote code execution via hardcoded encryption key in session.connect function&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2016-3953, PYSEC-2026-570&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;web2py&lt;/code&gt; — fixed in 2.14.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The sample web application in web2py before 2.14.2 might allow remote attackers to execute arbitrary code via vectors involving use of a hardcoded encryption key when calling the `session.connect` function.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2016-3953"&gt;https://nvd.nist.gov/vuln/detail/CVE-2016-3953&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/web2py/web2py/issues/1205"&gt;https://github.com/web2py/web2py/issues/1205&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/web2py/web2py/commit/9706d125b42481178d2b423de245f5d2faadbf40"&gt;https://github.com/web2py/web2py/commit/9706d125b42481178d2b423de245f5d2faadbf40&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://devco.re/blog/2017/01/03/web2py-unserialize-code-execution-CVE-2016-3957"&gt;https://devco.re/blog/2017/01/03/web2py-unserialize-code-execution-CVE-2016-3957&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/web2py/web2py"&gt;https://github.com/web2py/web2py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/web2py/web2py/blob/R-2.14.1/applications/examples/models/session.py"&gt;https://github.com/web2py/web2py/blob/R-2.14.1/applications/examples/models/session.py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://usn.ubuntu.com/4030-1"&gt;https://usn.ubuntu.com/4030-1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q2rq-qgcf-m22w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-cfh6-vr3j-qc3g: PraisonAI Has Missing Authentication in WebSocket Gateway</title>
-    <id>https://osv.dev/vulnerability/GHSA-cfh6-vr3j-qc3g</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cfh6-vr3j-qc3g"/>
-    <published>2026-04-01T23:28:04Z</published>
-    <updated>2026-06-29T12:26:38Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-34952"/>
-    <category term="PYSEC-2026-474"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;PraisonAI Has Missing Authentication in WebSocket Gateway&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34952, PYSEC-2026-474&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;praisonai&lt;/code&gt; — fixed in 4.5.97&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The PraisonAI Gateway server accepts WebSocket connections at `/ws` and serves agent topology at `/info` with no authentication. Any network client can connect, enumerate registered agents, and send arbitrary messages to agents and their tool sets.
-
-### Details
-
-`gateway/server.py:242` (source) -&amp;gt; `gateway/server.py:250` (sink)
-```python
-# source -- /info leaks all agent IDs with no auth
-async def info(request):
-    return JSONResponse({
-        &amp;quot;agents&amp;quot;: list(self._agents.keys()),
-        &amp;quot;sessions&amp;quot;: len(self._sessions),
-        &amp;quot;clients&amp;quot;: len(self._clients),
-    })
-
-# sink -- WebSocket accepted unconditionally, no token check
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    client_id = str(uuid.uuid4())
-    self._clients[client_id] = webso…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-cfh6-vr3j-qc3g"&gt;https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-cfh6-vr3j-qc3g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34952"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34952&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI"&gt;https://github.com/MervinPraison/PraisonAI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cfh6-vr3j-qc3g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jjhc-v7c2-5hh6: LiteLLM: Authentication bypass via OIDC userinfo cache key collision</title>
-    <id>https://osv.dev/vulnerability/GHSA-jjhc-v7c2-5hh6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jjhc-v7c2-5hh6"/>
-    <published>2026-04-03T21:59:50Z</published>
-    <updated>2026-06-29T12:26:38Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-35030"/>
-    <category term="PYSEC-2026-390"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;LiteLLM: Authentication bypass via OIDC userinfo cache key collision&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35030, PYSEC-2026-390&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;litellm&lt;/code&gt; — fixed in 1.83.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;###  Impact
-
-When JWT authentication is enabled (`enable_jwt_auth: true`), the OIDC userinfo cache uses `token[:20]` as the cache key. JWT headers produced by the same signing algorithm generate identical first 20 characters.
-
-This configuration option is not enabled by default. **Most instances are not affected.**
-
-An unauthenticated attacker can craft a token whose first 20 characters match a legitimate user&amp;#x27;s cached token. On cache hit, the attacker inherits the legitimate user&amp;#x27;s identity and permissions. This affects deployments with JWT/OIDC authentication enabled.
-
-###  Patches
-
-Fixed in v1.83.0. The cache key now uses the full hash of the JWT token.
-
-###  Workarounds
-
-Disable OIDC userinfo caching by setting the cache TTL to 0, or disable JWT authentication entirely.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/security/advisories/GHSA-jjhc-v7c2-5hh6"&gt;https://github.com/BerriAI/litellm/security/advisories/GHSA-jjhc-v7c2-5hh6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35030"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35030&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm"&gt;https://github.com/BerriAI/litellm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jjhc-v7c2-5hh6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-j9g7-mqhh-9hxf: DB-GPT Absolute Path Traversal in knowledge/{space_name}/document/upload</title>
-    <id>https://osv.dev/vulnerability/GHSA-j9g7-mqhh-9hxf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j9g7-mqhh-9hxf"/>
-    <published>2025-03-20T12:32:40Z</published>
-    <updated>2026-06-29T12:26:38Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2024-10833"/>
-    <category term="PYSEC-2026-324"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;DB-GPT Absolute Path Traversal in knowledge/{space_name}/document/upload&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-10833, PYSEC-2026-324&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dbgpt&lt;/code&gt; — fixed in 0.6.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;eosphoros-ai/db-gpt version 0.6.0 is vulnerable to an arbitrary file write through the knowledge API. The endpoint for uploading files as &amp;#x27;knowledge&amp;#x27; is susceptible to absolute path traversal, allowing attackers to write files to arbitrary locations on the target server. This vulnerability arises because the &amp;#x27;doc_file.filename&amp;#x27; parameter is user-controllable, enabling the construction of absolute paths.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-10833"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-10833&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eosphoros-ai/DB-GPT/commit/780ce803e325b87f4ddfbe5824451e379aeee56c"&gt;https://github.com/eosphoros-ai/DB-GPT/commit/780ce803e325b87f4ddfbe5824451e379aeee56c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eosphoros-ai/DB-GPT"&gt;https://github.com/eosphoros-ai/DB-GPT&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://huntr.com/bounties/dc58e981-e325-4c11-b4e1-1095890fd15a"&gt;https://huntr.com/bounties/dc58e981-e325-4c11-b4e1-1095890fd15a&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j9g7-mqhh-9hxf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-mw26-5g2v-hqw3: DeepDiff Class Pollution in Delta class leading to DoS, Remote Code Execution, and more</title>
-    <id>https://osv.dev/vulnerability/GHSA-mw26-5g2v-hqw3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mw26-5g2v-hqw3"/>
-    <published>2025-09-03T22:25:09Z</published>
-    <updated>2026-06-29T12:26:38Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2025-58367"/>
-    <category term="PYSEC-2026-327"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;DeepDiff Class Pollution in Delta class leading to DoS, Remote Code Execution, and more&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-58367, PYSEC-2026-327&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;deepdiff&lt;/code&gt; — fixed in 8.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-[Python class pollution](https://blog.abdulrah33m.com/prototype-pollution-in-python/) is a novel vulnerability categorized under [CWE-915](https://cwe.mitre.org/data/definitions/915.html). The `Delta` class is vulnerable to class pollution via its constructor, and when combined with a gadget available in DeltaDiff itself, it can lead to Denial of Service and Remote Code Execution (via insecure [Pickle](https://docs.python.org/3/library/pickle.html) deserialization).
-
-The gadget available in DeepDiff allows `deepdiff.serialization.SAFE_TO_IMPORT` to be modified to allow dangerous classes such as `posix.system`, and then perform insecure Pickle deserialization via the Delta class. This potentially allows any Python code to be executed, given that the input to `Delta` is user-cont…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/seperman/deepdiff/security/advisories/GHSA-mw26-5g2v-hqw3"&gt;https://github.com/seperman/deepdiff/security/advisories/GHSA-mw26-5g2v-hqw3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-58367"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-58367&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgilland/pydash/issues/180"&gt;https://github.com/dgilland/pydash/issues/180&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgilland/pydash/commit/2015f0a4bcdbc3a5b27652e38fe97b3ee13ac15f"&gt;https://github.com/dgilland/pydash/commit/2015f0a4bcdbc3a5b27652e38fe97b3ee13ac15f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/seperman/deepdiff/commit/c69c06c13f75e849c770ade3f556cd16209fd183"&gt;https://github.com/seperman/deepdiff/commit/c69c06c13f75e849c770ade3f556cd16209fd183&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/seperman/deepdiff"&gt;https://github.com/seperman/deepdiff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/seperman/deepdiff/releases/tag/8.6.1"&gt;https://github.com/seperman/deepdiff/releases/tag/8.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mw26-5g2v-hqw3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jfxc-v5g9-38xr: PraisonAI Vulnerable to Arbitrary File Write / Path Traversal in Action Orchestrator</title>
-    <id>https://osv.dev/vulnerability/GHSA-jfxc-v5g9-38xr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jfxc-v5g9-38xr"/>
-    <published>2026-04-06T23:09:03Z</published>
-    <updated>2026-06-29T12:26:37Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-39305"/>
-    <category term="PYSEC-2026-475"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;PraisonAI Vulnerable to Arbitrary File Write / Path Traversal in Action Orchestrator&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39305, PYSEC-2026-475&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;praisonai&lt;/code&gt; — fixed in 4.5.113&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The Action Orchestrator feature contains a Path Traversal vulnerability that allows an attacker (or compromised agent) to write to arbitrary files outside of the configured workspace directory. By supplying relative path segments (`../`) in the target path, malicious actions can overwrite sensitive system files or drop executable payloads on the host.
-
-### Details
-Location: `src/praisonai/praisonai/cli/features/action_orchestrator.py` (Lines 402, 409, 423)
-
-Vulnerable Code snippet:
-```python
-target = workspace / step.target
-```
-
-In the `_apply_step` method, paths are constructed by concatenating the `workspace` path with a user-supplied `step.target` string: `target = workspace / step.target`. The code fails to resolve and validate that the final absolute path remains within the bounds of …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-jfxc-v5g9-38xr"&gt;https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-jfxc-v5g9-38xr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39305"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39305&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI"&gt;https://github.com/MervinPraison/PraisonAI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/releases/tag/v4.5.113"&gt;https://github.com/MervinPraison/PraisonAI/releases/tag/v4.5.113&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jfxc-v5g9-38xr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-w6g9-xccc-347h: Plone Unauthenticated Write Vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-w6g9-xccc-347h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w6g9-xccc-347h"/>
-    <published>2022-05-24T17:07:14Z</published>
-    <updated>2026-06-29T12:26:37Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2020-7941"/>
-    <category term="PYSEC-2020-90"/>
-    <category term="PYSEC-2026-459"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Plone Unauthenticated Write Vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2020-7941, PYSEC-2020-90, PYSEC-2026-459&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;plone&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;plone-app-contenttypes&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A privilege escalation issue in plone.app.contenttypes in Plone 4.3 through 5.2.1 allows users to PUT (overwrite) some content without needing write permission.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2020-7941"&gt;https://nvd.nist.gov/vuln/detail/CVE-2020-7941&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.contenttypes"&gt;https://github.com/plone/plone.app.contenttypes&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.contenttypes/blob/master/CHANGES.rst?plain=1#L372-L374"&gt;https://github.com/plone/plone.app.contenttypes/blob/master/CHANGES.rst?plain=1#L372-L374&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/plone/PYSEC-2020-90.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/plone/PYSEC-2020-90.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://plone.org/security/hotfix/20200121"&gt;https://plone.org/security/hotfix/20200121&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://plone.org/security/hotfix/20200121/privilege-escalation-for-overwriting-content"&gt;https://plone.org/security/hotfix/20200121/privilege-escalation-for-overwriting-content&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.openwall.com/lists/oss-security/2020/01/22/1"&gt;https://www.openwall.com/lists/oss-security/2020/01/22/1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2020/01/24/1"&gt;http://www.openwall.com/lists/oss-security/2020/01/24/1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w6g9-xccc-347h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2020-90: A privilege escalation issue in plone.app.contenttypes in Plone 4.3 through 5.2.1 allows users to PUT (overwrite) some c</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2020-90</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2020-90"/>
-    <published>2020-01-23T21:15:00Z</published>
-    <updated>2026-06-29T12:26:37Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2020-7941"/>
-    <category term="GHSA-w6g9-xccc-347h"/>
-    <category term="PYSEC-2026-459"/>
-    <content type="html">&lt;p&gt;Aliases: CVE-2020-7941, GHSA-w6g9-xccc-347h, PYSEC-2026-459&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;plone&lt;/code&gt; — fixed in 5.2.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A privilege escalation issue in plone.app.contenttypes in Plone 4.3 through 5.2.1 allows users to PUT (overwrite) some content without needing write permission.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://plone.org/security/hotfix/20200121"&gt;https://plone.org/security/hotfix/20200121&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://plone.org/security/hotfix/20200121/privilege-escalation-for-overwriting-content"&gt;https://plone.org/security/hotfix/20200121/privilege-escalation-for-overwriting-content&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.openwall.com/lists/oss-security/2020/01/22/1"&gt;https://www.openwall.com/lists/oss-security/2020/01/22/1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2020/01/24/1"&gt;http://www.openwall.com/lists/oss-security/2020/01/24/1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2020-90"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-459: Plone Unauthenticated Write Vulnerability</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-459</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-459"/>
-    <published>2026-06-29T11:50:32Z</published>
-    <updated>2026-06-29T12:26:37Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2020-7941"/>
-    <category term="GHSA-w6g9-xccc-347h"/>
-    <category term="PYSEC-2020-90"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Plone Unauthenticated Write Vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2020-7941, GHSA-w6g9-xccc-347h, PYSEC-2020-90&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;plone-app-contenttypes&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A privilege escalation issue in plone.app.contenttypes in Plone 4.3 through 5.2.1 allows users to PUT (overwrite) some content without needing write permission.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2020-7941"&gt;https://nvd.nist.gov/vuln/detail/CVE-2020-7941&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.contenttypes"&gt;https://github.com/plone/plone.app.contenttypes&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.contenttypes/blob/master/CHANGES.rst?plain=1#L372-L374"&gt;https://github.com/plone/plone.app.contenttypes/blob/master/CHANGES.rst?plain=1#L372-L374&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/plone/PYSEC-2020-90.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/plone/PYSEC-2020-90.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://plone.org/security/hotfix/20200121"&gt;https://plone.org/security/hotfix/20200121&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://plone.org/security/hotfix/20200121/privilege-escalation-for-overwriting-content"&gt;https://plone.org/security/hotfix/20200121/privilege-escalation-for-overwriting-content&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.openwall.com/lists/oss-security/2020/01/22/1"&gt;https://www.openwall.com/lists/oss-security/2020/01/22/1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2020/01/24/1"&gt;http://www.openwall.com/lists/oss-security/2020/01/24/1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-459"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-3rf6-x59v-5jfv: dash-uploader has a directory traversal vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-3rf6-x59v-5jfv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3rf6-x59v-5jfv"/>
-    <published>2026-05-08T18:31:35Z</published>
-    <updated>2026-06-29T12:26:37Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-38360"/>
-    <category term="PYSEC-2026-320"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;dash-uploader has a directory traversal vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-38360, PYSEC-2026-320&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dash-uploader&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-An unauthenticated path traversal vulnerability exists in [dash-uploader](https://pypi.org/project/dash-uploader/) versions 0.1.0 through 0.7.0a2. The library&amp;#x27;s HTTP request handler at `dash_uploader/httprequesthandler.py` reads three form parameters (`upload_id`, `resumableFilename`, `resumableIdentifier`) from `request.form.get()` and passes them directly to `os.path.join()` and `os.makedirs()` without any sanitization.
-
-A single unauthenticated `POST /API/dash-uploader` request with `upload_id` set to a relative path (e.g. `../../etc/cron.d` or `../venv/lib/python3.13/site-packages`) escapes the application&amp;#x27;s `uploads/` directory and writes the supplied file content to the chosen target path under the privilege of the gunicorn / WSGI process.
-
-When the chosen target is a Pyt…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-38360"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-38360&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fohrloop/dash-uploader/issues/153"&gt;https://github.com/fohrloop/dash-uploader/issues/153&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/a1ohadance/CVE-2026-38360"&gt;https://github.com/a1ohadance/CVE-2026-38360&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fohrloop/dash-uploader"&gt;https://github.com/fohrloop/dash-uploader&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fohrloop/dash-uploader/blob/dev/dash_uploader/httprequesthandler.py"&gt;https://github.com/fohrloop/dash-uploader/blob/dev/dash_uploader/httprequesthandler.py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fohrloop/dash-uploader/blob/stable/dash_uploader/httprequesthandler.py"&gt;https://github.com/fohrloop/dash-uploader/blob/stable/dash_uploader/httprequesthandler.py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lmigtech/dash_uploader"&gt;https://github.com/lmigtech/dash_uploader&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/dash-uploader"&gt;https://pypi.org/project/dash-uploader&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3rf6-x59v-5jfv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rrqq-fv6m-692m: vanna vulnerable to remote code execution caused by prompt injection</title>
-    <id>https://osv.dev/vulnerability/GHSA-rrqq-fv6m-692m</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rrqq-fv6m-692m"/>
-    <published>2024-06-27T21:32:08Z</published>
-    <updated>2026-06-29T12:26:37Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2024-5826"/>
-    <category term="PYSEC-2026-562"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;vanna vulnerable to remote code execution caused by prompt injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-5826, PYSEC-2026-562&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vanna&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In the latest version of vanna-ai/vanna, the `vanna.ask` function is vulnerable to remote code execution due to prompt injection. The root cause is the lack of a sandbox when executing LLM-generated code, allowing an attacker to manipulate the code executed by the `exec` function in `src/vanna/base/base.py`. This vulnerability can be exploited by an attacker to achieve remote code execution on the app backend server, potentially gaining full control of the server.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-5826"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-5826&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vanna-ai/vanna"&gt;https://github.com/vanna-ai/vanna&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://huntr.com/bounties/90620087-44ac-4e43-b659-3c5d30889369"&gt;https://huntr.com/bounties/90620087-44ac-4e43-b659-3c5d30889369&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rrqq-fv6m-692m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-q279-jhrf-cc6v: Ray is vulnerable to Critical RCE via Safari &amp; Firefox Browsers through DNS Rebinding Attack</title>
-    <id>https://osv.dev/vulnerability/GHSA-q279-jhrf-cc6v</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q279-jhrf-cc6v"/>
-    <published>2025-11-26T19:35:23Z</published>
-    <updated>2026-06-29T12:26:37Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2025-62593"/>
-    <category term="PYSEC-2026-520"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Ray is vulnerable to Critical RCE via Safari &amp;amp; Firefox Browsers through DNS Rebinding Attack&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-62593, PYSEC-2026-520&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ray&lt;/code&gt; — fixed in 2.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Summary
-
-Developers working with Ray as a development tool can be exploited via a critical RCE vulnerability exploitable via Firefox and Safari. 
-
-Due to the longstanding [decision](https://docs.ray.io/en/releases-2.51.1/ray-security/index.html) by the Ray Development team to not implement any sort of authentication on critical endpoints, like the `/api/jobs` &amp;amp; `/api/job_agent/jobs/` has once again led to a severe vulnerability that allows attackers to execute arbitrary code against Ray. This time in a development context via the browsers Firefox and Safari.
-
-This vulnerability is due to an insufficient guard against browser-based attacks, as the current defense uses the `User-Agent` header starting with the string &amp;quot;Mozilla&amp;quot; as a defense mechanism. This defense is insufficient as the fet…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ray-project/ray/security/advisories/GHSA-q279-jhrf-cc6v"&gt;https://github.com/ray-project/ray/security/advisories/GHSA-q279-jhrf-cc6v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-62593"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-62593&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nccgroup/singularity/pull/68"&gt;https://github.com/nccgroup/singularity/pull/68&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ray-project/ray/commit/70e7c72780bdec075dba6cad1afe0832772bfe09"&gt;https://github.com/ray-project/ray/commit/70e7c72780bdec075dba6cad1afe0832772bfe09&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://docs.ray.io/en/releases-2.51.1/ray-security/index.html"&gt;https://docs.ray.io/en/releases-2.51.1/ray-security/index.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://en.wikipedia.org/wiki/Malvertising"&gt;https://en.wikipedia.org/wiki/Malvertising&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ray-project/ray"&gt;https://github.com/ray-project/ray&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ray-project/ray/blob/e7889ae542bf0188610bc8b06d274cbf53790cbd/python/ray/dashboard/http_server_head.py#L184-L196"&gt;https://github.com/ray-project/ray/blob/e7889ae542bf0188610bc8b06d274cbf53790cbd/python/ray/dashboard/http_server_head.py#L184-L196&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q279-jhrf-cc6v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-83g7-8fch-p37m: PaddlePaddle vulnerable to code injection via winstr</title>
-    <id>https://osv.dev/vulnerability/GHSA-83g7-8fch-p37m</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-83g7-8fch-p37m"/>
-    <published>2022-11-26T03:30:27Z</published>
-    <updated>2026-06-29T12:26:37Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2022-45908"/>
-    <category term="PYSEC-2026-443"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;PaddlePaddle vulnerable to code injection via winstr&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2022-45908, PYSEC-2026-443&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;paddlepaddle&lt;/code&gt; — fixed in 2.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In PaddlePaddle before 2.4, paddle.audio.functional.get_window is vulnerable to code injection because it calls eval on a user-supplied winstr. This may lead to arbitrary code execution.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2022-45908"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-45908&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PaddlePaddle/Paddle/commit/26c419ca386aeae3c461faf2b828d00b48e908eb"&gt;https://github.com/PaddlePaddle/Paddle/commit/26c419ca386aeae3c461faf2b828d00b48e908eb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PaddlePaddle/Paddle"&gt;https://github.com/PaddlePaddle/Paddle&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PaddlePaddle/Paddle/blob/develop/security/advisory/pdsa-2022-002.md"&gt;https://github.com/PaddlePaddle/Paddle/blob/develop/security/advisory/pdsa-2022-002.md&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-83g7-8fch-p37m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f4j7-r4q5-qw2c: ChromaDB Python project has a pre-authentication code injection vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-f4j7-r4q5-qw2c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f4j7-r4q5-qw2c"/>
-    <published>2026-05-18T18:31:30Z</published>
-    <updated>2026-06-29T12:26:36Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-45829"/>
-    <category term="PYSEC-2026-311"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;ChromaDB Python project has a pre-authentication code injection vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45829, PYSEC-2026-311&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;chromadb&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A pre-authentication, code injection vulnerability in version 1.0.0 or later of the ChromaDB Python project allows an unauthenticated attacker to run arbitrary code on the server by sending a malicious model repository and trust_remote_code set to true in the /api/v2/tenants/{tenant}/databases/{db}/collections endpoint.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45829"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45829&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma/issues/6717"&gt;https://github.com/chroma-core/chroma/issues/6717&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma"&gt;https://github.com/chroma-core/chroma&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.hiddenlayer.com/research/chromatoast-served-pre-auth"&gt;https://www.hiddenlayer.com/research/chromatoast-served-pre-auth&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f4j7-r4q5-qw2c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

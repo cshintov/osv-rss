@@ -3,12 +3,326 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-07-01T15:59:36Z</updated>
+  <updated>2026-07-01T20:30:10Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-whwg-vh4f-pmmf: SurrealDB: Edge PERMISSIONS FOR delete bypassed when a connected node is deleted</title>
+    <id>https://osv.dev/vulnerability/GHSA-whwg-vh4f-pmmf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-whwg-vh4f-pmmf"/>
+    <published>2026-07-01T20:23:49Z</published>
+    <updated>2026-07-01T20:30:10Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-49997"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Edge PERMISSIONS FOR delete bypassed when a connected node is deleted&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49997&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In SurrealDB, records can be connected as a graph: a `RELATE` statement creates an edge record between two node records. If either endpoint node is deleted, SurrealDB automatically removes the edge row to keep the graph consistent.
+
+A user with permission to delete a node could also delete the edges connected to that node, even when the edge table&amp;#x27;s `PERMISSIONS FOR delete` clause should have stopped them.
+
+The automatic edge removal (`Document::purge_edges`) ran with permissions disabled (`opt.clone().with_perms(false)`), so the edge table&amp;#x27;s `PERMISSIONS FOR delete` and `PERMISSIONS FOR select` clauses were never consulted. The removal step could also observe edge state that the edge&amp;#x27;s SELECT clause should have hidden.
+
+### Impact
+
+What an attacker **can** do:
+
+- Delete any edge connected…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-whwg-vh4f-pmmf"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-whwg-vh4f-pmmf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/242"&gt;https://github.com/surrealdb/surrealdb/pull/242&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/a80d1784cf75358441978bbd77688855e95f4578"&gt;https://github.com/surrealdb/surrealdb/commit/a80d1784cf75358441978bbd77688855e95f4578&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-whwg-vh4f-pmmf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wp87-mgvq-5j93: SurrealDB: USE NS/DB implicit creation bypasses DEFINE authorization</title>
+    <id>https://osv.dev/vulnerability/GHSA-wp87-mgvq-5j93</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wp87-mgvq-5j93"/>
+    <published>2026-07-01T20:21:25Z</published>
+    <updated>2026-07-01T20:30:10Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: USE NS/DB implicit creation bypasses DEFINE authorization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An anonymous caller could create new namespaces and databases on a running SurrealDB instance without holding `DEFINE NAMESPACE` or `DEFINE DATABASE` permission.
+
+`USE NS &amp;lt;name&amp;gt;` and `USE DB &amp;lt;name&amp;gt;` automatically create the target when it does not exist. The three places `USE` is handled — the RPC `use` method, `Datastore::process_use`, and the SurrealQL executor — did not check whether the caller was allowed to create the resource. Under default capabilities any session reached this path, including an unauthenticated guest.
+
+### Impact
+
+What an attacker **can** do:
+
+- Create new namespaces and databases without `DEFINE NAMESPACE` / `DEFINE DATABASE` permission. An unauthenticated guest is enough under default capabilities.
+- Recreate a parent namespace that an operator deliberately droppe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-wp87-mgvq-5j93"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-wp87-mgvq-5j93&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/f3ee3bd55533c14f1fa3e69ce18fc8904c1ce3f9"&gt;https://github.com/surrealdb/surrealdb/commit/f3ee3bd55533c14f1fa3e69ce18fc8904c1ce3f9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wp87-mgvq-5j93"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-gcwr-5mrf-fvch: SurrealDB: Authorization Bypass in KILL Statement Allows Termination of Other Users' Live Queries</title>
+    <id>https://osv.dev/vulnerability/GHSA-gcwr-5mrf-fvch</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gcwr-5mrf-fvch"/>
+    <published>2026-07-01T20:14:20Z</published>
+    <updated>2026-07-01T20:30:10Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Authorization Bypass in KILL Statement Allows Termination of Other Users&amp;#x27; Live Queries&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `KILL` statement is used to terminate `LIVE SELECT` subscriptions that capture real-time changes to data within a table. The `KILL` statement implementation in `core/src/expr/statements/kill.rs` verifies that the requesting user has database-level access, but does not verify that the requesting user is the owner of the live query being terminated.
+ 
+After passing the `valid_for_db()` check, the `KILL` statement resolves the live query UUID, looks up the corresponding live query entry, and immediately deletes it without comparing the requesting user&amp;#x27;s identity against the live query owner. This allows any authenticated user with database-level access to terminate any live query in that database, regardless of who created it.
+ 
+The affected user&amp;#x27;s real-time subscription silently stops re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-gcwr-5mrf-fvch"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-gcwr-5mrf-fvch&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/36f0a41a69b551172c7d1d13b1e8dbbd868e2ead"&gt;https://github.com/surrealdb/surrealdb/commit/36f0a41a69b551172c7d1d13b1e8dbbd868e2ead&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gcwr-5mrf-fvch"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fpxg-5xmv-922m: SurrealDB has bypass of field-level SELECT permissions through JSON Patch `copy` and `move` with empty `from`</title>
+    <id>https://osv.dev/vulnerability/GHSA-fpxg-5xmv-922m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fpxg-5xmv-922m"/>
+    <published>2026-07-01T20:18:06Z</published>
+    <updated>2026-07-01T20:30:10Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB has bypass of field-level SELECT permissions through JSON Patch `copy` and `move` with empty `from`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SurrealDB lets callers modify records using JSON Patch operations via the `UPDATE … PATCH` statement (and SDK equivalents such as `db.patch()`). One of those operations is `copy`, which duplicates one field&amp;#x27;s value into another field of the same record. A `PATCH` with an empty `from` — for example, `UPDATE thing:1 PATCH [{ op: &amp;#x27;copy&amp;#x27;, from: &amp;#x27;&amp;#x27;, path: &amp;#x27;/leak&amp;#x27; }]` — was treated as &amp;quot;copy the entire record&amp;quot; and duplicated every field, including fields the caller has no permission to read, into the destination field the caller chose. The permission filter that hides protected field values from the response only knew to hide the *original* protected field names, not the new destinations, so the protected values were returned to the caller intact under the new field name.
+
+### Impact
+
+An authenti…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-fpxg-5xmv-922m"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-fpxg-5xmv-922m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/56a7a1540d9228f82fd6284c258344e8dcb690fd"&gt;https://github.com/surrealdb/surrealdb/commit/56a7a1540d9228f82fd6284c258344e8dcb690fd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fpxg-5xmv-922m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-65rj-r9fh-jp2v: SurrealDB vulnerable to pre-auth memory amplification via unbounded `/sql` WebSocket frames</title>
+    <id>https://osv.dev/vulnerability/GHSA-65rj-r9fh-jp2v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-65rj-r9fh-jp2v"/>
+    <published>2026-07-01T20:15:03Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB vulnerable to pre-auth memory amplification via unbounded `/sql` WebSocket frames&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An anonymous caller could degrade `/sql` availability by streaming WebSocket frames many times larger than the operator-configured per-connection limit. The `/sql` upgrade handler accepted anonymous connections and did not propagate `SURREAL_WEBSOCKET_MAX_MESSAGE_SIZE` to the WebSocket protocol layer — incoming bytes accumulated in the per-connection read buffer before `check_anon` could reject the query, so the memory cost was incurred regardless of whether the caller could ever execute SurrealQL. The same upgrade path also silently ignored `--deny-http sql` and `--deny-arbitrary-query *` for authenticated callers, but that secondary effect does not grant new permissions.
+
+### Impact
+
+`SURREAL_WEBSOCKET_MAX_MESSAGE_SIZE` is not applied to anonymous `/sql` connections, so each connection c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-65rj-r9fh-jp2v"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-65rj-r9fh-jp2v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/899967e6a9cf064c88a4bc4b35ea7e2da28a6411"&gt;https://github.com/surrealdb/surrealdb/commit/899967e6a9cf064c88a4bc4b35ea7e2da28a6411&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-65rj-r9fh-jp2v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6g9v-7gq3-p2c6: SurrealDB: Authenticated callers can read fields hidden by field-level SELECT permissions via error messages</title>
+    <id>https://osv.dev/vulnerability/GHSA-6g9v-7gq3-p2c6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6g9v-7gq3-p2c6"/>
+    <published>2026-07-01T20:16:52Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Authenticated callers can read fields hidden by field-level SELECT permissions via error messages&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A record user with UPDATE access could read field values that field-level SELECT permissions hid from them. Arithmetic operators and `extend` embedded the raw operand into their error messages, and UPDATE permission checks evaluate against the unreduced document — so triggering such an error against a hidden field returned its value in the resulting error.
+
+### Impact
+
+A record user issues an UPDATE that performs an incompatible operation against a hidden field — e.g. `UPDATE person:me SET probe = email + 1` when `email` is a string — and reads the value from the returned error (`Tried to compute &amp;quot;alice@example.com&amp;quot; + 1 …`). One field per operation, but the attacker can repeat against any field on any record they can UPDATE.
+
+### Patches
+
+A patch has been introduced that replaces the raw o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6g9v-7gq3-p2c6"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6g9v-7gq3-p2c6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/0aaa332c79195e4c40275eb5224aed3d52f5cf90"&gt;https://github.com/surrealdb/surrealdb/commit/0aaa332c79195e4c40275eb5224aed3d52f5cf90&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6g9v-7gq3-p2c6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c8jx-96c9-8xrp: SurrealDB: Field-level SELECT permissions bypassed via indexed COUNT fast paths</title>
+    <id>https://osv.dev/vulnerability/GHSA-c8jx-96c9-8xrp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c8jx-96c9-8xrp"/>
+    <published>2026-07-01T20:22:06Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Field-level SELECT permissions bypassed via indexed COUNT fast paths&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A record user could learn the value of a hidden field by counting how many records match a guess.
+
+When `DEFINE FIELD ... PERMISSIONS FOR select WHERE ...` hides a field&amp;#x27;s contents from a caller, and that field is indexed, running `SELECT count() FROM t WHERE hidden_field = &amp;quot;guess&amp;quot; GROUP ALL` returned a count greater than zero whenever a record actually had that value — even though the caller was never allowed to read the field directly. The query planner used an indexed-COUNT shortcut (`Index::Count`, `IndexCountScan`, or the legacy `Iterate Index Count` / `Iterate Index Keys` paths) that counts matching index entries and skips the permission check that would normally hide the value. The same query with `WITH NOINDEX` correctly returned `[]`, confirming the gap.
+
+By repeating the count qu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-c8jx-96c9-8xrp"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-c8jx-96c9-8xrp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/240"&gt;https://github.com/surrealdb/surrealdb/pull/240&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/0c6dd021bb55b32a78a553c72bb9c0cdd414825f"&gt;https://github.com/surrealdb/surrealdb/commit/0c6dd021bb55b32a78a553c72bb9c0cdd414825f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c8jx-96c9-8xrp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6vg3-hgrw-p5gf: SurrealDB has an Authorization Bypass via Composite Record-id Paths</title>
+    <id>https://osv.dev/vulnerability/GHSA-6vg3-hgrw-p5gf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6vg3-hgrw-p5gf"/>
+    <published>2026-07-01T20:12:25Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB has an Authorization Bypass via Composite Record-id Paths&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An authenticated user could bypass permission rules that gated access on parts of a record&amp;#x27;s id — most commonly tenant-isolation rules of the form `PERMISSIONS FOR select WHERE id.tenant = $auth.id.tenant`. The same defect also let UNIQUE constraints defined on parts of an id admit duplicate entries.
+
+When a query referenced part of a composite record id (`id.tenant`, `id.uid`, …), SurrealDB read the value from the record&amp;#x27;s editable body fields instead of from the immutable id key. Because the body is editable but the id is fixed at creation, an attacker with write access could set the body field to any value and have permission checks read that spoofed value.
+
+### Impact
+
+What an attacker **can** do:
+
+- Read records hidden by permission rules of the form `id.&amp;lt;field&amp;gt; = $auth.&amp;lt;...&amp;gt;` (typica…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6vg3-hgrw-p5gf"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6vg3-hgrw-p5gf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/1fcb19040bfffba92b3f69edb9b707d469e0027b"&gt;https://github.com/surrealdb/surrealdb/commit/1fcb19040bfffba92b3f69edb9b707d469e0027b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6vg3-hgrw-p5gf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4m82-p8cx-f94j: SurrealDB: LIVE query subscriptions survive session state changes, bypassing access controls</title>
+    <id>https://osv.dev/vulnerability/GHSA-4m82-p8cx-f94j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4m82-p8cx-f94j"/>
+    <published>2026-07-01T20:16:12Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: LIVE query subscriptions survive session state changes, bypassing access controls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A `LIVE SELECT` subscription records the user&amp;#x27;s auth state (`$auth`, `$token`, `$session`, `$access`) when it is registered, and the server uses that recorded state to evaluate the table- and row-level `PERMISSIONS` clauses for every subsequent notification. The recorded state is never refreshed. 
+
+When something changes the user&amp;#x27;s effective auth state — the originating session is invalidated, the session&amp;#x27;s TTL expires, or the user signs in, signs up, or authenticates as a different identity on the same connection — the subscription keeps delivering notifications under the old, stale auth state, and the `PERMISSIONS` that should now apply to the connection are never consulted.
+
+### Impact
+
+A user whose session has been revoked, expired, signed out of, or re-authenticated on the same connec…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-4m82-p8cx-f94j"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-4m82-p8cx-f94j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/6cc48412c975d51b47617708ec44abc11ca5a89a"&gt;https://github.com/surrealdb/surrealdb/commit/6cc48412c975d51b47617708ec44abc11ca5a89a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/cbec0a73dc9575994d2b9c1aec26af539dc99878"&gt;https://github.com/surrealdb/surrealdb/commit/cbec0a73dc9575994d2b9c1aec26af539dc99878&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4m82-p8cx-f94j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4v76-cw68-4vc9: SurrealDB: Crafting malicious LIVE queries writes to the database, resulting in DoS, without permission to the table required</title>
+    <id>https://osv.dev/vulnerability/GHSA-4v76-cw68-4vc9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4v76-cw68-4vc9"/>
+    <published>2026-07-01T20:13:37Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Crafting malicious LIVE queries writes to the database, resulting in DoS, without permission to the table required&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A `LIVE` query whose `WHERE` clause evaluates to an error caused the source data modifier (the user creating, updating, or deleting a record on the watched table) to fail instead. Calling any arbitrary SurrealQL function with a typed parameter and passing a value of the wrong type — for example `LIVE SELECT * FROM t WHERE string::trim(deny)` — triggered an evaluation error inside the LIVE notification path. That error then propagated through to the triggering write, rolling back the attempted change.
+
+While such a `LIVE` query was registered, all `CREATE`, `UPDATE`, and `DELETE` operations on the watched table failed — including those issued by a root user — for as long as the registration remained active. Registering the `LIVE` required `select` permission on the table; no other permissio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-4v76-cw68-4vc9"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-4v76-cw68-4vc9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/af835eb199ad2327a04c42101d11aff21fce7e47"&gt;https://github.com/surrealdb/surrealdb/commit/af835eb199ad2327a04c42101d11aff21fce7e47&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/b29e03f0714d1c4ec091fc6f27f1edbe243b8aec"&gt;https://github.com/surrealdb/surrealdb/commit/b29e03f0714d1c4ec091fc6f27f1edbe243b8aec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4v76-cw68-4vc9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fwg2-gr34-q3w8: SurrealDB: ES512 silently downgraded to ES384 due to jsonwebtoken crate limitation</title>
+    <id>https://osv.dev/vulnerability/GHSA-fwg2-gr34-q3w8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fwg2-gr34-q3w8"/>
+    <published>2026-07-01T20:23:01Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: ES512 silently downgraded to ES384 due to jsonwebtoken crate limitation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When a user configures `ALGORITHM ES512` for any JWT access method (`DEFINE ACCESS ... TYPE JWT ALGORITHM ES512`), SurrealDB silently substitutes ES384 at all four internal algorithm conversion points. This occurs because the underlying `jsonwebtoken` crate (v10.x) does not include an ES512 algorithm variant, so the mapping defaults to ES384 without raising an error, warning, or log message.
+ 
+Users who provide the correct P-521 key type for ES512 will experience authentication handshake failures due to the curve mismatch with ES384 (which expects P-384).
+ 
+### Impact
+ 
+Authentication handshake failures when using ES512 with the correct P-521 key type, and when tokens are verified by external systems expecting real ES512 signatures. 
+ 
+This vulnerability cannot be exploited to forge tokens…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-fwg2-gr34-q3w8"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-fwg2-gr34-q3w8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/7226"&gt;https://github.com/surrealdb/surrealdb/pull/7226&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/bd043d73dad583219d7df2b91f81ab0054c53730"&gt;https://github.com/surrealdb/surrealdb/commit/bd043d73dad583219d7df2b91f81ab0054c53730&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fwg2-gr34-q3w8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-f82j-v89j-mf86: SurrealDB: `RELATE` overwrites existing edge records without `UPDATE` permission</title>
+    <id>https://osv.dev/vulnerability/GHSA-f82j-v89j-mf86</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f82j-v89j-mf86"/>
+    <published>2026-07-01T20:19:17Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: `RELATE` overwrites existing edge records without `UPDATE` permission&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`RELATE` creates an edge record between two existing records, and SurrealDB enforces the `CREATE` permission on the edge table for this operation. When the statement included a `SET id = edge:existing` clause, however, the new edge&amp;#x27;s id ended up pointing at an record that was already in storage. Rather than failing because the target already existed — which is what a create operation should do — the storage layer silently overwrote the existing edge. A caller with `CREATE` permission could therefore replace any existing edge on the table, even without `UPDATE` permission for that record.
+
+### Impact
+
+An authenticated user with `CREATE` permission on an edge table could overwrite any existing record on that table — including edges they had no `UPDATE` permission for — by issuing a `RELATE` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-f82j-v89j-mf86"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-f82j-v89j-mf86&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/79aef90d9baf56147d21f6dcea7a59189ade0eb3"&gt;https://github.com/surrealdb/surrealdb/commit/79aef90d9baf56147d21f6dcea7a59189ade0eb3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/orgs/surrealdb/discussions/110"&gt;https://github.com/orgs/surrealdb/discussions/110&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f82j-v89j-mf86"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-97vg-427p-8hx5: SurrealDB: Port-specific --deny-net rules silently bypassed on HTTP redirect</title>
+    <id>https://osv.dev/vulnerability/GHSA-97vg-427p-8hx5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-97vg-427p-8hx5"/>
+    <published>2026-07-01T20:20:40Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Port-specific --deny-net rules silently bypassed on HTTP redirect&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SurrealDB offers `http::*` functions that can access external network endpoints, with the `--allow-net` and `--deny-net` capabilities used to restrict the set of network targets that can be reached. An authenticated user of SurrealDB can bypass a port-scoped `--deny-net &amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;` rule by chaining an HTTP redirect: the initial request goes to an `--allow-net`-permitted hostname, the response&amp;#x27;s `3xx Location` header points at the denied `host:port`, and the redirect is followed even though the destination was explicitly denied.
+
+The root cause is in the redirect policy applied to outbound HTTP requests (`surrealdb/core/src/fnc/util/http/mod.rs`): the `NetTarget` for the redirect destination is built from `url.host_str()` alone and `url.port()` is dropped. The capability matcher (`surrea…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-97vg-427p-8hx5"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-97vg-427p-8hx5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/https://github.com/surrealdb/surrealdb/commit/ceb1ca3a1"&gt;https://github.com/surrealdb/surrealdb/commit/https://github.com/surrealdb/surrealdb/commit/ceb1ca3a1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-97vg-427p-8hx5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6wqw-vhfr-9999: SurrealDB: Authenticated subscribers can read records hidden by SELECT permissions via LIVE subscriptions</title>
+    <id>https://osv.dev/vulnerability/GHSA-6wqw-vhfr-9999</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6wqw-vhfr-9999"/>
+    <published>2026-07-01T20:20:00Z</published>
+    <updated>2026-07-01T20:30:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Authenticated subscribers can read records hidden by SELECT permissions via LIVE subscriptions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A record user could read records the table&amp;#x27;s SELECT permission expression should have hidden, when that expression referenced `$value`, `$before`, `$after`, or `$event`. Binding a chosen value to that name before registering a `LIVE SELECT` caused notifications to evaluate the permission against the attacker&amp;#x27;s input instead of the real document.
+
+### Impact
+
+A record user binds a value to `$value`, `$before`, `$after`, or `$event` (e.g. `LET $value = [$auth.id]`) and registers `LIVE SELECT * FROM person`. The captured value shadows the real document at notification time, so a SELECT permission like `WHERE $auth.id.id() IN $value` passes for every record on the table — the subscriber receives notifications for records they should not see.
+
+Read-only impact, bounded to one table. Permission …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6wqw-vhfr-9999"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6wqw-vhfr-9999&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/6bcc55c9c0494a0d4d36821019b54459f7162af7"&gt;https://github.com/surrealdb/surrealdb/commit/6bcc55c9c0494a0d4d36821019b54459f7162af7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/orgs/surrealdb/discussions/101"&gt;https://github.com/orgs/surrealdb/discussions/101&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6wqw-vhfr-9999"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-98fx-66cf-fc7c: SurrealDB: Scraping a TABLE with no available PERMISSIONS to current auth level</title>
+    <id>https://osv.dev/vulnerability/GHSA-98fx-66cf-fc7c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-98fx-66cf-fc7c"/>
+    <published>2026-07-01T20:06:08Z</published>
+    <updated>2026-07-01T20:15:10Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Scraping a TABLE with no available PERMISSIONS to current auth level&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability was discovered where the user-supplied `WHERE` clause in a `SELECT` statement is evaluated against the full record data before `PERMISSIONS FOR SELECT WHERE` determines whether the principal is authorised to access that record. A side-effecting expression in the `WHERE` clause can exfiltrate record contents before the permission check runs. The same ordering bug affects the `SET`, `MERGE`, `CONTENT` and `PATCH` clauses of update-variant statements (`UPDATE`, `UPSERT-update`, `INSERT ON DUPLICATE KEY UPDATE`, `RELATE-update`).
+
+This vulnerability is confined to the attacker&amp;#x27;s current database. It does not cross namespace or database isolation boundaries.
+
+### Impact
+
+An authenticated user — including Record and Scope users — can read the full contents of any table in the dat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-98fx-66cf-fc7c"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-98fx-66cf-fc7c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/500f4060349580b9cbb9c07b8112a487551c4616"&gt;https://github.com/surrealdb/surrealdb/commit/500f4060349580b9cbb9c07b8112a487551c4616&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-98fx-66cf-fc7c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q8qp-67f9-wr3f: SurrealDB vulnerable to Denial of Service due to nested types annotations</title>
+    <id>https://osv.dev/vulnerability/GHSA-q8qp-67f9-wr3f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q8qp-67f9-wr3f"/>
+    <published>2026-07-01T20:05:14Z</published>
+    <updated>2026-07-01T20:15:09Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB vulnerable to Denial of Service due to nested types annotations&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The SurrealDB type/kind parser did not enforce the configured recursion depth limit when parsing nested type annotations. The expression parser already enforced the limit for analogous constructs; the kind parser omitted it. An authenticated attacker could send a query with deeply nested type annotations (e.g., `array&amp;lt;option&amp;lt;array&amp;lt;option&amp;lt;...&amp;gt;&amp;gt;&amp;gt;&amp;gt;`) and exhaust server memory, crashing the process.
+
+This is an incomplete fix for [GHSA-6r8p-hpg7-825g](https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6r8p-hpg7-825g), which addressed the same class of bug in the expression parser but did not cover the kind/type annotation parser code path.
+
+### Impact
+
+An authenticated user with query execution privileges can crash a SurrealDB server with a single WebSocket message containing deep…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-q8qp-67f9-wr3f"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-q8qp-67f9-wr3f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/61d509b766afdf67cc26d8203fd7dc583c8d77aa"&gt;https://github.com/surrealdb/surrealdb/commit/61d509b766afdf67cc26d8203fd7dc583c8d77aa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q8qp-67f9-wr3f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wjjj-24cx-f28g: SurrealDB has unauthenticated remote DoS via malformed RPC `use` call</title>
+    <id>https://osv.dev/vulnerability/GHSA-wjjj-24cx-f28g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wjjj-24cx-f28g"/>
+    <published>2026-07-01T20:04:22Z</published>
+    <updated>2026-07-01T20:15:09Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB has unauthenticated remote DoS via malformed RPC `use` call&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A single unauthenticated WebSocket message to `/rpc` crashed the SurrealDB server. Sending `use { db: &amp;quot;x&amp;quot; }` without first selecting a namespace hit `.expect(&amp;quot;namespace should be set&amp;quot;)` in the `use` handler; because `surrealdb-core` is built with `panic = &amp;#x27;abort&amp;#x27;`, the panic terminated the process. `use` is callable before `signin`, and the per-method capability check passes by default for guest callers — so no credentials, token, or `--allow-guests` flag are required.
+
+### Impact
+
+An unauthenticated remote attacker who could reach the `/rpc` endpoint could crash the SurrealDB server with a single WebSocket message. No credentials, token, session knowledge, or capability are required.
+
+### Patches
+
+A patch has been introduced that returns a typed `invalid_params` response when `db` is set …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-wjjj-24cx-f28g"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-wjjj-24cx-f28g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/1537ec4fbd789c61a5b43b648a854577dbe31a34"&gt;https://github.com/surrealdb/surrealdb/commit/1537ec4fbd789c61a5b43b648a854577dbe31a34&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wjjj-24cx-f28g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5qfp-32cf-69jh: SurrealDB: HTTP /rpc `sessions` method leaks attached session UUIDs, enabling full session hijack by anonymous callers</title>
+    <id>https://osv.dev/vulnerability/GHSA-5qfp-32cf-69jh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5qfp-32cf-69jh"/>
+    <published>2026-07-01T20:00:17Z</published>
+    <updated>2026-07-01T20:15:09Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: HTTP /rpc `sessions` method leaks attached session UUIDs, enabling full session hijack by anonymous callers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The HTTP `/rpc` `sessions` method returned every attached session UUID without authentication, and the `/rpc` handler accepted an arbitrary `session` field with no ownership check. An anonymous caller could enumerate UUIDs and impersonate any authenticated session.
+
+&amp;quot;Attached&amp;quot; means sessions registered via `{&amp;quot;method&amp;quot;:&amp;quot;attach&amp;quot;}` — the only writer to the HTTP session map. Ordinary stateless `/rpc` requests use ephemeral per-request sessions that are filtered from `sessions()` and destroyed at end-of-request, so they are not enumerable.
+
+### Exposure
+
+- **Exposed:** clients that issue `attach`, notably the official Rust SDK&amp;#x27;s `Http`/`Https` engine (auto-attaches once per `Surreal` handle).
+- **Not exposed:** REST endpoints (`/sql`, `/key`, `/signin`, `/export`, etc.); WebSocket `/rpc` (per-co…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-5qfp-32cf-69jh"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-5qfp-32cf-69jh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/fd800fc7c55afcdc97057d18cf7cb7f83557e702"&gt;https://github.com/surrealdb/surrealdb/commit/fd800fc7c55afcdc97057d18cf7cb7f83557e702&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5qfp-32cf-69jh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4vgr-h27g-cf9p: SurrealDB: HTTP RPC Session Race Condition Allows Privilege Escalation</title>
+    <id>https://osv.dev/vulnerability/GHSA-4vgr-h27g-cf9p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4vgr-h27g-cf9p"/>
+    <published>2026-07-01T20:02:06Z</published>
+    <updated>2026-07-01T20:15:09Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: HTTP RPC Session Race Condition Allows Privilege Escalation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The HTTP `/rpc` endpoint has a time-of-check/time-of-use (TOCTOU) race condition on internal session state. When authenticated and unauthenticated requests are processed concurrently, the unauthenticated request can inherit the authenticated user&amp;#x27;s session and privileges. The `/rpc` endpoint is the primary interface used by all official SurrealDB SDKs.
+
+The HTTP `/rpc` handler does not bind each incoming request to an isolated session context. Instead, concurrent requests share mutable authentication state. When an authenticated request sets the session context and an unauthenticated request races in before it is cleared, the unauthenticated request executes with the authenticated user&amp;#x27;s privileges.
+
+The impact depends on the privilege level of the session that is hijacked. If a root or na…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-4vgr-h27g-cf9p"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-4vgr-h27g-cf9p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/2f53e6e86d1b87e38300e714cfd7aede1abe4c3d"&gt;https://github.com/surrealdb/surrealdb/commit/2f53e6e86d1b87e38300e714cfd7aede1abe4c3d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/fd800fc7c55afcdc97057d18cf7cb7f83557e702"&gt;https://github.com/surrealdb/surrealdb/commit/fd800fc7c55afcdc97057d18cf7cb7f83557e702&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4vgr-h27g-cf9p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vjjx-rfw4-rmfc: SurrealDB: Graph traversal bypasses table SELECT permissions</title>
+    <id>https://osv.dev/vulnerability/GHSA-vjjx-rfw4-rmfc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vjjx-rfw4-rmfc"/>
+    <published>2026-07-01T20:10:34Z</published>
+    <updated>2026-07-01T20:15:09Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Graph traversal bypasses table SELECT permissions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An authenticated record or scope user could read records on any table reachable through a graph edge or `REFERENCES TO` back-reference, regardless of that table&amp;#x27;s `PERMISSIONS FOR select` clause.
+
+Traversing `SELECT * FROM source-&amp;gt;edge-&amp;gt;target` returned full documents from `target` even when `target` was defined as `PERMISSIONS FOR select NONE`. The same bypass extended through multi-hop chains, so any table reachable by a sequence of edges from a readable starting point was exposed.
+
+The root cause: `GraphEdgeScan` and `ReferenceScan` fetched records straight from storage without routing them through `Document::pluck_select`, so the target table&amp;#x27;s permission expression was never consulted.
+
+### Impact
+
+An authenticated record or scope user can read records on any table reachable through a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-vjjx-rfw4-rmfc"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-vjjx-rfw4-rmfc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vjjx-rfw4-rmfc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q729-696q-g9pq: SurrealDB has Denial of Service in JSON parser due to nested objects</title>
+    <id>https://osv.dev/vulnerability/GHSA-q729-696q-g9pq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q729-696q-g9pq"/>
+    <published>2026-07-01T20:03:33Z</published>
+    <updated>2026-07-01T20:15:09Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB has Denial of Service in JSON parser due to nested objects&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The SurrealDB value and JSON parser did not enforce the configured recursion depth limit when parsing nested `{`, `[`, or `(` tokens. The expression parser already enforced the limit for these tokens; the value/JSON parser omitted it. An unauthenticated attacker could send a deeply nested JSON payload to the WebSocket `/rpc` endpoint and exhaust server memory, crashing the process.
+
+This is an incomplete fix for [GHSA-6r8p-hpg7-825g](https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6r8p-hpg7-825g), which addressed the same class of bug in the expression parser but did not cover the value/JSON parser code path.
+
+### Impact
+
+An unauthenticated remote attacker can crash a SurrealDB server with a single WebSocket message. No credentials or query execution privileges are required…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-q729-696q-g9pq"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-q729-696q-g9pq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/1bd9826f477f4089134460dc5574b6f4e6916973"&gt;https://github.com/surrealdb/surrealdb/commit/1bd9826f477f4089134460dc5574b6f4e6916973&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q729-696q-g9pq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-f26g-jm89-4g65: gitoxide: CommandForbiddenInModulesConfiguration Bypass in gix_submodule::File::update() Enables Arbitrary Command Execution via .gitmodules</title>
     <id>https://osv.dev/vulnerability/GHSA-f26g-jm89-4g65</id>
@@ -77,242 +391,5 @@ Non-HTTP transports such as stdio and child-process transports are not affected.
 The issue was fixed in `rmcp` 1.4.0 by adding default loopback-only host
 allowlist validation for the Streamable HTTP server transport. Incoming HTTP
 requests now validate …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/rmcp"&gt;https://crates.io/crates/rmcp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0189.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0189.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/security/advisories/GHSA-89vp-x53w-74fx"&gt;https://github.com/modelcontextprotocol/rust-sdk/security/advisories/GHSA-89vp-x53w-74fx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/pull/764"&gt;https://github.com/modelcontextprotocol/rust-sdk/pull/764&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/issues/815"&gt;https://github.com/modelcontextprotocol/rust-sdk/issues/815&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/issues/822"&gt;https://github.com/modelcontextprotocol/rust-sdk/issues/822&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#security-warning"&gt;https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#security-warning&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0189"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0192: `ttf-parser` is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0192</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0192"/>
-    <published>2026-06-28T12:00:00Z</published>
-    <updated>2026-06-29T21:15:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`ttf-parser` is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ttf-parser&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The author of `ttf-parser` has stated that the crate is unmaintained and will not receive further fixes (see the referenced issue).
-
-## Alternative(s)
-
-- [`skrifa`](https://crates.io/crates/skrifa), an actively maintained TrueType and OpenType font parsing crate, part of the Google Fonts &amp;quot;oxidize&amp;quot; (`fontations`) project.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/ttf-parser"&gt;https://crates.io/crates/ttf-parser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0192.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0192.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/harfbuzz/ttf-parser/issues/217"&gt;https://github.com/harfbuzz/ttf-parser/issues/217&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0192"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-r5fr-9gmv-jggh: scim_proto and kanidm_proto have an authenticated process abort via SCIM filter stack exhaustion</title>
-    <id>https://osv.dev/vulnerability/GHSA-r5fr-9gmv-jggh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r5fr-9gmv-jggh"/>
-    <published>2026-05-06T23:38:49Z</published>
-    <updated>2026-06-29T15:46:31Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-46689"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;scim_proto and kanidm_proto have an authenticated process abort via SCIM filter stack exhaustion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46689&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;scim_proto&lt;/code&gt; — fixed in 1.9.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;kanidm_proto&lt;/code&gt; — fixed in 1.9.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-A single unauthenticated `GET` to any `/scim/v1/...` endpoint with a `?filter=` query string of a few thousand nested parentheses (≈ 4–12 KB) drives the recursive-descent PEG parser past the worker thread&amp;#x27;s stack guard page. Rust responds to stack overflow with `std::process::abort()` — the entire `kanidmd` process exits. The parse runs inside axum&amp;#x27;s `Query&amp;lt;ScimEntryGetQuery&amp;gt;` extractor, before any handler body and therefore before any ACL check.
-
-### Details
-
-The SCIM filter grammar recurses on `(` and `not (` with no depth bound.
-
-**`proto/src/scim_v1/mod.rs:263-433`** — `peg::parser! { grammar scimfilter() ... }`:
-
-```rust
-// line 281
-&amp;quot;not&amp;quot; separator()+ &amp;quot;(&amp;quot; e:parse() &amp;quot;)&amp;quot; { ScimFilter::Not(Box::new(e)) }
-// line 293
-&amp;quot;(&amp;quot; e:parse() &amp;quot;)&amp;quot; { e }
-```
-
-Both rules re-enter `parse()` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kanidm/kanidm/security/advisories/GHSA-r5fr-9gmv-jggh"&gt;https://github.com/kanidm/kanidm/security/advisories/GHSA-r5fr-9gmv-jggh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46689"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46689&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kanidm/kanidm"&gt;https://github.com/kanidm/kanidm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kanidm/kanidm/releases/tag/v1.9.3"&gt;https://github.com/kanidm/kanidm/releases/tag/v1.9.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r5fr-9gmv-jggh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2025-0165: i_tree allowed out-of-bounds access through safe public node accessors</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0165</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0165"/>
-    <published>2025-07-04T12:00:00Z</published>
-    <updated>2026-06-29T15:15:03Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;i_tree allowed out-of-bounds access through safe public node accessors&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;i_tree&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `i_tree` exposed safe public `Tree::node` and `Tree::mut_node` methods in the public `tree` module. These methods accepted an arbitrary `u32` index and passed it directly to `Vec::get_unchecked` / `get_unchecked_mut` on the internal node buffer, without validating that the index was in bounds.
-
-Because these methods were safe and public, a caller could pass an out-of-bounds index without writing any `unsafe` code, producing an out-of-bounds shared or mutable reference and triggering undefined behavior.
-
-Starting with `0.10.0` the crate was restructured and these accessors are no longer reachable from outside the crate.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/i_tree"&gt;https://crates.io/crates/i_tree&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0165.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0165.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iShape-Rust/iTree/issues/1"&gt;https://github.com/iShape-Rust/iTree/issues/1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iShape-Rust/iTree/commit/a948b891cf159233bfed5b16bf185268fd9e1985"&gt;https://github.com/iShape-Rust/iTree/commit/a948b891cf159233bfed5b16bf185268fd9e1985&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iShape-Rust/iTree/compare/0.9.0...0.10.0"&gt;https://github.com/iShape-Rust/iTree/compare/0.9.0...0.10.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0165"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0191: `EbpfVm::invoke_function` performs out-of-bounds pointer arithmetic</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0191</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0191"/>
-    <published>2026-05-28T12:00:00Z</published>
-    <updated>2026-06-29T14:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`EbpfVm::invoke_function` performs out-of-bounds pointer arithmetic&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;solana_rbpf&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `solana_rbpf` expose the safe method
-`EbpfVm::invoke_function`. This method computes an obfuscated VM pointer by
-casting `self` to `*mut u64` and applying a randomized offset derived from
-`get_runtime_environment_key()`.
-
-The resulting pointer arithmetic is performed with `ptr::offset`, which
-requires the computed pointer to remain within the same allocation. In practice,
-the randomized offset can move the pointer far outside the allocation
-containing the `EbpfVm`, causing undefined behavior before the supplied builtin
-function is invoked.
-
-## Unmaintained
-
-The upstream `solana_rbpf` repository is archived, and no patched version of
-this crate is currently available.
-
-Users should migrate to the maintained [`solana-sbpf`](https://crates.io/crates/solana-sbpf)
-crate. Th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/solana_rbpf"&gt;https://crates.io/crates/solana_rbpf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0191.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0191.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/solana-labs/rbpf"&gt;https://github.com/solana-labs/rbpf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anza-xyz/sbpf/pull/151"&gt;https://github.com/anza-xyz/sbpf/pull/151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/solana-sbpf"&gt;https://crates.io/crates/solana-sbpf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0191"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0190: Unsoundness in `Error::downcast_mut()`</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0190</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0190"/>
-    <published>2026-06-25T12:00:00Z</published>
-    <updated>2026-06-29T14:15:03Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Unsoundness in `Error::downcast_mut()`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;anyhow&lt;/code&gt; — fixed in 1.0.103&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of this crate violate borrow rules, resulting in undefined behavior, when the user adds context to an error via `Error::context` and then later calls `Error::downcast_mut` on the returned `Error`.
-
-The flaw was corrected in commit `6e8c000` by revising how the mutable reference is constructed, avoiding inclusion of a shared reference in the resulting borrow chain.
-
-## Example
-
-```rust
-use anyhow::Error;
-use std::fmt;
-
-#[derive(Debug)]
-struct ErrorContext(&amp;amp;&amp;#x27;static str);
-
-impl fmt::Display for ErrorContext {
-    fn fmt(&amp;amp;self, f: &amp;amp;mut fmt::Formatter&amp;lt;&amp;#x27;_&amp;gt;) -&amp;gt; fmt::Result {
-        fmt::Display::fmt(&amp;amp;self.0, f)
-    }
-}
-
-fn main() {
-    let mut error = Error::msg(&amp;quot;inner error&amp;quot;).context(ErrorContext(&amp;quot;old context&amp;quot;));
-    let context: &amp;amp;mut ErrorContext = error.downcast_mut().unwrap…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/anyhow"&gt;https://crates.io/crates/anyhow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0190.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0190.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dtolnay/anyhow/issues/451"&gt;https://github.com/dtolnay/anyhow/issues/451&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0190"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-fvh2-gm75-j4j7: dynoxide: DNS rebinding and cross-origin CSRF via MCP HTTP transport</title>
-    <id>https://osv.dev/vulnerability/GHSA-fvh2-gm75-j4j7</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fvh2-gm75-j4j7"/>
-    <published>2026-05-18T17:00:25Z</published>
-    <updated>2026-06-29T13:14:15Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-42559"/>
-    <category term="GHSA-89vp-x53w-74fx"/>
-    <category term="RUSTSEC-2026-0140"/>
-    <category term="RUSTSEC-2026-0189"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;dynoxide: DNS rebinding and cross-origin CSRF via MCP HTTP transport&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42559, GHSA-89vp-x53w-74fx, RUSTSEC-2026-0140, RUSTSEC-2026-0189&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dynoxide-rs&lt;/code&gt; — fixed in 0.9.13&lt;/li&gt;&lt;li&gt;&lt;code&gt;dynoxide&lt;/code&gt; — fixed in 0.9.13&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-dynoxide&amp;#x27;s MCP HTTP transport was vulnerable to DNS rebinding via its transitive `rmcp` dependency, plus a related cross-origin CSRF gap. A malicious web page could make the user&amp;#x27;s browser send requests to a local `dynoxide mcp --http` or `dynoxide serve --mcp` server with a non-loopback `Host` header, which the server would then process. Affects 0.9.3 to 0.9.12. The stdio transport (`dynoxide mcp` without `--http`, which is the default) is not affected.
-
-## Impact
-
-If a user is running `dynoxide mcp --http` (or `dynoxide serve --mcp`) on their machine and then visits a malicious web page, the attacker&amp;#x27;s JavaScript can call any MCP tool exposed by the running dynoxide instance.
-
-Reachable tools include reads (`get_item`, `query`, `scan`, `batch_get_item`, `describe_table`, `lis…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nubo-db/dynoxide/security/advisories/GHSA-fvh2-gm75-j4j7"&gt;https://github.com/nubo-db/dynoxide/security/advisories/GHSA-fvh2-gm75-j4j7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nubo-db/dynoxide"&gt;https://github.com/nubo-db/dynoxide&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nubo-db/dynoxide/releases/tag/v0.9.13"&gt;https://github.com/nubo-db/dynoxide/releases/tag/v0.9.13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0140.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0140.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fvh2-gm75-j4j7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0140: DNS rebinding and cross-origin CSRF in dynoxide's MCP HTTP transport</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0140</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0140"/>
-    <published>2026-05-12T12:00:00Z</published>
-    <updated>2026-06-29T13:14:15Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-42559"/>
-    <category term="GHSA-89vp-x53w-74fx"/>
-    <category term="GHSA-fvh2-gm75-j4j7"/>
-    <category term="RUSTSEC-2026-0189"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;DNS rebinding and cross-origin CSRF in dynoxide&amp;#x27;s MCP HTTP transport&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42559, GHSA-89vp-x53w-74fx, GHSA-fvh2-gm75-j4j7, RUSTSEC-2026-0189&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dynoxide-rs&lt;/code&gt; — fixed in 0.9.13&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;dynoxide&amp;#x27;s MCP HTTP transport was vulnerable to DNS rebinding via its transitive `rmcp` dependency, plus a related cross-origin CSRF gap.
-
-A malicious web page could make the user&amp;#x27;s browser send requests to a local `dynoxide mcp --http` or `dynoxide serve --mcp` server with a non-loopback `Host` header, which the server would then process. The Host check alone did not close a related cross-origin CSRF vector: a page could `fetch` the loopback endpoint with `mode: &amp;#x27;no-cors&amp;#x27;`, and the Host header would match while the Origin header went unchecked.
-
-Affected MCP write tools include `put_item`, `update_item`, `delete_item`, `create_table`, and `batch_write_item`.
-
-The stdio transport (`dynoxide mcp` without `--http`) is not affected.
-
-## Patches
-
-dynoxide 0.9.13 closes both vectors:
-
-- Upgrade…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/dynoxide-rs"&gt;https://crates.io/crates/dynoxide-rs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0140.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0140.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nubo-db/dynoxide/security/advisories/GHSA-fvh2-gm75-j4j7"&gt;https://github.com/nubo-db/dynoxide/security/advisories/GHSA-fvh2-gm75-j4j7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nubo-db/dynoxide/releases/tag/v0.9.13"&gt;https://github.com/nubo-db/dynoxide/releases/tag/v0.9.13&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0140"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-89vp-x53w-74fx: rmcp Streamable HTTP server transport has a DNS rebinding vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-89vp-x53w-74fx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-89vp-x53w-74fx"/>
-    <published>2026-05-06T21:55:56Z</published>
-    <updated>2026-06-29T13:11:02Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-42559"/>
-    <category term="GHSA-fvh2-gm75-j4j7"/>
-    <category term="RUSTSEC-2026-0140"/>
-    <category term="RUSTSEC-2026-0189"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;rmcp Streamable HTTP server transport has a DNS rebinding vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42559, GHSA-fvh2-gm75-j4j7, RUSTSEC-2026-0140, RUSTSEC-2026-0189&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rmcp&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Prior to version 1.4.0, the `rmcp` crate&amp;#x27;s Streamable HTTP server transport (`crates/rmcp/src/transport/streamable_http_server/`) did not validate the incoming `Host` header. This allowed a malicious public website, via a DNS rebinding attack, to send authenticated requests to an MCP server running on the victim&amp;#x27;s loopback or private-network interface — violating the MCP specification&amp;#x27;s [transport security guidance](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#security-warning).
-
-## Impact
-
-An attacker who convinces a victim to visit a malicious page can:
-
-- Enumerate and invoke any tool exposed by a locally-running rmcp-based MCP server.
-- Read resources, prompts, and any state accessible via the MCP session.
-- Trigger side effects (file writes, sh…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/security/advisories/GHSA-89vp-x53w-74fx"&gt;https://github.com/modelcontextprotocol/rust-sdk/security/advisories/GHSA-89vp-x53w-74fx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nubo-db/dynoxide/security/advisories/GHSA-fvh2-gm75-j4j7"&gt;https://github.com/nubo-db/dynoxide/security/advisories/GHSA-fvh2-gm75-j4j7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42559"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42559&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/issues/815"&gt;https://github.com/modelcontextprotocol/rust-sdk/issues/815&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/issues/822"&gt;https://github.com/modelcontextprotocol/rust-sdk/issues/822&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/pull/764"&gt;https://github.com/modelcontextprotocol/rust-sdk/pull/764&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/commit/8e22aa2de28df5a285eed87c11cd89bf15fa90d3"&gt;https://github.com/modelcontextprotocol/rust-sdk/commit/8e22aa2de28df5a285eed87c11cd89bf15fa90d3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk"&gt;https://github.com/modelcontextprotocol/rust-sdk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-89vp-x53w-74fx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0188: WASI hard links and renames bypass wasmtime-wasi's FilePerms for destination</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0188</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0188"/>
-    <published>2026-06-24T12:00:00Z</published>
-    <updated>2026-06-29T12:45:05Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-4ch3-9j33-3pmj"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;WASI hard links and renames bypass wasmtime-wasi&amp;#x27;s FilePerms for destination&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-4ch3-9j33-3pmj&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 24.0.11, 36.0.12, 45.0.3, 46.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-4ch3-9j33-3pmj
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime-wasi"&gt;https://crates.io/crates/wasmtime-wasi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0188.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0188.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-4ch3-9j33-3pmj"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-4ch3-9j33-3pmj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0188"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-g6ww-w5j2-r7x3: BoxLite: Permission Bypass Allows Modification of Read-Only Files</title>
-    <id>https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3"/>
-    <published>2026-05-21T21:52:51Z</published>
-    <updated>2026-06-29T12:26:07Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-46695"/>
-    <category term="GO-2026-5392"/>
-    <category term="PYSEC-2026-299"/>
-    <category term="RUSTSEC-2026-0147"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;BoxLite: Permission Bypass Allows Modification of Read-Only Files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46695, GO-2026-5392, PYSEC-2026-299, RUSTSEC-2026-0147&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@boxlite-ai/boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/boxlite-ai/boxlite/sdks/go&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;boxlite-cli&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
-
-Boxlite is a sandbox service that allows users to create lightweight virtual machines (Boxes) and launch OCI containers within them to run untrusted code.
-
-One of the core security features claimed by Boxlite is the ability to mount host directories in read-only mode (read_only=True) into the VM via the virtiofs protocol (a host-guest shared filesystem protocol designed specifically for virtual machines), so that untrusted code can only read but not modify host data. Since the underlying function of the lightweight VM library libkrun used by Boxlite does not support mounting in read-only mode, Boxlite chooses to implement read-only by adding the MS_RDONLY flag when mounting the directory after the VM starts.
-
-However, because Boxlite does not restrict the kernel capabilities …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-g6ww-w5j2-r7x3"&gt;https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-g6ww-w5j2-r7x3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46695"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46695&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/pull/454"&gt;https://github.com/boxlite-ai/boxlite/pull/454&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite"&gt;https://github.com/boxlite-ai/boxlite&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0"&gt;https://github.com/boxlite-ai/boxlite/releases/tag/v0.9.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0147.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0147.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6ww-w5j2-r7x3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0147: Read-only volume remount bypass via guest CAP_SYS_ADMIN</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0147</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0147"/>
-    <published>2026-05-16T12:00:00Z</published>
-    <updated>2026-06-29T12:26:07Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-46695"/>
-    <category term="GHSA-g6ww-w5j2-r7x3"/>
-    <category term="GO-2026-5392"/>
-    <category term="PYSEC-2026-299"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Read-only volume remount bypass via guest CAP_SYS_ADMIN&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46695, GHSA-g6ww-w5j2-r7x3, GO-2026-5392, PYSEC-2026-299&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;boxlite&lt;/code&gt; — fixed in 0.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `boxlite` mount host directories shared via virtiofs
-as guest-side read-only by setting `MS_RDONLY` from the guest. Because the
-default guest capability set included `CAP_SYS_ADMIN`, untrusted code
-running inside a sandbox could execute `mount -o remount,rw &amp;lt;path&amp;gt;` to
-re-flag the share as read-write and then write through to the host
-filesystem — fully escaping the read-only contract `boxlite` advertised
-to callers.
-
-The fix in v0.9.0 enforces read-only at the hypervisor level via
-`krun_add_virtiofs3` (so the guest&amp;#x27;s `MS_RDONLY` is no longer the
-authoritative gate) and drops `CAP_SYS_ADMIN` from the default guest
-capability set (matching Docker&amp;#x27;s defaults).
-
-This is a sandbox-escape bug: `boxlite` is a sandboxing runtime, so the
-read-only invariant is part of its secur…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/boxlite"&gt;https://crates.io/crates/boxlite&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0147.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0147.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-g6ww-w5j2-r7x3"&gt;https://github.com/boxlite-ai/boxlite/security/advisories/GHSA-g6ww-w5j2-r7x3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/boxlite-ai/boxlite/pull/454"&gt;https://github.com/boxlite-ai/boxlite/pull/454&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0147"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

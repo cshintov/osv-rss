@@ -3,12 +3,303 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-01T22:30:09Z</updated>
+  <updated>2026-07-02T14:00:22Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-gcfq-8gqf-4876: GoFiber Vulnerable to X-Real-IP Spoofing via Header.Add() in BalancerForward</title>
+    <id>https://osv.dev/vulnerability/GHSA-gcfq-8gqf-4876</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gcfq-8gqf-4876"/>
+    <published>2026-07-02T13:50:45Z</published>
+    <updated>2026-07-02T14:00:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-45045"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoFiber Vulnerable to X-Real-IP Spoofing via Header.Add() in BalancerForward&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45045&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gofiber/fiber/v3&lt;/code&gt; — fixed in 3.3.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/gofiber/fiber/v2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `BalancerForward` proxy helper in GoFiber uses `Header.Add()` instead of `Header.Set()` when injecting the `X-Real-IP` header. This appends the real client IP as a second header value rather than replacing any attacker-supplied value. Upstream servers that read the first `X-Real-IP` header (nginx, Express, most HTTP servers) use the attacker&amp;#x27;s spoofed IP for logging, rate limiting, and access control.
+
+## Vulnerable Code
+
+**File:** `middleware/proxy/proxy.go`, lines 270-285
+
+```go
+func BalancerForward(servers []string, clients ...*fasthttp.Client) fiber.Handler {
+    r := &amp;amp;roundrobin{
+        current: 0,
+        pool:    servers,
+    }
+    return func(c fiber.Ctx) error {
+        server := r.get()
+        if !strings.HasPrefix(server, &amp;quot;http&amp;quot;) {
+            server = &amp;quot;http://…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gofiber/fiber/security/advisories/GHSA-gcfq-8gqf-4876"&gt;https://github.com/gofiber/fiber/security/advisories/GHSA-gcfq-8gqf-4876&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gofiber/fiber"&gt;https://github.com/gofiber/fiber&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gcfq-8gqf-4876"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g5vh-55hw-rxm8: GoFiber Vulnerable to Username Enumeration via Timing Oracle in BasicAuth Default Authorizer</title>
+    <id>https://osv.dev/vulnerability/GHSA-g5vh-55hw-rxm8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g5vh-55hw-rxm8"/>
+    <published>2026-07-02T13:46:25Z</published>
+    <updated>2026-07-02T14:00:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-44332"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoFiber Vulnerable to Username Enumeration via Timing Oracle in BasicAuth Default Authorizer&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44332&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gofiber/fiber/v3&lt;/code&gt; — fixed in 3.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The default `Authorizer` function in GoFiber&amp;#x27;s BasicAuth middleware uses short-circuit evaluation that skips password hash comparison for non-existent usernames. With bcrypt-hashed passwords (the primary use case), the timing difference between a valid and invalid username is approximately 1,000,000:1 (~100ms vs ~100ns), enabling reliable remote username enumeration.
+
+## Vulnerable Code
+
+**File:** `middleware/basicauth/config.go`, lines 126-138
+
+```go
+if cfg.Authorizer == nil {
+    verifiers := make(map[string]func(string) bool, len(cfg.Users))
+    for u, hpw := range cfg.Users {
+        v, err := parseHashedPassword(hpw)
+        if err != nil {
+            panic(err)
+        }
+        verifiers[u] = v
+    }
+    cfg.Authorizer = func(user, pass string, _ fiber.Ctx) bool {
+     …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gofiber/fiber/security/advisories/GHSA-g5vh-55hw-rxm8"&gt;https://github.com/gofiber/fiber/security/advisories/GHSA-g5vh-55hw-rxm8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gofiber/fiber"&gt;https://github.com/gofiber/fiber&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g5vh-55hw-rxm8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xf85-363p-868w: oras-go: Malicious registry can hijack Bearer token realm to exfiltrate credentials and refresh tokens</title>
+    <id>https://osv.dev/vulnerability/GHSA-xf85-363p-868w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xf85-363p-868w"/>
+    <published>2026-07-01T21:06:10Z</published>
+    <updated>2026-07-02T12:29:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48978"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;oras-go: Malicious registry can hijack Bearer token realm to exfiltrate credentials and refresh tokens&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48978&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:A/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go/v2&lt;/code&gt; — fixed in 2.6.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+oras-go&amp;#x27;s `auth.Client` follows the `realm` URL from a registry&amp;#x27;s `WWW-Authenticate: Bearer` challenge without validating its scheme or host. The `realm` field is server-controlled by design in the OCI/distribution spec — registries legitimately point token requests at a separate auth endpoint (e.g. Docker Hub&amp;#x27;s `registry-1.docker.io` -&amp;gt; `auth.docker.io`), so cross-host realms on public DNS names are not in themselves a vulnerability. Two specific patterns, however, are never legitimate under any registry trust model and can be abused by a malicious or compromised registry (or a man-in-the-middle on a plaintext connection):
+
+1. **SSRF to internal networks.** A realm of `http://169.254.169.254/...` (AWS/Azure IMDS), `http://10.0.0.x/...` (RFC 1918), or `http://127.0.0.1/...` cau…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/security/advisories/GHSA-xf85-363p-868w"&gt;https://github.com/oras-project/oras-go/security/advisories/GHSA-xf85-363p-868w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/commit/7a9f4b0b9558821b0422152ebe21ae56930fe764"&gt;https://github.com/oras-project/oras-go/commit/7a9f4b0b9558821b0422152ebe21ae56930fe764&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go"&gt;https://github.com/oras-project/oras-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/releases/tag/v2.6.1"&gt;https://github.com/oras-project/oras-go/releases/tag/v2.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xf85-363p-868w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jxpm-75mh-9fp7: oras-go blob upload vulnerable to credential forwarding via unvalidated Location header</title>
+    <id>https://osv.dev/vulnerability/GHSA-jxpm-75mh-9fp7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jxpm-75mh-9fp7"/>
+    <published>2026-07-01T21:35:45Z</published>
+    <updated>2026-07-02T12:29:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50151"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;oras-go blob upload vulnerable to credential forwarding via unvalidated Location header&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50151&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go/v2&lt;/code&gt; — fixed in 2.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+oras-go follows a registry-controlled `Location` header during the monolithic blob upload flow and reuses the `Authorization` header from the initial `POST` request for the subsequent `PUT` request. If a malicious registry returns a cross-host `Location`, oras-go can send the caller&amp;#x27;s credentials to an attacker-controlled endpoint.
+
+## Affected Versions
+
+tested: v2.6.0 (commit 03243809936cce826494b5506f724c6dc11115b1, as-of 2026-01-24)
+range: unknown; likely affects earlier v2.x releases that include the same upload flow
+
+## Impact
+
+Credential leak to an attacker-controlled endpoint and client-side ssrf to a cross-host target.
+
+## Affected Component
+
+- `registry/remote/repository.go:878-916` (`blobStore.completePushAfterInitialPost`)
+
+## Reproduction
+
+Attachments include `poc.z…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/security/advisories/GHSA-jxpm-75mh-9fp7"&gt;https://github.com/oras-project/oras-go/security/advisories/GHSA-jxpm-75mh-9fp7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/pull/1152"&gt;https://github.com/oras-project/oras-go/pull/1152&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/commit/4683c46ef078091544f5f55fd25102f002806991"&gt;https://github.com/oras-project/oras-go/commit/4683c46ef078091544f5f55fd25102f002806991&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go"&gt;https://github.com/oras-project/oras-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/releases/tag/v2.6.1"&gt;https://github.com/oras-project/oras-go/releases/tag/v2.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jxpm-75mh-9fp7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8xwf-rjm4-xvhv: oras-go has file store write outside workingDir via symlink traversal</title>
+    <id>https://osv.dev/vulnerability/GHSA-8xwf-rjm4-xvhv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8xwf-rjm4-xvhv"/>
+    <published>2026-07-01T21:43:10Z</published>
+    <updated>2026-07-02T12:29:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50162"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;oras-go has file store write outside workingDir via symlink traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50162&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go/v2&lt;/code&gt; — fixed in 2.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The file content store in `oras-go` attempts to confine writes to `workingDir` when `AllowPathTraversalOnWrite=false`, but the guard is lexical and does not account for symlink traversal. If `workingDir` contains a symlink path component and an attacker-controlled blob title (via `ocispec.AnnotationTitle`) targets a path under that symlink, `pushFile()` can create a file outside `workingDir`.
+
+## relevant links
+
+- repository: https://github.com/oras-project/oras-go
+- commit: 03243809936cce826494b5506f724c6dc11115b1
+- callsite: content/file/file.go:609 `resolveWritePath()` (used by `pushFile()`)
+
+## vulnerability details
+
+**pins:** oras-project/oras-go@03243809936cce826494b5506f724c6dc11115b1
+
+**as-of:** 2026-02-17
+
+**policy:** GitHub Security Advisory (oras-project/oras-go)
+
+**callsite:** …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/security/advisories/GHSA-8xwf-rjm4-xvhv"&gt;https://github.com/oras-project/oras-go/security/advisories/GHSA-8xwf-rjm4-xvhv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/commit/cc323e564d90c6b5b4bdd71d3c8d2ee2713b37e5"&gt;https://github.com/oras-project/oras-go/commit/cc323e564d90c6b5b4bdd71d3c8d2ee2713b37e5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go"&gt;https://github.com/oras-project/oras-go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8xwf-rjm4-xvhv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4946: Inefficient policy validation in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4946</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4946"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-02T10:44:30Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-32281"/>
+    <category term="CVE-2026-32281"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Inefficient policy validation in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32281, CVE-2026-32281&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Validating certificate chains which use policies is unexpectedly inefficient when certificates in the chain contain a very large number of policy mappings, possibly causing denial of service.
+
+This only affects validation of otherwise trusted certificate chains, issued by a root CA in the VerifyOptions.Roots CertPool, or in the system certificate pool.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/758061"&gt;https://go.dev/cl/758061&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78281"&gt;https://go.dev/issue/78281&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4946"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4866: Case-sensitive excludedSubtrees name constraints cause Auth Bypass in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4866</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4866"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-02T10:44:29Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-33810"/>
+    <category term="CVE-2026-33810"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Case-sensitive excludedSubtrees name constraints cause Auth Bypass in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-33810, CVE-2026-33810&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When verifying a certificate chain containing excluded DNS constraints, these constraints are not correctly applied to wildcard DNS SANs which use a different case than the constraint.
+
+This only affects validation of otherwise trusted certificate chains, issued by a root CA in the VerifyOptions.Roots CertPool, or in the system certificate pool.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/763763"&gt;https://go.dev/cl/763763&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78332"&gt;https://go.dev/issue/78332&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4864: TOCTOU permits root escape on Linux via Root.Chmod in os in internal/syscall/unix</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4864</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4864"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-02T10:44:29Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-32282"/>
+    <category term="CVE-2026-32282"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;TOCTOU permits root escape on Linux via Root.Chmod in os in internal/syscall/unix&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32282, CVE-2026-32282&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;On Linux, if the target of Root.Chmod is replaced with a symlink while the chmod operation is in progress, Chmod can operate on the target of the symlink, even when the target lies outside the root.
+
+The Linux fchmodat syscall silently ignores the AT_SYMLINK_NOFOLLOW flag, which Root.Chmod uses to avoid symlink traversal. Root.Chmod checks its target before acting and returns an error if the target is a symlink lying outside the root, so the impact is limited to cases where the target is replaced with a symlink between the check and operation.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/763761"&gt;https://go.dev/cl/763761&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78293"&gt;https://go.dev/issue/78293&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4864"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4342: Excessive CPU consumption when building archive index in archive/zip</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4342</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4342"/>
+    <published>2026-01-28T19:08:28Z</published>
+    <updated>2026-07-02T10:44:29Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2025-61728"/>
+    <category term="CVE-2025-61728"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excessive CPU consumption when building archive index in archive/zip&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2025-61728, CVE-2025-61728&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.24.12, 1.25.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;archive/zip uses a super-linear file name indexing algorithm that is invoked the first time a file in an archive is opened. This can lead to a denial of service when consuming a maliciously constructed ZIP archive.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/736713"&gt;https://go.dev/cl/736713&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77102"&gt;https://go.dev/issue/77102&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc"&gt;https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4342"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4337: Unexpected session resumption in crypto/tls</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4337</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4337"/>
+    <published>2026-02-05T17:23:09Z</published>
+    <updated>2026-07-02T10:44:29Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2025-68121"/>
+    <category term="CVE-2025-68121"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unexpected session resumption in crypto/tls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2025-68121, CVE-2025-68121&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.24.13, 1.25.7, 1.26.0-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;During session resumption in crypto/tls, if the underlying Config has its ClientCAs or RootCAs fields mutated between the initial handshake and the resumed handshake, the resumed handshake may succeed when it should have failed. This may happen when a user calls Config.Clone and mutates the returned Config, or uses Config.GetConfigForClient. This can cause a client to resume a session with a server that it would not have resumed with during the initial handshake, or cause a server to resume a session with a client that it would not have resumed with during the initial handshake.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/K09ubi9FQFk"&gt;https://groups.google.com/g/golang-announce/c/K09ubi9FQFk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/737700"&gt;https://go.dev/cl/737700&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77217"&gt;https://go.dev/issue/77217&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4337"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4601: Incorrect parsing of IPv6 host literals in net/url</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4601</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4601"/>
+    <published>2026-03-06T21:03:42Z</published>
+    <updated>2026-07-02T10:44:29Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-25679"/>
+    <category term="CVE-2026-25679"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Incorrect parsing of IPv6 host literals in net/url&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-25679, CVE-2026-25679&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.8, 1.26.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;url.Parse insufficiently validated the host/authority component and accepted some invalid URLs.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/752180"&gt;https://go.dev/cl/752180&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77578"&gt;https://go.dev/issue/77578&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk"&gt;https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4601"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5037: Inefficient candidate hostname parsing in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5037</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5037"/>
+    <published>2026-06-02T21:39:47Z</published>
+    <updated>2026-07-02T10:44:29Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-27145"/>
+    <category term="CVE-2026-27145"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Inefficient candidate hostname parsing in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-27145, CVE-2026-27145&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.11, 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(*x509.Certificate).VerifyHostname previously called matchHostnames in a loop over all DNS Subject Alternative Name (SAN) entries. This caused strings.Split(host, &amp;quot;.&amp;quot;) to execute repeatedly on the same input hostname.
+
+With a large DNS SAN list, verification costs scaled quadratically based on the number of SAN entries multiplied by the hostname&amp;#x27;s label count. Because x509.Verify validates hostnames before building the certificate chain, this overhead occurred even for untrusted certificates.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/783621"&gt;https://go.dev/cl/783621&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79694"&gt;https://go.dev/issue/79694&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw"&gt;https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5037"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2025-4155: Excessive resource consumption when printing error string for host certificate validation in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2025-4155</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-4155"/>
+    <published>2025-12-02T18:30:24Z</published>
+    <updated>2026-07-02T10:44:29Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2025-61729"/>
+    <category term="CVE-2025-61729"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excessive resource consumption when printing error string for host certificate validation in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2025-61729, CVE-2025-61729&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.24.11, 1.25.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Within HostnameError.Error(), when constructing an error string, there is no limit to the number of hosts that will be printed out. Furthermore, the error string is constructed by repeated string concatenation, leading to quadratic runtime. Therefore, a certificate provided by a malicious actor can result in excessive resource consumption.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/725920"&gt;https://go.dev/cl/725920&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/76445"&gt;https://go.dev/issue/76445&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/8FJoBkPddm4"&gt;https://groups.google.com/g/golang-announce/c/8FJoBkPddm4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-4155"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4341: Memory exhaustion in query parameter parsing in net/url</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4341</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4341"/>
+    <published>2026-01-28T19:08:18Z</published>
+    <updated>2026-07-02T10:44:28Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2025-61726"/>
+    <category term="CVE-2025-61726"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Memory exhaustion in query parameter parsing in net/url&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2025-61726, CVE-2025-61726&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.24.12, 1.25.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The net/url package does not set a limit on the number of query parameters in a query.
+
+While the maximum size of query parameters in URLs is generally limited by the maximum request header size, the net/http.Request.ParseForm method can parse large URL-encoded forms. Parsing a large form containing many unique query parameters can cause excessive memory consumption.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/736712"&gt;https://go.dev/cl/736712&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77101"&gt;https://go.dev/issue/77101&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc"&gt;https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4341"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5029: Invoking incorrect handling of character references in DOCTYPE nodes in golang.org/x/net/html</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5029</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5029"/>
+    <published>2026-05-22T02:46:43Z</published>
+    <updated>2026-07-02T10:44:28Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-25681"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking incorrect handling of character references in DOCTYPE nodes in golang.org/x/net/html&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25681&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.55.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Parsing arbitrary HTML which is then rendered using Render can result in an unexpected HTML tree. This can be leveraged to execute XSS attacks in applications that attempt to sanitize input HTML before rendering.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79574"&gt;https://go.dev/issue/79574&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8"&gt;https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781703"&gt;https://go.dev/cl/781703&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5029"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4981: Crash when handling long CNAME response in net</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4981</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4981"/>
+    <published>2026-05-07T19:21:40Z</published>
+    <updated>2026-07-02T10:44:28Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-33811"/>
+    <category term="CVE-2026-33811"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Crash when handling long CNAME response in net&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-33811, CVE-2026-33811&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.10, 1.26.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When using LookupCNAME with the cgo DNS resolver, a very long CNAME response can trigger a double-free of C memory and a crash.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78803"&gt;https://go.dev/issue/78803&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/767860"&gt;https://go.dev/cl/767860&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/qcCIEXso47M"&gt;https://groups.google.com/g/golang-announce/c/qcCIEXso47M&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4981"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5026: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5026</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5026"/>
+    <published>2026-05-22T02:46:43Z</published>
+    <updated>2026-07-02T10:44:28Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39821"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39821&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.55.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The ToASCII and ToUnicode functions incorrectly accept Punycode-encoded labels that decode to an ASCII-only label. For example, ToUnicode(&amp;quot;xn--example-.com&amp;quot;) incorrectly returns the name &amp;quot;example.com&amp;quot; rather than an error.
+
+This behavior can lead to privilege escalation in programs using the idna package. For example, a program which performs privilege checks on the ASCII hostname may reject &amp;quot;example.com&amp;quot; but permit &amp;quot;xn--example-.com&amp;quot;. If that program subsequently converts the ASCII hostname to Unicode, it will inadvertently permits access to the Unicode name &amp;quot;example.com&amp;quot;.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/767220"&gt;https://go.dev/cl/767220&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78760"&gt;https://go.dev/issue/78760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8"&gt;https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5026"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4947: Unexpected work during chain building in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4947</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4947"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-02T10:44:28Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-32280"/>
+    <category term="CVE-2026-32280"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unexpected work during chain building in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32280, CVE-2026-32280&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;During chain building, the amount of work that is done is not correctly limited when a large number of intermediate certificates are passed in VerifyOptions.Intermediates, which can lead to a denial of service. This affects both direct users of crypto/x509 and users of crypto/tls.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/758320"&gt;https://go.dev/cl/758320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78282"&gt;https://go.dev/issue/78282&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4947"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4870: Unauthenticated TLS 1.3 KeyUpdate record can cause persistent connection retention and DoS in crypto/tls</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4870</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4870"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-02T10:44:28Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-32283"/>
+    <category term="CVE-2026-32283"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unauthenticated TLS 1.3 KeyUpdate record can cause persistent connection retention and DoS in crypto/tls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32283, CVE-2026-32283&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;If one side of the TLS connection sends multiple key update messages post-handshake in a single record, the connection can deadlock, causing uncontrolled consumption of resources. This can lead to a denial of service.
+
+This only affects TLS 1.3.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/763767"&gt;https://go.dev/cl/763767&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78334"&gt;https://go.dev/issue/78334&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4870"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-x4mj-7f9g-29h4: Contour has Lua code injection via Cookie Path Rewrite Policy</title>
     <id>https://osv.dev/vulnerability/GHSA-x4mj-7f9g-29h4</id>
@@ -90,32 +381,6 @@ entry, ok := fs.SharedLinks[token]
 fs.sharedLinksMu.RUnlock()                     …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/patrickhener/goshs/security/advisories/GHSA-j48m-h7xq-2xpj"&gt;https://github.com/patrickhener/goshs/security/advisories/GHSA-j48m-h7xq-2xpj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/patrickhener/goshs"&gt;https://github.com/patrickhener/goshs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j48m-h7xq-2xpj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-8xwf-rjm4-xvhv: oras-go has file store write outside workingDir via symlink traversal</title>
-    <id>https://osv.dev/vulnerability/GHSA-8xwf-rjm4-xvhv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8xwf-rjm4-xvhv"/>
-    <published>2026-07-01T21:43:10Z</published>
-    <updated>2026-07-01T22:00:10Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-50162"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;oras-go has file store write outside workingDir via symlink traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50162&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go/v2&lt;/code&gt; — fixed in 2.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The file content store in `oras-go` attempts to confine writes to `workingDir` when `AllowPathTraversalOnWrite=false`, but the guard is lexical and does not account for symlink traversal. If `workingDir` contains a symlink path component and an attacker-controlled blob title (via `ocispec.AnnotationTitle`) targets a path under that symlink, `pushFile()` can create a file outside `workingDir`.
-
-## relevant links
-
-- repository: https://github.com/oras-project/oras-go
-- commit: 03243809936cce826494b5506f724c6dc11115b1
-- callsite: content/file/file.go:609 `resolveWritePath()` (used by `pushFile()`)
-
-## vulnerability details
-
-**pins:** oras-project/oras-go@03243809936cce826494b5506f724c6dc11115b1
-
-**as-of:** 2026-02-17
-
-**policy:** GitHub Security Advisory (oras-project/oras-go)
-
-**callsite:** …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/security/advisories/GHSA-8xwf-rjm4-xvhv"&gt;https://github.com/oras-project/oras-go/security/advisories/GHSA-8xwf-rjm4-xvhv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/commit/cc323e564d90c6b5b4bdd71d3c8d2ee2713b37e5"&gt;https://github.com/oras-project/oras-go/commit/cc323e564d90c6b5b4bdd71d3c8d2ee2713b37e5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go"&gt;https://github.com/oras-project/oras-go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8xwf-rjm4-xvhv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] GHSA-fxhp-mv3v-67qp: `oras-go` tar extraction: Hardlink entry with relative Linkname escapes extract dir via process CWD resolution</title>
     <id>https://osv.dev/vulnerability/GHSA-fxhp-mv3v-67qp</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fxhp-mv3v-67qp"/>
@@ -166,49 +431,6 @@ There are two related paths:
 2. A blob upload `POST` authenticates to the origin registry, then the origin returns an upload `Location` on another host or port. The follow-up `PUT` can carry the origin `Authorization` header to the `Location` target.
 
 The upload `Location` issue appears related to the existing public fix in pul…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/security/advisories/GHSA-vh4v-2xq2-g5cg"&gt;https://github.com/oras-project/oras-go/security/advisories/GHSA-vh4v-2xq2-g5cg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/commit/3c2e884e12ea52b6bff60c97f1edb7df7d0e0909"&gt;https://github.com/oras-project/oras-go/commit/3c2e884e12ea52b6bff60c97f1edb7df7d0e0909&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go"&gt;https://github.com/oras-project/oras-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/releases/tag/v2.6.1"&gt;https://github.com/oras-project/oras-go/releases/tag/v2.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vh4v-2xq2-g5cg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-jxpm-75mh-9fp7: oras-go blob upload vulnerable to credential forwarding via unvalidated Location header</title>
-    <id>https://osv.dev/vulnerability/GHSA-jxpm-75mh-9fp7</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jxpm-75mh-9fp7"/>
-    <published>2026-07-01T21:35:45Z</published>
-    <updated>2026-07-01T21:45:22Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-50151"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;oras-go blob upload vulnerable to credential forwarding via unvalidated Location header&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50151&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go/v2&lt;/code&gt; — fixed in 2.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-oras-go follows a registry-controlled `Location` header during the monolithic blob upload flow and reuses the `Authorization` header from the initial `POST` request for the subsequent `PUT` request. If a malicious registry returns a cross-host `Location`, oras-go can send the caller&amp;#x27;s credentials to an attacker-controlled endpoint.
-
-## Affected Versions
-
-tested: v2.6.0 (commit 03243809936cce826494b5506f724c6dc11115b1, as-of 2026-01-24)
-range: unknown; likely affects earlier v2.x releases that include the same upload flow
-
-## Impact
-
-Credential leak to an attacker-controlled endpoint and client-side ssrf to a cross-host target.
-
-## Affected Component
-
-- `registry/remote/repository.go:878-916` (`blobStore.completePushAfterInitialPost`)
-
-## Reproduction
-
-Attachments include `poc.z…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/security/advisories/GHSA-jxpm-75mh-9fp7"&gt;https://github.com/oras-project/oras-go/security/advisories/GHSA-jxpm-75mh-9fp7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/pull/1152"&gt;https://github.com/oras-project/oras-go/pull/1152&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/commit/4683c46ef078091544f5f55fd25102f002806991"&gt;https://github.com/oras-project/oras-go/commit/4683c46ef078091544f5f55fd25102f002806991&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go"&gt;https://github.com/oras-project/oras-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/releases/tag/v2.6.1"&gt;https://github.com/oras-project/oras-go/releases/tag/v2.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jxpm-75mh-9fp7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-xf85-363p-868w: oras-go: Malicious registry can hijack Bearer token realm to exfiltrate credentials and refresh tokens</title>
-    <id>https://osv.dev/vulnerability/GHSA-xf85-363p-868w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xf85-363p-868w"/>
-    <published>2026-07-01T21:06:10Z</published>
-    <updated>2026-07-01T21:15:11Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-48978"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;oras-go: Malicious registry can hijack Bearer token realm to exfiltrate credentials and refresh tokens&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48978&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:A/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go/v2&lt;/code&gt; — fixed in 2.6.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-oras-go&amp;#x27;s `auth.Client` follows the `realm` URL from a registry&amp;#x27;s `WWW-Authenticate: Bearer` challenge without validating its scheme or host. The `realm` field is server-controlled by design in the OCI/distribution spec — registries legitimately point token requests at a separate auth endpoint (e.g. Docker Hub&amp;#x27;s `registry-1.docker.io` -&amp;gt; `auth.docker.io`), so cross-host realms on public DNS names are not in themselves a vulnerability. Two specific patterns, however, are never legitimate under any registry trust model and can be abused by a malicious or compromised registry (or a man-in-the-middle on a plaintext connection):
-
-1. **SSRF to internal networks.** A realm of `http://169.254.169.254/...` (AWS/Azure IMDS), `http://10.0.0.x/...` (RFC 1918), or `http://127.0.0.1/...` cau…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/security/advisories/GHSA-xf85-363p-868w"&gt;https://github.com/oras-project/oras-go/security/advisories/GHSA-xf85-363p-868w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/commit/7a9f4b0b9558821b0422152ebe21ae56930fe764"&gt;https://github.com/oras-project/oras-go/commit/7a9f4b0b9558821b0422152ebe21ae56930fe764&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go"&gt;https://github.com/oras-project/oras-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/releases/tag/v2.6.1"&gt;https://github.com/oras-project/oras-go/releases/tag/v2.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xf85-363p-868w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GHSA-4j6x-2764-m8gh: Rancher has over-inclusive team membership expansion in GitHub App authentication provider</title>
@@ -691,54 +913,6 @@ In affected versions, NeuVector does not enforce TLS certificate verification wh
 The patched version includes…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/neuvector/neuvector/security/advisories/GHSA-qqj3-g7mx-5p4w"&gt;https://github.com/neuvector/neuvector/security/advisories/GHSA-qqj3-g7mx-5p4w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-54470"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-54470&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/neuvector/neuvector/commit/06424701e69bf1eb76ff90180d78853fded93021"&gt;https://github.com/neuvector/neuvector/commit/06424701e69bf1eb76ff90180d78853fded93021&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/neuvector/neuvector/commit/415737cbec581a5dc5f204fac1c78b7f29ad7dc2"&gt;https://github.com/neuvector/neuvector/commit/415737cbec581a5dc5f204fac1c78b7f29ad7dc2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.suse.com/show_bug.cgi?id=CVE-2025-54470"&gt;https://bugzilla.suse.com/show_bug.cgi?id=CVE-2025-54470&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/neuvector/neuvector"&gt;https://github.com/neuvector/neuvector&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qqj3-g7mx-5p4w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[UPDATED] GO-2026-4601: Incorrect parsing of IPv6 host literals in net/url</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4601</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4601"/>
-    <published>2026-03-06T21:03:42Z</published>
-    <updated>2026-07-01T10:44:21Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-25679"/>
-    <category term="CVE-2026-25679"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Incorrect parsing of IPv6 host literals in net/url&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-25679, CVE-2026-25679&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.8, 1.26.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;url.Parse insufficiently validated the host/authority component and accepted some invalid URLs.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/752180"&gt;https://go.dev/cl/752180&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77578"&gt;https://go.dev/issue/77578&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk"&gt;https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4601"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-4947: Unexpected work during chain building in crypto/x509</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4947</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4947"/>
-    <published>2026-04-07T22:53:49Z</published>
-    <updated>2026-07-01T10:44:21Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-32280"/>
-    <category term="CVE-2026-32280"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Unexpected work during chain building in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32280, CVE-2026-32280&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;During chain building, the amount of work that is done is not correctly limited when a large number of intermediate certificates are passed in VerifyOptions.Intermediates, which can lead to a denial of service. This affects both direct users of crypto/x509 and users of crypto/tls.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/758320"&gt;https://go.dev/cl/758320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78282"&gt;https://go.dev/issue/78282&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4947"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-4870: Unauthenticated TLS 1.3 KeyUpdate record can cause persistent connection retention and DoS in crypto/tls</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4870</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4870"/>
-    <published>2026-04-07T22:53:49Z</published>
-    <updated>2026-07-01T10:44:21Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-32283"/>
-    <category term="CVE-2026-32283"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Unauthenticated TLS 1.3 KeyUpdate record can cause persistent connection retention and DoS in crypto/tls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32283, CVE-2026-32283&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;If one side of the TLS connection sends multiple key update messages post-handshake in a single record, the connection can deadlock, causing uncontrolled consumption of resources. This can lead to a denial of service.
-
-This only affects TLS 1.3.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/763767"&gt;https://go.dev/cl/763767&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78334"&gt;https://go.dev/issue/78334&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4870"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-4946: Inefficient policy validation in crypto/x509</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4946</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4946"/>
-    <published>2026-04-07T22:53:49Z</published>
-    <updated>2026-07-01T10:44:21Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-32281"/>
-    <category term="CVE-2026-32281"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Inefficient policy validation in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32281, CVE-2026-32281&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Validating certificate chains which use policies is unexpectedly inefficient when certificates in the chain contain a very large number of policy mappings, possibly causing denial of service.
-
-This only affects validation of otherwise trusted certificate chains, issued by a root CA in the VerifyOptions.Roots CertPool, or in the system certificate pool.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/758061"&gt;https://go.dev/cl/758061&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78281"&gt;https://go.dev/issue/78281&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4946"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] GHSA-9cr8-q42q-g8m7: Traefik: HTTP/3 mTLS bypass via exact SNI TLSOptions lookup for wildcard and mixed-case hosts</title>
     <id>https://osv.dev/vulnerability/GHSA-9cr8-q42q-g8m7</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9cr8-q42q-g8m7"/>
@@ -1136,74 +1310,5 @@ When the daemon dropped privileges it set the p…&lt;/p&gt;&lt;p&gt;References:
     <category term="Go"/>
     <category term="CVE-2026-9300"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;omec-project amf Vulnerable to Improper Restriction of Operations within the Bounds of a Memory Buffer&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-9300&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/omec-project/amf&lt;/code&gt; — fixed in 1.7.1-0.20260421213846-34bc6724acc9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability has been found in omec-project amf up to 2.1.1. This affects an unknown part of the component NGSetupRequest Handler. Such manipulation leads to memory corruption. The attack can be executed remotely. The exploit has been disclosed to the public and may be used. It is best practice to apply a patch to resolve this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-9300"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-9300&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/omec-project/amf/issues/679"&gt;https://github.com/omec-project/amf/issues/679&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/omec-project/amf/pull/666"&gt;https://github.com/omec-project/amf/pull/666&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/omec-project/amf/commit/34bc6724acc97dba1f8691e586da95b042cb612d"&gt;https://github.com/omec-project/amf/commit/34bc6724acc97dba1f8691e586da95b042cb612d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/omec-project/amf"&gt;https://github.com/omec-project/amf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/811841"&gt;https://vuldb.com/submit/811841&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/365247"&gt;https://vuldb.com/vuln/365247&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/365247/cti"&gt;https://vuldb.com/vuln/365247/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6p7m-c3mw-4gmw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-25qr-6mpr-f7qx: Rclone: Unauthenticated options/set allows runtime auth bypass, leading to sensitive operations and command execution</title>
-    <id>https://osv.dev/vulnerability/GHSA-25qr-6mpr-f7qx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-25qr-6mpr-f7qx"/>
-    <published>2026-04-22T14:44:13Z</published>
-    <updated>2026-06-30T13:59:23Z</updated>
-    <category term="Go"/>
-    <category term="BIT-rclone-2026-41176"/>
-    <category term="CVE-2026-41176"/>
-    <category term="GO-2026-4964"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rclone: Unauthenticated options/set allows runtime auth bypass, leading to sensitive operations and command execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-41176, CVE-2026-41176, GO-2026-4964&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.73.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The RC endpoint `options/set` is exposed without `AuthRequired: true`, but it can mutate global runtime configuration, including the RC option block itself. An unauthenticated attacker can set `rc.NoAuth=true`, which disables the authorization gate for many RC methods registered with `AuthRequired: true` on reachable RC servers that are started without global HTTP authentication. This can lead to unauthorized access to sensitive administrative functionality, including configuration and operational RC methods.
-
-### Preconditions
-
-Preconditions for this vulnerability are:
-
-- The rclone remote control API **must** be enabled, either by the `--rc` flag or by running the `rclone rcd` server
-- The remote control API **must** be reachable by the attacker - by default rclone only serve…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-25qr-6mpr-f7qx"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-25qr-6mpr-f7qx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41176"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone"&gt;https://github.com/rclone/rclone&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/config.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/config.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/rcserver/rcserver.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/rcserver/rcserver.go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-25qr-6mpr-f7qx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-4964: Rclone: Unauthenticated options/set allows runtime auth bypass, leading to sensitive operations and command execution in github.com/rclone/rclone</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4964</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4964"/>
-    <published>2026-05-20T19:07:16Z</published>
-    <updated>2026-06-30T13:59:23Z</updated>
-    <category term="Go"/>
-    <category term="BIT-rclone-2026-41176"/>
-    <category term="CVE-2026-41176"/>
-    <category term="GHSA-25qr-6mpr-f7qx"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rclone: Unauthenticated options/set allows runtime auth bypass, leading to sensitive operations and command execution in github.com/rclone/rclone&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-41176, CVE-2026-41176, GHSA-25qr-6mpr-f7qx&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.73.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Rclone: Unauthenticated options/set allows runtime auth bypass, leading to sensitive operations and command execution in github.com/rclone/rclone.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: .&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-25qr-6mpr-f7qx"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-25qr-6mpr-f7qx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41176"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/config.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/config.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/rcserver/rcserver.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/rcserver/rcserver.go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4964"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jfwf-28xr-xw6q: RClone: Unauthenticated operations/fsinfo allows attacker-controlled backend instantiation and local command execution</title>
-    <id>https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q"/>
-    <published>2026-04-22T14:45:10Z</published>
-    <updated>2026-06-30T13:59:22Z</updated>
-    <category term="Go"/>
-    <category term="BIT-rclone-2026-41179"/>
-    <category term="CVE-2026-41179"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;RClone: Unauthenticated operations/fsinfo allows attacker-controlled backend instantiation and local command execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-41179, CVE-2026-41179&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.73.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The RC endpoint `operations/fsinfo` is exposed without `AuthRequired: true` and accepts attacker-controlled `fs` input. Because `rc.GetFs(...)` supports inline backend definitions, an unauthenticated attacker can instantiate an attacker-controlled backend on demand. For the WebDAV backend, `bearer_token_command` is executed during backend initialization, making single-request unauthenticated local command execution possible on reachable RC deployments without global HTTP authentication.
-
-### Preconditions
-
-Preconditions for this vulnerability are:
-
-- The rclone remote control API **must** be enabled, either by the `--rc` flag or by running the `rclone rcd` server
-- The remote control API **must** be reachable by the attacker - by default rclone only serves the rc to localhost u…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-jfwf-28xr-xw6q"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-jfwf-28xr-xw6q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41179"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/commit/2a9e952b38e03a96bf40c9eb6e8e22199865ee3b"&gt;https://github.com/rclone/rclone/commit/2a9e952b38e03a96bf40c9eb6e8e22199865ee3b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone"&gt;https://github.com/rclone/rclone&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/backend/webdav/webdav.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/backend/webdav/webdav.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/operations/rc.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/operations/rc.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/cache.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/cache.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/releases/tag/v1.73.5"&gt;https://github.com/rclone/rclone/releases/tag/v1.73.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5026: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5026</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5026"/>
-    <published>2026-05-22T02:46:43Z</published>
-    <updated>2026-06-30T11:14:29Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-39821"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39821&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.55.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The ToASCII and ToUnicode functions incorrectly accept Punycode-encoded labels that decode to an ASCII-only label. For example, ToUnicode(&amp;quot;xn--example-.com&amp;quot;) incorrectly returns the name &amp;quot;example.com&amp;quot; rather than an error.
-
-This behavior can lead to privilege escalation in programs using the idna package. For example, a program which performs privilege checks on the ASCII hostname may reject &amp;quot;example.com&amp;quot; but permit &amp;quot;xn--example-.com&amp;quot;. If that program subsequently converts the ASCII hostname to Unicode, it will inadvertently permits access to the Unicode name &amp;quot;example.com&amp;quot;.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/767220"&gt;https://go.dev/cl/767220&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78760"&gt;https://go.dev/issue/78760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8"&gt;https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5026"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

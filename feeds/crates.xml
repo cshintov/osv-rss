@@ -3,12 +3,52 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-07-03T13:45:04Z</updated>
+  <updated>2026-07-03T18:29:35Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-3rjw-m598-pq24: Cmov/CmovEq on aarch64 can produce wrong results if high-bits of registers are set </title>
+    <id>https://osv.dev/vulnerability/GHSA-3rjw-m598-pq24</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3rjw-m598-pq24"/>
+    <published>2026-07-02T17:18:11Z</published>
+    <updated>2026-07-03T18:29:35Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-50185"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cmov/CmovEq on aarch64 can produce wrong results if high-bits of registers are set &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50185&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cmov&lt;/code&gt; — fixed in 0.5.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The aarch64 implementations of `Cmov` and `CmovEq` seem to assume that the high bits when loading a value of size smaller than a register into a register are zero-extended. However, this is not the case and these bits are unspecified. This can result in a `left.cmovz(&amp;amp;right, condition)` not moving `right` into `left`, even if `condition == 0`. 
+
+### Details
+
+The Rust reference for inline assembly states that:
+&amp;gt; If a value is of a smaller size than the register it is allocated in then the upper bits of that register will have an undefined value for inputs [..]. [Reference](https://doc.rust-lang.org/reference/inline-assembly.html#r-asm.register-operands.smaller-value)
+
+If the high bits `[8..]` of the selector loaded into a register in the `Cmov` implementation or the high bits `…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/utils/security/advisories/GHSA-3rjw-m598-pq24"&gt;https://github.com/RustCrypto/utils/security/advisories/GHSA-3rjw-m598-pq24&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/utils"&gt;https://github.com/RustCrypto/utils&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3rjw-m598-pq24"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0198: `Report::frames_mut` allows aliased mutable references</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0198</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0198"/>
+    <published>2026-07-03T12:00:00Z</published>
+    <updated>2026-07-03T15:34:08Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`Report::frames_mut` allows aliased mutable references&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;error-stack&lt;/code&gt; — fixed in 0.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of this crate return an iterator from
+`Report::frames_mut` whose `&amp;amp;mut Frame` items have lifetimes independent
+of the iterator, so all yielded references can be held at the same time.
+A yielded frame&amp;#x27;s sources are also yielded by the iterator and reachable
+through the parent frame via `Frame::sources_mut`, allowing safe code to
+obtain two live mutable references to the same frame. This is undefined
+behavior and can be used to cause a segmentation fault (see reproducer in
+the linked issue). Versions 0.1.0 and 0.1.1 are affected through
+`Frame::source_mut` instead of `Frame::sources_mut`.
+
+The flaw is fixed in 0.8.0 by replacing the iterator with internal
+iteration: `Report::frames_mut` now takes a visitor closure, so mutable
+access to a frame is scoped and cannot overlap w…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/error-stack"&gt;https://crates.io/crates/error-stack&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0198.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0198.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hashintel/hash/issues/8945"&gt;https://github.com/hashintel/hash/issues/8945&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hashintel/hash/pull/8946"&gt;https://github.com/hashintel/hash/pull/8946&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0198"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0197: `Matrix{2,3,4}::swap_columns` can trigger undefined behavior for identical indices</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0197</id>
@@ -415,25 +455,6 @@ You are affected if:
 The `getblocktemplate` RPC handler panics when parsing a `LongPollId` parameter that contains non-ASCII (multi-byte UTF-8) characters. The handler performs byte-index string slicing on the user-supplied string, which panics in Rust when a byte index falls within a multi-byte character boundary. Because Zebra&amp;#x27;s release profile sets `panic = &amp;quot;abort&amp;quot;`, the panic …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-qv2r-v3mx-f4pf"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-qv2r-v3mx-f4pf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/Cargo.toml#L305"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/Cargo.toml#L305&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qv2r-v3mx-f4pf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-3rjw-m598-pq24: Cmov/CmovEq on aarch64 can produce wrong results if high-bits of registers are set </title>
-    <id>https://osv.dev/vulnerability/GHSA-3rjw-m598-pq24</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3rjw-m598-pq24"/>
-    <published>2026-07-02T17:18:11Z</published>
-    <updated>2026-07-02T17:30:12Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-50185"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Cmov/CmovEq on aarch64 can produce wrong results if high-bits of registers are set &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50185&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cmov&lt;/code&gt; — fixed in 0.5.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The aarch64 implementations of `Cmov` and `CmovEq` seem to assume that the high bits when loading a value of size smaller than a register into a register are zero-extended. However, this is not the case and these bits are unspecified. This can result in a `left.cmovz(&amp;amp;right, condition)` not moving `right` into `left`, even if `condition == 0`. 
-
-### Details
-
-The Rust reference for inline assembly states that:
-&amp;gt; If a value is of a smaller size than the register it is allocated in then the upper bits of that register will have an undefined value for inputs [..]. [Reference](https://doc.rust-lang.org/reference/inline-assembly.html#r-asm.register-operands.smaller-value)
-
-If the high bits `[8..]` of the selector loaded into a register in the `Cmov` implementation or the high bits `…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/utils/security/advisories/GHSA-3rjw-m598-pq24"&gt;https://github.com/RustCrypto/utils/security/advisories/GHSA-3rjw-m598-pq24&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/utils"&gt;https://github.com/RustCrypto/utils&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3rjw-m598-pq24"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] RUSTSEC-2026-0195: Unbounded namespace-declaration allocation in `NsReader` enables memory-exhaustion denial of service</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0195</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0195"/>
@@ -804,21 +825,5 @@ This is an incomplete fix for [GHSA-6r8p-hpg7-825g](https://github.com/surrealdb
 ### Impact
 
 An unauthenticated remote attacker can crash a SurrealDB server with a single WebSocket message. No credentials or query execution privileges are required…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-q729-696q-g9pq"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-q729-696q-g9pq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/1bd9826f477f4089134460dc5574b6f4e6916973"&gt;https://github.com/surrealdb/surrealdb/commit/1bd9826f477f4089134460dc5574b6f4e6916973&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q729-696q-g9pq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f26g-jm89-4g65: gitoxide: CommandForbiddenInModulesConfiguration Bypass in gix_submodule::File::update() Enables Arbitrary Command Execution via .gitmodules</title>
-    <id>https://osv.dev/vulnerability/GHSA-f26g-jm89-4g65</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f26g-jm89-4g65"/>
-    <published>2026-05-05T19:23:45Z</published>
-    <updated>2026-07-01T15:59:36Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-40034"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;gitoxide: CommandForbiddenInModulesConfiguration Bypass in gix_submodule::File::update() Enables Arbitrary Command Execution via .gitmodules&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40034&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gix&lt;/code&gt; — fixed in 0.83.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-[`gix_submodule::File::update()`](https://github.com/GitoxideLabs/gitoxide/blob/main/gix-submodule/src/access.rs#L168) is the API that gates whether an attacker-supplied `.gitmodules` file may set `update = !&amp;lt;shell command&amp;gt;`. The function is designed to return `Err(CommandForbiddenInModulesConfiguration)` unless the `!command` value came from a trusted local source (`.git/config`). Git CVE [CVE-2019-19604](https://nvd.nist.gov/vuln/detail/cve-2019-19604) illustrates why this check is necessary.
-
-However, the guard is implemented incorrectly: it checks whether any section with the same submodule name exists from a non-`.gitmodules` source; it does not verify that the `update` value came from that section.
-
-Once a submodule has been initialized (any workflow that writes `submodu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-f26g-jm89-4g65"&gt;https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-f26g-jm89-4g65&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40034"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40034&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/commit/6a2e6a436f76c8bbf2487f9967413a51356667a0"&gt;https://github.com/GitoxideLabs/gitoxide/commit/6a2e6a436f76c8bbf2487f9967413a51356667a0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/commit/dd5c18d9e526e8de462fa40aa047acd097cfa7dc"&gt;https://github.com/GitoxideLabs/gitoxide/commit/dd5c18d9e526e8de462fa40aa047acd097cfa7dc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide"&gt;https://github.com/GitoxideLabs/gitoxide&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://red.anthropic.com/2026/cvd/findings/ANT-2026-6SNS6KMP"&gt;https://red.anthropic.com/2026/cvd/findings/ANT-2026-6SNS6KMP&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/gitoxide-command-injection-via-partial-gitmodules-override-in-gix-submodule"&gt;https://www.vulncheck.com/advisories/gitoxide-command-injection-via-partial-gitmodules-override-in-gix-submodule&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f26g-jm89-4g65"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

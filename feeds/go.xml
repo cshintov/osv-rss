@@ -3,12 +3,38 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-02T21:26:03Z</updated>
+  <updated>2026-07-03T18:29:36Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-g3xr-5w5j-w4q4: Contour has Improper JWT Verification for Non-SNI Requests on Virtual Hosts with Fallback Certificate Enabled</title>
+    <id>https://osv.dev/vulnerability/GHSA-g3xr-5w5j-w4q4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g3xr-5w5j-w4q4"/>
+    <published>2026-07-02T17:15:20Z</published>
+    <updated>2026-07-03T18:29:36Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50149"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Contour has Improper JWT Verification for Non-SNI Requests on Virtual Hosts with Fallback Certificate Enabled&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50149&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/projectcontour/contour&lt;/code&gt; — fixed in 1.33.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+When an `HTTPProxy` is configured with incompatible combination of both `.spec.virtualhost.tls.enableFallbackCertificate: true` and `.spec.virtualhost.jwtProviders`, Contour does not reject the configuration. Consequently, requests from clients that do not send TLS SNI or send an unrecognized SNI (one that does not match any `HTTPProxy` FQDN) bypass configured JWT verification and are proxied to upstream services without a valid token.
+
+To list all `HTTPProxies` with this invalid configuration, run
+
+```bash
+kubectl get httpproxies -A -o json | jq -r &amp;#x27;
+  .items[]
+  | select(.spec.virtualhost | .tls.enableFallbackCertificate and .jwtProviders)
+  | &amp;quot;Invalid HTTPProxy found: \(.metadata.namespace)/\(.metadata.name)&amp;quot;
+&amp;#x27;
+```
+
+### Patches
+
+This issue is fixed in Contour v1.33.5. Contou…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/projectcontour/contour/security/advisories/GHSA-g3xr-5w5j-w4q4"&gt;https://github.com/projectcontour/contour/security/advisories/GHSA-g3xr-5w5j-w4q4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcontour/contour"&gt;https://github.com/projectcontour/contour&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g3xr-5w5j-w4q4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-q675-qj96-32m9: golang.org/x/image/tiff has excessive resource consumption in PackBits decompression</title>
     <id>https://osv.dev/vulnerability/GHSA-q675-qj96-32m9</id>
@@ -449,32 +475,6 @@ T…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="http
     <category term="Go"/>
     <category term="CVE-2026-41185"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Calico Inserts Sensitive Information into Log File&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41185&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:L/SI:L/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/projectcalico/calico&lt;/code&gt; — fixed in 3.31.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/projectcalico/calico&lt;/code&gt; — fixed in 1.11.0-cni-plugin.0.20260417001138-cd73bc2cea0f&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When Calico is configured with the Azure IPAM plugin, the Calico CNI binary mutates the incoming CNI configuration to attach subnet information before delegating to the IPAM plugin. After mutating, the Azure IPAM helper logs the entire unmarshaled configuration map (stdinData) at INFO level to /var/log/calico/cni/cni.log on every CNI ADD and DEL invocation — once per pod scheduled or terminated on the node. When the cluster is deployed using token-based Kubernetes authentication, this log entry contains the ServiceAccount token, client key, and certificate authority in plaintext. Any principal with read access to /var/log/calico/cni/cni.log on a node  can read these logs and extract the credentials, which grant cluster-wide Calico networking admin privileges.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41185"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41185&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/pull/12502"&gt;https://github.com/projectcalico/calico/pull/12502&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/pull/12526"&gt;https://github.com/projectcalico/calico/pull/12526&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/pull/12527"&gt;https://github.com/projectcalico/calico/pull/12527&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/commit/0ca653db0ae7400ea9fb066daa7f45c902482271"&gt;https://github.com/projectcalico/calico/commit/0ca653db0ae7400ea9fb066daa7f45c902482271&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/commit/cd73bc2cea0f4989772f2deb93909e7cfac927e0"&gt;https://github.com/projectcalico/calico/commit/cd73bc2cea0f4989772f2deb93909e7cfac927e0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/commit/da9ea3a13927a35e4022b787d17a005b2157d812"&gt;https://github.com/projectcalico/calico/commit/da9ea3a13927a35e4022b787d17a005b2157d812&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico"&gt;https://github.com/projectcalico/calico&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m67g-87rx-v42c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-g3xr-5w5j-w4q4: Contour has Improper JWT Verification for Non-SNI Requests on Virtual Hosts with Fallback Certificate Enabled</title>
-    <id>https://osv.dev/vulnerability/GHSA-g3xr-5w5j-w4q4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g3xr-5w5j-w4q4"/>
-    <published>2026-07-02T17:15:20Z</published>
-    <updated>2026-07-02T17:30:11Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-50149"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Contour has Improper JWT Verification for Non-SNI Requests on Virtual Hosts with Fallback Certificate Enabled&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50149&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/projectcontour/contour&lt;/code&gt; — fixed in 1.33.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-When an `HTTPProxy` is configured with incompatible combination of both `.spec.virtualhost.tls.enableFallbackCertificate: true` and `.spec.virtualhost.jwtProviders`, Contour does not reject the configuration. Consequently, requests from clients that do not send TLS SNI or send an unrecognized SNI (one that does not match any `HTTPProxy` FQDN) bypass configured JWT verification and are proxied to upstream services without a valid token.
-
-To list all `HTTPProxies` with this invalid configuration, run
-
-```bash
-kubectl get httpproxies -A -o json | jq -r &amp;#x27;
-  .items[]
-  | select(.spec.virtualhost | .tls.enableFallbackCertificate and .jwtProviders)
-  | &amp;quot;Invalid HTTPProxy found: \(.metadata.namespace)/\(.metadata.name)&amp;quot;
-&amp;#x27;
-```
-
-### Patches
-
-This issue is fixed in Contour v1.33.5. Contou…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/projectcontour/contour/security/advisories/GHSA-g3xr-5w5j-w4q4"&gt;https://github.com/projectcontour/contour/security/advisories/GHSA-g3xr-5w5j-w4q4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcontour/contour"&gt;https://github.com/projectcontour/contour&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g3xr-5w5j-w4q4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-57wx-m636-g3g8: Go package github.com/notaryproject/notation configured with permissive trust policies potentially susceptible to rollback attack from compromised registry</title>
@@ -2219,181 +2219,5 @@ An attacker with `git push` access to a Fleet-monitored repository could overwri
 Fleet team recommends you:
 1. Review your system for potentially leaked credentials.
 2. Replace any credentials that may b…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/fleet/security/advisories/GHSA-864g-863m-vcvq"&gt;https://github.com/rancher/fleet/security/advisories/GHSA-864g-863m-vcvq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/fleet"&gt;https://github.com/rancher/fleet&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-864g-863m-vcvq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-8w27-c4vc-88q9: Concourse login flow has an open redirect issue</title>
-    <id>https://osv.dev/vulnerability/GHSA-8w27-c4vc-88q9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8w27-c4vc-88q9"/>
-    <published>2026-07-01T19:01:16Z</published>
-    <updated>2026-07-01T19:15:22Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-49826"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Concourse login flow has an open redirect issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49826&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/concourse/concourse&lt;/code&gt; — fixed in 1.6.1-0.20260526150512-ac60be5f0435&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-An attacker is able to craft and send a user a URL that will redirect the user from the Concourse web server to any other site. This could be used in a phishing attack to steal user&amp;#x27;s credentials.
-
-### Patches
-
-This has been fixed in 8.2.3
-
-### Workarounds
-
-None.
-
-### Exploit
-
-Vulnerable code was in: https://github.com/concourse/concourse/blob/ea7b812e3a88fdd070f0faece874e8a2d4fbb31c/skymarshal/skyserver/skyserver.go#L162-L170
-
-The issue stems from the underlying processing logic of Go&amp;#x27;s `url` package. Normally, `ParseRequestURI()` will eventually reach an internal `url.setPath()` function, where the URL will be decoded. However, if `RawPath` is not empty and `validEncoded(RawPath)` is true, and the decoded result equals `Path`, then return `RawPath` as is; otherwise, escape `P…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/concourse/concourse/security/advisories/GHSA-8w27-c4vc-88q9"&gt;https://github.com/concourse/concourse/security/advisories/GHSA-8w27-c4vc-88q9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/concourse/concourse/commit/ac60be5f0435b6592f5a4fcc089050d72ad2452c"&gt;https://github.com/concourse/concourse/commit/ac60be5f0435b6592f5a4fcc089050d72ad2452c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/concourse/concourse"&gt;https://github.com/concourse/concourse&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/concourse/concourse/releases/tag/v8.2.3"&gt;https://github.com/concourse/concourse/releases/tag/v8.2.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8w27-c4vc-88q9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-cv2p-68f4-f4pw: picoclaw is vulnerable to OS command injection via the ExecTool component</title>
-    <id>https://osv.dev/vulnerability/GHSA-cv2p-68f4-f4pw</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cv2p-68f4-f4pw"/>
-    <published>2026-05-27T15:33:11Z</published>
-    <updated>2026-07-01T19:15:22Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-36045"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;picoclaw is vulnerable to OS command injection via the ExecTool component&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-36045&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/sipeed/picoclaw&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;picoclaw &amp;lt;=v0.1.2 and earlier is vulnerable to OS command injection via the ExecTool component (pkg/tools/shell.go). The guardCommand() function attempts to restrict shell command execution using a denylist of 8 regular expressions, but the denylist is incomplete.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-36045"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-36045&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sipeed/picoclaw/commit/01d694b9985a66c3d7119fc9f74ce8ed4f0f21b5"&gt;https://github.com/sipeed/picoclaw/commit/01d694b9985a66c3d7119fc9f74ce8ed4f0f21b5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/NucleiAv/41899be6266a9813840301577792ed68"&gt;https://gist.github.com/NucleiAv/41899be6266a9813840301577792ed68&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sipeed/picoclaw"&gt;https://github.com/sipeed/picoclaw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sipeed/picoclaw/releases/tag/v0.1.2"&gt;https://github.com/sipeed/picoclaw/releases/tag/v0.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cv2p-68f4-f4pw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-6c87-g9pw-78fx: Contrast's Imagepuller registryFor uses unanchored suffix matching, leaking auth credentials and trusted CA configuration to sibling-domain registries</title>
-    <id>https://osv.dev/vulnerability/GHSA-6c87-g9pw-78fx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6c87-g9pw-78fx"/>
-    <published>2026-07-01T18:43:55Z</published>
-    <updated>2026-07-01T19:00:17Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Contrast&amp;#x27;s Imagepuller registryFor uses unanchored suffix matching, leaking auth credentials and trusted CA configuration to sibling-domain registries&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/edgelesssys/contrast&lt;/code&gt; — fixed in 1.21.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Summary
-
-`Config.registryFor` selected a per-registry credential / CA / mirror block by checking `strings.HasSuffix(name, fqdn)` after stripping a single trailing dot. 
-The match has no boundary between the configured FQDN and any preceding characters in the request hostname.
-A registry configured as `[registries.&amp;quot;ghcr.io.&amp;quot;]` is therefore also applied to any image pulled from a host whose name happens to end in the literal byte sequence `ghcr.io`, 
-including attacker-registered domains such as `evilghcr.io.` 
-The imagepuller would then send the configured `Authorization` header (basic auth, registry token, or identity token), trust the configured custom CA bundle,
-follow the configured mirror, or honour `insecure-skip-verify`, on requests to that hostname.
-
-# Prerequisites
-
-For this to b…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/edgelesssys/contrast/security/advisories/GHSA-6c87-g9pw-78fx"&gt;https://github.com/edgelesssys/contrast/security/advisories/GHSA-6c87-g9pw-78fx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/edgelesssys/contrast/commit/10826b1d82613025767fb094e8aa51a7dcfbd2a1"&gt;https://github.com/edgelesssys/contrast/commit/10826b1d82613025767fb094e8aa51a7dcfbd2a1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/edgelesssys/contrast"&gt;https://github.com/edgelesssys/contrast&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/edgelesssys/contrast/releases/tag/v1.21.0"&gt;https://github.com/edgelesssys/contrast/releases/tag/v1.21.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6c87-g9pw-78fx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-3ccm-4qq2-5wrp: Constrata's coordinator transit engine `ciphertextContainer.UnmarshalJSON` panics on attacker-controlled short ciphertexts</title>
-    <id>https://osv.dev/vulnerability/GHSA-3ccm-4qq2-5wrp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3ccm-4qq2-5wrp"/>
-    <published>2026-07-01T18:47:53Z</published>
-    <updated>2026-07-01T19:00:17Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Constrata&amp;#x27;s coordinator transit engine `ciphertextContainer.UnmarshalJSON` panics on attacker-controlled short ciphertexts&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/edgelesssys/contrast&lt;/code&gt; — fixed in 1.21.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`ciphertextContainer.UnmarshalJSON` decodes the third `:`-separated component of a `vault:vX:base64...` ciphertext and then unconditionally takes a 12-byte prefix slice for the AES-GCM nonce: `c.nonce = fullCiphertext[:aesGCMNonceSize]`. If the decoded blob is shorter than 12 bytes, the slice expression panics. The panic happens before any cryptographic operation, while the JSON body of the request is still being parsed inside the request handler. Because the handler is invoked from `net/http`&amp;#x27;s standard handler goroutine, the panic is recovered to a 500 response, but the request handler aborts mid-execution and the recovered panic appears in the Coordinator&amp;#x27;s logs. An authenticated workload that holds a valid mesh certificate for any `WorkloadSecretID` can trigger the panic at…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/edgelesssys/contrast/security/advisories/GHSA-3ccm-4qq2-5wrp"&gt;https://github.com/edgelesssys/contrast/security/advisories/GHSA-3ccm-4qq2-5wrp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/edgelesssys/contrast/commit/d6584fbff816037472034f7ad6e08cdbab1d870d"&gt;https://github.com/edgelesssys/contrast/commit/d6584fbff816037472034f7ad6e08cdbab1d870d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/edgelesssys/contrast"&gt;https://github.com/edgelesssys/contrast&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/edgelesssys/contrast/releases/tag/v1.21.0"&gt;https://github.com/edgelesssys/contrast/releases/tag/v1.21.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3ccm-4qq2-5wrp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5cv4-jp36-h3mw: Go Net HTML parser is vulnerable to denial of service</title>
-    <id>https://osv.dev/vulnerability/GHSA-5cv4-jp36-h3mw</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5cv4-jp36-h3mw"/>
-    <published>2026-05-26T13:30:17Z</published>
-    <updated>2026-07-01T18:26:19Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-25680"/>
-    <category term="GO-2026-5028"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Go Net HTML parser is vulnerable to denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25680, GO-2026-5028&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.55.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In Go Net (`golang.org/x/net`) before verion 0.55.0, parsing arbitrary HTML can consume excessive CPU time, possibly leading to denial of service.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-25680"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-25680&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781702"&gt;https://go.dev/cl/781702&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79573"&gt;https://go.dev/issue/79573&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.googlesource.com/net/+/08be507abce89191d78cd49da60f4501fc910472"&gt;https://go.googlesource.com/net/+/08be507abce89191d78cd49da60f4501fc910472&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.googlesource.com/net/+/refs/tags/v0.55.0"&gt;https://go.googlesource.com/net/+/refs/tags/v0.55.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8"&gt;https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5028"&gt;https://pkg.go.dev/vuln/GO-2026-5028&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="cs.opensource.google/go/x/net"&gt;cs.opensource.google/go/x/net&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5cv4-jp36-h3mw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5028: Invoking denial of service when parsing arbitrary HTML in golang.org/x/net/html</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5028</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5028"/>
-    <published>2026-05-22T02:46:43Z</published>
-    <updated>2026-07-01T18:26:19Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-25680"/>
-    <category term="GHSA-5cv4-jp36-h3mw"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking denial of service when parsing arbitrary HTML in golang.org/x/net/html&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25680, GHSA-5cv4-jp36-h3mw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.55.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Parsing arbitrary HTML can consume excessive CPU time, possibly leading to denial of service.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781702"&gt;https://go.dev/cl/781702&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79573"&gt;https://go.dev/issue/79573&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8"&gt;https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5028"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-7jcp-v9w4-wjmg: KubeVirt has a Link Following vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-7jcp-v9w4-wjmg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7jcp-v9w4-wjmg"/>
-    <published>2026-05-26T15:32:10Z</published>
-    <updated>2026-07-01T17:59:23Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-7374"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;KubeVirt has a Link Following vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-7374&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;kubevirt.io/kubevirt&lt;/code&gt; — fixed in 1.8.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;kubevirt.io/kubevirt&lt;/code&gt; — fixed in 1.7.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;kubevirt.io/kubevirt&lt;/code&gt; — fixed in 1.6.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A flaw was found in KubeVirt&amp;#x27;s virt-handler component. This vulnerability allows an authenticated OpenShift user with edit permissions in a single namespace to exploit improper symlink validation when connecting to virtual machine console sockets. By replacing the console socket with a symlink to the host&amp;#x27;s container runtime (CRI-O) socket, an attacker can hijack virt-handler&amp;#x27;s privileged connection. This enables the attacker to access any Unix socket on the host, potentially leading to full control of the node and the entire cluster.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-7374"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-7374&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kubevirt/kubevirt/pull/17916"&gt;https://github.com/kubevirt/kubevirt/pull/17916&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kubevirt/kubevirt/commit/011eef8129e2c21e0ea496f283ee1676009bc757"&gt;https://github.com/kubevirt/kubevirt/commit/011eef8129e2c21e0ea496f283ee1676009bc757&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-7374.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-7374.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kubevirt/kubevirt"&gt;https://github.com/kubevirt/kubevirt&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2463728"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2463728&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-7374"&gt;https://access.redhat.com/security/cve/CVE-2026-7374&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:20975"&gt;https://access.redhat.com/errata/RHSA-2026:20975&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7jcp-v9w4-wjmg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-45gg-vh54-h5m9: golang.org/x/crypto/ssh vulnerable to invoking bypass of certificate restrictions</title>
-    <id>https://osv.dev/vulnerability/GHSA-45gg-vh54-h5m9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-45gg-vh54-h5m9"/>
-    <published>2026-06-25T22:14:38Z</published>
-    <updated>2026-07-01T15:45:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-39828"/>
-    <category term="GO-2026-5014"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh vulnerable to invoking bypass of certificate restrictions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39828, GO-2026-5014&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When an SSH server authentication callback returned PartialSuccessError with non-nil Permissions, those permissions were silently discarded, potentially dropping certificate restrictions such as force-command after a second factor succeeded. Returning non-nil Permissions with PartialSuccessError now results in a connection error.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39828"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39828&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:26546"&gt;https://access.redhat.com/errata/RHSA-2026:26546&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:26547"&gt;https://access.redhat.com/errata/RHSA-2026:26547&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-39828"&gt;https://access.redhat.com/security/cve/CVE-2026-39828&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2480687"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2480687&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781621"&gt;https://go.dev/cl/781621&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79562"&gt;https://go.dev/issue/79562&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-45gg-vh54-h5m9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-x527-x647-q7gg: golang.org/x/crypto/ssh: Invoking VerifiedPublicKeyCallback permissions skip enforcement</title>
-    <id>https://osv.dev/vulnerability/GHSA-x527-x647-q7gg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x527-x647-q7gg"/>
-    <published>2026-06-25T22:23:16Z</published>
-    <updated>2026-07-01T15:45:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-46595"/>
-    <category term="GO-2026-5023"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh: Invoking VerifiedPublicKeyCallback permissions skip enforcement&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46595, GO-2026-5023&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Previously, CVE-2024-45337 fixed an authorization bypass for misused ssh server configurations; if any other type of callback is passed other than public key, then the source-address validation would be skipped.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46595"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46595&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-45337"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-45337&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-46595.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-46595.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-5023"&gt;https://pkg.go.dev/vuln/GO-2026-5023&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79570"&gt;https://go.dev/issue/79570&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781642"&gt;https://go.dev/cl/781642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x527-x647-q7gg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5cgq-3rg8-m6cv: golang.org/x/crypto/ssh/knownhosts vulnerable to auth bypass via unenforced @revoked status</title>
-    <id>https://osv.dev/vulnerability/GHSA-5cgq-3rg8-m6cv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5cgq-3rg8-m6cv"/>
-    <published>2026-06-25T22:22:04Z</published>
-    <updated>2026-07-01T15:45:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-42508"/>
-    <category term="GO-2026-5021"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh/knownhosts vulnerable to auth bypass via unenforced @revoked status&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42508, GO-2026-5021&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh/knownhosts&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Previously, a revoked &amp;#x27;SignatureKey&amp;#x27; belonging to a CA was not correctly checked for revocation. Now, both the &amp;#x27;key&amp;#x27; and &amp;#x27;key.SignatureKey&amp;#x27; are checked for @revoked.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42508"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42508&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:23262"&gt;https://access.redhat.com/errata/RHSA-2026:23262&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:23264"&gt;https://access.redhat.com/errata/RHSA-2026:23264&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:26546"&gt;https://access.redhat.com/errata/RHSA-2026:26546&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:26547"&gt;https://access.redhat.com/errata/RHSA-2026:26547&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-42508"&gt;https://access.redhat.com/security/cve/CVE-2026-42508&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2480688"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2480688&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5cgq-3rg8-m6cv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-78mq-xcr3-xm33: golang.org/x/crypto/ssh is vulnerable to invoking server panic during CheckHostKey/Authenticate flow</title>
-    <id>https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33"/>
-    <published>2026-06-25T22:15:17Z</published>
-    <updated>2026-07-01T15:45:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-39835"/>
-    <category term="GO-2026-5015"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh is vulnerable to invoking server panic during CheckHostKey/Authenticate flow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39835, GO-2026-5015&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SSH servers which use CertChecker as a public key callback without setting IsUserAuthority or IsHostAuthority could be caused to panic by a client presenting a certificate. CertChecker now returns an error instead of panicking when these callbacks are nil.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39835"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39835&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:26546"&gt;https://access.redhat.com/errata/RHSA-2026:26546&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:26547"&gt;https://access.redhat.com/errata/RHSA-2026:26547&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-39835"&gt;https://access.redhat.com/security/cve/CVE-2026-39835&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2480680"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2480680&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781660"&gt;https://go.dev/cl/781660&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79563"&gt;https://go.dev/issue/79563&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-w879-237q-wc7r: golang.org/x/crypto/ssh: Invoking pathological RSA/DSA parameters may cause DoS</title>
-    <id>https://osv.dev/vulnerability/GHSA-w879-237q-wc7r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w879-237q-wc7r"/>
-    <published>2026-06-25T22:18:43Z</published>
-    <updated>2026-07-01T15:45:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-39829"/>
-    <category term="GO-2026-5018"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto/ssh: Invoking pathological RSA/DSA parameters may cause DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39829, GO-2026-5018&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto/ssh&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The RSA and DSA public key parsers did not enforce size limits on key parameters. A crafted public key with an excessively large modulus or DSA parameter could cause several minutes of CPU consumption during signature verification. This could be triggered by unauthenticated clients during public key authentication. RSA moduli are now limited to 8192 bits, and DSA parameters are validated per FIPS 186-2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39829"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39829&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:26546"&gt;https://access.redhat.com/errata/RHSA-2026:26546&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:26547"&gt;https://access.redhat.com/errata/RHSA-2026:26547&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:29455"&gt;https://access.redhat.com/errata/RHSA-2026:29455&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-39829"&gt;https://access.redhat.com/security/cve/CVE-2026-39829&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2480681"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2480681&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cs.opensource.google/go/x/crypto"&gt;https://cs.opensource.google/go/x/crypto&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/781641"&gt;https://go.dev/cl/781641&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w879-237q-wc7r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-mqr9-hjr8-2m9w: Content Censorship in the InterPlanetary File System (IPFS) via Kademlia DHT abuse</title>
-    <id>https://osv.dev/vulnerability/GHSA-mqr9-hjr8-2m9w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mqr9-hjr8-2m9w"/>
-    <published>2024-10-25T18:30:49Z</published>
-    <updated>2026-07-01T14:59:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2023-26248"/>
-    <category term="GO-2024-3218"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Content Censorship in the InterPlanetary File System (IPFS) via Kademlia DHT abuse&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-26248, GO-2024-3218&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/libp2p/go-libp2p-kad-dht&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The Kademlia DHT (go-libp2p-kad-dht 0.20.0 and earlier) used in IPFS (0.18.1 and earlier) assigns routing information for content (i.e., information about who holds the content) to be stored by peers whose peer IDs have a small DHT distance from the content ID. This allows an attacker to censor content by generating many Sybil peers whose peer IDs have a small distance from the content ID, thus hijacking the content resolution process.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-26248"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-26248&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://arxiv.org/abs/2307.12212"&gt;https://arxiv.org/abs/2307.12212&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/libp2p/go-libp2p-kad-dht"&gt;https://github.com/libp2p/go-libp2p-kad-dht&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2024-3218"&gt;https://pkg.go.dev/vuln/GO-2024-3218&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mqr9-hjr8-2m9w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2024-3218: Content Censorship in the InterPlanetary File System (IPFS) via Kademlia DHT abuse in github.com/libp2p/go-libp2p-kad-dht</title>
-    <id>https://osv.dev/vulnerability/GO-2024-3218</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2024-3218"/>
-    <published>2024-12-12T15:16:20Z</published>
-    <updated>2026-07-01T14:59:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2023-26248"/>
-    <category term="GHSA-mqr9-hjr8-2m9w"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Content Censorship in the InterPlanetary File System (IPFS) via Kademlia DHT abuse in github.com/libp2p/go-libp2p-kad-dht&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-26248, GHSA-mqr9-hjr8-2m9w&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/libp2p/go-libp2p-kad-dht&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Content Censorship in the InterPlanetary File System (IPFS) via Kademlia DHT abuse in github.com/libp2p/go-libp2p-kad-dht&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-mqr9-hjr8-2m9w"&gt;https://github.com/advisories/GHSA-mqr9-hjr8-2m9w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://arxiv.org/abs/2307.12212"&gt;https://arxiv.org/abs/2307.12212&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2024-3218"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

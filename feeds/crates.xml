@@ -3,12 +3,57 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-07-04T08:30:04Z</updated>
+  <updated>2026-07-04T20:30:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0201: Non-painting replaced elements amplify to thousands of blank PDF pages (denial of service)</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0201</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0201"/>
+    <published>2026-07-05T12:00:00Z</published>
+    <updated>2026-07-04T20:30:04Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-4rf6-qx84-q9fv"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Non-painting replaced elements amplify to thousands of blank PDF pages (denial of service)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-4rf6-qx84-q9fv&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fulgur&lt;/code&gt; — fixed in 0.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`fulgur` converts untrusted HTML/CSS into PDF, commonly on a server that
+processes input supplied by many tenants. In versions prior to 0.26.0, a
+childless box that resolves to a pathologically tall height was amplified into
+thousands of blank PDF pages, even when it produces no visible output.
+
+The childless-collapse defense that would normally collapse such a box was gated
+by a tag-only &amp;quot;replaced content&amp;quot; check, so any non-painting replaced element
+bypassed it, including an unresolved `src` (the common offline-first case), a
+`visibility:hidden` image, an undecodable image format, and an empty `&amp;lt;svg&amp;gt;`. A
+trailing-sibling variant of the same gap was also open.
+
+A few bytes of HTML therefore amplified into roughly `MAX_PAGES` (10,000) blank
+pages; the renderer allocates and runs a per-page …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/fulgur"&gt;https://crates.io/crates/fulgur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0201.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0201.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-4rf6-qx84-q9fv"&gt;https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-4rf6-qx84-q9fv&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0201"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0200: Unbounded page slicing from attacker-controlled CSS height causes denial of service</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0200</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0200"/>
+    <published>2026-07-05T12:00:00Z</published>
+    <updated>2026-07-04T19:45:04Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-j5cx-ph8g-95v3"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unbounded page slicing from attacker-controlled CSS height causes denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-j5cx-ph8g-95v3&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fulgur&lt;/code&gt; — fixed in 0.19.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`fulgur` converts untrusted HTML/CSS into PDF, commonly on a server that
+processes input supplied by many tenants. In versions prior to 0.19.0, a
+body-direct child whose CSS-resolved height greatly exceeds the page height was
+sliced into one fragment per page with no upper bound.
+
+The height is taken directly from attacker-controlled HTML/CSS (`height`, `vh`
+units), so a few bytes such as `&amp;lt;div style=&amp;quot;height:99999999px&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;` forced on
+the order of 125,000 page fragments. The pagination code then allocates
+`vec![Vec::new(); page_count]` and runs a per-page render loop, resulting in CPU
+and memory exhaustion. A non-finite height (one that resolves to `+inf`)
+additionally made the slicing loop&amp;#x27;s `remaining -= last_slice_h` decrement never
+terminate, causing an infinite loop.
+
+An attacker a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/fulgur"&gt;https://crates.io/crates/fulgur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0200.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0200.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-j5cx-ph8g-95v3"&gt;https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-j5cx-ph8g-95v3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0200"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0199: Panic in `bcrypt::verify` on non-ASCII hash input</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0199</id>
@@ -133,7 +178,7 @@ mod miri_ub {
     // can create a tiny backing buffer for hu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/jxl-grid"&gt;https://crates.io/crates/jxl-grid&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0151.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0151.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tirr-c/jxl-oxide/security/advisories/GHSA-5pmv-rx8r-wmv5"&gt;https://github.com/tirr-c/jxl-oxide/security/advisories/GHSA-5pmv-rx8r-wmv5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0151"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-5pmv-rx8r-wmv5: jxl-grid on 32-bit platforms has an out-of-bounds writes due to integer overflow</title>
+    <title>[UPDATED] GHSA-5pmv-rx8r-wmv5: jxl-grid on 32-bit platforms has an out-of-bounds writes due to integer overflow</title>
     <id>https://osv.dev/vulnerability/GHSA-5pmv-rx8r-wmv5</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5pmv-rx8r-wmv5"/>
     <published>2026-07-02T20:45:59Z</published>
@@ -164,7 +209,7 @@ mod miri_ub {
     #[t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tirr-c/jxl-oxide/security/advisories/GHSA-5pmv-rx8r-wmv5"&gt;https://github.com/tirr-c/jxl-oxide/security/advisories/GHSA-5pmv-rx8r-wmv5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tirr-c/jxl-oxide"&gt;https://github.com/tirr-c/jxl-oxide&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0151.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0151.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5pmv-rx8r-wmv5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-2v8p-fqpx-2q3w: jxl-oxide: integer subtraction overflow panic in cluster_from_table via crafted JXL input (DoS)</title>
+    <title>[UPDATED] GHSA-2v8p-fqpx-2q3w: jxl-oxide: integer subtraction overflow panic in cluster_from_table via crafted JXL input (DoS)</title>
     <id>https://osv.dev/vulnerability/GHSA-2v8p-fqpx-2q3w</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2v8p-fqpx-2q3w"/>
     <published>2026-07-02T20:44:57Z</published>
@@ -181,7 +226,7 @@ that sets `overflow-checks = true` in Cargo.toml or `[profile.*]`.
 No memory corruption is possible — the panic fires before any unsafe code is reached.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tirr-c/jxl-oxide/security/advisories/GHSA-2v8p-fqpx-2q3w"&gt;https://github.com/tirr-c/jxl-oxide/security/advisories/GHSA-2v8p-fqpx-2q3w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tirr-c/jxl-oxide"&gt;https://github.com/tirr-c/jxl-oxide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2v8p-fqpx-2q3w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-66m8-c62j-h6v5: jxl-oxide: `FrameBuffer::new` creates out-of-bounds slices on overflow</title>
+    <title>[UPDATED] GHSA-66m8-c62j-h6v5: jxl-oxide: `FrameBuffer::new` creates out-of-bounds slices on overflow</title>
     <id>https://osv.dev/vulnerability/GHSA-66m8-c62j-h6v5</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-66m8-c62j-h6v5"/>
     <published>2026-07-02T20:45:10Z</published>
@@ -196,7 +241,7 @@ Additionally, calling the safe grouped buffer accessors afterward can create inv
 On 32-bit platforms this can cause panic by accessing out-of-range indices, making it a DoS vulnerability.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tirr-c/jxl-oxide/security/advisories/GHSA-66m8-c62j-h6v5"&gt;https://github.com/tirr-c/jxl-oxide/security/advisories/GHSA-66m8-c62j-h6v5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tirr-c/jxl-oxide"&gt;https://github.com/tirr-c/jxl-oxide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-66m8-c62j-h6v5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-63wg-wjjj-7cp8: Zebra Address Book Aborted by IPv4-Mapped Mempool Misbehavior Update</title>
+    <title>[UPDATED] GHSA-63wg-wjjj-7cp8: Zebra Address Book Aborted by IPv4-Mapped Mempool Misbehavior Update</title>
     <id>https://osv.dev/vulnerability/GHSA-63wg-wjjj-7cp8</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-63wg-wjjj-7cp8"/>
     <published>2026-07-02T20:26:56Z</published>
@@ -218,7 +263,7 @@ An address normalization mismatch between the handshake path and the mempool mis
 The handshake path canonicalizes IPv4-mapped IPv6 addresses to plain IPv4 when storing the peer in the address book via `MetaAddr::new_connected`. The m…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-63wg-wjjj-7cp8"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-63wg-wjjj-7cp8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-63wg-wjjj-7cp8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-65jj-fmw8-468q: zebrad has unbounded memory leak in mempool download pipeline via timeout path cancel_handles retention</title>
+    <title>[UPDATED] GHSA-65jj-fmw8-468q: zebrad has unbounded memory leak in mempool download pipeline via timeout path cancel_handles retention</title>
     <id>https://osv.dev/vulnerability/GHSA-65jj-fmw8-468q</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-65jj-fmw8-468q"/>
     <published>2026-07-02T20:12:35Z</published>
@@ -240,7 +285,7 @@ All default configurations are affected.
 The mempool download pipeline&amp;#x27;s `cancel_handles` map retains entries for transactions whose verification times out at the outer `RATE_LIMIT_DELAY` (73-second) boundary. The `tokio::time::error::Elapsed` error carries no payload, so the transaction ID is unrecoverable and the corresponding `cancel_handles` entry (including the full `Gossip::Tx(UnminedTx)`, up to ~2 MB) is never removed. Entries accumulate monotonically with no upper bound or garbage collection, leading to eventual…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-65jj-fmw8-468q"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-65jj-fmw8-468q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebrad/src/components/mempool.rs#L663-L672"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebrad/src/components/mempool.rs#L663-L672&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebrad/src/components/mempool/downloads.rs#L215-L228"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebrad/src/components/mempool/downloads.rs#L215-L228&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-65jj-fmw8-468q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-2gf8-q9rr-jq3h: zebrad has persistent on-disk corruption of Sapling/Orchard subtree roots after chain fork via pop_tip</title>
+    <title>[UPDATED] GHSA-2gf8-q9rr-jq3h: zebrad has persistent on-disk corruption of Sapling/Orchard subtree roots after chain fork via pop_tip</title>
     <id>https://osv.dev/vulnerability/GHSA-2gf8-q9rr-jq3h</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2gf8-q9rr-jq3h"/>
     <published>2026-07-02T20:11:36Z</published>
@@ -261,7 +306,7 @@ All default configurations are affected. The corruption persists across restarts
 When `pop_tip` removes the tip block during a chain fork, stale Sapling and Orchard note commitment subtree root data is retained in the in-memory non-finalized state. When the chain subsequently finalizes, this stale data is written to the persistent RocksDB state. The corrupted subtree root history affects `z_getsubtreesbyindex` (used by lightwalletd for wallet synchronization) and could affect future chain verification that depends on correct subtree r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-2gf8-q9rr-jq3h"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-2gf8-q9rr-jq3h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2gf8-q9rr-jq3h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-w834-cf6p-9m9w: Zebra: Finalized address balance credit-first overflow on consensus-valid blocks</title>
+    <title>[UPDATED] GHSA-w834-cf6p-9m9w: Zebra: Finalized address balance credit-first overflow on consensus-valid blocks</title>
     <id>https://osv.dev/vulnerability/GHSA-w834-cf6p-9m9w</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w834-cf6p-9m9w"/>
     <published>2026-07-02T19:44:54Z</published>
@@ -284,180 +329,5 @@ Because the triggering block is consensus-valid (zcashd accepts it), the panic r
 ### Details
 
 The finalized…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-w834-cf6p-9m9w"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-w834-cf6p-9m9w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w834-cf6p-9m9w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-hhm7-qrv5-h4r6: Zebra: Repeated Non-Finalized Shielded Transaction Aborts Zebra Before Duplicate-Nullifier Rejection</title>
-    <id>https://osv.dev/vulnerability/GHSA-hhm7-qrv5-h4r6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hhm7-qrv5-h4r6"/>
-    <published>2026-07-02T19:46:35Z</published>
-    <updated>2026-07-02T20:00:07Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-52739"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Zebra: Repeated Non-Finalized Shielded Transaction Aborts Zebra Before Duplicate-Nullifier Rejection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52739&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebra-state&lt;/code&gt; — fixed in 7.0.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
-
-You are affected if:
-
-1. You run `zebrad` up to and including `v4.4.1`.
-2. Your node processes blocks past the checkpoint height (non-finalized state is active).
-3. The network has NU5 or later activated.
-
-All default configurations are affected.
-
-### Summary
-
-`Chain::push` in the non-finalized state updates the transaction-location index (`tx_loc_by_hash`) before it runs the duplicate shielded-nullifier guard. When an invalid child block repeats a shielded transaction from its non-finalized parent, the `assert_eq!(prior_pair, None, &amp;quot;transactions must be unique within a single chain&amp;quot;)` fires before the contextual validation that would cleanly reject the duplicate. Under Zebra&amp;#x27;s `panic = &amp;quot;abort&amp;quot;` release profile, this terminates the entire node process.
-
-The block should …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-hhm7-qrv5-h4r6"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-hhm7-qrv5-h4r6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/Cargo.toml#L304-L305"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/Cargo.toml#L304-L305&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-consensus/src/transaction.rs#L521-L526"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-consensus/src/transaction.rs#L521-L526&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-state/src/service/non_finalized_state/chain.rs#L1608-L1628"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-state/src/service/non_finalized_state/chain.rs#L1608-L1628&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hhm7-qrv5-h4r6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-gvjc-3w7c-92jx: Zebra has sync restart poisoning from single unauthenticated peer via above-lookahead block</title>
-    <id>https://osv.dev/vulnerability/GHSA-gvjc-3w7c-92jx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gvjc-3w7c-92jx"/>
-    <published>2026-07-02T19:44:24Z</published>
-    <updated>2026-07-02T20:00:07Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-52737"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Zebra has sync restart poisoning from single unauthenticated peer via above-lookahead block&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52737&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebra-consensus&lt;/code&gt; — fixed in 7.0.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
-
-You are affected if:
-
-1. You run `zebrad` up to and including `v4.4.1`.
-2. Your node accepts inbound P2P connections and is syncing or catching up to the chain tip.
-
-### Summary
-
-A malicious peer can answer Zebra&amp;#x27;s outbound `getblocks`/`FindBlocks` request with a small two-hash inventory, then serve a syntactically valid block whose coinbase height is far above the victim&amp;#x27;s local tip. The `AboveLookaheadHeightLimit` error in the sync download pipeline triggers a global sync restart rather than being scoped to the offending peer. The peer is never scored or disconnected because the error type does not carry the advertiser address.
-
-On mainnet, each successful cycle imposes a 67-second sync restart delay. All in-flight downloads from honest peers are cancelled on each rest…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-gvjc-3w7c-92jx"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-gvjc-3w7c-92jx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gvjc-3w7c-92jx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-gf9r-m956-97qx: zebrad has consensus divergence via P2SH sigop undercount in pure-Rust disabled-opcode parser</title>
-    <id>https://osv.dev/vulnerability/GHSA-gf9r-m956-97qx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gf9r-m956-97qx"/>
-    <published>2026-07-02T19:43:36Z</published>
-    <updated>2026-07-02T20:00:07Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-52735"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;zebrad has consensus divergence via P2SH sigop undercount in pure-Rust disabled-opcode parser&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52735&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebra-script&lt;/code&gt; — fixed in 7.0.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
-
-You are affected if:
-
-1. You run any version of `zebrad` up to and including `v4.4.1`.
-2. Your node validates blocks on mainnet, testnet, or any network where both Zebra and zcashd nodes participate.
-
-All default configurations are affected. No feature flags, non-default settings, or special build options are required.
-
-### Summary
-
-Zebra&amp;#x27;s P2SH sigop counter uses a pure-Rust code path that short-circuits on disabled opcodes (such as `OP_CODESEPARATOR`), returning a partial count of zero for any sigops following the disabled opcode. The reference implementation (zcashd) correctly counts through disabled opcodes in its static sigop analysis. This produces a consensus divergence: Zebra accepts blocks that zcashd rejects when the block-wide `MAX_BLOCK_SIGOPS = 20,000` thres…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-gf9r-m956-97qx"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-gf9r-m956-97qx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AlfredoG87/zcash_script/blob/v0.4.4/src/script/iter.rs#L104-L115"&gt;https://github.com/AlfredoG87/zcash_script/blob/v0.4.4/src/script/iter.rs#L104-L115&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-consensus/src/block.rs#L140"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-consensus/src/block.rs#L140&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-script/src/lib.rs#L383-L400"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-script/src/lib.rs#L383-L400&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gf9r-m956-97qx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4m69-67m6-prqp: Zebra has block suppression via NU5 same-header body poisoning of sent-hash cache</title>
-    <id>https://osv.dev/vulnerability/GHSA-4m69-67m6-prqp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4m69-67m6-prqp"/>
-    <published>2026-07-02T19:43:08Z</published>
-    <updated>2026-07-02T19:45:33Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-52736"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Zebra has block suppression via NU5 same-header body poisoning of sent-hash cache&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52736&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebra-state&lt;/code&gt; — fixed in 7.0.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
-
-### Am I affected
-
-You are affected if:
-
-1. You run any version of `zebrad` up to and including `v4.4.1`.
-2. Your node accepts inbound P2P connections (`network.listen_addr` is set, which is the default).
-3. Your node processes blocks past the checkpoint height (non-finalized state is active).
-
-All default configurations are affected.
-
-### Summary
-
-Zebra records a block hash in `non_finalized_block_write_sent_hashes` when the block is sent to the write task, before contextual validation completes. If validation fails, the hash is not removed. A remote unauthenticated peer can deliver a poisoned block body that shares a header hash with a later valid canonical block. The poisoned body is rejected, but the hash remains cached. When the valid canonical block arrives, Zebra tre…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-4m69-67m6-prqp"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-4m69-67m6-prqp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-state/src/service.rs#L659-L714"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-state/src/service.rs#L659-L714&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-state/src/service.rs#L797-L802"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-state/src/service.rs#L797-L802&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4m69-67m6-prqp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-443g-gwgp-49x4: zebrad vulnerable to getblocks/getheaders locator CPU amplification via uncapped vector length</title>
-    <id>https://osv.dev/vulnerability/GHSA-443g-gwgp-49x4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-443g-gwgp-49x4"/>
-    <published>2026-07-02T19:34:21Z</published>
-    <updated>2026-07-02T19:45:33Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;zebrad vulnerable to getblocks/getheaders locator CPU amplification via uncapped vector length&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebra-chain&lt;/code&gt; — fixed in 8.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
-
-You are affected if:
-
-1. You run `zebrad` up to and including `v4.4.1`.
-2. Your node accepts inbound P2P connections.
-
-### Summary
-
-The `read_getblocks` and `read_getheaders` codec paths accepted block locator vectors up to approximately 65,535 entries (the generic `TrustedPreallocate` ceiling derived from `MAX_PROTOCOL_MESSAGE_LEN`), rather than the protocol-specification limit of 101 entries (matching zcashd&amp;#x27;s `MAX_LOCATOR_SZ`). Each entry in the locator vector triggers a per-hash chain lookup (`HashMap::contains_key` + `RocksDB::contains_hash`) in `find_chain_intersection` on a tokio blocking-pool thread.
-
-A single maximally-sized `getblocks` message occupies one blocking-pool thread for approximately 10–65ms. Under sustained load from multiple peers, this can degrade…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-443g-gwgp-49x4"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-443g-gwgp-49x4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/pull/10570"&gt;https://github.com/ZcashFoundation/zebra/pull/10570&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/commit/8981a1b95d4807cad99e5bb3b94fc8bc723ac033"&gt;https://github.com/ZcashFoundation/zebra/commit/8981a1b95d4807cad99e5bb3b94fc8bc723ac033&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-443g-gwgp-49x4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-h72h-ppcx-998p: Zebra has pre-handshake buffer capacity reservation based on attacker-claimed body length</title>
-    <id>https://osv.dev/vulnerability/GHSA-h72h-ppcx-998p</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h72h-ppcx-998p"/>
-    <published>2026-07-02T19:42:05Z</published>
-    <updated>2026-07-02T19:45:30Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Zebra has pre-handshake buffer capacity reservation based on attacker-claimed body length&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebra-network&lt;/code&gt; — fixed in 7.0.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
-
-You are affected if:
-
-1. You run `zebrad` up to and including `v4.4.1`.
-2. Your node accepts inbound P2P connections (`network.listen_addr` is set, which is the default).
-
-### Summary
-
-The P2P codec&amp;#x27;s `Codec::decode()` method calls `src.reserve(body_len + HEADER_LEN)` after parsing a 24-byte protocol header, using the attacker-claimed `body_len` field. This reserves up to `MAX_PROTOCOL_MESSAGE_LEN` (~2 MiB) of virtual buffer capacity per connection before any body bytes arrive and before the handshake completes.
-
-However, `BytesMut::reserve()` sets virtual capacity without committing physical memory pages. The operating system does not allocate physical RAM until bytes are actually written into the buffer. Since the attacker never sends body bytes, the reserved capacity …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-h72h-ppcx-998p"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-h72h-ppcx-998p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-network/src/peer/handshake.rs#L917-L934"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-network/src/peer/handshake.rs#L917-L934&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-network/src/protocol/external/codec.rs#L359-L416"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-network/src/protocol/external/codec.rs#L359-L416&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h72h-ppcx-998p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-c8w6-x74f-vmg3: zebrad vulnerable to full node denial of service via crafted Sapling receiver in z_listunifiedreceivers</title>
-    <id>https://osv.dev/vulnerability/GHSA-c8w6-x74f-vmg3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c8w6-x74f-vmg3"/>
-    <published>2026-07-02T19:37:58Z</published>
-    <updated>2026-07-02T19:45:30Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;zebrad vulnerable to full node denial of service via crafted Sapling receiver in z_listunifiedreceivers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebra-rpc&lt;/code&gt; — fixed in 8.0.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
-
-You are affected if:
-
-1. You run `zebrad` up to and including `v4.4.1`.
-2. Your `zebrad.toml` sets `rpc.listen_addr` to a TCP address (RPC server is enabled).
-3. An attacker can authenticate to the RPC endpoint. With the default `enable_cookie_auth = true`, this requires the attacker to read the `.cookie` file (typically local access). With `enable_cookie_auth = false`, any network client reaching the RPC port can trigger it.
-
-### Summary
-
-The `z_listunifiedreceivers` RPC handler panics when processing a structurally valid Unified Address whose Sapling receiver carries 43 bytes that fail cryptographic validation (`sapling_crypto::PaymentAddress::from_bytes` returns `None` for non-subgroup Jubjub points). The handler calls `.expect(&amp;quot;using data already decoded as valid&amp;quot;)` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-c8w6-x74f-vmg3"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-c8w6-x74f-vmg3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/Cargo.toml#L305"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/Cargo.toml#L305&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-rpc/src/methods.rs#L2867-L2914"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-rpc/src/methods.rs#L2867-L2914&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c8w6-x74f-vmg3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4fc2-h7jh-287c: zebrad has mempool transaction admission denial via single-peer inbound queue saturation</title>
-    <id>https://osv.dev/vulnerability/GHSA-4fc2-h7jh-287c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4fc2-h7jh-287c"/>
-    <published>2026-07-02T19:39:02Z</published>
-    <updated>2026-07-02T19:45:29Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-52732"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;zebrad has mempool transaction admission denial via single-peer inbound queue saturation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52732&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
-
-You are affected if:
-
-1. You run `zebrad` up to and including `v4.4.1`.
-2. Your node accepts inbound P2P connections (`network.listen_addr` is set, which is the default).
-3. Your node&amp;#x27;s mempool is active (node is synced near the chain tip).
-
-All default configurations are affected.
-
-### Summary
-
-A single unauthenticated P2P peer can monopolize all 25 inbound mempool download/verification slots (`MAX_INBOUND_CONCURRENCY`) by advertising fake transaction IDs. While the slots are occupied, all other inbound transactions from honest peers and local RPC `sendrawtransaction` calls are rejected with `MempoolError::FullQueue`. The attacker peer is never scored for misbehavior and is not disconnected, allowing sustained denial of mempool admission.
-
-### Details
-
-The mempool downl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-4fc2-h7jh-287c"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-4fc2-h7jh-287c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebrad/src/components/mempool/downloads.rs#L82"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebrad/src/components/mempool/downloads.rs#L82&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4fc2-h7jh-287c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

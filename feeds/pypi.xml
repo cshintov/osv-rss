@@ -3,12 +3,112 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-07-06T15:30:15Z</updated>
+  <updated>2026-07-06T17:45:10Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-h9f9-h6gm-wc85: flyto-core has Unauthenticated Command Execution via HTTP MCP `execute_module`</title>
+    <id>https://osv.dev/vulnerability/GHSA-h9f9-h6gm-wc85</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h9f9-h6gm-wc85"/>
+    <published>2026-07-06T17:41:03Z</published>
+    <updated>2026-07-06T17:45:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55786"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;flyto-core has Unauthenticated Command Execution via HTTP MCP `execute_module`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55786&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flyto-core&lt;/code&gt; — fixed in 2.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Unauthenticated Command Execution via HTTP MCP `execute_module`
+
+### Summary
+
+The HTTP MCP endpoint (`POST /mcp`) in flyto-core accepts unauthenticated JSON-RPC `tools/call` requests and dispatches them to arbitrary registered modules, including `sandbox.execute_shell`, which passes attacker-controlled input directly to `asyncio.create_subprocess_shell`. An unauthenticated attacker can execute arbitrary OS commands as the flyto-core server process. By default the server binds to `127.0.0.1`, making this a High-severity local vulnerability (CVSS 8.4); if started with `--host 0.0.0.0`, it becomes remotely exploitable over the network. Dynamic reproduction confirmed command execution as `root` inside a Docker container without any `Authorization` header.
+
+### Details
+
+flyto-core exposes an…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/flytohub/flyto-core/security/advisories/GHSA-h9f9-h6gm-wc85"&gt;https://github.com/flytohub/flyto-core/security/advisories/GHSA-h9f9-h6gm-wc85&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/flytohub/flyto-core"&gt;https://github.com/flytohub/flyto-core&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h9f9-h6gm-wc85"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-794r-5rp2-fpg8: flyto-core has SSRF guard bypass via IPv6 transition addresses (IPv4-mapped / 6to4 / NAT64) in validate_url_ssrf</title>
+    <id>https://osv.dev/vulnerability/GHSA-794r-5rp2-fpg8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-794r-5rp2-fpg8"/>
+    <published>2026-07-06T17:30:34Z</published>
+    <updated>2026-07-06T17:45:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55787"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;flyto-core has SSRF guard bypass via IPv6 transition addresses (IPv4-mapped / 6to4 / NAT64) in validate_url_ssrf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55787&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flyto-core&lt;/code&gt; — fixed in 2.26.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`flyto-core`&amp;#x27;s SSRF protection (`validate_url_ssrf` / `is_private_ip` in `src/core/utils.py`) blocks private and metadata destinations by resolving the host and testing the resulting IP for membership in a hardcoded `PRIVATE_IP_RANGES` list. That list contains only the *native* RFC 1918 / loopback / link-local / unique-local ranges. It does **not** account for IPv6 transition address forms that embed an IPv4 (or loopback) target:
+
+- IPv4-mapped `::ffff:a.b.c.d`
+- IPv4-compatible `::a.b.c.d`
+- 6to4 `2002::/16`
+- NAT64 well-known prefix `64:ff9b::/96` and local-use `64:ff9b:1::/48`
+
+A workflow author can submit a URL with a literal transition-form host (for example `http://[::ffff:127.0.0.1]:8080/...` or `http://[64:ff9b::a9fe:a9fe]/latest/meta-data/`). `is_private_ip()` returns …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/flytohub/flyto-core/security/advisories/GHSA-794r-5rp2-fpg8"&gt;https://github.com/flytohub/flyto-core/security/advisories/GHSA-794r-5rp2-fpg8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/flytohub/flyto-core"&gt;https://github.com/flytohub/flyto-core&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-794r-5rp2-fpg8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jhhc-3hcp-qhm5: WeasyPrint has CSS Injection via Presentational Hints</title>
+    <id>https://osv.dev/vulnerability/GHSA-jhhc-3hcp-qhm5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jhhc-3hcp-qhm5"/>
+    <published>2026-07-06T17:29:53Z</published>
+    <updated>2026-07-06T17:45:09Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-49452"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;WeasyPrint has CSS Injection via Presentational Hints&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49452&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;weasyprint&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A CSS injection issue exists in WeasyPrint when HTML presentational hints are enabled. Unescaped attribute values are embedded into CSS, allowing injection of arbitrary CSS declarations. This affects applications processing untrusted HTML input.
+
+### Details
+File: weasyprint/css/__init__.py
+
+The `background` attribute is used to construct CSS:
+
+background-image:url({element.get(&amp;quot;background&amp;quot;)})
+
+This string is parsed by `tinycss2.parse_blocks_contents()`.
+
+Because the value is not escaped, additional CSS declarations can be injected.
+
+### PoC
+&amp;lt;body background=&amp;quot;x);background-image:url(http://169.254.169.254/latest/meta-data/)&amp;quot;&amp;gt;
+
+### Impact
+- CSS injection
+- Server-side requests via injected `url()`
+- Limited to cases where `presentational_hints=True`
+
+### Suggested Fix
+- Escape a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Kozea/WeasyPrint/security/advisories/GHSA-jhhc-3hcp-qhm5"&gt;https://github.com/Kozea/WeasyPrint/security/advisories/GHSA-jhhc-3hcp-qhm5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Kozea/WeasyPrint"&gt;https://github.com/Kozea/WeasyPrint&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jhhc-3hcp-qhm5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-55f6-pf8r-c2f4: Open Babel has out-of-bounds write in MOPAC translationVectors[] (UNIT CELL TRANSLATION)</title>
+    <id>https://osv.dev/vulnerability/GHSA-55f6-pf8r-c2f4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-55f6-pf8r-c2f4"/>
+    <published>2026-07-06T16:41:43Z</published>
+    <updated>2026-07-06T16:45:19Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2022-46292"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Open Babel has out-of-bounds write in MOPAC translationVectors[] (UNIT CELL TRANSLATION)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2022-46292&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openbabel&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A memory-safety vulnerability in Open Babel&amp;#x27;s MOPAC output parser
+allowed an out-of-bounds write into the `translationVectors[]` array
+when reading the &amp;quot;UNIT CELL TRANSLATION&amp;quot; block of a crafted input
+file.
+
+### Details
+
+The MOPAC output reader stored translation vectors from the UNIT CELL
+TRANSLATION block into a fixed-size `translationVectors[]` array. A
+malformed block could push more vectors than the array had slots,
+causing a write past the end of the array. One of five
+`translationVectors[]` OOB writes in the TALOS 2022 batch.
+
+### Impact
+
+Open Babel is a C++ library and CLI used to read and write chemistry
+file formats; it is shipped by Linux distributions and embedded in
+services that may parse untrusted input. Triggering this vulnerability
+requires the victim to open …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/security/advisories/GHSA-55f6-pf8r-c2f4"&gt;https://github.com/openbabel/openbabel/security/advisories/GHSA-55f6-pf8r-c2f4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2022-46292"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-46292&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel/commit/40e852138f21d586b7ccdce6329e7b23a87168bb"&gt;https://github.com/openbabel/openbabel/commit/40e852138f21d586b7ccdce6329e7b23a87168bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbabel/openbabel"&gt;https://github.com/openbabel/openbabel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://talosintelligence.com/vulnerability_reports/TALOS-2022-1666"&gt;https://talosintelligence.com/vulnerability_reports/TALOS-2022-1666&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.talosintelligence.com/vulnerability_reports/TALOS-2022-1666"&gt;https://www.talosintelligence.com/vulnerability_reports/TALOS-2022-1666&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-55f6-pf8r-c2f4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-9fq2-x9r6-wfmf: Numpy Deserialization of Untrusted Data</title>
     <id>https://osv.dev/vulnerability/GHSA-9fq2-x9r6-wfmf</id>
@@ -1765,60 +1865,5 @@ These issues have been discovered via fuzzing and it is possible that more weakn
         
 ### Patches
 We have patched the issue in multiple GitHub commits and these will be included in TensorFlow 2.8.0 and Ten…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tensorflow/tensorflow/security/advisories/GHSA-9x52-887g-fhc2"&gt;https://github.com/tensorflow/tensorflow/security/advisories/GHSA-9x52-887g-fhc2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2022-23594"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-23594&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tensorflow/tensorflow"&gt;https://github.com/tensorflow/tensorflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tensorflow/tensorflow/tree/274df9b02330b790aa8de1cee164b70f72b9b244/tensorflow/core/ir/importexport"&gt;https://github.com/tensorflow/tensorflow/tree/274df9b02330b790aa8de1cee164b70f72b9b244/tensorflow/core/ir/importexport&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/tensorflow-gpu"&gt;https://pypi.org/project/tensorflow-gpu&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-9x52-887g-fhc2"&gt;https://github.com/advisories/GHSA-9x52-887g-fhc2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-752"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-j57p-g33w-95c5: OpenStack Horizon Cross-site scripting (XSS) vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-j57p-g33w-95c5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j57p-g33w-95c5"/>
-    <published>2022-05-13T01:11:28Z</published>
-    <updated>2026-07-06T08:11:10Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2014-3474"/>
-    <category term="PYSEC-2026-644"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenStack Horizon Cross-site scripting (XSS) vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2014-3474, PYSEC-2026-644&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;horizon&lt;/code&gt; — fixed in 8.0.0a0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Cross-site scripting (XSS) vulnerability in `horizon/static/horizon/js/horizon.instances.js` in the Launch Instance menu in OpenStack Dashboard (Horizon) before 2013.2.4, 2014.1 before 2014.1.2, and Juno before Juno-2 allows remote authenticated users to inject arbitrary web script or HTML via a network name.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2014-3474"&gt;https://nvd.nist.gov/vuln/detail/CVE-2014-3474&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openstack/horizon/commit/32a7b713468161282f2ea01d5e2faff980d924cd"&gt;https://github.com/openstack/horizon/commit/32a7b713468161282f2ea01d5e2faff980d924cd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openstack/horizon/commit/c844bd692894353c60b320005b804970605e910f"&gt;https://github.com/openstack/horizon/commit/c844bd692894353c60b320005b804970605e910f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openstack/horizon/commit/de4466d88b816437fb29eff5ab23b9b964cd3985"&gt;https://github.com/openstack/horizon/commit/de4466d88b816437fb29eff5ab23b9b964cd3985&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2014:0939"&gt;https://access.redhat.com/errata/RHSA-2014:0939&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2014:1188"&gt;https://access.redhat.com/errata/RHSA-2014:1188&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2014-3474"&gt;https://access.redhat.com/security/cve/CVE-2014-3474&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugs.launchpad.net/horizon/+bug/1322197"&gt;https://bugs.launchpad.net/horizon/+bug/1322197&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j57p-g33w-95c5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-83rh-hx5x-q9p5: Out-of-bounds Read in OpenCV</title>
-    <id>https://osv.dev/vulnerability/GHSA-83rh-hx5x-q9p5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-83rh-hx5x-q9p5"/>
-    <published>2021-10-12T22:03:23Z</published>
-    <updated>2026-07-06T08:11:10Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2017-18009"/>
-    <category term="PYSEC-2026-702"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Out-of-bounds Read in OpenCV&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2017-18009, PYSEC-2026-702&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;opencv-python&lt;/code&gt; — fixed in 3.4.1.15&lt;/li&gt;&lt;li&gt;&lt;code&gt;opencv-contrib-python&lt;/code&gt; — fixed in 3.4.1.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In OpenCV 3.3.1 (corresponding with OpenCV-Python 3.3.1.11), a heap-based buffer over-read exists in the function cv::HdrDecoder::checkSignature in modules/imgcodecs/src/grfmt_hdr.cpp.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2017-18009"&gt;https://nvd.nist.gov/vuln/detail/CVE-2017-18009&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/opencv/opencv/issues/10479"&gt;https://github.com/opencv/opencv/issues/10479&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/opencv/opencv/pull/10480/commits/4ca89db22dea962690f31c1781bce5937ee91837"&gt;https://github.com/opencv/opencv/pull/10480/commits/4ca89db22dea962690f31c1781bce5937ee91837&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/opencv/opencv-python"&gt;https://github.com/opencv/opencv-python&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.securityfocus.com/bid/106945"&gt;http://www.securityfocus.com/bid/106945&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-83rh-hx5x-q9p5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5f5c-687x-g5qm: Classic Buffer Overflow in pyo</title>
-    <id>https://osv.dev/vulnerability/GHSA-5f5c-687x-g5qm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5f5c-687x-g5qm"/>
-    <published>2022-01-07T00:10:33Z</published>
-    <updated>2026-07-06T08:11:10Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2021-41499"/>
-    <category term="PYSEC-2026-743"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Classic Buffer Overflow in pyo&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-41499, PYSEC-2026-743&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pyo&lt;/code&gt; — fixed in 1.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Buffer Overflow Vulnerability exists in ajaxsoundstudio.com in Pyo &amp;lt; 1.03 in the Server_debug function, which allows remote attackers to conduct DoS attacks by deliberately passing on an overlong audio file name.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2021-41499"&gt;https://nvd.nist.gov/vuln/detail/CVE-2021-41499&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/belangeo/pyo/issues/222"&gt;https://github.com/belangeo/pyo/issues/222&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/belangeo/pyo"&gt;https://github.com/belangeo/pyo&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5f5c-687x-g5qm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-xqvg-xm9m-p2c4: Moderate severity vulnerability that affects mailman</title>
-    <id>https://osv.dev/vulnerability/GHSA-xqvg-xm9m-p2c4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xqvg-xm9m-p2c4"/>
-    <published>2018-09-11T18:57:16Z</published>
-    <updated>2026-07-06T08:11:10Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2018-13796"/>
-    <category term="PYSEC-2026-661"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Moderate severity vulnerability that affects mailman&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2018-13796, PYSEC-2026-661&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mailman&lt;/code&gt; — fixed in 2.1.28&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An issue was discovered in GNU Mailman before 2.1.28. A crafted URL can cause arbitrary text to be displayed on a web page from a trusted site.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2018-13796"&gt;https://nvd.nist.gov/vuln/detail/CVE-2018-13796&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugs.launchpad.net/mailman/+bug/1780874"&gt;https://bugs.launchpad.net/mailman/+bug/1780874&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-xqvg-xm9m-p2c4"&gt;https://github.com/advisories/GHSA-xqvg-xm9m-p2c4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.debian.org/debian-lts-announce/2018/07/msg00034.html"&gt;https://lists.debian.org/debian-lts-announce/2018/07/msg00034.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.gentoo.org/glsa/201904-10"&gt;https://security.gentoo.org/glsa/201904-10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://usn.ubuntu.com/4348-1"&gt;https://usn.ubuntu.com/4348-1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.mail-archive.com/mailman-users@python.org/msg71003.html"&gt;https://www.mail-archive.com/mailman-users@python.org/msg71003.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xqvg-xm9m-p2c4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-634c-v2xv-ffpg: Out-of-bounds Write in OpenCV</title>
-    <id>https://osv.dev/vulnerability/GHSA-634c-v2xv-ffpg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-634c-v2xv-ffpg"/>
-    <published>2021-10-12T22:02:51Z</published>
-    <updated>2026-07-06T08:11:10Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2017-14136"/>
-    <category term="PYSEC-2026-700"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Out-of-bounds Write in OpenCV&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2017-14136, PYSEC-2026-700&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;opencv-python&lt;/code&gt; — fixed in 3.3.1.11&lt;/li&gt;&lt;li&gt;&lt;code&gt;opencv-contrib-python&lt;/code&gt; — fixed in 3.3.1.11&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenCV (Open Source Computer Vision Library) 3.3 (corresponding to OpenCV-Python 3.3.0.9) has an out-of-bounds write error in the function FillColorRow1 in utils.cpp when reading an image file by using cv::imread. NOTE: this vulnerability exists because of an incomplete fix for CVE-2017-12597.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2017-14136"&gt;https://nvd.nist.gov/vuln/detail/CVE-2017-14136&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/opencv/opencv/issues/9443"&gt;https://github.com/opencv/opencv/issues/9443&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/opencv/opencv/pull/9448"&gt;https://github.com/opencv/opencv/pull/9448&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/opencv/opencv-python"&gt;https://github.com/opencv/opencv-python&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/xiaoqx/pocs/blob/master/opencv.md"&gt;https://github.com/xiaoqx/pocs/blob/master/opencv.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.debian.org/debian-lts-announce/2018/07/msg00030.html"&gt;https://lists.debian.org/debian-lts-announce/2018/07/msg00030.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.gentoo.org/glsa/201712-02"&gt;https://security.gentoo.org/glsa/201712-02&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-634c-v2xv-ffpg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

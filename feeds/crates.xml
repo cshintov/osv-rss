@@ -3,12 +3,48 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-07-08T08:12:56Z</updated>
+  <updated>2026-07-08T17:45:16Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-2r75-cxrj-cmph: wasmtime-wasi: WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction</title>
+    <id>https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph"/>
+    <published>2026-06-05T15:47:02Z</published>
+    <updated>2026-07-08T17:45:16Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-47261"/>
+    <category term="RUSTSEC-2026-0149"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;wasmtime-wasi: WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47261, RUSTSEC-2026-0149&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 44.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 36.0.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 24.0.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+In `wasmtime-wasi`, when a filesystem preopen is given `DirPerms::all()` and `FilePerms::READ` without `FilePerms::WRITE`,  this wasmtime-wasi enforced access control mechanism can be bypassed by using the wasip2 `descriptor.open-at` or wasip1 `path_open` interfaces by opening a file with `OpenFlags::TRUNCATE` oflag only, for example:
+
+```rust
+dir_descriptor.open_at(
+   PathFlags::empty(),
+   FILENAME,
+   OpenFlags::TRUNCATE,
+   DescriptorFlags::READ,
+)
+```
+
+```rust
+wasip1::path_open(
+    dir_fd,
+    0,
+    FILENAME,
+    wasip1::OFLAGS_TRUNC,
+    wasip1::RIGHTS_FD_READ,
+    0,
+    0
+)
+```
+
+The root cause is that the clause that considered `OpenFlags::TRUNCATE` did not set `open_mode |= OpenMode::WRITE;`, used later in that function for the access control check against `FilePerm…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-47261"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-47261&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime"&gt;https://github.com/bytecodealliance/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v24.0.9"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v24.0.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v36.0.10"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v36.0.10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v44.0.2"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v44.0.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v45.0.0"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v45.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0149.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0149.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-83hf-93m4-rgwq: Hickory DNS's Record Cache Accepts AUTHORITY-Section NS from Sibling Zone via Parent-Pool Zone-Context Elevation</title>
     <id>https://osv.dev/vulnerability/GHSA-83hf-93m4-rgwq</id>
@@ -1145,7 +1181,7 @@ _Zellic finding 3.35. Reported in the Zellic *uutils coreutils Program Security 
 _Zellic finding 3.73. Reported in the Zellic *uutils coreutils Program Security Assessment* (for Canonical, Jan 2026), audited commit `3a07ffc5a9bd4c283e75afa548ba1f1957bad242`._&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-xv5w-cw7x-72gj"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-xv5w-cw7x-72gj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35371"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35371&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/issues/10006"&gt;https://github.com/uutils/coreutils/issues/10006&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xv5w-cw7x-72gj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-239g-2685-54x3: install: TOCTOU symlink race (unlink-then-create without O_EXCL) allows arbitrary file overwrite</title>
+    <title>[UPDATED] GHSA-239g-2685-54x3: install: TOCTOU symlink race (unlink-then-create without O_EXCL) allows arbitrary file overwrite</title>
     <id>https://osv.dev/vulnerability/GHSA-239g-2685-54x3</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-239g-2685-54x3"/>
     <published>2026-07-06T19:54:08Z</published>
@@ -1162,7 +1198,7 @@ _Zellic finding 3.73. Reported in the Zellic *uutils coreutils Program Security 
 _Reported by Zellic in the *uutils coreutils Program Security Assessment*…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-239g-2685-54x3"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-239g-2685-54x3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35355"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35355&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/10067"&gt;https://github.com/uutils/coreutils/pull/10067&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/commit/b5bbabc18a1121908848d836f869a4e98eb63886"&gt;https://github.com/uutils/coreutils/commit/b5bbabc18a1121908848d836f869a4e98eb63886&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/releases/tag/0.6.0"&gt;https://github.com/uutils/coreutils/releases/tag/0.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-239g-2685-54x3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-6gcw-w7cp-94g9: comm: lossy UTF-8 conversion silently corrupts non-UTF-8 output</title>
+    <title>[UPDATED] GHSA-6gcw-w7cp-94g9: comm: lossy UTF-8 conversion silently corrupts non-UTF-8 output</title>
     <id>https://osv.dev/vulnerability/GHSA-6gcw-w7cp-94g9</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6gcw-w7cp-94g9"/>
     <published>2026-07-06T19:51:22Z</published>
@@ -1175,7 +1211,7 @@ _Reported by Zellic in the *uutils coreutils Program Security Assessment*…&lt;
 _Zellic finding 3.34. Reported in the Zellic *uutils coreutils Program Security Assessment* (for Canonical, Jan 2026), audited commit `3a07ffc5a9bd4c283e75afa548ba1f1957bad242`._&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-6gcw-w7cp-94g9"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-6gcw-w7cp-94g9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35346"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35346&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/issues/10192"&gt;https://github.com/uutils/coreutils/issues/10192&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/10206"&gt;https://github.com/uutils/coreutils/pull/10206&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/commit/b9372e509ea9b278fe13763237067a261bb8c946"&gt;https://github.com/uutils/coreutils/commit/b9372e509ea9b278fe13763237067a261bb8c946&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/releases/tag/0.6.0"&gt;https://github.com/uutils/coreutils/releases/tag/0.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6gcw-w7cp-94g9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-jcjr-rh8q-7xqf: ln: rejects non-UTF-8 source filenames in target-directory mode</title>
+    <title>[UPDATED] GHSA-jcjr-rh8q-7xqf: ln: rejects non-UTF-8 source filenames in target-directory mode</title>
     <id>https://osv.dev/vulnerability/GHSA-jcjr-rh8q-7xqf</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jcjr-rh8q-7xqf"/>
     <published>2026-07-06T19:53:39Z</published>
@@ -1194,7 +1230,7 @@ name=$(printf &amp;#x27;bad_\377&amp;#x27;); mkdir dst; : &amp;gt; &amp;quot;$na
 _Zellic private finding (zellic-ext/coreutils-private PR #84). Reported in the Zellic *uutils coreutils Program Security Assessment* (for Canonical, Jan 2026), audited commit `3a07ffc5a9bd4c283e75afa548ba1f1957bad242`._&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-jcjr-rh8q-7xqf"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-jcjr-rh8q-7xqf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35373"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35373&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/11403"&gt;https://github.com/uutils/coreutils/pull/11403&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jcjr-rh8q-7xqf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-wv33-5pxh-r7j7: cut: -s (only-delimited) ignored when delimiter is a newline</title>
+    <title>[UPDATED] GHSA-wv33-5pxh-r7j7: cut: -s (only-delimited) ignored when delimiter is a newline</title>
     <id>https://osv.dev/vulnerability/GHSA-wv33-5pxh-r7j7</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wv33-5pxh-r7j7"/>
     <published>2026-07-06T19:54:33Z</published>
@@ -1207,7 +1243,7 @@ _Zellic private finding (zellic-ext/coreutils-private PR #84). Reported in the Z
 _Zellic finding 3.22. Reported in the Zellic *uutils coreutils Program Security Assessment* (for Canonical, Jan 2026), audited commit `3a07ffc5a9bd4c283e75afa548ba1f1957bad242`._&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-wv33-5pxh-r7j7"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-wv33-5pxh-r7j7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35343"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35343&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/11143"&gt;https://github.com/uutils/coreutils/pull/11143&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/commit/9bbb58b746c41802278b0cba738eebbf21517cf7"&gt;https://github.com/uutils/coreutils/commit/9bbb58b746c41802278b0cba738eebbf21517cf7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/releases/tag/0.7.0"&gt;https://github.com/uutils/coreutils/releases/tag/0.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wv33-5pxh-r7j7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-gwm6-q8ch-hcfr: install -D: symlink race in directory creation allows arbitrary file overwrite</title>
+    <title>[UPDATED] GHSA-gwm6-q8ch-hcfr: install -D: symlink race in directory creation allows arbitrary file overwrite</title>
     <id>https://osv.dev/vulnerability/GHSA-gwm6-q8ch-hcfr</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gwm6-q8ch-hcfr"/>
     <published>2026-07-06T19:54:56Z</published>
@@ -1224,7 +1260,7 @@ _Zellic finding 3.22. Reported in the Zellic *uutils coreutils Program Security 
 _Reported by Zellic in the *uutils coreutils Program Security Assessment* (prepared for Canonical, J…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-gwm6-q8ch-hcfr"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-gwm6-q8ch-hcfr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35356"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35356&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/10140"&gt;https://github.com/uutils/coreutils/pull/10140&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/commit/0c41299975f3c1e21cf5ca968d42cad55ceb42a1"&gt;https://github.com/uutils/coreutils/commit/0c41299975f3c1e21cf5ca968d42cad55ceb42a1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/releases/tag/0.7.0"&gt;https://github.com/uutils/coreutils/releases/tag/0.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gwm6-q8ch-hcfr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-p6rv-2qpm-fwvg: kill: 'kill -1' parsed as PID -1, sending SIGTERM to all processes (system crash / DoS)</title>
+    <title>[UPDATED] GHSA-p6rv-2qpm-fwvg: kill: 'kill -1' parsed as PID -1, sending SIGTERM to all processes (system crash / DoS)</title>
     <id>https://osv.dev/vulnerability/GHSA-p6rv-2qpm-fwvg</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p6rv-2qpm-fwvg"/>
     <published>2026-07-06T19:55:15Z</published>
@@ -1246,7 +1282,7 @@ $ kill -1        # GNU: kill: not enough arguments
 _Reported by Zellic in the *uutils coreutils Program Security Assessment* (prepared for Canonical, Jan 20 2026), audited commit `3…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-p6rv-2qpm-fwvg"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-p6rv-2qpm-fwvg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35369"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35369&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/9700"&gt;https://github.com/uutils/coreutils/pull/9700&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/commit/2d3aebce6712841bc08b9b94e9078be50a25fc10"&gt;https://github.com/uutils/coreutils/commit/2d3aebce6712841bc08b9b94e9078be50a25fc10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/releases/tag/0.6.0"&gt;https://github.com/uutils/coreutils/releases/tag/0.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p6rv-2qpm-fwvg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-2w8r-9xj7-69j5: mktemp: empty TMPDIR creates temp files in CWD instead of /tmp</title>
+    <title>[UPDATED] GHSA-2w8r-9xj7-69j5: mktemp: empty TMPDIR creates temp files in CWD instead of /tmp</title>
     <id>https://osv.dev/vulnerability/GHSA-2w8r-9xj7-69j5</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2w8r-9xj7-69j5"/>
     <published>2026-07-06T19:50:41Z</published>
@@ -1257,60 +1293,5 @@ _Reported by Zellic in the *uutils coreutils Program Security Assessment* (prepa
 
 ---
 _Zellic finding 3.11. Reported in the Zellic *uutils coreutils Program Security Assessment* (for Canonical, Jan 2026), audited commit `3a07ffc5a9bd4c283e75afa548ba1f1957bad242`._&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-2w8r-9xj7-69j5"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-2w8r-9xj7-69j5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35342"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35342&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/10566"&gt;https://github.com/uutils/coreutils/pull/10566&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/commit/eb25ec328b226d8fbbaa4058bf9187165bf06d51"&gt;https://github.com/uutils/coreutils/commit/eb25ec328b226d8fbbaa4058bf9187165bf06d51&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/releases/tag/0.6.0"&gt;https://github.com/uutils/coreutils/releases/tag/0.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2w8r-9xj7-69j5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4x34-chg5-mwjj: chmod: recursive mode returns exit code 0 even when some files fail (last-file-wins)</title>
-    <id>https://osv.dev/vulnerability/GHSA-4x34-chg5-mwjj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4x34-chg5-mwjj"/>
-    <published>2026-07-06T19:27:41Z</published>
-    <updated>2026-07-06T19:30:10Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-35339"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;chmod: recursive mode returns exit code 0 even when some files fail (last-file-wins)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35339&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;uu_chmod&lt;/code&gt; — fixed in 0.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In `Chmoder::chmod()` the recursive branch overwrites the running result instead of accumulating it, so the exit code reflects only the *last* file processed:
-
-```
-if self.recursive {
-    r = self.walk_dir_with_context(file, true);   // overwrites r
-} else {
-    r = self.chmod_file(file).and(r);
-}
-```
-
-**PoC:** GNU returns 1 when a file fails; uutils returns 0 if the last entry succeeds:
-
-```
-$ chmod -R 0755 chmod-bug/root chmod-bug/user  # GNU -&amp;gt; ret=1
-$ uutils chmod -R 0755 chmod-bug/root chmod-bug/user  # -&amp;gt; ret=0
-```
-
-**Impact:** scripts relying on the exit code get a false success signal while some files retained restrictive/unexpected permissions, leading to access-control misconfigurations. Recommendation: accumulate errors during traversal.
-
-**Remediation:** Acknowledged by Canonic…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-4x34-chg5-mwjj"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-4x34-chg5-mwjj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35339"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35339&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/9793"&gt;https://github.com/uutils/coreutils/pull/9793&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/commit/abd581f62e97d0b147306ac40eac13af71c6fbba"&gt;https://github.com/uutils/coreutils/commit/abd581f62e97d0b147306ac40eac13af71c6fbba&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/releases/tag/0.6.0"&gt;https://github.com/uutils/coreutils/releases/tag/0.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4x34-chg5-mwjj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4c7q-4928-8445: chmod: --preserve-root bypassed by any path that resolves to root (e.g. /../)</title>
-    <id>https://osv.dev/vulnerability/GHSA-4c7q-4928-8445</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4c7q-4928-8445"/>
-    <published>2026-07-06T17:41:45Z</published>
-    <updated>2026-07-06T17:45:09Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-35338"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;chmod: --preserve-root bypassed by any path that resolves to root (e.g. /../)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35338&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;uu_chmod&lt;/code&gt; — fixed in 0.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`Chmoder::chmod()` only compares the literal argument against `Path::new(&amp;quot;/&amp;quot;)`, so the `--preserve-root` guard is bypassed by any path that *resolves* to root — a symlink to `/` or simply `/../`.
-
-```
-if self.recursive &amp;amp;&amp;amp; self.preserve_root &amp;amp;&amp;amp; file == Path::new(&amp;quot;/&amp;quot;) {
-    return Err(ChmodError::PreserveRoot(&amp;quot;/&amp;quot;.to_string()).into());
-}
-```
-
-**PoC** — recursively chmods the entire filesystem to `000` despite `--preserve-root`:
-
-```
-chmod -R --preserve-root 000 /../ -v
-```
-
-**Impact:** `--preserve-root` is the documented safeguard against destructive recursive operations on `/`. Bypassing it allows `chmod -R` to alter permissions across the whole filesystem, causing a complete system breakdown. Recommendation: canonicalize the target path before comparing against root.
-
-**Remediation:** Ackno…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/security/advisories/GHSA-4c7q-4928-8445"&gt;https://github.com/uutils/coreutils/security/advisories/GHSA-4c7q-4928-8445&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35338"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35338&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/pull/10033"&gt;https://github.com/uutils/coreutils/pull/10033&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/commit/413055b378fa6fe2299c5e5f538c8e6e841ab810"&gt;https://github.com/uutils/coreutils/commit/413055b378fa6fe2299c5e5f538c8e6e841ab810&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils"&gt;https://github.com/uutils/coreutils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uutils/coreutils/releases/tag/0.6.0"&gt;https://github.com/uutils/coreutils/releases/tag/0.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4c7q-4928-8445"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,314 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-10T13:44:30Z</updated>
+  <updated>2026-07-10T19:31:58Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-p4m3-mgmm-c664: SiYuan: Path Traversal via Double URL Encoding in /assets/*path (publish mode arbitrary   file─read), Incomplete fix of CVE-2026-41894 </title>
+    <id>https://osv.dev/vulnerability/GHSA-p4m3-mgmm-c664</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p4m3-mgmm-c664"/>
+    <published>2026-07-10T19:25:04Z</published>
+    <updated>2026-07-10T19:31:58Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54066"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Path Traversal via Double URL Encoding in /assets/*path (publish mode arbitrary   file─read), Incomplete fix of CVE-2026-41894 &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54066&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260628153353-2d5d72223df4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+  The patch for CVE-2026-41894 (&amp;quot;Path Traversal via Double URL Encoding&amp;quot;) sanitized the `/export/` route but the
+  **identical root cause remains in the `/assets/*path` route**. In publish mode (anonymous read-only HTTP endpoint,
+  default port 6808), an unauthenticated remote attacker can read arbitrary files inside `WorkspaceDir` — including
+  `conf/conf.json` (which contains the `AccessAuthCode` SHA256 hash, API token, and sync keys), `temp/siyuan.db`,
+  `temp/blocktree.db`, and `siyuan.log` — by double-URL-encoding `..` segments.
+
+  Verified against siyuan v3.6.5:
+  - `GET /assets/%252e%252e/%252e%252e/conf/conf.json` → **HTTP 200, 10349 bytes (conf.json served)**
+  - `GET /export/%252e%252e/%252e%252e/conf/conf.json` → HTTP 401 (patched)
+  - `GET /assets/%2e%2e/conf/conf.js…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-p4m3-mgmm-c664"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-p4m3-mgmm-c664&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54066"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54066&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p4m3-mgmm-c664"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hvr9-72v2-fff3: SiYuan: Unauthenticated Admin API Access via Blanket chrome-extension:// Origin Allowlist</title>
+    <id>https://osv.dev/vulnerability/GHSA-hvr9-72v2-fff3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hvr9-72v2-fff3"/>
+    <published>2026-07-10T19:26:06Z</published>
+    <updated>2026-07-10T19:31:58Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54069"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Unauthenticated Admin API Access via Blanket chrome-extension:// Origin Allowlist&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54069&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260628153353-2d5d72223df4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+SiYuan Note&amp;#x27;s kernel HTTP server unconditionally trusts all `chrome-extension://` origins, granting `RoleAdministrator` access to every installed browser extension without any authentication. Combined with the default empty `AccessAuthCode` on desktop installs, any Chrome/Chromium extension -- including a compromised legitimate extension via supply chain attack -- can make fully authenticated admin API calls to the SiYuan kernel at `127.0.0.1:6806`, enabling data exfiltration, stored XSS injection, and configuration tampering.
+
+## Affected Versions
+
+SiYuan &amp;lt;= v3.6.5 (commit `96dfe0bea474`). The chrome-extension allowlist remains unfixed as of the latest commit on the fix branch (`d7b77d945e0d`).
+
+## Vulnerability Details
+
+### Blanket chrome-extension:// Origin Trust (CWE-346)
+
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-hvr9-72v2-fff3"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-hvr9-72v2-fff3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54069"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54069&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hvr9-72v2-fff3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-h69g-9hx6-f3v4: Excelize: Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-h69g-9hx6-f3v4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h69g-9hx6-f3v4"/>
+    <published>2026-07-10T19:25:20Z</published>
+    <updated>2026-07-10T19:31:58Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54063"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excelize: Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54063&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/xuri/excelize/v2&lt;/code&gt; — fixed in 2.11.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS)
+
+### Summary
+The `checkSheet()` function in `github.com/xuri/excelize/v2` uses an attacker-controlled `&amp;lt;row r=&amp;quot;N&amp;quot;&amp;gt;` XML attribute value directly as the length argument to `make([]xlsxRow, row)` without validating it against the Excel row limit (`TotalRows = 1,048,576`). A specially crafted XLSX file can trigger two denial-of-service variants: (A) an out-of-memory process kill when `r=2147483647` forces a ~16 GB allocation attempt, and (B) a runtime panic via out-of-bounds slice indexing when `r=-1`. Any service that opens attacker-supplied XLSX files and calls `GetCellValue` is affected. No authentication is required.
+
+### Details
+The vulnerable code path is triggered by calling `GetCellValue` (or any API that…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize/security/advisories/GHSA-h69g-9hx6-f3v4"&gt;https://github.com/qax-os/excelize/security/advisories/GHSA-h69g-9hx6-f3v4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54063"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54063&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize"&gt;https://github.com/qax-os/excelize&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize/releases/tag/v2.11.0"&gt;https://github.com/qax-os/excelize/releases/tag/v2.11.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h69g-9hx6-f3v4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xqp3-jq6g-x3qm: File Browser: Authentication Bypass via Proxy Auth Header Forgery</title>
+    <id>https://osv.dev/vulnerability/GHSA-xqp3-jq6g-x3qm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xqp3-jq6g-x3qm"/>
+    <published>2026-07-10T19:27:13Z</published>
+    <updated>2026-07-10T19:31:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54089"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;File Browser: Authentication Bypass via Proxy Auth Header Forgery&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54089&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/filebrowser/filebrowser/v2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+When FileBrowser is configured with proxy authentication (`auth.method=proxy`), any unauthenticated attacker who can reach the server directly can impersonate **any user - including admin** - by sending a single forged HTTP header. No credentials are required. Additionally, specifying a non-existent username causes the server to **automatically create a new user account**, providing an account creation primitive with no authorization.
+
+**This is an already known issue that has been documented in the documentation for several years, but has not been documented as a vulnerability before.**
+
+## Severity
+
+**HIGH** - CVSS 3.1: **8.1** (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N)
+
+## Affected Component
+
+- **File:** [`auth/proxy.go`](https://github.com/filebrowser/filebrowser/blob/main/auth/…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/security/advisories/GHSA-xqp3-jq6g-x3qm"&gt;https://github.com/filebrowser/filebrowser/security/advisories/GHSA-xqp3-jq6g-x3qm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54089"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54089&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser"&gt;https://github.com/filebrowser/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/blob/main/auth/proxy.go"&gt;https://github.com/filebrowser/filebrowser/blob/main/auth/proxy.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/blob/main/http/auth.go#L121-L137"&gt;https://github.com/filebrowser/filebrowser/blob/main/http/auth.go#L121-L137&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xqp3-jq6g-x3qm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-w7cg-whh7-xp28: SiYuan: Stored XSS in Bazaar marketplace via package README event handlers</title>
+    <id>https://osv.dev/vulnerability/GHSA-w7cg-whh7-xp28</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w7cg-whh7-xp28"/>
+    <published>2026-07-10T19:27:24Z</published>
+    <updated>2026-07-10T19:31:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54070"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Stored XSS in Bazaar marketplace via package README event handlers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54070&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260628153353-2d5d72223df4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`renderPackageREADME` in `kernel/bazaar/readme.go` renders a Bazaar package README from Markdown to HTML with the lute engine and `SetSanitize(true)`. The lute sanitizer is an event-handler blocklist: `allowAttr` rejects only attribute names present in a fixed `eventAttrs` map copied from the w3schools legacy handler list.
+
+That map omits modern event handlers. `onpointerover`, `onpointerdown`, `onauxclick`, `onbeforetoggle`, `onfocusin`, `onanimationstart`, and `ontransitionend` are not in the list, so the sanitizer passes them through verbatim on any tag.
+
+The frontend assigns the rendered HTML to `mdElement.innerHTML` in `app/src/config/bazaar.ts` with no client-side DOMPurify on this path, into a normal element in the main document (no iframe, no sandbox). The kernel sends …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-w7cg-whh7-xp28"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-w7cg-whh7-xp28&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54070"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54070&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w7cg-whh7-xp28"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mvjr-vv3c-w4qv: SiYuan: Stored XSS to RCE via CSS-snippet &lt;style&gt; breakout in renderSnippet()</title>
+    <id>https://osv.dev/vulnerability/GHSA-mvjr-vv3c-w4qv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mvjr-vv3c-w4qv"/>
+    <published>2026-07-10T19:25:09Z</published>
+    <updated>2026-07-10T19:31:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54067"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Stored XSS to RCE via CSS-snippet &amp;lt;style&amp;gt; breakout in renderSnippet()&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54067&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260628153353-2d5d72223df4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A CSS snippet body containing `&amp;lt;/style&amp;gt;` breaks out of its surrounding `&amp;lt;style&amp;gt;` tag when `renderSnippet()` interpolates it via `insertAdjacentHTML`. A payload like `&amp;lt;/style&amp;gt;&amp;lt;img src=x onerror=&amp;quot;...&amp;quot;&amp;gt;` runs arbitrary JavaScript in the renderer. On Electron desktop builds the renderer runs with `nodeIntegration:true`, so `require(&amp;#x27;child_process&amp;#x27;)` is reachable from the injected handler and the XSS chains to host RCE. Snippets sync via the workspace repository, so an attacker with write access to any synced workspace plants the payload once and it fires on every device that pulls.
+
+The bug also bypasses the user&amp;#x27;s `enabledCSS` / `enabledJS` separation. A user who turned `enabledJS` off was making a deliberate call not to run untrusted JavaScript; the CSS path runs it anyway.
+
+###…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-mvjr-vv3c-w4qv"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-mvjr-vv3c-w4qv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54067"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54067&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mvjr-vv3c-w4qv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-h29v-hj44-q8cv: Authorizer: Unvalidated redirect_uri in /authorize leaks OAuth2 tokens to attacker-controlled URL</title>
+    <id>https://osv.dev/vulnerability/GHSA-h29v-hj44-q8cv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h29v-hj44-q8cv"/>
+    <published>2026-07-10T19:25:15Z</published>
+    <updated>2026-07-10T19:31:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54072"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Authorizer: Unvalidated redirect_uri in /authorize leaks OAuth2 tokens to attacker-controlled URL&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54072&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/authorizerdev/authorizer&lt;/code&gt; — fixed in 0.0.0-20260409051328-bd3f5baf6d3d&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `/authorize` endpoint accepts any `redirect_uri` without validating it against `AllowedOrigins`. When `response_type=token` or `response_type=id_token`, the server appends `access_token`, `id_token`, and `refresh_token` as query parameters and issues a 302 redirect to the attacker-supplied URL. An unauthenticated attacker can obtain the required `client_id` from the public `/graphql?query={meta{client_id}}` endpoint.
+
+Partial fix was applied in v2.0.1 to other handlers (`oauth_login`, `verify_email`, `magic_link_login`, `forgot_password`, `invite_members`, `oauth_callback`) but `/authorize` was not included.
+
+## Vulnerable Code
+
+`internal/http_handlers/authorize.go`:
+
+```go
+redirectURI := strings.TrimSpace(gc.Query(&amp;quot;redirect_uri&amp;quot;))
+// ... no IsValidOrigin() call ...
+// resp…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/authorizerdev/authorizer/security/advisories/GHSA-h29v-hj44-q8cv"&gt;https://github.com/authorizerdev/authorizer/security/advisories/GHSA-h29v-hj44-q8cv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authorizerdev/authorizer"&gt;https://github.com/authorizerdev/authorizer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h29v-hj44-q8cv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-gcm7-57gf-953c: SiYuan: Unauthenticated SQLite Data Exfiltration via Template Injection in /api/icon/getDynamicIcon</title>
+    <id>https://osv.dev/vulnerability/GHSA-gcm7-57gf-953c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gcm7-57gf-953c"/>
+    <published>2026-07-10T19:26:00Z</published>
+    <updated>2026-07-10T19:31:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54068"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Unauthenticated SQLite Data Exfiltration via Template Injection in /api/icon/getDynamicIcon&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54068&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260628153353-2d5d72223df4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `/api/icon/getDynamicIcon` endpoint is explicitly excluded from authentication in SiYuan&amp;#x27;s kernel router (`router.go`, &amp;quot;不需要鉴权&amp;quot; -- no auth needed). When called with `type=8` and a valid block `id` parameter, this endpoint invokes `RenderDynamicIconContentTemplate`, which executes a Go template that includes the `querySQL` and `queryBlocks` functions. These functions run arbitrary SELECT statements against the SiYuan SQLite database. An unauthenticated network-adjacent attacker who knows a valid block ID can exfiltrate all user note content, tags, asset references, and block attributes from the database.
+
+### Details
+
+**Root cause -- kernel/api/router.go, line 37:**
+
+```go
+// 不需要鉴权
+ginServer.Handle(&amp;quot;GET&amp;quot;, &amp;quot;/api/icon/getDynamicIcon&amp;quot;, getDynamicIcon)
+```
+
+**Attack chain:**
+
+1.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-gcm7-57gf-953c"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-gcm7-57gf-953c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54068"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54068&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gcm7-57gf-953c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2024-2760: Rancher's Failure to delete orphaned role bindings does not revoke project level access from group based authentication in github.com/rancher/rancher</title>
+    <id>https://osv.dev/vulnerability/GO-2024-2760</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2024-2760"/>
+    <published>2024-06-05T15:10:52Z</published>
+    <updated>2026-07-10T18:29:34Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2021-36775"/>
+    <category term="GHSA-28g7-896h-695v"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Rancher&amp;#x27;s Failure to delete orphaned role bindings does not revoke project level access from group based authentication in github.com/rancher/rancher&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-36775, GHSA-28g7-896h-695v&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Rancher&amp;#x27;s Failure to delete orphaned role bindings does not revoke project level access from group based authentication in github.com/rancher/rancher.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: github.com/rancher/rancher before v2.4.18, from v2.5.0 before v2.5.12, from v2.6.0 before v2.6.3.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/security/advisories/GHSA-28g7-896h-695v"&gt;https://github.com/rancher/rancher/security/advisories/GHSA-28g7-896h-695v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2021-36775"&gt;https://nvd.nist.gov/vuln/detail/CVE-2021-36775&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.suse.com/show_bug.cgi?id=1189120"&gt;https://bugzilla.suse.com/show_bug.cgi?id=1189120&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2024-2760"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5853: Fulcio has OIDC Discovery Redirect Following Allows SSRF and JWKS Substitution for Meta-Issuer Paths, with Kubernetes Service-Account Token Leakage in github.com/sigstore/fulcio</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5853</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5853"/>
+    <published>2026-07-07T15:26:32Z</published>
+    <updated>2026-07-10T18:29:34Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-49478"/>
+    <category term="GHSA-f5mr-q85p-6hh6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fulcio has OIDC Discovery Redirect Following Allows SSRF and JWKS Substitution for Meta-Issuer Paths, with Kubernetes Service-Account Token Leakage in github.com/sigstore/fulcio&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49478, GHSA-f5mr-q85p-6hh6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/sigstore/fulcio&lt;/code&gt; — fixed in 1.8.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Fulcio has OIDC Discovery Redirect Following Allows SSRF and JWKS Substitution for Meta-Issuer Paths, with Kubernetes Service-Account Token Leakage in github.com/sigstore/fulcio&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/fulcio/security/advisories/GHSA-f5mr-q85p-6hh6"&gt;https://github.com/sigstore/fulcio/security/advisories/GHSA-f5mr-q85p-6hh6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5853"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-gqf8-rvrh-g7w6: Rancher cloud credentials can be used through proxy API by users without access</title>
+    <id>https://osv.dev/vulnerability/GHSA-gqf8-rvrh-g7w6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gqf8-rvrh-g7w6"/>
+    <published>2026-03-03T14:52:15Z</published>
+    <updated>2026-07-10T18:29:34Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2021-25320"/>
+    <category term="GO-2026-4589"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Rancher cloud credentials can be used through proxy API by users without access&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-25320, GO-2026-4589&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.4.16&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.5.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability was discovered in Rancher 2.2.0 through the aforementioned patched versions, where cloud credentials weren&amp;#x27;t being properly validated through the Rancher API. Specifically through a proxy designed to communicate with cloud providers. Any Rancher user that was logged-in and aware of a cloud-credential ID that was valid for a given cloud provider, could call that cloud provider&amp;#x27;s API through the proxy API, and the cloud-credential would be attached. The exploit is limited to valid Rancher users. There is not a direct mitigation outside of upgrading to the patched Rancher versions.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/security/advisories/GHSA-gqf8-rvrh-g7w6"&gt;https://github.com/rancher/rancher/security/advisories/GHSA-gqf8-rvrh-g7w6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2021-25320"&gt;https://nvd.nist.gov/vuln/detail/CVE-2021-25320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.suse.com/show_bug.cgi?id=1185514"&gt;https://bugzilla.suse.com/show_bug.cgi?id=1185514&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher"&gt;https://github.com/rancher/rancher&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gqf8-rvrh-g7w6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6m8r-jh89-rq7h: Rancher Cross-site Scripting Vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-6m8r-jh89-rq7h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6m8r-jh89-rq7h"/>
+    <published>2022-05-24T17:43:45Z</published>
+    <updated>2026-07-10T18:29:33Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2021-25313"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Rancher Cross-site Scripting Vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-25313&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.5.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.4.14&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.3.11&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A Improper Neutralization of Input During Web Page Generation (&amp;#x27;Cross-site Scripting&amp;#x27;) vulnerability in Rancher allows remote attackers to execute JavaScript via malicious links. This issue affects: SUSE Rancher Rancher versions prior to 2.5.6.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2021-25313"&gt;https://nvd.nist.gov/vuln/detail/CVE-2021-25313&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/issues/31583"&gt;https://github.com/rancher/rancher/issues/31583&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.suse.com/show_bug.cgi?id=1181852"&gt;https://bugzilla.suse.com/show_bug.cgi?id=1181852&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/releases/tag/v2.3.11"&gt;https://github.com/rancher/rancher/releases/tag/v2.3.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/releases/tag/v2.4.14"&gt;https://github.com/rancher/rancher/releases/tag/v2.4.14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/releases/tag/v2.5.6"&gt;https://github.com/rancher/rancher/releases/tag/v2.5.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6m8r-jh89-rq7h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-wm2r-rp98-8pmh: Exposure of SSH credentials in Rancher/Fleet</title>
+    <id>https://osv.dev/vulnerability/GHSA-wm2r-rp98-8pmh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wm2r-rp98-8pmh"/>
+    <published>2022-04-27T21:09:13Z</published>
+    <updated>2026-07-10T18:29:33Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Exposure of SSH credentials in Rancher/Fleet&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.5.13&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.6.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+This vulnerability only affects customers using Fleet for continuous delivery with authenticated Git and/or Helm repositories.
+
+A security vulnerability ([CVE-2022-29810](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-29810)) was discovered in `go-getter` library in versions prior to [`v1.5.11`](https://github.com/hashicorp/go-getter/releases/tag/v1.5.11) that exposes SSH private keys in base64 format due to a failure in redacting such information from error messages. The vulnerable version of this library is used in Rancher through Fleet in versions of Fleet prior to [`v0.3.9`](https://github.com/rancher/fleet/releases/tag/v0.3.9). This issue affects Rancher versions 2.5.0 up to and including 2.5.12 and from 2.6.0 up to and including 2.6.3.
+
+When Git and/or Helm authen…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/security/advisories/GHSA-wm2r-rp98-8pmh"&gt;https://github.com/rancher/rancher/security/advisories/GHSA-wm2r-rp98-8pmh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="github.com/rancher/rancher"&gt;github.com/rancher/rancher&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wm2r-rp98-8pmh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-28g7-896h-695v: Rancher's Failure to delete orphaned role bindings does not revoke project level access from group based authentication</title>
+    <id>https://osv.dev/vulnerability/GHSA-28g7-896h-695v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-28g7-896h-695v"/>
+    <published>2024-04-24T21:01:50Z</published>
+    <updated>2026-07-10T18:29:32Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2021-36775"/>
+    <category term="GO-2024-2760"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Rancher&amp;#x27;s Failure to delete orphaned role bindings does not revoke project level access from group based authentication&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-36775, GO-2024-2760&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.4.18&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.5.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.6.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+This vulnerability only affects customers using group based authentication in Rancher versions up to and including 2.4.17, 2.5.11 and 2.6.2.
+
+When removing a Project Role associated to a group from a project, the bindings that grant access to cluster scoped resources for those subjects do not get deleted. This happens due to an incomplete authorization logic check. A user who is a member of an affected group with authenticated access to Rancher could use this to access resources they should no longer have access to. The exposure level will depend on the original permission level granted to the affected project role.
+
+### Patches
+Patched versions include releases 2.4.18, 2.5.12, 2.6.3 and later versions.
+
+### Workarounds
+Limit access in Rancher to trusted users. There is not a di…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/security/advisories/GHSA-28g7-896h-695v"&gt;https://github.com/rancher/rancher/security/advisories/GHSA-28g7-896h-695v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2021-36775"&gt;https://nvd.nist.gov/vuln/detail/CVE-2021-36775&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.suse.com/show_bug.cgi?id=1189120"&gt;https://bugzilla.suse.com/show_bug.cgi?id=1189120&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher"&gt;https://github.com/rancher/rancher&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-28g7-896h-695v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-gc62-j469-9gjm: Rancher Privilege Escalation Vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-gc62-j469-9gjm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gc62-j469-9gjm"/>
+    <published>2022-05-24T16:47:29Z</published>
+    <updated>2026-07-10T18:29:32Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2019-12274"/>
+    <category term="GO-2023-1991"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Rancher Privilege Escalation Vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2019-12274, GO-2023-1991&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 2.2.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 1.6.27&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In Rancher 1 and 2 through 2.2.3, unprivileged users (if allowed to deploy nodes) can gain admin access to the Rancher management plane because node driver options intentionally allow posting certain data to the cloud. The problem is that a user could choose to post a sensitive file such as /root/.kube/config or /var/lib/rancher/management-state/cred/kubeconfig-system.yaml.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2019-12274"&gt;https://nvd.nist.gov/vuln/detail/CVE-2019-12274&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://forums.rancher.com/t/rancher-release-v2-2-4-addresses-rancher-cve-2019-12274-and-cve-2019-12303/14466"&gt;https://forums.rancher.com/t/rancher-release-v2-2-4-addresses-rancher-cve-2019-12274-and-cve-2019-12303/14466&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gc62-j469-9gjm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2023-1991: Rancher Privilege Escalation Vulnerability in github.com/rancher/rancher</title>
+    <id>https://osv.dev/vulnerability/GO-2023-1991</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2023-1991"/>
+    <published>2024-08-20T20:32:20Z</published>
+    <updated>2026-07-10T18:29:32Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2019-12274"/>
+    <category term="GHSA-gc62-j469-9gjm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Rancher Privilege Escalation Vulnerability in github.com/rancher/rancher&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2019-12274, GHSA-gc62-j469-9gjm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt; — fixed in 1.6.27, 2.2.4+incompatible&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Rancher Privilege Escalation Vulnerability in github.com/rancher/rancher&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-gc62-j469-9gjm"&gt;https://github.com/advisories/GHSA-gc62-j469-9gjm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2019-12274"&gt;https://nvd.nist.gov/vuln/detail/CVE-2019-12274&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://forums.rancher.com/t/rancher-release-v2-2-4-addresses-rancher-cve-2019-12274-and-cve-2019-12303/14466"&gt;https://forums.rancher.com/t/rancher-release-v2-2-4-addresses-rancher-cve-2019-12274-and-cve-2019-12303/14466&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2023-1991"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4589: Rancher cloud credentials can be used through proxy API by users without access in github.com/rancher/rancher</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4589</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4589"/>
+    <published>2026-03-10T18:28:01Z</published>
+    <updated>2026-07-10T18:29:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2021-25320"/>
+    <category term="GHSA-gqf8-rvrh-g7w6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Rancher cloud credentials can be used through proxy API by users without access in github.com/rancher/rancher&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-25320, GHSA-gqf8-rvrh-g7w6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rancher/rancher&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Rancher cloud credentials can be used through proxy API by users without access in github.com/rancher/rancher.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: github.com/rancher/rancher before v2.4.16, from v2.5.0 before v2.5.9.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rancher/rancher/security/advisories/GHSA-gqf8-rvrh-g7w6"&gt;https://github.com/rancher/rancher/security/advisories/GHSA-gqf8-rvrh-g7w6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2021-25320"&gt;https://nvd.nist.gov/vuln/detail/CVE-2021-25320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.suse.com/show_bug.cgi?id=1185514"&gt;https://bugzilla.suse.com/show_bug.cgi?id=1185514&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4589"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9vcr-p3rj-q5q6: sigstore-go has a multi-log threshold bypass via single compromised log</title>
+    <id>https://osv.dev/vulnerability/GHSA-9vcr-p3rj-q5q6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9vcr-p3rj-q5q6"/>
+    <published>2026-07-09T23:20:30Z</published>
+    <updated>2026-07-10T15:44:38Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-49834"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;sigstore-go has a multi-log threshold bypass via single compromised log&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49834&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/sigstore/sigstore-go&lt;/code&gt; — fixed in 1.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+_What kind of vulnerability is it? Who is impacted?_
+
+A verifier configured with WithTransparencyLog(N&amp;gt;1) or WithSignedCertificateTimestamps(N&amp;gt;1) expected defense-in-depth against the compromise of a single log instance. However, threshold counting counted verified witnesses per-entry or per-validation-path rather than per-log-authority.
+
+As a result, a single compromised transparency log could forge multiple entries with different indices, and a single compromised CT log could verify multiple times (either across multiple certificate chains or via multiple embedded SCTs), fully satisfying the multi-log threshold requirements and defeating the multi-log policy.
+
+Note that this does not affect Cosign, as Cosign sets a threshold of 1.
+
+### Patches
+_Has the problem been patched? Wh…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/sigstore-go/security/advisories/GHSA-9vcr-p3rj-q5q6"&gt;https://github.com/sigstore/sigstore-go/security/advisories/GHSA-9vcr-p3rj-q5q6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/sigstore-go"&gt;https://github.com/sigstore/sigstore-go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9vcr-p3rj-q5q6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2024-2778: Rancher Privilege escalation vulnerability via malicious "Connection" header in github.com/rancher/rancher</title>
     <id>https://osv.dev/vulnerability/GO-2024-2778</id>
@@ -260,26 +562,6 @@ If you are required to interoperate with OpenPGP systems and need a maintained p
     <category term="Go"/>
     <category term="CVE-2026-9094"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Casdoor: GetTokenExchangeToken bypass through lack of cross-organization JWT signature check&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-9094&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/casdoor/casdoor&lt;/code&gt; — fixed in 2.387.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Casdoor versions 2.362.0 and earlier contain a vulnerability enabling cross-organization token exchange. The GetTokenExchangeToken function in object/token_oauth.go validates JWT signatures but does not verify that the token&amp;#x27;s user belongs to the same organization as the target application. This can result in privilege escalation across organizational boundaries.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-9094"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-9094&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/commit/d92b8568686d"&gt;https://github.com/casdoor/casdoor/commit/d92b8568686d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor"&gt;https://github.com/casdoor/casdoor&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://kb.cert.org/vuls/id/780781"&gt;https://kb.cert.org/vuls/id/780781&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c9w5-qp6m-m395"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-9vcr-p3rj-q5q6: sigstore-go has a multi-log threshold bypass via single compromised log</title>
-    <id>https://osv.dev/vulnerability/GHSA-9vcr-p3rj-q5q6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9vcr-p3rj-q5q6"/>
-    <published>2026-07-09T23:20:30Z</published>
-    <updated>2026-07-09T23:30:10Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-49834"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;sigstore-go has a multi-log threshold bypass via single compromised log&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49834&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/sigstore/sigstore-go&lt;/code&gt; — fixed in 1.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-_What kind of vulnerability is it? Who is impacted?_
-
-A verifier configured with WithTransparencyLog(N&amp;gt;1) or WithSignedCertificateTimestamps(N&amp;gt;1) expected defense-in-depth against the compromise of a single log instance. However, threshold counting counted verified witnesses per-entry or per-validation-path rather than per-log-authority.
-
-As a result, a single compromised transparency log could forge multiple entries with different indices, and a single compromised CT log could verify multiple times (either across multiple certificate chains or via multiple embedded SCTs), fully satisfying the multi-log threshold requirements and defeating the multi-log policy.
-
-Note that this does not affect Cosign, as Cosign sets a threshold of 1.
-
-### Patches
-_Has the problem been patched? Wh…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/sigstore-go/security/advisories/GHSA-9vcr-p3rj-q5q6"&gt;https://github.com/sigstore/sigstore-go/security/advisories/GHSA-9vcr-p3rj-q5q6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/sigstore-go"&gt;https://github.com/sigstore/sigstore-go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9vcr-p3rj-q5q6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GHSA-h5g6-xmh4-hc37: OpenRun: Redirect URL validation bypass using  //host  paths leads to Open Redirect</title>
@@ -836,134 +1118,5 @@ For example, &amp;#x27;root.Open(&amp;quot;symlink/&amp;quot;)&amp;#x27; will op
     <category term="Go"/>
     <category term="CVE-2026-42505"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Invoking Encrypted Client Hello privacy leak in crypto/tls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42505&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.12, 1.26.5, 1.27.0-rc.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Handshakes which used Encrypted Client Hello could be de-anonymized by a passive network observer due to a disclosure of pre-shared key identities in the unencrypted client hello.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/775960"&gt;https://go.dev/cl/775960&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79282"&gt;https://go.dev/issue/79282&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/OrmQE_Yp5Sc"&gt;https://groups.google.com/g/golang-announce/c/OrmQE_Yp5Sc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5856"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5662: Prometheus has Stored XSS via metric names and label values in Prometheus web UI in github.com/prometheus/prometheus</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5662</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5662"/>
-    <published>2026-06-25T22:34:38Z</published>
-    <updated>2026-07-08T18:15:29Z</updated>
-    <category term="Go"/>
-    <category term="BIT-prometheus-2026-40179"/>
-    <category term="CVE-2026-40179"/>
-    <category term="GHSA-vffh-x6r8-xx99"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Prometheus has Stored XSS via metric names and label values in Prometheus web UI in github.com/prometheus/prometheus&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-prometheus-2026-40179, CVE-2026-40179, GHSA-vffh-x6r8-xx99&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 0.311.2-0.20260410083055-07c6232d159b&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Prometheus has Stored XSS via metric names and label values in Prometheus web UI in github.com/prometheus/prometheus&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99"&gt;https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c"&gt;https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18506"&gt;https://github.com/prometheus/prometheus/pull/18506&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5662"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-7789-65hx-f26w: FileBrowser Quantum has Username Enumeration via Authentication Timing Side-Channel</title>
-    <id>https://osv.dev/vulnerability/GHSA-7789-65hx-f26w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7789-65hx-f26w"/>
-    <published>2026-03-24T19:18:56Z</published>
-    <updated>2026-07-08T17:56:10Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54685"/>
-    <category term="GO-2026-4820"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;FileBrowser Quantum has Username Enumeration via Authentication Timing Side-Channel&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54685, GO-2026-4820&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gtsteffaniak/filebrowser/backend&lt;/code&gt; — fixed in 0.0.0-20260317230626-af08800667b8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The `/api/auth/login` authentication endpoint does not execute in constant time. When a non-existent username is supplied, the server returns a `401`/`403` response almost immediately. When a valid username is provided, the server performs a bcrypt password comparison, causing a measurable delay in the response time.
-
-### Details
-
-The vulnerability exists in the `Auth` function of `JSONAuth` in `auth/json.go` (lines 45–52). The function performs a database lookup for the user prior to performing any password validation.
-
-```go
-user, err := userStore.Get(username)
-	if err != nil {
-		return nil, fmt.Errorf(&amp;quot;unable to get user from store: %v&amp;quot;, err)
-	}
-	err = users.CheckPwd(password, user.Password)
-	if err != nil {
-		return nil, err
-	}
-```
-
-If the username is not found, the functi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/security/advisories/GHSA-7789-65hx-f26w"&gt;https://github.com/gtsteffaniak/filebrowser/security/advisories/GHSA-7789-65hx-f26w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/commit/af08800667b874620edc6f44c3e2e64fec7abd85"&gt;https://github.com/gtsteffaniak/filebrowser/commit/af08800667b874620edc6f44c3e2e64fec7abd85&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser"&gt;https://github.com/gtsteffaniak/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/releases/tag/v1.3.2-beta"&gt;https://github.com/gtsteffaniak/filebrowser/releases/tag/v1.3.2-beta&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7789-65hx-f26w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-4820: FileBrowser Quantum has Username Enumeration via Authentication Timing Side-Channel in github.com/gtsteffaniak/filebrowser/backend</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4820</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4820"/>
-    <published>2026-03-26T20:33:02Z</published>
-    <updated>2026-07-08T17:56:10Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54685"/>
-    <category term="GHSA-7789-65hx-f26w"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;FileBrowser Quantum has Username Enumeration via Authentication Timing Side-Channel in github.com/gtsteffaniak/filebrowser/backend&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54685, GHSA-7789-65hx-f26w&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gtsteffaniak/filebrowser/backend&lt;/code&gt; — fixed in 0.0.0-20260317230626-af08800667b8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;FileBrowser Quantum has Username Enumeration via Authentication Timing Side-Channel in github.com/gtsteffaniak/filebrowser/backend&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/security/advisories/GHSA-7789-65hx-f26w"&gt;https://github.com/gtsteffaniak/filebrowser/security/advisories/GHSA-7789-65hx-f26w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/commit/af08800667b874620edc6f44c3e2e64fec7abd85"&gt;https://github.com/gtsteffaniak/filebrowser/commit/af08800667b874620edc6f44c3e2e64fec7abd85&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/releases/tag/v1.3.2-beta"&gt;https://github.com/gtsteffaniak/filebrowser/releases/tag/v1.3.2-beta&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4820"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-pgh9-mpwc-8jjf: Harvester's SUSE Virtualization Registration Client Vulnerable to MITM and DOS</title>
-    <id>https://osv.dev/vulnerability/GHSA-pgh9-mpwc-8jjf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pgh9-mpwc-8jjf"/>
-    <published>2026-05-06T20:16:08Z</published>
-    <updated>2026-07-08T17:45:16Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2025-71261"/>
-    <category term="GO-2026-5538"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Harvester&amp;#x27;s SUSE Virtualization Registration Client Vulnerable to MITM and DOS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71261, GO-2026-5538&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/harvester/harvester&lt;/code&gt; — fixed in 1.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-A vulnerability has been identified in the [SUSE Virtualization (Harvester) Rancher integration mechanism](https://docs.harvesterhci.io/v1.7/rancher/rancher-integration) where by default the registration client uses an insecure TLS option that fails to verify  the remote server’s certificate. This security gap could allow the execution of a man-in-the-middle (MitM) attack against SUSE Virtualization.
-
-An attacker with network-level access between the SUSE Virtualization and Rancher Manager could interfere with the TLS handshake and abuse it to bypass TLS as a security control. The registration client could be misled to send cluster registration requests to an impersonated remote service. Additionally, because the system processes response payloads without performing size valida…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/harvester/harvester/security/advisories/GHSA-pgh9-mpwc-8jjf"&gt;https://github.com/harvester/harvester/security/advisories/GHSA-pgh9-mpwc-8jjf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-71261"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-71261&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/harvester/harvester"&gt;https://github.com/harvester/harvester&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pgh9-mpwc-8jjf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5851: Sigstore Timestamp Authority has OOM due to unbounded metric label cardinality in github.com/sigstore/timestamp-authority</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5851</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5851"/>
-    <published>2026-07-07T15:26:32Z</published>
-    <updated>2026-07-08T15:29:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-49835"/>
-    <category term="GHSA-9c54-x2g4-v92j"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Sigstore Timestamp Authority has OOM due to unbounded metric label cardinality in github.com/sigstore/timestamp-authority&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49835, GHSA-9c54-x2g4-v92j&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/sigstore/timestamp-authority&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/sigstore/timestamp-authority/v2&lt;/code&gt; — fixed in 2.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Sigstore Timestamp Authority has OOM due to unbounded metric label cardinality in github.com/sigstore/timestamp-authority&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/timestamp-authority/security/advisories/GHSA-9c54-x2g4-v92j"&gt;https://github.com/sigstore/timestamp-authority/security/advisories/GHSA-9c54-x2g4-v92j&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5851"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5528: Grafana Tempo has an Uncontrolled Resource Consumption issue in github.com/grafana/tempo</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5528</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5528"/>
-    <published>2026-06-25T22:34:34Z</published>
-    <updated>2026-07-08T15:29:23Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-21728"/>
-    <category term="GHSA-p4r4-xvrq-gvmc"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Grafana Tempo has an Uncontrolled Resource Consumption issue in github.com/grafana/tempo&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-21728, GHSA-p4r4-xvrq-gvmc&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/tempo&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Grafana Tempo has an Uncontrolled Resource Consumption issue in github.com/grafana/tempo.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: github.com/grafana/tempo before v2.8.4, from v2.9.0 before v2.9.2, from v2.10.0 before v2.10.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-p4r4-xvrq-gvmc"&gt;https://github.com/advisories/GHSA-p4r4-xvrq-gvmc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-21728"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-21728&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/commit/650eb1985a0776789c8564122990f588a742356f"&gt;https://github.com/grafana/tempo/commit/650eb1985a0776789c8564122990f588a742356f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/pull/6525"&gt;https://github.com/grafana/tempo/pull/6525&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/blob/4dc3e5b0d3463a0b67498b662b85a148698b4afd/docs/sources/tempo/release-notes/version-2/v2-10.md?plain=1#L328"&gt;https://github.com/grafana/tempo/blob/4dc3e5b0d3463a0b67498b662b85a148698b4afd/docs/sources/tempo/release-notes/version-2/v2-10.md?plain=1#L328&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/blob/4dc3e5b0d3463a0b67498b662b85a148698b4afd/docs/sources/tempo/release-notes/version-2/v2-8.md?plain=1#L251"&gt;https://github.com/grafana/tempo/blob/4dc3e5b0d3463a0b67498b662b85a148698b4afd/docs/sources/tempo/release-notes/version-2/v2-8.md?plain=1#L251&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/blob/4dc3e5b0d3463a0b67498b662b85a148698b4afd/docs/sources/tempo/release-notes/version-2/v2-9.md?plain=1#L224"&gt;https://github.com/grafana/tempo/blob/4dc3e5b0d3463a0b67498b662b85a148698b4afd/docs/sources/tempo/release-notes/version-2/v2-9.md?plain=1#L224&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5528"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5761: Malicious image with /dev symlink can trigger limited host filesystem integrity violations in github.com/opencontainers/runc</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5761</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5761"/>
-    <published>2026-07-07T16:52:19Z</published>
-    <updated>2026-07-08T15:29:23Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-41579"/>
-    <category term="GHSA-xjvp-4fhw-gc47"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious image with /dev symlink can trigger limited host filesystem integrity violations in github.com/opencontainers/runc&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41579, GHSA-xjvp-4fhw-gc47&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/opencontainers/runc&lt;/code&gt; — fixed in 1.3.6, 1.4.3, 1.5.0-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Malicious image with /dev symlink can trigger limited host filesystem integrity violations in github.com/opencontainers/runc&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/opencontainers/runc/security/advisories/GHSA-xjvp-4fhw-gc47"&gt;https://github.com/opencontainers/runc/security/advisories/GHSA-xjvp-4fhw-gc47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5761"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5778: Rekor has an OOM Condition due to Unbounded gzip Decompression in Alpine APK Parsing Logic in github.com/sigstore/rekor</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5778</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5778"/>
-    <published>2026-07-07T15:26:32Z</published>
-    <updated>2026-07-08T15:29:22Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-48702"/>
-    <category term="GHSA-47q9-m4ww-924m"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rekor has an OOM Condition due to Unbounded gzip Decompression in Alpine APK Parsing Logic in github.com/sigstore/rekor&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48702, GHSA-47q9-m4ww-924m&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/sigstore/rekor&lt;/code&gt; — fixed in 1.5.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Rekor has an OOM Condition due to Unbounded gzip Decompression in Alpine APK Parsing Logic in github.com/sigstore/rekor&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sigstore/rekor/security/advisories/GHSA-47q9-m4ww-924m"&gt;https://github.com/sigstore/rekor/security/advisories/GHSA-47q9-m4ww-924m&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5778"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5914: CiliumLocalRedirectPolicy addressMatcher allows cross-namespace service traffic hijacking and can break service translation in github.com/cilium/cilium</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5914</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5914"/>
-    <published>2026-07-07T15:26:37Z</published>
-    <updated>2026-07-08T15:29:22Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-53935"/>
-    <category term="GHSA-q6h5-q3q6-f87x"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;CiliumLocalRedirectPolicy addressMatcher allows cross-namespace service traffic hijacking and can break service translation in github.com/cilium/cilium&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53935, GHSA-q6h5-q3q6-f87x&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cilium/cilium&lt;/code&gt; — fixed in 1.17.16, 1.18.10, 1.19.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;CiliumLocalRedirectPolicy addressMatcher allows cross-namespace service traffic hijacking and can break service translation in github.com/cilium/cilium&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/security/advisories/GHSA-q6h5-q3q6-f87x"&gt;https://github.com/cilium/cilium/security/advisories/GHSA-q6h5-q3q6-f87x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/pull/44512"&gt;https://github.com/cilium/cilium/pull/44512&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/pull/44584"&gt;https://github.com/cilium/cilium/pull/44584&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/pull/44585"&gt;https://github.com/cilium/cilium/pull/44585&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5914"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

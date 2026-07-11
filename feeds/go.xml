@@ -3,12 +3,109 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-10T23:59:21Z</updated>
+  <updated>2026-07-11T05:59:30Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-fxhp-mv3v-67qp: `oras-go` tar extraction: Hardlink entry with relative Linkname escapes extract dir via process CWD resolution</title>
+    <id>https://osv.dev/vulnerability/GHSA-fxhp-mv3v-67qp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fxhp-mv3v-67qp"/>
+    <published>2026-07-01T21:48:04Z</published>
+    <updated>2026-07-11T05:59:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50163"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`oras-go` tar extraction: Hardlink entry with relative Linkname escapes extract dir via process CWD resolution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50163&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oras.land/oras-go/v2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Root cause
+
+The tar-extraction helper `ensureLinkPath` at [`content/file/utils.go:262-275`](https://github.com/oras-project/oras-go/blob/main/content/file/utils.go#L262-L275) validates that a hardlink&amp;#x27;s target resolves inside the extract base, but then returns the original unresolved `target` string back to the caller:
+
+```go
+func ensureLinkPath(baseAbs, baseRel, link, target string) (string, error) {
+    path := target
+    if !filepath.IsAbs(target) {
+        path = filepath.Join(filepath.Dir(link), target)  // resolved FOR VALIDATION
+    }
+    if _, err := resolveRelToBase(baseAbs, baseRel, path); err != nil {
+        return &amp;quot;&amp;quot;, err
+    }
+    return target, nil   // &amp;lt;-- returns the ORIGINAL target, not the validated path
+}
+```
+
+The caller for `TypeLink` hardlinks then does:
+
+```go
+ca…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/security/advisories/GHSA-fxhp-mv3v-67qp"&gt;https://github.com/oras-project/oras-go/security/advisories/GHSA-fxhp-mv3v-67qp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go/commit/b11f777f8d405c5023c4b307cfdc5068dfc3d406"&gt;https://github.com/oras-project/oras-go/commit/b11f777f8d405c5023c4b307cfdc5068dfc3d406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oras-project/oras-go"&gt;https://github.com/oras-project/oras-go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fxhp-mv3v-67qp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-2pv8-4c52-mf8j: Vikunja: Unauthenticated Instance-Wide Data Breach via Link Share Hash Disclosure Chained with Cross-Project Attachment IDOR</title>
+    <id>https://osv.dev/vulnerability/GHSA-2pv8-4c52-mf8j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2pv8-4c52-mf8j"/>
+    <published>2026-03-26T16:56:24Z</published>
+    <updated>2026-07-11T04:11:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-56765"/>
+    <category term="GO-2026-4855"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Unauthenticated Instance-Wide Data Breach via Link Share Hash Disclosure Chained with Cross-Project Attachment IDOR&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56765, GO-2026-4855&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Two independently-exploitable authorization flaws in Vikunja can be chained to allow an unauthenticated attacker to download and delete every file attachment across all projects in a Vikunja instance. The `ReadAll` endpoint for link shares exposes share hashes (including admin-level shares) to any user with read access, enabling permission escalation. The task attachment `ReadOne`/`GetTaskAttachment` endpoint performs permission checks against a user-supplied task ID but fetches the attachment by its own sequential ID without verifying the attachment belongs to that task, enabling cross-project file access.
+
+## Details
+
+### Vulnerability 1: Link Share Hash Disclosure (Permission Escalation Entry Point)
+
+Tracked in https://github.com/go-vikunja/vikunja/security/advisories/GHSA-8…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-2pv8-4c52-mf8j"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-2pv8-4c52-mf8j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-8hp8-9fhr-pfm9"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-8hp8-9fhr-pfm9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-jfmm-mjcp-8wq2"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-jfmm-mjcp-8wq2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vikunja.io/changelog/vikunja-v2.2.2-was-released"&gt;https://vikunja.io/changelog/vikunja-v2.2.2-was-released&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2pv8-4c52-mf8j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4855: Vikunja: Unauthenticated Instance-Wide Data Breach via Link Share Hash Disclosure Chained with Cross-Project Attachment IDOR in code.vikunja.io/api</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4855</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4855"/>
+    <published>2026-03-26T20:33:09Z</published>
+    <updated>2026-07-11T04:11:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-56765"/>
+    <category term="GHSA-2pv8-4c52-mf8j"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Unauthenticated Instance-Wide Data Breach via Link Share Hash Disclosure Chained with Cross-Project Attachment IDOR in code.vikunja.io/api&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56765, GHSA-2pv8-4c52-mf8j&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Vikunja: Unauthenticated Instance-Wide Data Breach via Link Share Hash Disclosure Chained with Cross-Project Attachment IDOR in code.vikunja.io/api.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: code.vikunja.io/api before v2.2.1.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-2pv8-4c52-mf8j"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-2pv8-4c52-mf8j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-8hp8-9fhr-pfm9"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-8hp8-9fhr-pfm9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-jfmm-mjcp-8wq2"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-jfmm-mjcp-8wq2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vikunja.io/changelog/vikunja-v2.2.2-was-released"&gt;https://vikunja.io/changelog/vikunja-v2.2.2-was-released&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4855"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-wxg7-w2v3-w38g:  ZITADEL: Missing Token Lifecyle Validation (`exp` and `iat`) in JWT IdP Provider</title>
+    <id>https://osv.dev/vulnerability/GHSA-wxg7-w2v3-w38g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wxg7-w2v3-w38g"/>
+    <published>2026-06-18T13:52:21Z</published>
+    <updated>2026-07-11T04:11:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-56664"/>
+    <category term="GO-2026-5732"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt; ZITADEL: Missing Token Lifecyle Validation (`exp` and `iat`) in JWT IdP Provider&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56664, GO-2026-5732&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zitadel/zitadel&lt;/code&gt; — fixed in 1.80.0-v2.20.0.20260615122908-fad02c6d9f45&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Two closely related token lifecycle validation vulnerabilities were discovered in ZITADEL&amp;#x27;s external JWT Identity Provider (IdP) implementation.
+
+Specifically, within the validation pipeline:
+
+* **Missing Expiration (`exp`) Enforcement:** If an incoming JWT omits the `exp` claim entirely, the expiration block is silently skipped rather than rejected. The token is treated as valid forever.
+* **Missing Issued-At (`iat`) Enforcement:** ZITADEL enforces a 1-hour freshness window (`maxAge`) via the token&amp;#x27;s issue time. However, this safety check is guarded by a presence condition. If a token omits the `iat` claim, the freshness check is entirely bypassed, allowing arbitrarily old tokens to pass.
+
+Per the OIDC Core 1.0 specification, identity token validation pipelines must strictly …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/security/advisories/GHSA-wxg7-w2v3-w38g"&gt;https://github.com/zitadel/zitadel/security/advisories/GHSA-wxg7-w2v3-w38g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/commit/fad02c6d9f4587956f830d4536c64a9a94baa7ac"&gt;https://github.com/zitadel/zitadel/commit/fad02c6d9f4587956f830d4536c64a9a94baa7ac&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel"&gt;https://github.com/zitadel/zitadel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/releases/tag/v3.4.12"&gt;https://github.com/zitadel/zitadel/releases/tag/v3.4.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/releases/tag/v4.15.2"&gt;https://github.com/zitadel/zitadel/releases/tag/v4.15.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wxg7-w2v3-w38g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5732: ZITADEL: Missing Token Lifecyle Validation (`exp` and `iat`) in JWT IdP Provider in github.com/zitadel/zitadel</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5732</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5732"/>
+    <published>2026-06-25T22:34:38Z</published>
+    <updated>2026-07-11T04:11:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-56664"/>
+    <category term="GHSA-wxg7-w2v3-w38g"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ZITADEL: Missing Token Lifecyle Validation (`exp` and `iat`) in JWT IdP Provider in github.com/zitadel/zitadel&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56664, GHSA-wxg7-w2v3-w38g&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zitadel/zitadel&lt;/code&gt; — fixed in 1.80.0-v2.20.0.20260615122908-fad02c6d9f45&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;ZITADEL: Missing Token Lifecyle Validation (`exp` and `iat`) in JWT IdP Provider in github.com/zitadel/zitadel&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/security/advisories/GHSA-wxg7-w2v3-w38g"&gt;https://github.com/zitadel/zitadel/security/advisories/GHSA-wxg7-w2v3-w38g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/commit/fad02c6d9f4587956f830d4536c64a9a94baa7ac"&gt;https://github.com/zitadel/zitadel/commit/fad02c6d9f4587956f830d4536c64a9a94baa7ac&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/releases/tag/v3.4.12"&gt;https://github.com/zitadel/zitadel/releases/tag/v3.4.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/releases/tag/v4.15.2"&gt;https://github.com/zitadel/zitadel/releases/tag/v4.15.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5732"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-6w3m-4hhp-775q: KEDA has PostgreSQL connection string parameter injection via incomplete whitespace escaping</title>
     <id>https://osv.dev/vulnerability/GHSA-6w3m-4hhp-775q</id>

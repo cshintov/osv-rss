@@ -3,12 +3,246 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-14T19:20:27Z</updated>
+  <updated>2026-07-14T20:45:18Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-cm26-5974-52h8: nebula-mesh: Certificate revocation is never enforced at the mesh</title>
+    <id>https://osv.dev/vulnerability/GHSA-cm26-5974-52h8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cm26-5974-52h8"/>
+    <published>2026-07-14T20:28:18Z</published>
+    <updated>2026-07-14T20:45:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-61699"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nebula-mesh: Certificate revocation is never enforced at the mesh&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61699&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/forgekeep/nebula-mesh&lt;/code&gt; — fixed in 0.7.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+nebula-mesh revokes a host by adding its certificate fingerprint to a per-CA blocklist and shipping that list to every other agent on each poll. Slack&amp;#x27;s Nebula enforces certificate revocation ONLY through the `pki.blocklist` list in `config.yml` (no CRL/OCSP). The project&amp;#x27;s own code states this: `internal/pki/durations.go:15` — &amp;quot;Revocation via the blocklist remains the immediate security control.&amp;quot;
+
+The server side is fully implemented (computes per-CA blocklist via `GetBlocklistForCA`, returns it in the agent-updates response, sets `has_updates=true` when non-empty). The agent side was never implemented:
+
+1. The agent decodes the `blocklist` JSON field into `UpdatesResponse.Blocklist` (`internal/agent/poller.go:33`) and then DISCARDS it — `poll()` applies `CertificatePEM`, `CA…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-cm26-5974-52h8"&gt;https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-cm26-5974-52h8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/0426e2f224a9b1e2029029bf923c93ed39d21cdb"&gt;https://github.com/forgekeep/nebula-mesh/commit/0426e2f224a9b1e2029029bf923c93ed39d21cdb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh"&gt;https://github.com/forgekeep/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.7.1"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.7.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cm26-5974-52h8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qf34-295c-26v8: Woodpecker: Privilege escalation via unrestricted serviceAccountName in the Kubernetes backend</title>
+    <id>https://osv.dev/vulnerability/GHSA-qf34-295c-26v8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qf34-295c-26v8"/>
+    <published>2026-07-14T20:29:32Z</published>
+    <updated>2026-07-14T20:45:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-61549"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Woodpecker: Privilege escalation via unrestricted serviceAccountName in the Kubernetes backend&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61549&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;go.woodpecker-ci.org/woodpecker/v3&lt;/code&gt; — fixed in 3.16.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/woodpecker-ci/woodpecker&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;go.woodpecker-ci.org/woodpecker/v2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A privilege escalation vulnerability affects Woodpecker instances using the **Kubernetes backend**.
+
+The pipeline option `backend_options.kubernetes.serviceAccountName` was passed directly to the pod spec without any admin gating.
+
+**Who is impacted:** any operator running the Kubernetes backend. Any user with **Push** permission on a connected repository can run pipeline pods under an arbitrary ServiceAccount in the pipeline namespace, gaining that account&amp;#x27;s RBAC permissions. If a privileged ServiceAccount is reachable in that namespace, this can lead to secret exfiltration (database credentials, API keys, TLS certs) and full cluster takeover.
+
+### Patches
+
+https://github.com/woodpecker-ci/woodpecker/pull/6792
+
+### Workarounds
+
+Operators who cannot upgrade immediately can miti…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/woodpecker-ci/woodpecker/security/advisories/GHSA-qf34-295c-26v8"&gt;https://github.com/woodpecker-ci/woodpecker/security/advisories/GHSA-qf34-295c-26v8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/woodpecker-ci/woodpecker/pull/6792"&gt;https://github.com/woodpecker-ci/woodpecker/pull/6792&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/woodpecker-ci/woodpecker"&gt;https://github.com/woodpecker-ci/woodpecker&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qf34-295c-26v8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7rx3-5wx3-5v76: Nebula-mesh allows non-admin operators to disable webhook SSRF protection via `allow_private`</title>
+    <id>https://osv.dev/vulnerability/GHSA-7rx3-5wx3-5v76</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7rx3-5wx3-5v76"/>
+    <published>2026-07-14T20:28:42Z</published>
+    <updated>2026-07-14T20:45:18Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nebula-mesh allows non-admin operators to disable webhook SSRF protection via `allow_private`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/forgekeep/nebula-mesh&lt;/code&gt; — fixed in 0.7.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Non-admin operators (role `user`) can set `allow_private: true` on their own managed webhook subscription (`POST`/`PATCH /api/v1/webhook-subscriptions`). No admin check exists on this field. At delivery time, `allow_private` switches the dispatcher to an unguarded HTTP client, bypassing the private/loopback/link-local SSRF guard — letting a low-privilege operator make the server request internal addresses.
+
+### Details
+
+`internal/api/webhooks.go:67` (`handleCreateWebhookSubscription`) and `:110` (`handleUpdateWebhookSubscription`) persist operator-supplied `AllowPrivate` with no role check — only ownership is enforced (`canAccessWebhookSub`), and that&amp;#x27;s not even called on create.
+
+`internal/webhook/webhook.go:294-296`:
+```go
+client := d.guarded
+if tgt.AllowPrivate {
+    client…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-7rx3-5wx3-5v76"&gt;https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-7rx3-5wx3-5v76&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/f3c54530e388dd21763e548923426e60a8e93ff0"&gt;https://github.com/forgekeep/nebula-mesh/commit/f3c54530e388dd21763e548923426e60a8e93ff0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh"&gt;https://github.com/forgekeep/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.7.2"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.7.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7rx3-5wx3-5v76"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g4x6-jcvr-9m3g: nebula-mesh: Web UI host creation ignores configured enrollment token TTL and mints 24-hour bearer enrollment tokens</title>
+    <id>https://osv.dev/vulnerability/GHSA-g4x6-jcvr-9m3g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g4x6-jcvr-9m3g"/>
+    <published>2026-07-14T20:26:21Z</published>
+    <updated>2026-07-14T20:30:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55513"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nebula-mesh: Web UI host creation ignores configured enrollment token TTL and mints 24-hour bearer enrollment tokens&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55513&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/forgekeep/nebula-mesh&lt;/code&gt; — fixed in 0.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The `nebula-mgmt` Web UI host-creation path ignores both the server-wide `enrollment_token_ttl` security setting and per-network `network_config.enrollment_token_ttl` overrides. API host creation and token-regeneration paths use the configured TTL resolver, but `POST /ui/hosts` hardcodes `now.Add(24 * time.Hour)` for newly minted agent enrollment tokens. In deployments that intentionally reduce enrollment-token lifetime, any authenticated operator who can create a host through the Web UI can still mint a bearer enrollment token valid for about 24 hours.
+
+### Details
+Enrollment tokens are bearer credentials for the public `POST /api/v1/enroll` endpoint: possession of a valid token allows enrolling the pending host and receiving a signed Nebula certificate/config for that host. T…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-g4x6-jcvr-9m3g"&gt;https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-g4x6-jcvr-9m3g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/514006029e09f1991122b86a80e7b25970bcfa98"&gt;https://github.com/forgekeep/nebula-mesh/commit/514006029e09f1991122b86a80e7b25970bcfa98&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh"&gt;https://github.com/forgekeep/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.5.0"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.5.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g4x6-jcvr-9m3g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mf78-3rpf-r784: Anyquery: Local File Read (LFR) via Unrestricted SQLite Virtual Table Modules in Server Mode</title>
+    <id>https://osv.dev/vulnerability/GHSA-mf78-3rpf-r784</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mf78-3rpf-r784"/>
+    <published>2026-07-14T20:19:07Z</published>
+    <updated>2026-07-14T20:30:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54629"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Anyquery: Local File Read (LFR) via Unrestricted SQLite Virtual Table Modules in Server Mode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54629&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/julien040/anyquery&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+Anyquery&amp;#x27;s `server` mode lacks input sanitization and access control over its built-in SQLite virtual table modules (e.g., `csv_reader`, `log_reader`). Unauthenticated attackers connecting to the MySQL-compatible server port can create virtual tables pointing to local files on the system (e.g., `/etc/passwd`, `~/.ssh/id_rsa`). This allows full Local File Read (LFR) capabilities, compromising sensitive system configurations and credentials.
+
+## Details
+Anyquery utilizes the `hashicorp/go-getter` library within its data ingestion modules. When Anyquery is launched in **Server Mode** (`anyquery server`), it binds to a TCP port and accepts MySQL protocol connections. The server handler does not restrict the usage of these virtual table modules to safe directories. An attacker can co…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery/security/advisories/GHSA-mf78-3rpf-r784"&gt;https://github.com/julien040/anyquery/security/advisories/GHSA-mf78-3rpf-r784&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery"&gt;https://github.com/julien040/anyquery&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery/releases/tag/0.4.5"&gt;https://github.com/julien040/anyquery/releases/tag/0.4.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mf78-3rpf-r784"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-m3cx-mwpg-32jg: nebula-mesh: Unauthenticated OIDC login endpoint allocates unbounded in-memory state entries without rate limiting</title>
+    <id>https://osv.dev/vulnerability/GHSA-m3cx-mwpg-32jg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m3cx-mwpg-32jg"/>
+    <published>2026-07-14T20:19:32Z</published>
+    <updated>2026-07-14T20:30:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55512"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nebula-mesh: Unauthenticated OIDC login endpoint allocates unbounded in-memory state entries without rate limiting&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55512&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/forgekeep/nebula-mesh&lt;/code&gt; — fixed in 0.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+When OIDC is enabled, `GET /ui/oidc/login` is reachable without authentication and is registered outside the Web UI rate-limited auth routes. Every request creates a fresh random OIDC state value and stores it in an in-memory map for `10m`. Expired states are swept lazily, but there is no rate limit or maximum live-state cap on the allocation path. An unauthenticated remote client can therefore grow `OIDC.states` for the full state TTL, bounded by request throughput rather than by configured auth rate limits.
+
+### Details
+The OIDC login route is registered directly by `WithOIDC`:
+
+- `internal/web/web.go:153` registers `w.router.Get(&amp;quot;/ui/oidc/login&amp;quot;, o.HandleLogin)`.
+- `internal/web/web.go:154` rate-limits only `GET /ui/oidc/callback` with `w.rateLimitMiddleware(&amp;quot;auth&amp;quot;)`.
+
+The n…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-m3cx-mwpg-32jg"&gt;https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-m3cx-mwpg-32jg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/bc387086cc0e4b9c1654468b7391af19cacfe367"&gt;https://github.com/forgekeep/nebula-mesh/commit/bc387086cc0e4b9c1654468b7391af19cacfe367&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh"&gt;https://github.com/forgekeep/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.5.0"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.5.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m3cx-mwpg-32jg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q4vm-pq3q-8wgq: nebula-mesh: Operator session tokens stored in plaintext in the database</title>
+    <id>https://osv.dev/vulnerability/GHSA-q4vm-pq3q-8wgq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q4vm-pq3q-8wgq"/>
+    <published>2026-07-14T20:17:04Z</published>
+    <updated>2026-07-14T20:30:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53603"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nebula-mesh: Operator session tokens stored in plaintext in the database&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53603&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/forgekeep/nebula-mesh&lt;/code&gt; — fixed in 0.3.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+Operator session tokens are stored in plaintext in the `operator_sessions` table (the `token` column is the PRIMARY KEY). The session token is a 32-byte random hex value sent directly in a cookie and valid for 24 hours.
+
+- `internal/models/operator.go:61` — `OperatorSession.Token` holds the plaintext token.
+- `internal/store/sqlite_operators.go:590` — `CreateOperatorSession` inserts `sess.Token` verbatim.
+- `internal/store/sqlite_operators.go:603,642,681,698` — lookups/updates/deletes use `WHERE token = ?` against the plaintext value.
+
+Anyone who can read the database (backup, snapshot, file copy, or SQL-level disclosure) obtains every active session token and can hijack operator sessions directly, with no further authentication.
+
+This is functionally identical to the plaintext …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-q4vm-pq3q-8wgq"&gt;https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-q4vm-pq3q-8wgq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/7cb01bab281ded557f8b6c81dab5f48d4c10182e"&gt;https://github.com/forgekeep/nebula-mesh/commit/7cb01bab281ded557f8b6c81dab5f48d4c10182e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh"&gt;https://github.com/forgekeep/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.3.8"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.3.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q4vm-pq3q-8wgq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2p2f-px33-4vv5: nebula-mesh: CA private key not zeroized on web mobile-bundle error paths</title>
+    <id>https://osv.dev/vulnerability/GHSA-2p2f-px33-4vv5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2p2f-px33-4vv5"/>
+    <published>2026-07-14T20:05:38Z</published>
+    <updated>2026-07-14T20:15:13Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53604"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nebula-mesh: CA private key not zeroized on web mobile-bundle error paths&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53604&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/forgekeep/nebula-mesh&lt;/code&gt; — fixed in 0.3.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+The web handler `renderMobileBundle` (`internal/web/handlers.go:1325`) passes the real `*pki.CAResolver` directly into `mobilebundle.Build`. Inside `Build` (`internal/mobilebundle/builder.go:54`), `resolver.LoadByID` decrypts the CA&amp;#x27;s ed25519 private key into a `*pki.CAManager`, but `Build` never calls `CAManager.Wipe()` on any return path (success or any of the error paths at lines 56, 62, 68, 80, 86, 92, 98, 102, 109, 118, 150).
+
+As a result, when a mobile-bundle request goes through the **web** UI and `Build` returns — especially on error (missing network, invalid prefix, DB error, signing failure) — the plaintext CA private key remains on the Go heap, unwiped, until garbage collection. An attacker able to read process memory (core dump, swap, memory-scraping) can recover the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-2p2f-px33-4vv5"&gt;https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-2p2f-px33-4vv5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/1f1ab9aa8472239763d967e3d50a3cd53a1a79b9"&gt;https://github.com/forgekeep/nebula-mesh/commit/1f1ab9aa8472239763d967e3d50a3cd53a1a79b9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh"&gt;https://github.com/forgekeep/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.3.8"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.3.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2p2f-px33-4vv5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hwrq-8wxh-q4xv: Anyquery: Server-Side Request Forgery (SSRF) via Unrestricted SQLite Virtual Table Modules in Server Mode</title>
+    <id>https://osv.dev/vulnerability/GHSA-hwrq-8wxh-q4xv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hwrq-8wxh-q4xv"/>
+    <published>2026-07-14T20:02:06Z</published>
+    <updated>2026-07-14T20:15:13Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54628"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Anyquery: Server-Side Request Forgery (SSRF) via Unrestricted SQLite Virtual Table Modules in Server Mode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54628&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/julien040/anyquery&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+Anyquery&amp;#x27;s `server` mode does not restrict outbound HTTP requests initiated by its built-in SQLite virtual table modules (e.g., `json_reader`, `log_reader`). Unauthenticated attackers connecting to the MySQL-compatible server port can create virtual tables pointing to internal network endpoints or Cloud Metadata IPs (e.g., `http://169.254.169.254/latest/meta-data/`). This allows attackers to perform Server-Side Request Forgery (SSRF), bypassing external firewalls to scan internal ports and exfiltrate cloud credentials.
+
+## Details
+When Anyquery is launched in **Server Mode** (`anyquery server`), it binds to a TCP port and accepts MySQL protocol connections. The server handler allows the creation of dynamic virtual tables using modules like `json_reader` or `log_reader`, which in…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery/security/advisories/GHSA-hwrq-8wxh-q4xv"&gt;https://github.com/julien040/anyquery/security/advisories/GHSA-hwrq-8wxh-q4xv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery"&gt;https://github.com/julien040/anyquery&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/julien040/anyquery/releases/tag/0.4.5"&gt;https://github.com/julien040/anyquery/releases/tag/0.4.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hwrq-8wxh-q4xv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mqxv-9rm6-w8qc: Ech0: ParseAcceptLanguage `_` separator bypass enables ~70x CPU amplification via Accept-Language header in i18n.Middleware</title>
+    <id>https://osv.dev/vulnerability/GHSA-mqxv-9rm6-w8qc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mqxv-9rm6-w8qc"/>
+    <published>2026-07-14T19:58:54Z</published>
+    <updated>2026-07-14T20:15:13Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Ech0: ParseAcceptLanguage `_` separator bypass enables ~70x CPU amplification via Accept-Language header in i18n.Middleware&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/lin-snow/ech0&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Ech0&amp;#x27;s i18n middleware runs on every HTTP request and constructs a fresh `*goi18n.Localizer` from the raw `Accept-Language` header without imposing any size or shape filter. `goi18n.NewLocalizer` calls `golang.org/x/text/language.ParseAcceptLanguage` on the value internally. The underlying parser has quadratic-time behaviour on long lists of malformed language tags. The CVE-2022-32149 guard that golang.org/x/text added in v0.3.8 caps the number of `-` characters in the input at 1000, but it does not cap `_` characters even though the parser&amp;#x27;s internal scanner aliases `_` to `-` before parsing. A single unauthenticated GET request with an `Accept-Language` header built out of `_` separators burns about 1.5 seconds of server CPU on the host running Ech0; ten concurrent attackers…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lin-snow/Ech0/security/advisories/GHSA-mqxv-9rm6-w8qc"&gt;https://github.com/lin-snow/Ech0/security/advisories/GHSA-mqxv-9rm6-w8qc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lin-snow/Ech0"&gt;https://github.com/lin-snow/Ech0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mqxv-9rm6-w8qc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-pqg7-v6wh-3pfp: TsDProxy: X-Forwarded-For header injection allows IP spoofing in proxied requests to backend services</title>
+    <id>https://osv.dev/vulnerability/GHSA-pqg7-v6wh-3pfp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pqg7-v6wh-3pfp"/>
+    <published>2026-07-14T19:46:15Z</published>
+    <updated>2026-07-14T20:00:42Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;TsDProxy: X-Forwarded-For header injection allows IP spoofing in proxied requests to backend services&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/almeidapaulopt/tsdproxy&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
+
+The HTTP reverse proxy handler in tsdproxy does not strip the X-Forwarded-For (or X-Real-IP) header from incoming requests before calling r.SetXForwarded(). This allows an authenticated Tailscale user to inject arbitrary X-Forwarded-For values that are forwarded verbatim to backend services.
+
+```go
+// internal/proxymanager/port.go -- Rewrite function
+Rewrite: func(r *httputil.ProxyRequest) {
+    r.SetURL(pconfig.GetFirstTarget())
+    r.Out.Host = r.In.Host
+
+    // Strips tsdproxy identity headers (correct)
+    r.Out.Header.Del(consts.HeaderID)
+    r.Out.Header.Del(consts.HeaderRemoteUser)
+    r.Out.Header.Del(consts.HeaderXForwardedUser)
+    // ... other identity headers deleted ...
+
+    // X-Forwarded-For is NOT deleted before SetXForwarded!
+    // X-Real-IP is NOT deleted…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/almeidapaulopt/tsdproxy/security/advisories/GHSA-pqg7-v6wh-3pfp"&gt;https://github.com/almeidapaulopt/tsdproxy/security/advisories/GHSA-pqg7-v6wh-3pfp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/almeidapaulopt/tsdproxy/commit/e8200b7947719e5e7fbbbdb9c34f459a4c285e77"&gt;https://github.com/almeidapaulopt/tsdproxy/commit/e8200b7947719e5e7fbbbdb9c34f459a4c285e77&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/almeidapaulopt/tsdproxy"&gt;https://github.com/almeidapaulopt/tsdproxy&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pqg7-v6wh-3pfp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q3fv-x8vg-qqm4: Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser</title>
+    <id>https://osv.dev/vulnerability/GHSA-q3fv-x8vg-qqm4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q3fv-x8vg-qqm4"/>
+    <published>2026-07-14T19:52:14Z</published>
+    <updated>2026-07-14T20:00:42Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54448"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54448&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/aquasecurity/trivy&lt;/code&gt; — fixed in 0.71.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+When Trivy scans a Helm chart archive (`.tgz`), its custom tar unpacker reads each entry with `io.ReadAll(tr)` and no size limit. An attacker who can place a malicious `.tgz` file in the scanned path can craft a small compressed archive that decompresses to gigabytes, causing the Trivy process to be killed by the OS OOM killer.
+
+## Affected configurations
+
+Exploitation requires the attacker to place a crafted `.tgz` file in a location that Trivy will scan as a Helm chart. This applies to the following scan targets:
+
+| Command | Condition |
+| --- | --- |
+| `trivy config &amp;lt;dir&amp;gt;` | Directory contains a crafted `.tgz` Helm chart (misconfiguration scanning is always enabled) |
+| `trivy filesystem --scanners misconf &amp;lt;dir&amp;gt;` | Directory contains a crafted `.tgz` Helm chart **and** `--sc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4"&gt;https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54448"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54448&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/pull/10718"&gt;https://github.com/aquasecurity/trivy/pull/10718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4"&gt;https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy"&gt;https://github.com/aquasecurity/trivy&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/releases/tag/v0.71.0"&gt;https://github.com/aquasecurity/trivy/releases/tag/v0.71.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q3fv-x8vg-qqm4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2c7f-fxww-6w6c: yutu: Arbitrary File Write via MCP `caption-download` Tool</title>
+    <id>https://osv.dev/vulnerability/GHSA-2c7f-fxww-6w6c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2c7f-fxww-6w6c"/>
+    <published>2026-07-14T19:34:47Z</published>
+    <updated>2026-07-14T19:45:41Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50158"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;yutu: Arbitrary File Write via MCP `caption-download` Tool&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50158&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/eat-pray-ai/yutu&lt;/code&gt; — fixed in 0.10.9-dev1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Arbitrary File Write via MCP `caption-download` Tool
+
+### Summary
+
+The `caption-download` MCP tool in yutu passes the caller-supplied `file` parameter directly to `os.Create()` at `pkg/caption/caption.go:272` without any path validation, canonicalization, or confinement to the `pkg.Root` boundary (`YUTU_ROOT`). A local attacker — or any process able to reach the HTTP MCP server — can write arbitrary content to any path writable by the yutu process, entirely outside the intended working directory. This is a **High** severity vulnerability (CVSS 7.7) with high integrity and availability impact.
+
+### Details
+
+yutu uses `pkg.Root` (backed by Go 1.24&amp;#x27;s `os.OpenRoot`) to restrict all file I/O to the `YUTU_ROOT` directory. Every other caption file-write path honours this boundary:
+
+| Method | …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eat-pray-ai/yutu/security/advisories/GHSA-2c7f-fxww-6w6c"&gt;https://github.com/eat-pray-ai/yutu/security/advisories/GHSA-2c7f-fxww-6w6c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eat-pray-ai/yutu/commit/87026c4eee1ed28775383807087343a750707bf3"&gt;https://github.com/eat-pray-ai/yutu/commit/87026c4eee1ed28775383807087343a750707bf3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eat-pray-ai/yutu"&gt;https://github.com/eat-pray-ai/yutu&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eat-pray-ai/yutu/releases/tag/v0.10.9-dev1"&gt;https://github.com/eat-pray-ai/yutu/releases/tag/v0.10.9-dev1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2c7f-fxww-6w6c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-g7mm-9vx7-jm7h: Woodpecker gRPC agent_id metadata can be spoofed- cross-tenant agent impersonation</title>
     <id>https://osv.dev/vulnerability/GHSA-g7mm-9vx7-jm7h</id>

@@ -3,18 +3,180 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-07-17T13:19:27Z</updated>
+  <updated>2026-07-17T19:15:17Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
   <entry>
+    <title>[NEW] GHSA-vqrw-qphh-p34v: TAK-PS-Stats Web UI: Authenticated full-read SSRF in CloudTAK basemap import (PUT /api/basemap) — no IP-classification guard</title>
+    <id>https://osv.dev/vulnerability/GHSA-vqrw-qphh-p34v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vqrw-qphh-p34v"/>
+    <published>2026-07-17T19:02:37Z</published>
+    <updated>2026-07-17T19:15:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-54546"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;TAK-PS-Stats Web UI: Authenticated full-read SSRF in CloudTAK basemap import (PUT /api/basemap) — no IP-classification guard&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54546&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@tak-ps/cloudtak&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`PUT /api/basemap` (the basemap import endpoint) fetches an attacker-supplied URL server-side with **no SSRF protection whatsoever**. Any authenticated user can submit a JSON body `{ &amp;quot;type&amp;quot;: &amp;quot;...&amp;quot;, &amp;quot;url&amp;quot;: &amp;quot;&amp;lt;attacker url&amp;gt;&amp;quot; }`; the server calls `fetch(url)` against that URL and then reflects the response body (`name`, `attribution`, `tiles[0]`, zoom levels) back to the caller in the `OptionalTileJSON` response.
+
+Because there is no IP-address classification, internal-only services are reachable: cloud metadata (`http://169.254.169.254/...`), loopback (`http://127.0.0.1/...`), RFC1918 ranges, and CGNAT. The response body flows back to the attacker, making this a **full-read SSRF** (not blind): the attacker reads the internal HTTP response verbatim. This enables theft of cloud ins…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dfpc-coe/CloudTAK/security/advisories/GHSA-vqrw-qphh-p34v"&gt;https://github.com/dfpc-coe/CloudTAK/security/advisories/GHSA-vqrw-qphh-p34v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dfpc-coe/CloudTAK"&gt;https://github.com/dfpc-coe/CloudTAK&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vqrw-qphh-p34v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-5v72-xg48-5rpm: Denial of Service in ws</title>
+    <id>https://osv.dev/vulnerability/GHSA-5v72-xg48-5rpm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5v72-xg48-5rpm"/>
+    <published>2019-06-04T19:37:52Z</published>
+    <updated>2026-07-17T18:45:52Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Denial of Service in ws&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ws&lt;/code&gt; — fixed in 1.1.5&lt;/li&gt;&lt;li&gt;&lt;code&gt;ws&lt;/code&gt; — fixed in 3.3.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `ws` can crash when a specially crafted `Sec-WebSocket-Extensions` header containing `Object.prototype` property names as extension or parameter names is sent.
+
+## Proof of concept
+
+```
+const WebSocket = require(&amp;#x27;ws&amp;#x27;);
+const net = require(&amp;#x27;net&amp;#x27;);
+
+const wss = new WebSocket.Server({ port: 3000 }, function () {
+  const payload = &amp;#x27;constructor&amp;#x27;;  // or &amp;#x27;,;constructor&amp;#x27;
+
+  const request = [
+    &amp;#x27;GET / HTTP/1.1&amp;#x27;,
+    &amp;#x27;Connection: Upgrade&amp;#x27;,
+    &amp;#x27;Sec-WebSocket-Key: test&amp;#x27;,
+    &amp;#x27;Sec-WebSocket-Version: 8&amp;#x27;,
+    `Sec-WebSocket-Extensions: ${payload}`,
+    &amp;#x27;Upgrade: websocket&amp;#x27;,
+    &amp;#x27;\r\n&amp;#x27;
+  ].join(&amp;#x27;\r\n&amp;#x27;);
+
+  const socket = net.connect(3000, function () {
+    socket.resume();
+    socket.write(request);
+  });
+});
+```
+
+
+## Recommendation
+
+Update to version 3.3.1 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/websockets/ws/commit/a810bfa44f08c84ff3f43cc71327e9bb5fb273ef"&gt;https://github.com/websockets/ws/commit/a810bfa44f08c84ff3f43cc71327e9bb5fb273ef&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/websockets/ws/commit/c4fe46608acd61fbf7397eadc47378903f95b78a"&gt;https://github.com/websockets/ws/commit/c4fe46608acd61fbf7397eadc47378903f95b78a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/websockets/ws/commit/f8fdcd40ac8be7318a6ee41f5ceb7e77c995b407"&gt;https://github.com/websockets/ws/commit/f8fdcd40ac8be7318a6ee41f5ceb7e77c995b407&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/websockets/ws"&gt;https://github.com/websockets/ws&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://snyk.io/vuln/npm:ws:20171108"&gt;https://snyk.io/vuln/npm:ws:20171108&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5v72-xg48-5rpm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-cv3v-7846-6pxm: Unauthorized File Access in node-git-server</title>
+    <id>https://osv.dev/vulnerability/GHSA-cv3v-7846-6pxm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cv3v-7846-6pxm"/>
+    <published>2020-09-03T21:15:19Z</published>
+    <updated>2026-07-17T18:30:27Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unauthorized File Access in node-git-server&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;node-git-server&lt;/code&gt; — fixed in 0.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Versions of `node-git-server` prior to 0.6.1 are vulnerable to Unauthorized File Access. It is possible to access any git repository by using absolute paths, which may allow attackers to access private repositories.
+
+
+## Recommendation
+
+Upgrade to version 0.6.1 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gabrielcsapo/node-git-server/pull/62"&gt;https://github.com/gabrielcsapo/node-git-server/pull/62&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gabrielcsapo/node-git-server/commit/ac26650f69bc445d71e4f2c55328676d10a4be43"&gt;https://github.com/gabrielcsapo/node-git-server/commit/ac26650f69bc445d71e4f2c55328676d10a4be43&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gabrielcsapo/node-git-server/commit/fb8d62710e3d78c796e04a33fcff66cea3f212f3"&gt;https://github.com/gabrielcsapo/node-git-server/commit/fb8d62710e3d78c796e04a33fcff66cea3f212f3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gabrielcsapo/node-git-server"&gt;https://github.com/gabrielcsapo/node-git-server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gabrielcsapo/node-git-server/blob/0.2.0/lib/git.js"&gt;https://github.com/gabrielcsapo/node-git-server/blob/0.2.0/lib/git.js&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gabrielcsapo/node-git-server/tree/0.1.0"&gt;https://github.com/gabrielcsapo/node-git-server/tree/0.1.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://snyk.io/vuln/SNYK-JS-NODEGITSERVER-474343"&gt;https://snyk.io/vuln/SNYK-JS-NODEGITSERVER-474343&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cv3v-7846-6pxm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jj36-r9w3-3pfh: Budibase: Unauthenticated S3 signed upload URL generation allows arbitrary writes with stored datasource credentials</title>
+    <id>https://osv.dev/vulnerability/GHSA-jj36-r9w3-3pfh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jj36-r9w3-3pfh"/>
+    <published>2026-06-22T23:15:10Z</published>
+    <updated>2026-07-17T17:15:51Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-50136"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Budibase: Unauthenticated S3 signed upload URL generation allows arbitrary writes with stored datasource credentials&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50136&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@budibase/server&lt;/code&gt; — fixed in 3.39.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The application server exposes an unauthenticated endpoint that generates S3 `PutObject` presigned URLs using credentials stored in a workspace datasource. The route is protected only by the recaptcha middleware and does not require authentication, table permission, datasource permission, or builder access. A public caller who knows a workspace ID and S3 datasource ID can request a signed upload URL for attacker-controlled bucket and key values.
+
+### Details
+
+The static route registers the signed upload URL endpoint with only `recaptcha` before the controller:
+
+- `packages/server/src/api/routes/static.ts:44-48`
+
+```ts
+44:  .post(
+45:    &amp;quot;/api/attachments/:datasourceId/url&amp;quot;,
+46:    recaptcha,
+47:    controller.getSignedUploadURL
+48:  )
+```
+
+The controller loads the datasource by `datasource…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/security/advisories/GHSA-jj36-r9w3-3pfh"&gt;https://github.com/Budibase/budibase/security/advisories/GHSA-jj36-r9w3-3pfh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50136"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50136&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/pull/18774"&gt;https://github.com/Budibase/budibase/pull/18774&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase/commit/d9dbb7f6105373cc88ecacdbcab70c776f7dd6a1"&gt;https://github.com/Budibase/budibase/commit/d9dbb7f6105373cc88ecacdbcab70c776f7dd6a1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Budibase/budibase"&gt;https://github.com/Budibase/budibase&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jj36-r9w3-3pfh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-rr89-w3h9-m66j: ExifReader is vulnerable to denial of service via unbounded decompression of image metadata</title>
+    <id>https://osv.dev/vulnerability/GHSA-rr89-w3h9-m66j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rr89-w3h9-m66j"/>
+    <published>2026-05-29T17:52:26Z</published>
+    <updated>2026-07-17T17:00:52Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-8814"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ExifReader is vulnerable to denial of service via unbounded decompression of image metadata&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-8814&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;exifreader&lt;/code&gt; — fixed in 4.39.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Versions of ExifReader from 4.20.0 through 4.38.1 do not bound the size of decompressed metadata blocks. When a caller invokes the asynchronous API (e.g. `ExifReader.load(file)` or `ExifReader.load(buffer, {async: true})`) on an attacker-supplied image, a small compressed chunk in the file can expand to hundreds of megabytes of memory, consuming heap and CPU until the process slows down or runs out of memory.
+
+The affected paths share a single decompression utility, so the issue is reachable through any compressed metadata block the library handles asynchronously, including:
+
+- PNG `zTXt`, compressed `iTXt`, and `iCCP` chunks (deflate)
+- JPEG XL Brotli-compressed Exif and XMP blocks
+
+A typical proof of concept produced roughly 1000× expansion (for example, ~32 KB of compressed …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader/security/advisories/GHSA-rr89-w3h9-m66j"&gt;https://github.com/mattiasw/ExifReader/security/advisories/GHSA-rr89-w3h9-m66j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-8814"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-8814&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader/commit/5f116128adc19f674902f8bf582bfe7dd0a36375"&gt;https://github.com/mattiasw/ExifReader/commit/5f116128adc19f674902f8bf582bfe7dd0a36375&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader"&gt;https://github.com/mattiasw/ExifReader&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.snyk.io/vuln/SNYK-JS-EXIFREADER-16689340"&gt;https://security.snyk.io/vuln/SNYK-JS-EXIFREADER-16689340&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rr89-w3h9-m66j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h64w-w9pr-82m4: ExifReader is vulnerable to denial of service via crafted ICC `mluc` tag</title>
+    <id>https://osv.dev/vulnerability/GHSA-h64w-w9pr-82m4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h64w-w9pr-82m4"/>
+    <published>2026-05-29T17:58:37Z</published>
+    <updated>2026-07-17T17:00:52Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-8813"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ExifReader is vulnerable to denial of service via crafted ICC `mluc` tag&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-8813&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;exifreader&lt;/code&gt; — fixed in 4.39.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+When parsing an image with an embedded ICC profile that contains a crafted `multiLocalizedUnicodeType` (`mluc`) tag, ExifReader can be made to allocate memory proportional to attacker-controlled fields in the tag rather than to
+the actual size of the input. Processing such an image causes excessive memory consumption and can terminate the host process (out-of-memory).
+
+Any application that calls `ExifReader.load()` on untrusted images, for example, user uploads in a web service, is affected. ICC profiles are carried in JPEG, TIFF, PNG, HEIC, AVIF, JPEG XL, and WebP, so the issue is reachable from any of those formats.
+
+### Patches
+
+Fixed in `exifreader@4.39.0`. Upgrade with:
+
+    npm install exifreader@latest
+
+Bower users consume the bundled `dist/` files from this repository, …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader/security/advisories/GHSA-h64w-w9pr-82m4"&gt;https://github.com/mattiasw/ExifReader/security/advisories/GHSA-h64w-w9pr-82m4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-8813"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-8813&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader/commit/c9d88b67e127b2dcc7b46e328df468257fb2dc30"&gt;https://github.com/mattiasw/ExifReader/commit/c9d88b67e127b2dcc7b46e328df468257fb2dc30&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattiasw/ExifReader"&gt;https://github.com/mattiasw/ExifReader&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.snyk.io/vuln/SNYK-JS-EXIFREADER-16689335"&gt;https://security.snyk.io/vuln/SNYK-JS-EXIFREADER-16689335&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h64w-w9pr-82m4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-5gvr-v6qv-h5mm: claude-mem: The computeObservationContentHash Function is Vulnerable to Hash Collision</title>
+    <id>https://osv.dev/vulnerability/GHSA-5gvr-v6qv-h5mm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5gvr-v6qv-h5mm"/>
+    <published>2026-06-05T15:32:23Z</published>
+    <updated>2026-07-17T17:00:52Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-11330"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;claude-mem: The computeObservationContentHash Function is Vulnerable to Hash Collision&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11330&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:L · CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;claude-mem&lt;/code&gt; — fixed in 12.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A weakness has been identified in thedotmack claude-mem up to 11.0.1. The affected element is the function computeObservationContentHash of the file src/services/sqlite/observations/store.ts of the component Observation Content Hash Handler. This manipulation causes use of weak hash. The attack can only be executed locally. The attack&amp;#x27;s complexity is rated as high. The exploitability is described as difficult. Upgrading to version 12.0.0 is sufficient to fix this issue. Patch name: f32fda8b35e9fe9329f87da65c31149362a03f97. It is suggested to upgrade the affected component.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11330"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11330&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/thedotmack/claude-mem/pull/1494"&gt;https://github.com/thedotmack/claude-mem/pull/1494&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/thedotmack/claude-mem/commit/f32fda8b35e9fe9329f87da65c31149362a03f97"&gt;https://github.com/thedotmack/claude-mem/commit/f32fda8b35e9fe9329f87da65c31149362a03f97&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/thedotmack/claude-mem"&gt;https://github.com/thedotmack/claude-mem&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/thedotmack/claude-mem/releases/tag/v12.0.0"&gt;https://github.com/thedotmack/claude-mem/releases/tag/v12.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-11330"&gt;https://vuldb.com/cve/CVE-2026-11330&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/832401"&gt;https://vuldb.com/submit/832401&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/368870"&gt;https://vuldb.com/vuln/368870&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5gvr-v6qv-h5mm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-pjwm-pj3p-43mv: axios's shouldBypassProxy does not recognize IPv4-mapped IPv6 addresses, allowing NO_PROXY bypass (incomplete fix for CVE-2025-62718)</title>
+    <id>https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv"/>
+    <published>2026-05-29T15:59:30Z</published>
+    <updated>2026-07-17T15:46:06Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-44492"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;axios&amp;#x27;s shouldBypassProxy does not recognize IPv4-mapped IPv6 addresses, allowing NO_PROXY bypass (incomplete fix for CVE-2025-62718)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44492&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.16.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 0.32.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+shouldBypassProxy, introduced in v1.15.0 to fix CVE-2025-62718, does not normalise IPv4-mapped IPv6 addresses. When NO_PROXY lists an IPv4 address such as `127.0.0.1` or `169.254.169.254`, a request URL using the IPv4-mapped IPv6 form (`::ffff:7f00:1`, `::ffff:a9fe:a9fe`) still routes through the configured proxy. Node.js resolves these addresses to the underlying IPv4 host, so the request reaches the internal service via the proxy rather than being blocked.
+
+### Details
+lib/helpers/shouldBypassProxy.js (v1.15.0):                                                                                                                                   
+
+```javascript                                                                                                                           …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-pjwm-pj3p-43mv"&gt;https://github.com/axios/axios/security/advisories/GHSA-pjwm-pj3p-43mv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44492"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44492&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-62718"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-62718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36108"&gt;https://access.redhat.com/errata/RHSA-2026:36108&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36611"&gt;https://access.redhat.com/errata/RHSA-2026:36611&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36754"&gt;https://access.redhat.com/errata/RHSA-2026:36754&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36820"&gt;https://access.redhat.com/errata/RHSA-2026:36820&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36882"&gt;https://access.redhat.com/errata/RHSA-2026:36882&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
     <title>[NEW] MAL-2026-10769: Malicious code in easyway2 (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-10769</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10769"/>
     <published>2026-07-17T12:44:58Z</published>
-    <updated>2026-07-17T13:19:27Z</updated>
+    <updated>2026-07-17T14:49:35Z</updated>
     <category term="npm"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in easyway2 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;easyway2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
 ---
@@ -27,6 +189,27 @@ It is considered malicious because:
 
 - The package communicates with a domain associated with malicious activity.
 &lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10769"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xwcq-pm8m-c4vf: crypto-js PBKDF2 1,000 times weaker than specified in 1993 and 1.3M times weaker than current standard</title>
+    <id>https://osv.dev/vulnerability/GHSA-xwcq-pm8m-c4vf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xwcq-pm8m-c4vf"/>
+    <published>2023-10-25T21:15:52Z</published>
+    <updated>2026-07-17T13:59:33Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2023-46233"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;crypto-js PBKDF2 1,000 times weaker than specified in 1993 and 1.3M times weaker than current standard&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-46233&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crypto-js&lt;/code&gt; — fixed in 4.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+#### Summary
+Crypto-js PBKDF2 is 1,000 times weaker than originally specified in 1993, and [at least 1,300,000 times weaker than current industry standard][OWASP PBKDF2 Cheatsheet]. This is because it both (1) defaults to [SHA1][SHA1 wiki], a cryptographic hash algorithm considered insecure [since at least 2005][Cryptanalysis of SHA-1] and (2) defaults to [one single iteration][one iteration src], a &amp;#x27;strength&amp;#x27; or &amp;#x27;difficulty&amp;#x27; value specified at 1,000 when specified in 1993. PBKDF2 relies on iteration count as a countermeasure to [preimage][preimage attack] and [collision][collision attack] attacks.
+
+Potential Impact:
+
+1. If used to protect passwords, the impact is high.
+2. If used to generate signatures, the impact is high.
+
+Probability / risk analysis / attack enumeration:
+
+1. …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/brix/crypto-js/security/advisories/GHSA-xwcq-pm8m-c4vf"&gt;https://github.com/brix/crypto-js/security/advisories/GHSA-xwcq-pm8m-c4vf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-46233"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-46233&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/brix/crypto-js/commit/421dd538b2d34e7c24a5b72cc64dc2b9167db40a"&gt;https://github.com/brix/crypto-js/commit/421dd538b2d34e7c24a5b72cc64dc2b9167db40a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/brix/crypto-js"&gt;https://github.com/brix/crypto-js&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.debian.org/debian-lts-announce/2023/11/msg00025.html"&gt;https://lists.debian.org/debian-lts-announce/2023/11/msg00025.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xwcq-pm8m-c4vf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] MAL-2026-6067: Malicious code in scan-only (npm)</title>
@@ -1106,22 +1289,6 @@ It is considered malicious because:
 &lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10699"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[UPDATED] GHSA-pjwm-pj3p-43mv: axios's shouldBypassProxy does not recognize IPv4-mapped IPv6 addresses, allowing NO_PROXY bypass (incomplete fix for CVE-2025-62718)</title>
-    <id>https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv"/>
-    <published>2026-05-29T15:59:30Z</published>
-    <updated>2026-07-16T12:46:28Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-44492"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;axios&amp;#x27;s shouldBypassProxy does not recognize IPv4-mapped IPv6 addresses, allowing NO_PROXY bypass (incomplete fix for CVE-2025-62718)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44492&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.16.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 0.32.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-shouldBypassProxy, introduced in v1.15.0 to fix CVE-2025-62718, does not normalise IPv4-mapped IPv6 addresses. When NO_PROXY lists an IPv4 address such as `127.0.0.1` or `169.254.169.254`, a request URL using the IPv4-mapped IPv6 form (`::ffff:7f00:1`, `::ffff:a9fe:a9fe`) still routes through the configured proxy. Node.js resolves these addresses to the underlying IPv4 host, so the request reaches the internal service via the proxy rather than being blocked.
-
-### Details
-lib/helpers/shouldBypassProxy.js (v1.15.0):                                                                                                                                   
-
-```javascript                                                                                                                           …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-pjwm-pj3p-43mv"&gt;https://github.com/axios/axios/security/advisories/GHSA-pjwm-pj3p-43mv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44492"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44492&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-62718"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-62718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:34766"&gt;https://access.redhat.com/errata/RHSA-2026:34766&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36108"&gt;https://access.redhat.com/errata/RHSA-2026:36108&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36611"&gt;https://access.redhat.com/errata/RHSA-2026:36611&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36754"&gt;https://access.redhat.com/errata/RHSA-2026:36754&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36820"&gt;https://access.redhat.com/errata/RHSA-2026:36820&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pjwm-pj3p-43mv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] MAL-2026-10695: Malicious code in ai-p2p (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-10695</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10695"/>
@@ -1919,164 +2086,5 @@ The vulnerability has been fixed in `@babel/core@7.29.6` and `@babel/core@8.0.0-
 Callers can mitigate the issue without upgrading by setting [`inputSourceMap: false`](https://babeljs.io/docs/options#inputsourcemap) in their Babel options.
 
 Callers can also manually extract the `#sourceMappingURL` comment from the input source code, validate wheth…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/babel/babel/security/advisories/GHSA-4x5r-pxfx-6jf8"&gt;https://github.com/babel/babel/security/advisories/GHSA-4x5r-pxfx-6jf8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-49356"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-49356&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://babeljs.io/docs/options#inputsourcemap"&gt;https://babeljs.io/docs/options#inputsourcemap&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/babel/babel"&gt;https://github.com/babel/babel&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4x5r-pxfx-6jf8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-62gx-5q78-wrvx: obsidian-local-rest-api: Authenticated path traversal via URL-encoded %2F in /vault/{path} — arbitrary host file read/write/delete</title>
-    <id>https://osv.dev/vulnerability/GHSA-62gx-5q78-wrvx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-62gx-5q78-wrvx"/>
-    <published>2026-07-15T21:56:45Z</published>
-    <updated>2026-07-15T22:00:53Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;obsidian-local-rest-api: Authenticated path traversal via URL-encoded %2F in /vault/{path} — arbitrary host file read/write/delete&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;obsidian-local-rest-api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The Local REST API&amp;#x27;s `/vault/{path}` endpoints (GET/PUT/PATCH/POST/DELETE) percent-decode the request path *inside the handler — after* Express has already routed and normalized it, then hand it to the Obsidian vault adapter with no confinement check. A literal `../` is resolved/rejected at the routing layer (→ 404), but `%2F` is not a separator there, so `..%2F..%2F` survives routing and is only turned into a real `/` by the handler&amp;#x27;s `decodeURIComponent`, reconstituting a `../` traversal that walks out of the vault. An **authenticated** client can read, write, or delete **arbitrary files on the host** with the Obsidian process&amp;#x27;s privileges.
-
-### Details
-**Framework:** Express (`import express from &amp;quot;express&amp;quot;`; routes registered via `this.api.route(&amp;quot;/vault/*&amp;quot;)…`).
-
-**The vulner…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coddingtonbear/obsidian-local-rest-api/security/advisories/GHSA-62gx-5q78-wrvx"&gt;https://github.com/coddingtonbear/obsidian-local-rest-api/security/advisories/GHSA-62gx-5q78-wrvx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coddingtonbear/obsidian-local-rest-api"&gt;https://github.com/coddingtonbear/obsidian-local-rest-api&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coddingtonbear/obsidian-local-rest-api/releases/tag/4.1.3"&gt;https://github.com/coddingtonbear/obsidian-local-rest-api/releases/tag/4.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-62gx-5q78-wrvx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rcmh-qjqh-p98v: Nodemailer’s addressparser is vulnerable to DoS caused by recursive calls</title>
-    <id>https://osv.dev/vulnerability/GHSA-rcmh-qjqh-p98v</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rcmh-qjqh-p98v"/>
-    <published>2025-12-01T20:44:25Z</published>
-    <updated>2026-07-15T22:00:51Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2025-14874"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nodemailer’s addressparser is vulnerable to DoS caused by recursive calls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-14874&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemailer&lt;/code&gt; — fixed in 7.0.11&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.webjars.npm:nodemailer&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-A DoS can occur that immediately halts the system due to the use of an unsafe function.
-
-### Details
-According to **RFC 5322**, nested group structures (a group inside another group) are not allowed. Therefore, in lib/addressparser/index.js, the email address parser performs flattening when nested groups appear, since such input is likely to be abnormal. (If the address is valid, it is added as-is.) In other words, the parser flattens all nested groups and inserts them into the final group list.
-However, the code implemented for this flattening process can be exploited by malicious input and triggers DoS
-
-RFC 5322 uses a colon (:) to define a group, and commas (,) are used to separate members within a group.
-At the following location in lib/addressparser/index.js:
-
-https://gith…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/security/advisories/GHSA-rcmh-qjqh-p98v"&gt;https://github.com/nodemailer/nodemailer/security/advisories/GHSA-rcmh-qjqh-p98v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-14874"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-14874&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/commit/6218b8df"&gt;https://github.com/nodemailer/nodemailer/commit/6218b8df&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/commit/b61b9c0cfd682b6f647754ca338373b68336a150"&gt;https://github.com/nodemailer/nodemailer/commit/b61b9c0cfd682b6f647754ca338373b68336a150&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2025-14874"&gt;https://access.redhat.com/security/cve/CVE-2025-14874&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2418133"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2418133&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer"&gt;https://github.com/nodemailer/nodemailer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rcmh-qjqh-p98v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2025-32206: Malicious code in rhynpm (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2025-32206</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2025-32206"/>
-    <published>2025-08-14T18:52:04Z</published>
-    <updated>2026-07-15T21:49:34Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-5jr8-4283-75xm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in rhynpm (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-5jr8-4283-75xm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rhynpm&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The package rhynpm was found to contain malicious code.
-
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (32a726fb973a63bc1df07539cc817c5ded4ff281cd76ba9b7193b154578ad938)
-The package rhynpm was found to contain malicious code.
-
----
-
-Credit: [OpenSSF](https://github.com/ossf/malicious-packages) ([source](https://github.com/ossf/malicious-packages/blob/a9c5c026063beff48b794797f7b4d649cc67a034/osv/malicious/npm/rhynpm/MAL-2025-32206.json))
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-5jr8-4283-75xm"&gt;https://github.com/advisories/GHSA-5jr8-4283-75xm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2025-32206"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-v98h-vmpc-fpqv: TinyMCE Cross-Site Scripting (XSS) vulnerability through `mce:protected` comments</title>
-    <id>https://osv.dev/vulnerability/GHSA-v98h-vmpc-fpqv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v98h-vmpc-fpqv"/>
-    <published>2026-06-05T20:29:07Z</published>
-    <updated>2026-07-15T21:15:18Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-47762"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;TinyMCE Cross-Site Scripting (XSS) vulnerability through `mce:protected` comments&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47762&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tinymce&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;tinymce&lt;/code&gt; — fixed in 7.9.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;tinymce&lt;/code&gt; — fixed in 8.5.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;TinyMCE&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;TinyMCE&lt;/code&gt; — fixed in 7.9.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;TinyMCE&lt;/code&gt; — fixed in 8.5.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;tinymce/tinymce&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;tinymce/tinymce&lt;/code&gt; — fixed in 7.9.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;tinymce/tinymce&lt;/code&gt; — fixed in 8.5.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-Stored XSS vulnerability via forged mce:protected comments. Allows attackers to bypass sanitization and inject scripts that execute when content is restored. Impacts users who utilize the protect option.
-
-### Patches
-Patched by validating decoded mce:protected content against configured protect regex rules before restoring. Users should upgrade to the latest patched version.
-
-### Workarounds
-No official workaround available.
-
-### Fix
-To avoid this vulnerability:
-
-Upgrade to TinyMCE 8.5.1 or higher.
-Upgrade to TinyMCE 7.9.3 or higher.
-Upgrade to TinyMCE 5.11.1 LTS or higher for TinyMCE 5.x (only available as part of commercial [long-term support](https://www.tiny.cloud/long-term-support/) contract).
-
-### Acknowledgements
-Tiny thanks [Ivan Babenko](https://github.com/he1d3n) for t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tinymce/tinymce/security/advisories/GHSA-v98h-vmpc-fpqv"&gt;https://github.com/tinymce/tinymce/security/advisories/GHSA-v98h-vmpc-fpqv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-47762"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-47762&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tinymce/tinymce"&gt;https://github.com/tinymce/tinymce&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.tiny.cloud/docs/tinymce/7/7.9.3-release-notes/#overview"&gt;https://www.tiny.cloud/docs/tinymce/7/7.9.3-release-notes/#overview&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.tiny.cloud/docs/tinymce/8/8.5.1-release-notes/#overview"&gt;https://www.tiny.cloud/docs/tinymce/8/8.5.1-release-notes/#overview&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v98h-vmpc-fpqv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-10468: Malicious code in nodemon-sync (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10468</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10468"/>
-    <published>2026-07-13T17:53:06Z</published>
-    <updated>2026-07-15T19:08:57Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-jj64-x8fg-q524"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in nodemon-sync (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-jj64-x8fg-q524&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemon-sync&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (bf8b1d5b3dd215c6c8d726b73ad11fbb29e7285da9a7e88854552931f750d437)
-The package was found to contain malicious code or consuming dependency that contains malicious code
-
-## Source: ghsa-malware (8f1d069d3620bf91aae75a716a1e9b3b46bd25304c50bc117412c4fae97ba1c3)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-jj64-x8fg-q524"&gt;https://github.com/advisories/GHSA-jj64-x8fg-q524&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nodemon-sync/v/3.1.13"&gt;https://www.npmjs.com/package/nodemon-sync/v/3.1.13&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10468"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-10514: Malicious code in nodemon-eslint (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10514</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10514"/>
-    <published>2026-07-13T22:19:51Z</published>
-    <updated>2026-07-15T19:08:57Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-v57g-fjf5-426h"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in nodemon-eslint (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-v57g-fjf5-426h&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemon-eslint&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (50c506d75221403cde50b724defdd5c71441614ab87b54ff1ffa2a24af89678e)
-The package was found to contain malicious code or consuming dependency that contains malicious code
-
-## Source: ghsa-malware (7879df6e354f9a6be92534b33b3eb687a247ff0bc8b6c7e47834c7656b77d0d6)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-v57g-fjf5-426h"&gt;https://github.com/advisories/GHSA-v57g-fjf5-426h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nodemon-eslint/v/3.1.13"&gt;https://www.npmjs.com/package/nodemon-eslint/v/3.1.13&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10514"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-10513: Malicious code in nodemon-client (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10513</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10513"/>
-    <published>2026-07-13T22:20:26Z</published>
-    <updated>2026-07-15T19:08:57Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-cw3m-3cvq-pwp2"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in nodemon-client (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-cw3m-3cvq-pwp2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemon-client&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (d1d2f1b3c8848137e0ec6a9897d6f4056102623f1139549c9dd928fcb4482e69)
-The package was found to contain malicious code or consuming dependency that contains malicious code
-
-## Source: ghsa-malware (f670a97352692b40447bac9016f8233827aa722538e2bc4470e936f9fb399ddc)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-cw3m-3cvq-pwp2"&gt;https://github.com/advisories/GHSA-cw3m-3cvq-pwp2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nodemon-client/v/3.1.13"&gt;https://www.npmjs.com/package/nodemon-client/v/3.1.13&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10513"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-10335: Malicious code in miguelphonk (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10335</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10335"/>
-    <published>2026-07-13T06:27:40Z</published>
-    <updated>2026-07-15T19:08:36Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-w3fq-5v4w-qqcv"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in miguelphonk (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-w3fq-5v4w-qqcv&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;miguelphonk&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (75c26ae2a9608c5a861f096563a0ef1171cb898403537612739792024abcc2ff)
-The package was found to contain malicious code or consuming dependency that contains malicious code
-
-## Source: ghsa-malware (84d20078cae4b5e0b0029ef97d8894c7e6c373a1ac1ed5718ba5d6fd806c3783)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-w3fq-5v4w-qqcv"&gt;https://github.com/advisories/GHSA-w3fq-5v4w-qqcv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/miguelphonk/v/2.0.0"&gt;https://www.npmjs.com/package/miguelphonk/v/2.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10335"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

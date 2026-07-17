@@ -3,12 +3,55 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-07-16T19:00:21Z</updated>
+  <updated>2026-07-16T20:15:16Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-5rg2-xv9j-gv5p: nimiq-primitives: Out-of-bounds panic in KeyNibbles::Add from oversized child suffix in a deserialized proof</title>
+    <id>https://osv.dev/vulnerability/GHSA-5rg2-xv9j-gv5p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5rg2-xv9j-gv5p"/>
+    <published>2026-07-16T20:03:25Z</published>
+    <updated>2026-07-16T20:15:16Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-54542"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nimiq-primitives: Out-of-bounds panic in KeyNibbles::Add from oversized child suffix in a deserialized proof&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54542&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nimiq-primitives&lt;/code&gt; — fixed in 1.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A malicious peer acting as a state-sync source can crash a syncing node with a crafted `TrieChunk` whose proof contains a `TrieNodeChild` whose `suffix`, when concatenated with the parent key via `KeyNibbles::Add`, exceeds the fixed 63-byte backing array. `Add` (`primitives/src/key_nibbles.rs:332` / `:341`) indexes `bytes[self.bytes_len()..self.bytes_len() + other.bytes_len()]` with no combined-length check, causing an out-of-bounds slice panic (both the even- and odd-length branches).
+
+`KeyNibbles` deserialization validates only the individual `length &amp;lt;= 126`, not the combined parent + suffix length. The panic occurs at `put_chunk` → `child.key()` → `is_stump()` → `+`, i.e. **before** `proof.verify()`, so no valid proof is required. As with the related `child_index` issue, exp…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-5rg2-xv9j-gv5p"&gt;https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-5rg2-xv9j-gv5p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/pull/3790"&gt;https://github.com/nimiq/core-rs-albatross/pull/3790&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/commit/eabfc3e21731b0628c3f933163a0f1e1864217bf"&gt;https://github.com/nimiq/core-rs-albatross/commit/eabfc3e21731b0628c3f933163a0f1e1864217bf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross"&gt;https://github.com/nimiq/core-rs-albatross&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/releases/tag/v1.6.0"&gt;https://github.com/nimiq/core-rs-albatross/releases/tag/v1.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5rg2-xv9j-gv5p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-46wq-28cx-mhw4: nimiq-primitives: Panic in TrieProof::verify via child_index unwrap on equal-length keys</title>
+    <id>https://osv.dev/vulnerability/GHSA-46wq-28cx-mhw4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-46wq-28cx-mhw4"/>
+    <published>2026-07-16T20:03:00Z</published>
+    <updated>2026-07-16T20:15:16Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-54541"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nimiq-primitives: Panic in TrieProof::verify via child_index unwrap on equal-length keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54541&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nimiq-primitives&lt;/code&gt; — fixed in 1.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A malicious peer acting as a state-sync source can crash a syncing node by sending a crafted `TrieChunk` whose proof contains two `TrieProofNode`s with identical keys. `TrieProof::verify()` calls `TrieProofNode::child_index()` (`primitives/src/trie/trie_proof_node.rs:94`), which unconditionally unwraps `KeyNibbles::get(self.key.len())`. Because `is_prefix_of` returns `true` for two equal keys, execution reaches `get(len)`, which returns `None`, and the `unwrap()` panics.
+
+The panic is reached from untrusted network input (`ResponseChunk` → `commit_chunks` → `put_chunk` → `proof.verify()`) **before** any cryptographic proof verification, so the attacker does not need to produce a valid proof. Exploitation requires the attacker to be selected as the victim&amp;#x27;s sync peer while the v…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-46wq-28cx-mhw4"&gt;https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-46wq-28cx-mhw4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/pull/3789"&gt;https://github.com/nimiq/core-rs-albatross/pull/3789&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/commit/41d35acee1b5cf3bc34ec3ddc1abbc03604e791e"&gt;https://github.com/nimiq/core-rs-albatross/commit/41d35acee1b5cf3bc34ec3ddc1abbc03604e791e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross"&gt;https://github.com/nimiq/core-rs-albatross&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/releases/tag/v1.6.0"&gt;https://github.com/nimiq/core-rs-albatross/releases/tag/v1.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-46wq-28cx-mhw4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-ggxf-9f6j-w742: Diesel has possible use after free when deserializing a SQLite database via `SqliteConnection::deserialize_readonly_database`</title>
+    <id>https://osv.dev/vulnerability/GHSA-ggxf-9f6j-w742</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ggxf-9f6j-w742"/>
+    <published>2026-07-16T19:25:25Z</published>
+    <updated>2026-07-16T19:30:42Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Diesel has possible use after free when deserializing a SQLite database via `SqliteConnection::deserialize_readonly_database`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;diesel&lt;/code&gt; — fixed in 2.3.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Diesel allows loading a SQLite database from a byte buffer, represented as `&amp;amp;[u8]`, at runtime via the `SqliteConnection::deserialize_readonly_database` function. In previous versions of Diesel, this buffer was passed directly to libsqlite3. Since libsqlite3 requires the buffer to remain alive for as long as the database connection is open and Diesel did not ensure this as part of its safe API, callers of `SqliteConnection::deserialize_readonly_database` could drop the buffer prematurely. This prematurely drop caused libsqlite3 to operate on freed memory.
+
+This vulnerability affects users of `SqliteConnection::deserialize_readonly_database` who drop the buffer passed to the function before they drop the database connection.
+
+## Mitigation
+
+The preferred mitigation to the outlined problem i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/diesel-rs/diesel/commit/1bc2ea46d9840e8d9af844239d3c84f37fe7d84b"&gt;https://github.com/diesel-rs/diesel/commit/1bc2ea46d9840e8d9af844239d3c84f37fe7d84b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/diesel-rs/diesel"&gt;https://github.com/diesel-rs/diesel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0172.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0172.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ggxf-9f6j-w742"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-mrrw-grhq-86gf: Ascii (crate) allows out-of-bounds array indexing in safe code</title>
     <id>https://osv.dev/vulnerability/GHSA-mrrw-grhq-86gf</id>
@@ -219,47 +262,5 @@ Users should upgrade to a patched version and avoid untrusted conda channels.&lt
 The 19.0.0 release of Wasmtime contains a regression introduced during its development which can lead to a guest WebAssembly module causing a panic in the host runtime. A valid WebAssembly module, when executed at runtime, may cause this panic. The panic in question is caused when a WebAssembly module issues a `table.*` instruction which uses a dropped element segment with a table that also has an `externref` type. This causes Wasmtime to erroneously use an empty function segment instead of an empty externref segment to perform this operation. This mismatch in types causes a panic in Wasmtime when it&amp;#x27;s asserted that an externref table is only viewed as externrefs.
 
 This regression was introduced during the development of the 19.0.0 release and only affects the 19.0.0 release. T…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-75hq-h6g9-h4q5"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-75hq-h6g9-h4q5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-30266"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-30266&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/issues/8281"&gt;https://github.com/bytecodealliance/wasmtime/issues/8281&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/8018"&gt;https://github.com/bytecodealliance/wasmtime/pull/8018&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/8283"&gt;https://github.com/bytecodealliance/wasmtime/pull/8283&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/7f57d0bb0948fa56cc950278d0db230ed10e8664"&gt;https://github.com/bytecodealliance/wasmtime/commit/7f57d0bb0948fa56cc950278d0db230ed10e8664&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime"&gt;https://github.com/bytecodealliance/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2024-0441.html"&gt;https://rustsec.org/advisories/RUSTSEC-2024-0441.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-75hq-h6g9-h4q5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2024-0441: Panic when using a dropped extenref-typed element segment</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2024-0441</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2024-0441"/>
-    <published>2024-04-02T12:00:00Z</published>
-    <updated>2026-07-13T07:26:38Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2024-30266"/>
-    <category term="GHSA-75hq-h6g9-h4q5"/>
-    <category term="PYSEC-2024-327"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Panic when using a dropped extenref-typed element segment&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-30266, GHSA-75hq-h6g9-h4q5, PYSEC-2024-327&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 19.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-75hq-h6g9-h4q5.
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2024-0441.html"&gt;https://rustsec.org/advisories/RUSTSEC-2024-0441.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-75hq-h6g9-h4q5"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-75hq-h6g9-h4q5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2024-0441"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0206: `rustybuzz` is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0206</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0206"/>
-    <published>2026-07-11T12:00:00Z</published>
-    <updated>2026-07-12T07:15:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`rustybuzz` is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rustybuzz&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The current maintainer of `rustybuzz` has stated that the crate is unmaintained and will not receive further fixes or updates (see the referenced issue).
-
-## Alternative(s)
-
-- [`harfrust`](https://github.com/harfbuzz/harfrust), an actively maintained and updated alternative which is part of the Harfbuzz project.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/rustybuzz"&gt;https://crates.io/crates/rustybuzz&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0206.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0206.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/harfbuzz/rustybuzz/issues/166"&gt;https://github.com/harfbuzz/rustybuzz/issues/166&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0206"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-99j7-fhr2-xfj4: `exploration` was removed from crates.io for malicious code</title>
-    <id>https://osv.dev/vulnerability/GHSA-99j7-fhr2-xfj4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-99j7-fhr2-xfj4"/>
-    <published>2026-07-10T19:32:24Z</published>
-    <updated>2026-07-11T06:26:40Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0155"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`exploration` was removed from crates.io for malicious code&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0155&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;exploration&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A method within the `exploration` crate attempted to download and execute a payload from a remote site.
-
-The malicious crate had 1 version published on 2026-06-02, approximately 1 hour before removal, and had no evidence of actual usage. This crate had no dependencies on crates.io.
-
-Rustsec to Kirill Boychenko from the [Socket Threat Research Team](https://socket.dev/) for reporting this crate.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0155.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0155.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-99j7-fhr2-xfj4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,406 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-20T19:15:27Z</updated>
+  <updated>2026-07-20T22:30:24Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-833g-cqhp-h72j: File Browser: Share API exposes the password hash and bypass token</title>
+    <id>https://osv.dev/vulnerability/GHSA-833g-cqhp-h72j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-833g-cqhp-h72j"/>
+    <published>2026-07-20T22:17:56Z</published>
+    <updated>2026-07-20T22:30:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-62684"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;File Browser: Share API exposes the password hash and bypass token&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-62684&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/filebrowser/filebrowser/v2&lt;/code&gt; — fixed in 2.63.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+When a user creates a password-protected share or lists existing shares, the JSON response includes the full bcrypt `password_hash` and the secret `token` of the share. The `Link` storage struct is serialized directly with `json.Marshal` and tags `password_hash` and `token` for output, with no field filtering. Any authenticated user receives these secrets for their own shares, and an administrator listing all shares via `GET /api/shares` receives the password hash and bypass token for **every** user&amp;#x27;s shares, enabling offline cracking of share passwords and direct password-bypass access to protected shares.
+
+## Details
+
+**1. The `Link` struct serializes both secrets to JSON (`share/share.go:10-19`)**
+
+```go
+type Link struct {
+    Hash         string `json:&amp;quot;hash&amp;quot; storm:&amp;quot;id,index…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/security/advisories/GHSA-833g-cqhp-h72j"&gt;https://github.com/filebrowser/filebrowser/security/advisories/GHSA-833g-cqhp-h72j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser"&gt;https://github.com/filebrowser/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-833g-cqhp-h72j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-83xp-526h-j3ww: File Browser: Archive builder turns backslash filenames into path traversal (zip-slip)</title>
+    <id>https://osv.dev/vulnerability/GHSA-83xp-526h-j3ww</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-83xp-526h-j3ww"/>
+    <published>2026-07-20T22:16:09Z</published>
+    <updated>2026-07-20T22:30:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-62843"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;File Browser: Archive builder turns backslash filenames into path traversal (zip-slip)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-62843&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/filebrowser/filebrowser/v2&lt;/code&gt; — fixed in 2.63.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The fix for `GHSA-gxjx-7m74-hcq8` / `CVE-2026-54093` (shipped in v2.63.6) added a `strings.ReplaceAll(nameInArchive, &amp;quot;\\&amp;quot;, &amp;quot;/&amp;quot;)` step to the archive builder; this was the advisory&amp;#x27;s recommended &amp;quot;Primary Fix.&amp;quot; On a Linux host a backslash is a legal, non-separator filename character, so replacing it with the real POSIX separator `/` **manufactures** a `/`-delimited traversal sequence out of a benign single file name. The fix neutralized the Windows-only vector but reintroduced the same class of bug on POSIX systems, and the advisory&amp;#x27;s &amp;quot;Secondary Mitigation&amp;quot; (reject backslash filenames at creation time) was never implemented, so the malicious file can still be planted.
+
+A file named `..\..\evil.sh`, one ordinary regular file on a Linux server, is emitted into generated zip/tar arc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/security/advisories/GHSA-83xp-526h-j3ww"&gt;https://github.com/filebrowser/filebrowser/security/advisories/GHSA-83xp-526h-j3ww&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-62843"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-62843&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/commit/8503ba61ff51d48a7313896483d130eb6a5abfe0"&gt;https://github.com/filebrowser/filebrowser/commit/8503ba61ff51d48a7313896483d130eb6a5abfe0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser"&gt;https://github.com/filebrowser/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/releases/tag/v2.63.17"&gt;https://github.com/filebrowser/filebrowser/releases/tag/v2.63.17&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-83xp-526h-j3ww"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7rc3-g7h6-22m7: File Browser: Colliding username normalization gives two users the same home directory</title>
+    <id>https://osv.dev/vulnerability/GHSA-7rc3-g7h6-22m7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7rc3-g7h6-22m7"/>
+    <published>2026-07-20T22:19:10Z</published>
+    <updated>2026-07-20T22:30:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-62685"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;File Browser: Colliding username normalization gives two users the same home directory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-62685&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/filebrowser/filebrowser/v2&lt;/code&gt; — fixed in 2.63.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+FileBrowser confines each user to a *scope*: a home directory that acts as the boundary for everything they can read or write. When self-registration and automatic home-directory creation are both enabled (`Signup=true` and `CreateUserDir=true`), a new user&amp;#x27;s scope is built from their username after it passes through `cleanUsername()`. That function rewrites the name: it strips `..` and replaces every character outside `0-9A-Za-z@_\-.` with `-`.
+
+The problem is that this rewrite is **many-to-one**: different usernames can produce the same result, and FileBrowser never checks whether the resulting scope is already taken. So `team/one`, `team one`, and `team-one` all collapse to the same directory name, and whoever registers second is handed the **same home directory** as the fir…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/security/advisories/GHSA-7rc3-g7h6-22m7"&gt;https://github.com/filebrowser/filebrowser/security/advisories/GHSA-7rc3-g7h6-22m7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-62685"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-62685&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/commit/883a36f02fcb69566a8628cb47f18fdc73348387"&gt;https://github.com/filebrowser/filebrowser/commit/883a36f02fcb69566a8628cb47f18fdc73348387&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser"&gt;https://github.com/filebrowser/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/releases/tag/v2.63.17"&gt;https://github.com/filebrowser/filebrowser/releases/tag/v2.63.17&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7rc3-g7h6-22m7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4jgr-pg2m-m988: Heimdall: Forwarded Header Injection via Unsanitized Host Header in Proxy Mode</title>
+    <id>https://osv.dev/vulnerability/GHSA-4jgr-pg2m-m988</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4jgr-pg2m-m988"/>
+    <published>2026-06-18T14:24:41Z</published>
+    <updated>2026-07-20T21:56:16Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-57209"/>
+    <category term="GO-2026-5125"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Heimdall: Forwarded Header Injection via Unsanitized Host Header in Proxy Mode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-57209, GO-2026-5125&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dadrus/heimdall&lt;/code&gt; — fixed in 0.17.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When Heimdall operates in proxy mode, it constructs the `Forwarded` HTTP header after executing the matched rule pipeline by inserting the incoming request&amp;#x27;s `Host` header value directly into the header string without sanitizing commas or semicolons. This allows an attacker to inject additional parameters into the `Forwarded` header, potentially spoofing IP addresses for upstream services.
+
+### Vulnerable Code
+
+**File: `proxy/request_context.go` (line 201)**
+
+```go
+entry := &amp;quot;for=&amp;quot; + clientIP + &amp;quot;;host=&amp;quot; + in.Host + &amp;quot;;proto=&amp;quot; + proto
+```
+
+Go&amp;#x27;s `net/http` allows commas and semicolons in Host header values. No sanitization is applied before string concatenation.
+
+### PoC
+
+```bash
+# Inject a spoofed IP into the Forwarded header
+curl -s -H &amp;quot;Host: evil.com,for=127.0.0.1&amp;quot; \
+  &amp;quot;http://…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dadrus/heimdall/security/advisories/GHSA-4jgr-pg2m-m988"&gt;https://github.com/dadrus/heimdall/security/advisories/GHSA-4jgr-pg2m-m988&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dadrus/heimdall"&gt;https://github.com/dadrus/heimdall&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4jgr-pg2m-m988"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5125: Heimdall: Forwarded Header Injection via Unsanitized Host Header in Proxy Mode in github.com/dadrus/heimdall</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5125</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5125"/>
+    <published>2026-06-25T18:26:48Z</published>
+    <updated>2026-07-20T21:56:16Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-57209"/>
+    <category term="GHSA-4jgr-pg2m-m988"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Heimdall: Forwarded Header Injection via Unsanitized Host Header in Proxy Mode in github.com/dadrus/heimdall&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-57209, GHSA-4jgr-pg2m-m988&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dadrus/heimdall&lt;/code&gt; — fixed in 0.17.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Heimdall: Forwarded Header Injection via Unsanitized Host Header in Proxy Mode in github.com/dadrus/heimdall&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dadrus/heimdall/security/advisories/GHSA-4jgr-pg2m-m988"&gt;https://github.com/dadrus/heimdall/security/advisories/GHSA-4jgr-pg2m-m988&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5125"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-38x9-25wx-7fg2: Heimdall: IP Spoofing via Unvalidated Forwarding Headers</title>
+    <id>https://osv.dev/vulnerability/GHSA-38x9-25wx-7fg2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-38x9-25wx-7fg2"/>
+    <published>2026-06-18T14:24:37Z</published>
+    <updated>2026-07-20T21:46:42Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-57210"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Heimdall: IP Spoofing via Unvalidated Forwarding Headers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-57210&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;https://github.com/dadrus/heimdall&lt;/code&gt; — fixed in 0.17.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When the `trusted_proxies` option is configured, heimdall extracts client IP addresses from the `Forwarded` (`for=` parameter) and `X-Forwarded-For` headers and exposes them as `Request.ClientIPAddresses` to the rule pipeline. However, extracted values are not validated to be syntactically valid IP addresses. Arbitrary strings, malformed IP literals, and RFC 7239 `unknown` values and obfuscated identifiers are accepted without further checks.
+In addition, the `Forwarded` header parser splits on `,` and `;` without accounting for RFC 7239 quoted strings, which can cause a single quoted value to be parsed as multiple entries, with fragments — including trailing quote characters — treated as independent addresses.
+
+### Impact
+
+`Request.ClientIPAddresses` is available to all pipel…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dadrus/heimdall/security/advisories/GHSA-38x9-25wx-7fg2"&gt;https://github.com/dadrus/heimdall/security/advisories/GHSA-38x9-25wx-7fg2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dadrus/heimdall"&gt;https://github.com/dadrus/heimdall&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-38x9-25wx-7fg2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7fq5-7wr8-rjwj: OliveTin has a Concurrent Template Parsing Race Condition which Leads to Cross-Request Command Contamination</title>
+    <id>https://osv.dev/vulnerability/GHSA-7fq5-7wr8-rjwj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7fq5-7wr8-rjwj"/>
+    <published>2026-06-24T17:38:12Z</published>
+    <updated>2026-07-20T21:32:33Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48708"/>
+    <category term="GO-2026-5216"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OliveTin has a Concurrent Template Parsing Race Condition which Leads to Cross-Request Command Contamination&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48708, GO-2026-5216&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/OliveTin/OliveTin&lt;/code&gt; — fixed in 0.0.0-20260521225117-d74da9314005&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+OliveTin&amp;#x27;s template engine uses a **single shared `text/template.Template` instance** (`tpl` package-level variable in `service/internal/tpl/templates.go`) across all goroutines. Every action execution calls `tpl.Parse(source)` followed by `t.Execute()` on this shared instance with no synchronization. When two or more actions execute concurrently (which is the normal case — each `ExecRequest` spawns a goroutine), a race condition occurs: one goroutine&amp;#x27;s `Parse` overwrites the template tree while another goroutine is calling `Execute`, causing:
+
+1. **Cross-user command contamination**: User A&amp;#x27;s arguments rendered in User B&amp;#x27;s shell command template
+2. **Go runtime panic**: Concurrent map writes in Go&amp;#x27;s `text/template` internal structures cause a fatal crash
+3. **Incorrect command…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/security/advisories/GHSA-7fq5-7wr8-rjwj"&gt;https://github.com/OliveTin/OliveTin/security/advisories/GHSA-7fq5-7wr8-rjwj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-48708"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-48708&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/commit/d74da9314005954dd49fa20dabf272247bc76519"&gt;https://github.com/OliveTin/OliveTin/commit/d74da9314005954dd49fa20dabf272247bc76519&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin"&gt;https://github.com/OliveTin/OliveTin&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OliveTin/OliveTin/releases/tag/3000.13.0"&gt;https://github.com/OliveTin/OliveTin/releases/tag/3000.13.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7fq5-7wr8-rjwj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8wc8-hf36-mjh9: File Browser: ScopedFs follows a dangling symlink on write, letting a scoped user create files outside their scope</title>
+    <id>https://osv.dev/vulnerability/GHSA-8wc8-hf36-mjh9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8wc8-hf36-mjh9"/>
+    <published>2026-07-20T21:17:43Z</published>
+    <updated>2026-07-20T21:30:46Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55668"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;File Browser: ScopedFs follows a dangling symlink on write, letting a scoped user create files outside their scope&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55668&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/filebrowser/filebrowser/v2&lt;/code&gt; — fixed in 2.63.16&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`ScopedFs` confines every File Browser user to a scope directory. Its `within()` guard is meant to reject any operation that follows a symbolic link out of that scope. When the link target does not exist yet, the guard walks up to the nearest existing ancestor and validates that instead. For a dangling symlink (target does not exist), the nearest existing ancestor is the in-scope directory containing the link, so the guard returns &amp;quot;in scope&amp;quot; and the subsequent `os.OpenFile(O_CREATE)` follows the link and creates the file at its out-of-scope target.
+
+A post-auth user with `Create` and `Modify` permission can write attacker-controlled content to any non-existent path outside their scope that the File Browser process can write to. The precondition is a dangling symlink present ins…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/security/advisories/GHSA-8wc8-hf36-mjh9"&gt;https://github.com/filebrowser/filebrowser/security/advisories/GHSA-8wc8-hf36-mjh9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55668"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55668&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/commit/64511ce45e3be379e965f7f4fb0929a068d5bb81"&gt;https://github.com/filebrowser/filebrowser/commit/64511ce45e3be379e965f7f4fb0929a068d5bb81&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser"&gt;https://github.com/filebrowser/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/releases/tag/v2.63.16"&gt;https://github.com/filebrowser/filebrowser/releases/tag/v2.63.16&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8wc8-hf36-mjh9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-ww63-pv5x-vfc8: Daytona: Public sandbox previews remain accessible for up to one hour after being made private</title>
+    <id>https://osv.dev/vulnerability/GHSA-ww63-pv5x-vfc8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ww63-pv5x-vfc8"/>
+    <published>2026-06-16T21:05:13Z</published>
+    <updated>2026-07-20T21:30:44Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54321"/>
+    <category term="GO-2026-5729"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Daytona: Public sandbox previews remain accessible for up to one hour after being made private&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54321, GO-2026-5729&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/daytonaio/daytona&lt;/code&gt; — fixed in 0.184.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Sandbox previews that were switched from public to private could remain reachable without authentication for a short period after the change, due to a cached visibility state that was not invalidated when the sandbox&amp;#x27;s visibility changed.
+
+### Impact
+When a sandbox owner changed a preview from public to private, the preview proxy could continue serving unauthenticated requests to that sandbox&amp;#x27;s ordinary preview ports for a bounded period before the change took effect. Only sandboxes that had been made public and were later set back to private were affected, and only until the proxy&amp;#x27;s cached visibility state was refreshed. Terminal, toolbox, and recording-dashboard ports were never affected, as those always require authentication. The issue did not involve cross-tenant access, p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona/security/advisories/GHSA-ww63-pv5x-vfc8"&gt;https://github.com/daytonaio/daytona/security/advisories/GHSA-ww63-pv5x-vfc8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54321"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona"&gt;https://github.com/daytonaio/daytona&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ww63-pv5x-vfc8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xf64-8mw2-4gr2: Traefik has a StripPrefix Route-Level Auth Bypass via Path Normalization</title>
+    <id>https://osv.dev/vulnerability/GHSA-xf64-8mw2-4gr2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xf64-8mw2-4gr2"/>
+    <published>2026-06-11T13:26:57Z</published>
+    <updated>2026-07-20T21:30:44Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48020"/>
+    <category term="GO-2026-5752"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik has a StripPrefix Route-Level Auth Bypass via Path Normalization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48020, GO-2026-5752&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt; — fixed in 2.11.48&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.6.19&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.7.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+There is a high severity vulnerability in Traefik&amp;#x27;s `StripPrefix` middleware that allows an unauthenticated attacker to bypass route-level authentication and authorization. When a public router matches on a `PathPrefix` rule and applies the `StripPrefix` middleware, a request path containing `..` or its percent-encoded form `%2e%2e` can match the public route at routing time and then, after the prefix is stripped and the path is normalized, resolve to a path served by a separate, authenticated router. As a result, an attacker can reach protected backend paths — such as admin or internal configuration endpoints — without satisfying the authentication middleware attached to the protected router.
+
+## Patches
+
+- https://github.com/traefik/traefik/releases/tag/v2.11.48
+- https://git…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-xf64-8mw2-4gr2"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-xf64-8mw2-4gr2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-48020"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-48020&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-48020"&gt;https://access.redhat.com/security/cve/CVE-2026-48020&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2491915"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2491915&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v2.11.48"&gt;https://github.com/traefik/traefik/releases/tag/v2.11.48&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.6.19"&gt;https://github.com/traefik/traefik/releases/tag/v3.6.19&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.3"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xf64-8mw2-4gr2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-qxvm-pcfm-qc39: Daytona: Cross-org IDOR in organization role update/delete — any org owner can rewrite or destroy another org's roles</title>
+    <id>https://osv.dev/vulnerability/GHSA-qxvm-pcfm-qc39</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qxvm-pcfm-qc39"/>
+    <published>2026-06-16T21:30:08Z</published>
+    <updated>2026-07-20T21:30:41Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54322"/>
+    <category term="GO-2026-5600"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Daytona: Cross-org IDOR in organization role update/delete — any org owner can rewrite or destroy another org&amp;#x27;s roles&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54322, GO-2026-5600&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:L/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/daytonaio/daytona&lt;/code&gt; — fixed in 0.185.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Daytona&amp;#x27;s organization role update and delete endpoints authorized the caller as an owner of the organization named in the request path, but resolved and mutated the target role by its identifier alone, without verifying the role belonged to that organization. An authenticated user who owns any organization (organizations are self-service) could therefore modify the permissions of, or delete, a role belonging to a different organization, given that role&amp;#x27;s identifier.
+
+### Impact
+This is a cross-tenant broken access control (IDOR) issue affecting multi-tenant deployments, including the managed Daytona platform. Using a target role&amp;#x27;s identifier, an attacker with owner rights over their own organization could:
+
+- Overwrite the target role&amp;#x27;s name and permission set, escalating or s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona/security/advisories/GHSA-qxvm-pcfm-qc39"&gt;https://github.com/daytonaio/daytona/security/advisories/GHSA-qxvm-pcfm-qc39&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54322"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54322&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona"&gt;https://github.com/daytonaio/daytona&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qxvm-pcfm-qc39"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3g6v-2r68-prfc: Traefik: Kubernetes Gateway crossProviderNamespaces bypass allows HTTPRoute outside the allowlist to expose internal Traefik services</title>
+    <id>https://osv.dev/vulnerability/GHSA-3g6v-2r68-prfc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3g6v-2r68-prfc"/>
+    <published>2026-06-17T14:01:48Z</published>
+    <updated>2026-07-20T21:30:38Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54761"/>
+    <category term="GO-2026-5083"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik: Kubernetes Gateway crossProviderNamespaces bypass allows HTTPRoute outside the allowlist to expose internal Traefik services&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54761, GO-2026-5083&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.6.21&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.7.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+There is a high severity vulnerability in Traefik&amp;#x27;s Kubernetes Gateway provider affecting the `crossProviderNamespaces` allowlist. For `HTTPRoute` rules that declare multiple (WRR) backendRefs, Traefik evaluates the allowlist against the target `backendRef.namespace` instead of the route&amp;#x27;s own namespace. As a result, an `HTTPRoute` created in a namespace that is not allow-listed can reference a cross-provider `TraefikService` such as `api@internal`, `dashboard@internal` or `rest@internal` by pointing `backendRef.namespace` at an allow-listed namespace covered by a Gateway API `ReferenceGrant`, exposing internal Traefik services on the data plane. Exploitation requires the ability to create an accepted `HTTPRoute` and a matching `ReferenceGrant` from an allow-listed namespace ; …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-3g6v-2r68-prfc"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-3g6v-2r68-prfc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54761"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54761&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.6.21"&gt;https://github.com/traefik/traefik/releases/tag/v3.6.21&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.5"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3g6v-2r68-prfc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vgj4-345g-jcf8: Cloudreve: OAuth access tokens bypass scope enforcement due to missing client_id claim</title>
+    <id>https://osv.dev/vulnerability/GHSA-vgj4-345g-jcf8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vgj4-345g-jcf8"/>
+    <published>2026-07-20T21:15:20Z</published>
+    <updated>2026-07-20T21:30:38Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54560"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cloudreve: OAuth access tokens bypass scope enforcement due to missing client_id claim&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54560&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cloudreve/Cloudreve/v4&lt;/code&gt; — fixed in 4.0.0-20260606015557-ed20843dc3df&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+  Cloudreve&amp;#x27;s OAuth access tokens can bypass OAuth scope enforcement.
+
+  This does not appear to be the intended design. The documentation describes OAuth client permissions/scopes, the API
+  has an insufficient-scope error code, and the code comments say `RequiredScopes(...)` should verify scopes when a
+  token has scopes, while skipping checks only for non-scoped session-based authentication.
+
+  However, OAuth access tokens are issued without the OAuth `client_id` claim. Later, the JWT verifier only loads scopes
+  into the request context when `claims.ClientID != &amp;quot;&amp;quot;`. Because the OAuth access token has no `client_id`, its scopes
+  are not loaded, and `RequiredScopes(...)` treats the request like a non-scoped first-party/session token and skips
+  scope checks.
+
+  As a result, …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cloudreve/cloudreve/security/advisories/GHSA-vgj4-345g-jcf8"&gt;https://github.com/cloudreve/cloudreve/security/advisories/GHSA-vgj4-345g-jcf8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54560"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54560&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cloudreve/cloudreve/commit/ed20843dc3df20a25fcaf6b538647e11c4d68d87"&gt;https://github.com/cloudreve/cloudreve/commit/ed20843dc3df20a25fcaf6b538647e11c4d68d87&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cloudreve/cloudreve"&gt;https://github.com/cloudreve/cloudreve&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cloudreve/cloudreve/releases/tag/4.16.1"&gt;https://github.com/cloudreve/cloudreve/releases/tag/4.16.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vgj4-345g-jcf8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fmm7-x4gx-8jhr: File Browser: Out-of-scope file deletion by a Create-only scoped user via symlink-following RemoveAll in upload failure-cleanup</title>
+    <id>https://osv.dev/vulnerability/GHSA-fmm7-x4gx-8jhr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fmm7-x4gx-8jhr"/>
+    <published>2026-07-20T21:17:24Z</published>
+    <updated>2026-07-20T21:30:38Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55667"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;File Browser: Out-of-scope file deletion by a Create-only scoped user via symlink-following RemoveAll in upload failure-cleanup&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55667&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/filebrowser/filebrowser/v2&lt;/code&gt; — fixed in 2.63.16&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A scoped, non-admin File Browser user holding only the **Create** permission can delete arbitrary files outside their scope (other tenants&amp;#x27; data, and the application&amp;#x27;s own database) via the upload failure-cleanup path. This is an incomplete fix of CVE-2026-54094: the v2.63.14 `ScopedFs` containment wrapper was applied to read/write/list/rename but NOT to the delete path. Confidentiality is preserved (reads stay blocked); integrity and availability are not.
+
+`ScopedFs.RemoveAll` is the one dereferencing operation that skips the symlink `guard` every other method enforces. The direct-upload handler runs `RemoveAll` on the user-controlled path during failed-upload cleanup, gated only by `Perm.Create`. If an escaping directory symlink already exists inside the user&amp;#x27;s scope, an auth…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/security/advisories/GHSA-fmm7-x4gx-8jhr"&gt;https://github.com/filebrowser/filebrowser/security/advisories/GHSA-fmm7-x4gx-8jhr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55667"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55667&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser"&gt;https://github.com/filebrowser/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/filebrowser/filebrowser/blob/be23ab3a15bf957928ecfed88de5ab67850c1b9c/http/resource.go#L172-L174"&gt;https://github.com/filebrowser/filebrowser/blob/be23ab3a15bf957928ecfed88de5ab67850c1b9c/http/resource.go#L172-L174&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fmm7-x4gx-8jhr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-x756-g4x3-c64m: Cloudreve: Non-admin remote download users can SSRF loopback/internal services and read imported responses</title>
+    <id>https://osv.dev/vulnerability/GHSA-x756-g4x3-c64m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x756-g4x3-c64m"/>
+    <published>2026-07-20T21:16:51Z</published>
+    <updated>2026-07-20T21:30:38Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54562"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cloudreve: Non-admin remote download users can SSRF loopback/internal services and read imported responses&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54562&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cloudreve/Cloudreve/v4&lt;/code&gt; — fixed in 4.0.0-20260606025411-aaebf317a78f&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/cloudreve/Cloudreve/v3&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Cloudreve&amp;#x27;s remote download workflow accepts user-supplied URLs and passes them to the configured downloader without blocking loopback, localhost, IPv6 localhost, or redirect-to-loopback targets.
+
+When the remote download permission is granted to a non-admin user group, a normal authenticated user can make the server-side downloader fetch internal-only URLs and then read the fetched response after it is imported into the user&amp;#x27;s own Cloudreve files.
+
+This does not affect default normal users unless the remote download permission is enabled for their group. However, the permission is a feature-level user-group capability and does not make the user an administrator.
+
+## Attacker requirements
+
+The attacker must be:
+
+- authenticated
+- non-admin
+- in a user group where `GroupPermissi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cloudreve/cloudreve/security/advisories/GHSA-x756-g4x3-c64m"&gt;https://github.com/cloudreve/cloudreve/security/advisories/GHSA-x756-g4x3-c64m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54562"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54562&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cloudreve/cloudreve/commit/aaebf317a78f2413d74afd66c21a1f3143711312"&gt;https://github.com/cloudreve/cloudreve/commit/aaebf317a78f2413d74afd66c21a1f3143711312&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cloudreve/cloudreve"&gt;https://github.com/cloudreve/cloudreve&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cloudreve/cloudreve/releases/tag/4.16.1"&gt;https://github.com/cloudreve/cloudreve/releases/tag/4.16.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x756-g4x3-c64m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fjv8-j4p5-cr9m: Daytona: Path traversal in sandbox volume id mounts arbitrary host paths into the sandbox — cross-tenant data access and host escape</title>
+    <id>https://osv.dev/vulnerability/GHSA-fjv8-j4p5-cr9m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fjv8-j4p5-cr9m"/>
+    <published>2026-06-18T17:19:51Z</published>
+    <updated>2026-07-20T21:30:34Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54319"/>
+    <category term="GO-2026-5367"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Daytona: Path traversal in sandbox volume id mounts arbitrary host paths into the sandbox — cross-tenant data access and host escape&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54319, GO-2026-5367&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/daytonaio/daytona&lt;/code&gt; — fixed in 0.186.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+A sandbox volume reference (`volumeId`, which may also be a volume name) was forwarded to the
+runner and used to build the host bind-mount source path without confinement. A reference
+containing path-traversal sequences could in principle resolve the mount source outside the
+intended per-volume base directory.
+
+## Impact
+Had the traversal been reachable, an authenticated user could have caused the runner to
+bind-mount an unintended host path into their sandbox, with a worst-case impact of read and
+write access to other tenants&amp;#x27; volume data (per-volume FUSE mounts are world-readable and
+writable).
+
+Important: this path was not exploitable in any released version. A volume reference is
+validated against the database before it reaches the runner, and the volume id column is a
+UUID …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona/security/advisories/GHSA-fjv8-j4p5-cr9m"&gt;https://github.com/daytonaio/daytona/security/advisories/GHSA-fjv8-j4p5-cr9m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54319"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54319&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona"&gt;https://github.com/daytonaio/daytona&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fjv8-j4p5-cr9m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4mr2-fg2p-w63c: Traefik Kubernetes Ingress NGINX provider fails open when auth-secret resolution fails</title>
+    <id>https://osv.dev/vulnerability/GHSA-4mr2-fg2p-w63c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4mr2-fg2p-w63c"/>
+    <published>2026-06-19T21:15:56Z</published>
+    <updated>2026-07-20T21:30:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54762"/>
+    <category term="GO-2026-5128"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik Kubernetes Ingress NGINX provider fails open when auth-secret resolution fails&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54762, GO-2026-5128&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:H/UI:N/VC:N/VI:N/VA:N/SC:H/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.7.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+There is a medium severity vulnerability in Traefik&amp;#x27;s Kubernetes Ingress NGINX provider that causes affected routes to fail open. When an Ingress explicitly enables BasicAuth or DigestAuth through the supported `nginx.ingress.kubernetes.io/auth-type` and `auth-secret` annotations, but the referenced auth Secret cannot be resolved or parsed, Traefik logs the resolution error, skips installing the authentication middleware, and still emits a router to the backend service. A route that operators intended to protect is therefore published to the data plane without its authentication control, allowing unauthenticated access to the backend. The trigger is an invalid or unresolved auth dependency — a missing, malformed, unreadable, or policy-denied Secret — rather than an intentionall…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-4mr2-fg2p-w63c"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-4mr2-fg2p-w63c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54762"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54762&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.5"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4mr2-fg2p-w63c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-rg3g-4rw9-gqrp: Argo CD: Kubernetes Secret Extraction via ArgoCD ServerSideDiff via sensitive annotations</title>
+    <id>https://osv.dev/vulnerability/GHSA-rg3g-4rw9-gqrp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rg3g-4rw9-gqrp"/>
+    <published>2026-05-19T15:54:21Z</published>
+    <updated>2026-07-20T21:26:20Z</updated>
+    <category term="Go"/>
+    <category term="BIT-argo-cd-2026-45737"/>
+    <category term="CVE-2026-45737"/>
+    <category term="GO-2026-5618"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Argo CD: Kubernetes Secret Extraction via ArgoCD ServerSideDiff via sensitive annotations&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-argo-cd-2026-45737, CVE-2026-45737, GO-2026-5618&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.2.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.3.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.4.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The original fix for [GHSA-3v3m-wc6v-x4x3](https://github.com/argoproj/argo-cd/security/advisories/GHSA-3v3m-wc6v-x4x3) is incomplete. argocd app diff --server-side-diff can still expose Kubernetes Secret values embedded in the kubectl.kubernetes.io/last-applied-configuration annotation.
+
+The prior fix masks top-level Secret data in ServerSideDiff responses, but it does not fully sanitize Secret data stored inside the last-applied-configuration annotation. If a Secret was previously created or updated using client-side apply, that annotation may contain raw data, stringData, and sensitive annotations. These values can be shown in UI/CLI diffs.
+
+### Details
+The ServerSideDiff endpoint returns ResourceDiff.TargetState / LiveState based on server-side dry-run output. Kubernetes se…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/security/advisories/GHSA-rg3g-4rw9-gqrp"&gt;https://github.com/argoproj/argo-cd/security/advisories/GHSA-rg3g-4rw9-gqrp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd"&gt;https://github.com/argoproj/argo-cd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rg3g-4rw9-gqrp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5618: Argo CD: Kubernetes Secret Extraction via ArgoCD ServerSideDiff via sensitive annotations in github.com/argoproj/argo-cd</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5618</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5618"/>
+    <published>2026-06-25T22:34:34Z</published>
+    <updated>2026-07-20T21:26:20Z</updated>
+    <category term="Go"/>
+    <category term="BIT-argo-cd-2026-45737"/>
+    <category term="CVE-2026-45737"/>
+    <category term="GHSA-rg3g-4rw9-gqrp"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Argo CD: Kubernetes Secret Extraction via ArgoCD ServerSideDiff via sensitive annotations in github.com/argoproj/argo-cd&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-argo-cd-2026-45737, CVE-2026-45737, GHSA-rg3g-4rw9-gqrp&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.2.12, 3.3.10, 3.4.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Argo CD: Kubernetes Secret Extraction via ArgoCD ServerSideDiff via sensitive annotations in github.com/argoproj/argo-cd&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/security/advisories/GHSA-rg3g-4rw9-gqrp"&gt;https://github.com/argoproj/argo-cd/security/advisories/GHSA-rg3g-4rw9-gqrp&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5618"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-f59h-q822-g45g: Caddy: FastCGI header normalization bypass in `forward_auth copy_headers`</title>
+    <id>https://osv.dev/vulnerability/GHSA-f59h-q822-g45g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f59h-q822-g45g"/>
+    <published>2026-06-16T21:28:28Z</published>
+    <updated>2026-07-20T21:15:27Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52845"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Caddy: FastCGI header normalization bypass in `forward_auth copy_headers`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52845&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/caddyserver/caddy/v2&lt;/code&gt; — fixed in 2.11.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/caddyserver/caddy&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`forward_auth copy_headers` deletes the exact client-supplied identity header before copying the trusted value from the auth gateway. But when the request later goes through `php_fastcgi`, Caddy normalizes HTTP headers into CGI variables by replacing `-` with `_`.
+
+This lets a client send an underscore alias that survives the `forward_auth` delete step but becomes the same PHP/FastCGI variable:
+
+```text
+Remote-Groups  -&amp;gt; HTTP_REMOTE_GROUPS
+Remote_Groups  -&amp;gt; HTTP_REMOTE_GROUPS
+
+Remote-User    -&amp;gt; HTTP_REMOTE_USER
+Remote_User    -&amp;gt; HTTP_REMOTE_USER
+```
+
+Result: a remote client can inject or sometimes override identity/group headers trusted by PHP/FastCGI applications behind Caddy.
+
+### Details
+
+`forward_auth copy_headers` intentionally removes client-controlled headers before set…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/caddyserver/caddy/security/advisories/GHSA-f59h-q822-g45g"&gt;https://github.com/caddyserver/caddy/security/advisories/GHSA-f59h-q822-g45g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-52845"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-52845&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-52845"&gt;https://access.redhat.com/security/cve/CVE-2026-52845&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2491907"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2491907&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/caddyserver/caddy"&gt;https://github.com/caddyserver/caddy&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-52845.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-52845.json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f59h-q822-g45g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-qwxf-2m7m-2m3x: Daytona: Cross-tenant data leak in notification WebSocket gateway via unverified organizationId join</title>
+    <id>https://osv.dev/vulnerability/GHSA-qwxf-2m7m-2m3x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qwxf-2m7m-2m3x"/>
+    <published>2026-06-17T18:07:30Z</published>
+    <updated>2026-07-20T21:15:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54324"/>
+    <category term="GO-2026-5598"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Daytona: Cross-tenant data leak in notification WebSocket gateway via unverified organizationId join&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54324, GO-2026-5598&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/daytonaio/daytona&lt;/code&gt; — fixed in 0.185.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A cross-tenant authorization flaw in Daytona&amp;#x27;s notification WebSocket gateway allowed any authenticated user to subscribe to another organization&amp;#x27;s realtime notification channel and passively receive that organization&amp;#x27;s events.
+
+### Impact
+The notification gateway&amp;#x27;s JWT handshake joined a client-supplied organization identifier to the corresponding notification room without verifying that the authenticated user was a member of that organization. As a result, an authenticated user could receive another organization&amp;#x27;s realtime sandbox, snapshot, volume, and runner events, including data carried in those events. This is a cross-tenant confidentiality break. It required a valid account and knowledge of the target organization id (a non-secret UUID); no elevated privileges were need…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona/security/advisories/GHSA-qwxf-2m7m-2m3x"&gt;https://github.com/daytonaio/daytona/security/advisories/GHSA-qwxf-2m7m-2m3x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54324"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54324&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/daytonaio/daytona"&gt;https://github.com/daytonaio/daytona&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qwxf-2m7m-2m3x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-qrp7-cvwr-j2c6: Caddy: Windows `file_server` path authorization bypass via encoded backslash</title>
+    <id>https://osv.dev/vulnerability/GHSA-qrp7-cvwr-j2c6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qrp7-cvwr-j2c6"/>
+    <published>2026-06-16T21:28:11Z</published>
+    <updated>2026-07-20T21:15:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52844"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Caddy: Windows `file_server` path authorization bypass via encoded backslash&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52844&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/caddyserver/caddy/v2&lt;/code&gt; — fixed in 2.11.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/caddyserver/caddy&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+On Windows, Caddy `path` matchers treat `/private\secret.txt` as outside `/private/*`, but `file_server` later resolves the same request path as `private\secret.txt` on disk.
+
+An unauthenticated remote client can request `/private%5csecret.txt` and bypass Caddy path-scoped auth/deny routes protecting `/private/*`.
+
+### Details
+
+The mismatch is between two Caddy code paths:
+
+- `MatchPath.MatchWithError()` compares `r.URL.Path` using URL path semantics and does not normalize `\` to `/`: `modules/caddyhttp/matchers.go:429`, `:436`, `:490`, `:532`.
+- If the route matcher misses, Caddy skips that route: `modules/caddyhttp/routes.go:271`.
+- `file_server` then maps the same request path to a filesystem path with `SanitizedPathJoin(root, r.URL.Path)`: `modules/caddyhttp/fileserver/sta…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/caddyserver/caddy/security/advisories/GHSA-qrp7-cvwr-j2c6"&gt;https://github.com/caddyserver/caddy/security/advisories/GHSA-qrp7-cvwr-j2c6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-52844"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-52844&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/caddyserver/caddy"&gt;https://github.com/caddyserver/caddy&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qrp7-cvwr-j2c6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-xgx4-4h9w-53pv: AdGuard Home: DoQ-to-UDP State Reduction and Source-Port Oracle</title>
     <id>https://osv.dev/vulnerability/GHSA-xgx4-4h9w-53pv</id>
@@ -179,128 +573,5 @@ Milvus exposes TCP port 9091 by default with two critical authentication bypass 
 ### Vulnerability 1: Weak Default Authentication on `/expr` Endpoint
 
 The `/expr` endpoint on port 9091 accepts an `auth` parameter that defaults to the `etcd.rootPath` value (`by-dev`). This value is well-known and predictable. An attacker who can reach port 9091 can evaluate a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/milvus-io/milvus/security/advisories/GHSA-7ppg-37fh-vcr6"&gt;https://github.com/milvus-io/milvus/security/advisories/GHSA-7ppg-37fh-vcr6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/milvus-io/milvus/commit/92b74dd2e286006a83b4a5f07951027b32e718a9"&gt;https://github.com/milvus-io/milvus/commit/92b74dd2e286006a83b4a5f07951027b32e718a9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/milvus-io/milvus"&gt;https://github.com/milvus-io/milvus&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/milvus-io/milvus/releases/tag/v2.5.27"&gt;https://github.com/milvus-io/milvus/releases/tag/v2.5.27&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/milvus-io/milvus/releases/tag/v2.6.10"&gt;https://github.com/milvus-io/milvus/releases/tag/v2.6.10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7ppg-37fh-vcr6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-wxg7-w2v3-w38g:  ZITADEL: Missing Token Lifecyle Validation (`exp` and `iat`) in JWT IdP Provider</title>
-    <id>https://osv.dev/vulnerability/GHSA-wxg7-w2v3-w38g</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wxg7-w2v3-w38g"/>
-    <published>2026-06-18T13:52:21Z</published>
-    <updated>2026-07-18T17:30:29Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-56664"/>
-    <category term="GO-2026-5732"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt; ZITADEL: Missing Token Lifecyle Validation (`exp` and `iat`) in JWT IdP Provider&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56664, GO-2026-5732&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zitadel/zitadel&lt;/code&gt; — fixed in 1.80.0-v2.20.0.20260615122908-fad02c6d9f45&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-A token lifecycle validation vulnerability was discovered in ZITADEL&amp;#x27;s external JWT Identity Provider (IdP) implementation.
-ZITADEL enforces a 1-hour maximum token age freshness window (`maxAge`) calculated from the token&amp;#x27;s issue time. However, this safety check is guarded by a presence condition. If an incoming token omits the `iat` claim, the freshness check is entirely bypassed, allowing arbitrarily old tokens to pass authentication successfully.
-
-Per the OIDC Core 1.0 specification, identity token validation pipelines must strictly handle and enforce session expiration. ZITADEL&amp;#x27;s silent acceptance of tokens missing these temporal constraints compromises session integrity.
-
-### Impact
-
-An attacker in possession of a stale token lacking an `iat` claim can reuse it indefinite…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/security/advisories/GHSA-wxg7-w2v3-w38g"&gt;https://github.com/zitadel/zitadel/security/advisories/GHSA-wxg7-w2v3-w38g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-56664"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-56664&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/commit/4925fab849d39a88674485d937b79e54318b48a8"&gt;https://github.com/zitadel/zitadel/commit/4925fab849d39a88674485d937b79e54318b48a8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/commit/d1c3aa84af8fcb0f33910ada30b866f4afb551ac"&gt;https://github.com/zitadel/zitadel/commit/d1c3aa84af8fcb0f33910ada30b866f4afb551ac&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/commit/fad02c6d9f4587956f830d4536c64a9a94baa7ac"&gt;https://github.com/zitadel/zitadel/commit/fad02c6d9f4587956f830d4536c64a9a94baa7ac&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel"&gt;https://github.com/zitadel/zitadel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/releases/tag/v3.4.12"&gt;https://github.com/zitadel/zitadel/releases/tag/v3.4.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/releases/tag/v4.15.2"&gt;https://github.com/zitadel/zitadel/releases/tag/v4.15.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wxg7-w2v3-w38g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8qqm-fp2q-v734: Skipper: Incomplete fix for CVE-2026-50197: an oversized body can bypass OPA deny-on-presence Rego policies</title>
-    <id>https://osv.dev/vulnerability/GHSA-8qqm-fp2q-v734</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8qqm-fp2q-v734"/>
-    <published>2026-07-17T21:49:48Z</published>
-    <updated>2026-07-17T22:00:50Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Skipper: Incomplete fix for CVE-2026-50197: an oversized body can bypass OPA deny-on-presence Rego policies&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zalando/skipper&lt;/code&gt; — fixed in 0.27.26&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-A wrong policy can be an open door. 
-You have to check `input.attributes.request.http.truncated_body` in your policy.
-
-### Description
-
-Incomplete fix for CVE-2026-50197: an oversized declared-`Content-Length` body still hands OPA an empty `parsed_body`, so deny-on-presence Rego policies fail OPEN while the full payload reaches upstream.
-
-The CVE-2026-50197 fix (commit `3152f3b0`, PR #4041, v0.26.10) substituted `expectedSize = maxBodyBytes`
-only when `req.ContentLength &amp;lt; 0` (chunked / HTTP/2 without content-length). But when a request declares a
-`Content-Length` larger than `maxBodyBytes`, `expectedSize &amp;gt; maxBodyBytes`, the body-extraction `if` is
-skipped entirely, and `ExtractHttpBodyOptionally` returns `rawBodyBytes = nil` — so OPA evaluates an empty
-`parsed_body`, while th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper/security/advisories/GHSA-8qqm-fp2q-v734"&gt;https://github.com/zalando/skipper/security/advisories/GHSA-8qqm-fp2q-v734&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper"&gt;https://github.com/zalando/skipper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper/releases/tag/v0.27.26"&gt;https://github.com/zalando/skipper/releases/tag/v0.27.26&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8qqm-fp2q-v734"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5587-2x54-jj6h: Skipper's routesrv-no-auth component: All routesrv API Endpoints Lack Authentication</title>
-    <id>https://osv.dev/vulnerability/GHSA-5587-2x54-jj6h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5587-2x54-jj6h"/>
-    <published>2026-07-17T21:46:18Z</published>
-    <updated>2026-07-17T22:00:50Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54246"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Skipper&amp;#x27;s routesrv-no-auth component: All routesrv API Endpoints Lack Authentication&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54246&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zalando/skipper&lt;/code&gt; — fixed in 0.27.13&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
-
-The `routesrv` component exposes the full cluster route topology (Ingress/RouteGroup configurations, backend URLs, filter chains, OAuth/OIDC callback paths) and cache-cluster topology (Redis/Valkey shard addresses) over plain HTTP with **zero authentication**. Any pod in the Kubernetes cluster can reach routesrv via its predictable DNS name and retrieve sensitive cluster-wide routing and cache infrastructure data.
-
-## Vulnerable Code
-
-**routesrv/routesrv.go:87-99,114-137** — all handler registrations on the main mux:
-```go
-mux.Handle(&amp;quot;/routes&amp;quot;, b)          // eskipBytes.ServeHTTP — all route data
-mux.Handle(&amp;quot;/routes/{zone}&amp;quot;, b)   // zone-scoped route data
-mux.Handle(&amp;quot;/swarm/redis/shards&amp;quot;, rh)   // Redis cluster addresses
-mux.Handle(&amp;quot;/swarm/valkey/shards&amp;quot;, vh)  // Valkey clu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper/security/advisories/GHSA-5587-2x54-jj6h"&gt;https://github.com/zalando/skipper/security/advisories/GHSA-5587-2x54-jj6h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper"&gt;https://github.com/zalando/skipper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper/releases/tag/v0.27.13"&gt;https://github.com/zalando/skipper/releases/tag/v0.27.13&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5587-2x54-jj6h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8qw8-rq86-9pc2: Gitea has insufficient permission checks for Composer package source links</title>
-    <id>https://osv.dev/vulnerability/GHSA-8qw8-rq86-9pc2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8qw8-rq86-9pc2"/>
-    <published>2026-07-17T19:04:37Z</published>
-    <updated>2026-07-17T19:15:17Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-27771"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea has insufficient permission checks for Composer package source links&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-27771&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### CVE Description
-Gitea versions up to and including 1.26.1 have insufficient permission checks for Composer package source links, which can expose private or internal package source information.
-
-### Summary
-A critical vulnerability has been discovered in Gitea. It was already reported via (security@gitea.io) from (dev@noscope.com), and submitted an encrypted report.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-8qw8-rq86-9pc2"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-8qw8-rq86-9pc2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-27771"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-27771&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/37610"&gt;https://github.com/go-gitea/gitea/pull/37610&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.2"&gt;https://blog.gitea.com/release-of-1.26.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.2"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8qw8-rq86-9pc2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rjwr-m7qx-3fjr: oapi-codegen: OpenAPI Server Description Escapes Generated Go Comment and Injects Executable Code</title>
-    <id>https://osv.dev/vulnerability/GHSA-rjwr-m7qx-3fjr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rjwr-m7qx-3fjr"/>
-    <published>2026-07-17T18:50:17Z</published>
-    <updated>2026-07-17T19:00:18Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;oapi-codegen: OpenAPI Server Description Escapes Generated Go Comment and Injects Executable Code&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/oapi-codegen/oapi-codegen/v2&lt;/code&gt; — fixed in 2.7.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The vulnerability in oapi-codegen seems to be similar with CVE-2026-22785,  which is a generated-code injection issue where untrusted OpenAPI `summary` text is embedded into generated TypeScript MCP server source without proper escaping. `oapi-codegen` has a similar vulnerability in its server URL generator: untrusted OpenAPI `servers[].description` text is inserted into a generated Go line comment without normalizing embedded newlines. A crafted description can break out of the comment, add imports through `goimports`, and emit executable Go declarations into the generated package.
-
-&amp;gt; [!NOTE]
-&amp;gt; A vulnerability like this requires that it is missed in code review **and** that you then call the malicious method.
-&amp;gt; 
-&amp;gt; Using an `init()` function could be enough to not require a dir…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oapi-codegen/oapi-codegen/security/advisories/GHSA-rjwr-m7qx-3fjr"&gt;https://github.com/oapi-codegen/oapi-codegen/security/advisories/GHSA-rjwr-m7qx-3fjr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oapi-codegen/oapi-codegen/commit/19c6282e9a6fb84b51aa92b12fad1f0b7e5f5ef6"&gt;https://github.com/oapi-codegen/oapi-codegen/commit/19c6282e9a6fb84b51aa92b12fad1f0b7e5f5ef6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oapi-codegen/oapi-codegen"&gt;https://github.com/oapi-codegen/oapi-codegen&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oapi-codegen/oapi-codegen/releases/tag/v2.7.1"&gt;https://github.com/oapi-codegen/oapi-codegen/releases/tag/v2.7.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rjwr-m7qx-3fjr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-cwxq-rc9x-2jvv: Skipper: Unbounded Request Body Read in Admission Webhook Causes Memory Exhaustion DoS</title>
-    <id>https://osv.dev/vulnerability/GHSA-cwxq-rc9x-2jvv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cwxq-rc9x-2jvv"/>
-    <published>2026-07-17T18:14:08Z</published>
-    <updated>2026-07-17T18:30:27Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54247"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Skipper: Unbounded Request Body Read in Admission Webhook Causes Memory Exhaustion DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54247&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zalando/skipper&lt;/code&gt; — fixed in 0.26.22&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The Kubernetes admission webhook handler reads the entire request body using `io.ReadAll(r.Body)` without any size limit. Any client that can reach the webhook port within the cluster can send a multi-GB payload, causing the skipper process to exhaust memory and be OOM-killed. This disrupts all Kubernetes admission control, potentially blocking all pod creation and updates.
-
-## Vulnerable Code
-
-```go
-// dataclients/kubernetes/admission/admission.go:76
-body, err := io.ReadAll(r.Body)  // &amp;lt;-- NO SIZE LIMIT
-if err != nil {
-    log.Errorf(&amp;quot;Failed to read request: %v&amp;quot;, err)
-    w.WriteHeader(http.StatusInternalServerError)
-    invalidRequests.WithLabelValues(admitterName).Inc()
-    return
-}
-
-var review admissionReview
-err = json.Unmarshal(body, &amp;amp;review)
-```
-
-For comparison, the OPA …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper/security/advisories/GHSA-cwxq-rc9x-2jvv"&gt;https://github.com/zalando/skipper/security/advisories/GHSA-cwxq-rc9x-2jvv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper"&gt;https://github.com/zalando/skipper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zalando/skipper/releases/tag/v0.26.22"&gt;https://github.com/zalando/skipper/releases/tag/v0.26.22&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cwxq-rc9x-2jvv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

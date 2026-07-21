@@ -3,12 +3,116 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-07-20T23:30:26Z</updated>
+  <updated>2026-07-21T03:56:48Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-2fmp-9rvw-hc96: Network-AI: Poisoned environment backup manifest allows arbitrary recursive deletion during backup pruning</title>
+    <id>https://osv.dev/vulnerability/GHSA-2fmp-9rvw-hc96</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2fmp-9rvw-hc96"/>
+    <published>2026-06-19T21:42:26Z</published>
+    <updated>2026-07-21T03:56:48Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-58484"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Network-AI: Poisoned environment backup manifest allows arbitrary recursive deletion during backup pruning&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58484&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;network-ai&lt;/code&gt; — fixed in 5.12.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`EnvironmentManager.listBackups()` reads each backup&amp;#x27;s `_manifest.json` and trusts the manifest&amp;#x27;s `path` field. `EnvironmentManager.pruneBackups()` later passes that trusted `entry.path` directly to `rmSync(entry.path, { recursive: true, force: true })`.
+
+An attacker who can place or modify a manifest inside `data/&amp;lt;env&amp;gt;/.backups/&amp;lt;name&amp;gt;/_manifest.json` can cause `network-ai env backup prune --env &amp;lt;env&amp;gt; --keep &amp;lt;n&amp;gt;` or any code path invoking `pruneBackups()` to recursively delete an arbitrary path accessible to the Network-AI process user. Confirmed in Network-AI 5.12.1.
+
+### Details
+`listBackups()` trusts manifest content from disk:
+
+```ts
+for (const name of readdirSync(backupsDir)) {
+  const manifest = join(backupsDir, name, &amp;#x27;_manifest.json&amp;#x27;);
+  if (existsSync(manifest)) {
+    t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-2fmp-9rvw-hc96"&gt;https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-2fmp-9rvw-hc96&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3"&gt;https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI"&gt;https://github.com/Jovancoding/Network-AI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2"&gt;https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2fmp-9rvw-hc96"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mxjx-28vx-xjjj: Network-AI: ApprovalInbox HTTP server has no authentication — anyone can approve pending agent actions </title>
+    <id>https://osv.dev/vulnerability/GHSA-mxjx-28vx-xjjj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mxjx-28vx-xjjj"/>
+    <published>2026-06-19T21:42:32Z</published>
+    <updated>2026-07-21T03:56:47Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-58482"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Network-AI: ApprovalInbox HTTP server has no authentication — anyone can approve pending agent actions &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58482&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;network-ai&lt;/code&gt; — fixed in 5.12.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`network-ai`&amp;#x27;s `ApprovalInbox` (`lib/approval-inbox.ts`) is a shipped, exported, documented feature — *&amp;quot;a web-accessible approval queue with REST API … and SSE streaming&amp;quot;* (SECURITY.md). It is the network surface of the **human-in-the-loop Approval Gate**, which `ApprovalGate` uses to require explicit human approval for *&amp;quot;high-risk operations (writes, shell commands, budget spend)&amp;quot;* (SECURITY.md). The HTTP server it exposes has **no authentication of any kind** and sets **`Access-Control-Allow-Origin: *`** on every route, including the state-changing `POST /approvals/:id/approve` and `/deny`.
+
+As a result, any party who can send an HTTP request to the inbox port — a co-located process, a container/SSRF on the same host, a remote client when the operator binds a non-loopback add…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-mxjx-28vx-xjjj"&gt;https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-mxjx-28vx-xjjj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3"&gt;https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI"&gt;https://github.com/Jovancoding/Network-AI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2"&gt;https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mxjx-28vx-xjjj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-48x2-6pr9-2jjf: Network-AI: EnvironmentManager.restore() backup ID path traversal copies arbitrary directories into environment data</title>
+    <id>https://osv.dev/vulnerability/GHSA-48x2-6pr9-2jjf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-48x2-6pr9-2jjf"/>
+    <published>2026-06-19T21:42:38Z</published>
+    <updated>2026-07-21T03:56:47Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-58413"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Network-AI: EnvironmentManager.restore() backup ID path traversal copies arbitrary directories into environment data&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58413&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;network-ai&lt;/code&gt; — fixed in 5.12.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`EnvironmentManager.restore(env, backupId)` computes the backup path with `join(envDir, &amp;#x27;.backups&amp;#x27;, backupId)` and only checks that this path exists. It does not resolve the result or verify that it remains under `data/&amp;lt;env&amp;gt;/.backups`.
+
+A caller can pass a traversal backup ID such as `../../../outside/source-dir` to restore files from an arbitrary directory into the target environment data directory. Confirmed in Network-AI 5.12.1.
+
+### Details
+`restore()` builds `backupPath` directly from caller-controlled `backupId`:
+
+```ts
+restore(env: EnvName, backupId: string): RestoreResult {
+  const envDir = this.getDataDir(env);
+  const backupsDir = join(envDir, &amp;#x27;.backups&amp;#x27;);
+  const backupPath = join(backupsDir, backupId);
+
+  if (!existsSync(backupPath)) {
+    throw new Error(`Backup &amp;#x27;$…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-48x2-6pr9-2jjf"&gt;https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-48x2-6pr9-2jjf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3"&gt;https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI"&gt;https://github.com/Jovancoding/Network-AI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2"&gt;https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-48x2-6pr9-2jjf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jvcm-f35g-w78p: Network-AI: AgentRuntime sandbox path-prefix checks allow file access outside the configured base directory</title>
+    <id>https://osv.dev/vulnerability/GHSA-jvcm-f35g-w78p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jvcm-f35g-w78p"/>
+    <published>2026-06-19T21:42:29Z</published>
+    <updated>2026-07-21T03:56:46Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-58481"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Network-AI: AgentRuntime sandbox path-prefix checks allow file access outside the configured base directory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58481&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;network-ai&lt;/code&gt; — fixed in 5.12.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`AgentRuntime` promises scoped file access under a configured sandbox `basePath`, but its path containment checks use raw string prefix tests. A sandbox base such as `/tmp/network-ai-sandbox` also matches a sibling path such as `/tmp/network-ai-sandbox_evil/secret.txt`.
+
+An agent/user that can call `AgentRuntime.readFile()` or `AgentRuntime.listDir()` can read or list files outside the intended sandbox when the target path is in a sibling directory sharing the base path prefix. This breaks the documented sandbox boundary. Confirmed in Network-AI 5.12.1. Severity: Medium, CVSS 3.1 vector `CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N`.
+
+### Details
+The vulnerable containment check is in `lib/agent-runtime.ts`:
+
+```ts
+resolvePath(filePath: string): string | null {
+  const normaliz…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-jvcm-f35g-w78p"&gt;https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-jvcm-f35g-w78p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3"&gt;https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI"&gt;https://github.com/Jovancoding/Network-AI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2"&gt;https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jvcm-f35g-w78p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6x2m-p4xp-wg22: Network-AI: EnvironmentManager.backup() follows symlinked directories and copies files outside the environment root into backups</title>
+    <id>https://osv.dev/vulnerability/GHSA-6x2m-p4xp-wg22</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6x2m-p4xp-wg22"/>
+    <published>2026-06-19T21:42:36Z</published>
+    <updated>2026-07-21T03:56:45Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-58414"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Network-AI: EnvironmentManager.backup() follows symlinked directories and copies files outside the environment root into backups&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58414&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;network-ai&lt;/code&gt; — fixed in 5.12.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`EnvironmentManager.backup()` recursively collects files using `_collectBackupFiles()`. `_collectBackupFiles()` uses `statSync(full)`, which follows symlinks. If `data/&amp;lt;env&amp;gt;` contains a symlink to a directory outside the environment root, backup recursion follows the symlink and copies external files into `data/&amp;lt;env&amp;gt;/.backups/&amp;lt;backupId&amp;gt;/`.
+
+An attacker who can place a symlink under the environment data directory can cause backup operations to disclose files outside the environment root into backup artifacts. Confirmed in Network-AI 5.12.1.
+
+### Details
+`backup()` collects file paths and copies them into the backup directory:
+
+```ts
+const files = this._collectBackupFiles(envDir);
+for (const rel of files) {
+  const src = join(envDir, rel);
+  const dst = join(backupPath, rel);
+  m…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-6x2m-p4xp-wg22"&gt;https://github.com/Jovancoding/Network-AI/security/advisories/GHSA-6x2m-p4xp-wg22&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3"&gt;https://github.com/Jovancoding/Network-AI/commit/a59c13a1f0ce0e8a0779a90343eef92fac5ab4c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI"&gt;https://github.com/Jovancoding/Network-AI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2"&gt;https://github.com/Jovancoding/Network-AI/releases/tag/v5.12.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6x2m-p4xp-wg22"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-f48w-9m4c-m7f5: Astro: XSS via unescaped spread attribute names in renderHTMLElement (incomplete fix for CVE-2026-54298)</title>
     <id>https://osv.dev/vulnerability/GHSA-f48w-9m4c-m7f5</id>
@@ -2900,85 +3004,5 @@ _-= Per source details. Do not edit below this line.=-_
 ## Source: ghsa-malware (d30579e205476f67d9146972cc0e2aabdd79345dabe3af1c9e0d07fd8d81a9f6)
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-p5pm-xhx8-3gq6"&gt;https://github.com/advisories/GHSA-p5pm-xhx8-3gq6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10843"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-10842: Malicious code in @gocortexio/npmgremlinbox-openpbs-2-3 (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10842</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10842"/>
-    <published>2026-07-20T03:01:01Z</published>
-    <updated>2026-07-20T03:35:25Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-rhgp-gf2p-j7r3"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @gocortexio/npmgremlinbox-openpbs-2-3 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-rhgp-gf2p-j7r3&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@gocortexio/npmgremlinbox-openpbs-2-3&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (2a66e3fdf500614035fa89cb285a3a94a898e6890333031745ac4312f6e5caf6)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-rhgp-gf2p-j7r3"&gt;https://github.com/advisories/GHSA-rhgp-gf2p-j7r3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10842"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-10841: Malicious code in @gocortexio/npmgremlinbox-ncgl-uk-2-0 (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10841</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10841"/>
-    <published>2026-07-20T03:01:01Z</published>
-    <updated>2026-07-20T03:35:24Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-cx55-w99m-rcx9"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @gocortexio/npmgremlinbox-ncgl-uk-2-0 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-cx55-w99m-rcx9&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@gocortexio/npmgremlinbox-ncgl-uk-2-0&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (00382b16f7bcacbf6333acca5a11b4f1be3a615a64431e0781cf8d9c3877b813)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-cx55-w99m-rcx9"&gt;https://github.com/advisories/GHSA-cx55-w99m-rcx9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10841"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-10840: Malicious code in @gocortexio/npmgremlinbox-ms-lpl (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10840</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10840"/>
-    <published>2026-07-20T03:01:01Z</published>
-    <updated>2026-07-20T03:35:24Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-pwfp-vhxq-7g8f"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @gocortexio/npmgremlinbox-ms-lpl (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-pwfp-vhxq-7g8f&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@gocortexio/npmgremlinbox-ms-lpl&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (8c00cf6119e52189754e58f2c2460b83968a20c5086aa9424d58123b077c9e7e)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-pwfp-vhxq-7g8f"&gt;https://github.com/advisories/GHSA-pwfp-vhxq-7g8f&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10840"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-10839: Malicious code in @gocortexio/npmgremlinbox-mpl-2-0 (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10839</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10839"/>
-    <published>2026-07-20T03:01:01Z</published>
-    <updated>2026-07-20T03:35:23Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-pgj9-qg38-66qm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @gocortexio/npmgremlinbox-mpl-2-0 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-pgj9-qg38-66qm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@gocortexio/npmgremlinbox-mpl-2-0&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (fee530f600c3dda2f184f9f4cbeb4dbe23b98fa5c6e426e89afceffadce4175d)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-pgj9-qg38-66qm"&gt;https://github.com/advisories/GHSA-pgj9-qg38-66qm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10839"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-10838: Malicious code in @gocortexio/npmgremlinbox-mpl-1-1 (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10838</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10838"/>
-    <published>2026-07-20T03:01:01Z</published>
-    <updated>2026-07-20T03:35:22Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-jq98-3cqm-6m69"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @gocortexio/npmgremlinbox-mpl-1-1 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-jq98-3cqm-6m69&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@gocortexio/npmgremlinbox-mpl-1-1&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (16b711dafb2bb4c7dfab16c8144346191d7e09f630cfa91e7dd9e3b9b9960151)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-jq98-3cqm-6m69"&gt;https://github.com/advisories/GHSA-jq98-3cqm-6m69&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10838"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

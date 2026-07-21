@@ -3,12 +3,52 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-07-21T03:56:46Z</updated>
+  <updated>2026-07-21T15:15:49Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-fjj5-v948-whjj: Mise Vulnerable to Arbitrary Code Execution via Tera Templates in .tool-versions Files (Trust Bypass)</title>
+    <id>https://osv.dev/vulnerability/GHSA-fjj5-v948-whjj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fjj5-v948-whjj"/>
+    <published>2026-06-22T17:19:56Z</published>
+    <updated>2026-07-21T15:15:49Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-33646"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Mise Vulnerable to Arbitrary Code Execution via Tera Templates in .tool-versions Files (Trust Bypass)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-33646&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mise&lt;/code&gt; — fixed in 2026.3.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Mise processes `.tool-versions` files through the Tera template engine during parsing, with the `exec()` function registered, enabling arbitrary command execution. Unlike `.mise.toml` files, `.tool-versions` files are **not subject to trust verification** in non-paranoid mode. This means an attacker can place a malicious `.tool-versions` file in a git repository, and when a victim with mise activated `cd`s into the directory, arbitrary commands execute without any trust prompt.
+
+## Vulnerability Details
+
+### Vulnerable Code
+
+**File:** `src/config/config_file/tool_versions.rs`, lines 60-63
+
+```rust
+pub fn parse_str(s: &amp;amp;str, path: PathBuf) -&amp;gt; Result&amp;lt;Self&amp;gt; {
+    let mut cf = Self::init(&amp;amp;path);
+    let dir = path.parent();
+    let s = get_tera(dir).render_str(s, &amp;amp;cf.context)?;  // …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise/security/advisories/GHSA-fjj5-v948-whjj"&gt;https://github.com/jdx/mise/security/advisories/GHSA-fjj5-v948-whjj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33646"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-33646&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise"&gt;https://github.com/jdx/mise&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fjj5-v948-whjj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-f94h-j2qg-fxw3: mise HTTP backend uses raw version path for install symlink destination</title>
+    <id>https://osv.dev/vulnerability/GHSA-f94h-j2qg-fxw3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f94h-j2qg-fxw3"/>
+    <published>2026-06-23T18:13:53Z</published>
+    <updated>2026-07-21T15:15:49Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-54557"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;mise HTTP backend uses raw version path for install symlink destination&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54557&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mise&lt;/code&gt; — fixed in 2026.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The mise HTTP backend builds its install symlink destination from the raw resolved version string for non-latest versions. Normal tool install paths use the sanitized version pathname, but the HTTP backend&amp;#x27;s symlink path uses the raw value. On Unix-like systems, if that version is an absolute path, `PathBuf::join` discards the intended mise installs root.
+
+A repository-controlled `.tool-versions` file can therefore make `mise install` create a symlink outside the mise install tree. With `bin_path`, the same issue can place an executable symlink under an attacker-selected absolute prefix, such as a developer-tool prefix that is later added to `PATH`.
+
+The reproducer below also models a CI/developer workflow where a later step executes a preexisting trusted command from a user-lo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise/security/advisories/GHSA-f94h-j2qg-fxw3"&gt;https://github.com/jdx/mise/security/advisories/GHSA-f94h-j2qg-fxw3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54557"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54557&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise"&gt;https://github.com/jdx/mise&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f94h-j2qg-fxw3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-xx7m-69ff-9crp: SurrealDB vulnerable to Denial of Service through scripting function memory edge case</title>
     <id>https://osv.dev/vulnerability/GHSA-xx7m-69ff-9crp</id>
@@ -280,41 +320,5 @@ When Deno was run in BYONM mode (`nodeModulesDir: &amp;quot;manual&amp;quot;`), 
 ## Details
 
 In BYONM mode, Deno resolved npm packages directly from a user-managed `node_modules` tree. Resolution of `require(&amp;quot;pkg&amp;quot;)` proceeded by reading `pkg/package.json`, taking the `main` field, joining it to the package directory, an…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno/security/advisories/GHSA-968w-xfqw-vp9q"&gt;https://github.com/denoland/deno/security/advisories/GHSA-968w-xfqw-vp9q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-49406"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-49406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/denoland/deno"&gt;https://github.com/denoland/deno&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-968w-xfqw-vp9q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-h4f5-h82v-5w4r: SurrealDB has an Uncaught Exception in Function Generating Random Time</title>
-    <id>https://osv.dev/vulnerability/GHSA-h4f5-h82v-5w4r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h4f5-h82v-5w4r"/>
-    <published>2024-11-22T20:11:38Z</published>
-    <updated>2026-07-19T03:56:48Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2024-58357"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB has an Uncaught Exception in Function Generating Random Time&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-58357&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 2.1.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;surrealdb-core&lt;/code&gt; — fixed in 2.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `rand::time()` function in SurrealQL generates a random time from an optional range of two Unix timestamps. Due to the underlying use of `timestamp_opt` from the `chrono` crate, this function could potentially return `None` in some instances, leading to a panic when `unwrap` was called on its result in order to return a SurrealQL `datetime` type to the caller of the function.
-
-### Impact
-
-A client that is authorized to run queries in a SurrealDB server would be able to make repeated (in the order of millions) calls to `rand::time()` in order to reliably trigger a panic. This would crash the server, leading to denial of service.
-
-### Patches
-
-The function has been updated in to guarantee that some `datetime` is returned or that an error is otherwise gracefully handled.
-
-- Version 2.1.0 …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-h4f5-h82v-5w4r"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-h4f5-h82v-5w4r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/5126"&gt;https://github.com/surrealdb/surrealdb/pull/5126&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h4f5-h82v-5w4r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-pxw4-94j3-v9pf: SurrealDB CPU exhaustion via custom functions result in total DoS</title>
-    <id>https://osv.dev/vulnerability/GHSA-pxw4-94j3-v9pf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pxw4-94j3-v9pf"/>
-    <published>2025-04-11T14:09:14Z</published>
-    <updated>2026-07-19T03:56:48Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2025-71397"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB CPU exhaustion via custom functions result in total DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71397&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 2.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 2.1.5&lt;/li&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 2.0.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SurrealDB allows authenticated users with `OWNER` or `EDITOR` permissions at the root, database or namespace levels to define their own database functions using the `DEFINE FUNCTION` statement
-
-A custom database function comprises a name together with a function body. In the function body, the user programs the functionality of the function in terms of SurrealQL. The language includes a `FOR` keyword, used to implement for-loops.
-
-Whilst the parser and interpreter constrain the number of iterations for a single for-loop, nesting several for-loops with a large number of iterations is possible. Thus, an attacker could define a function that comprises several nested for-loops with an iteration count of 1.000.000 each. 
-
-Executing the function will consume all the CPU time of the server, timeo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-pxw4-94j3-v9pf"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-pxw4-94j3-v9pf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/5597"&gt;https://github.com/surrealdb/surrealdb/pull/5597&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pxw4-94j3-v9pf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

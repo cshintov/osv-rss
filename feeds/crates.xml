@@ -3,12 +3,94 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-07-24T04:11:42Z</updated>
+  <updated>2026-07-24T17:01:28Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-cqjc-rmpq-xprq: Russh: Post-auth remote panic via pty-req with more than 130 terminal-mode records</title>
+    <id>https://osv.dev/vulnerability/GHSA-cqjc-rmpq-xprq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cqjc-rmpq-xprq"/>
+    <published>2026-07-24T16:46:13Z</published>
+    <updated>2026-07-24T17:01:28Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Post-auth remote panic via pty-req with more than 130 terminal-mode records&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A post-authentication denial-of-service panic in `russh` 0.62.2 (commit
+`c4be19f1915c8682f4615c3fd50008512b474491`, current default branch `main` as
+of 2026-07-22). An authenticated client sends a `pty-req` channel request
+carrying more than 130 terminal-mode records. The parser uses a fixed
+`[(Pty::TTY_OP_END, 0); 130]` array but increments its counter `i` for every
+valid record (logging &amp;quot;too many pty codes&amp;quot; without returning), then slices
+`&amp;amp;modes[0..i]` — an out-of-bounds slice that **panics** (`range end index 131
+out of range for slice of length 130`) before the application `pty_request`
+handler runs.
+
+This is reachable with the **default** server configuration and the **default**
+crypto config (curve25519-sha256 + chacha20-poly1305), requiring only an
+authenticated session…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-cqjc-rmpq-xprq"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-cqjc-rmpq-xprq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/8912512371820167a12a0a638bd666856ce458ad"&gt;https://github.com/Eugeny/russh/commit/8912512371820167a12a0a638bd666856ce458ad&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.4"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cqjc-rmpq-xprq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5xvq-cp9x-6p6r: Russh: Pre-auth remote panic via all-zero Curve25519 peer public value (encode_mpint OOB)</title>
+    <id>https://osv.dev/vulnerability/GHSA-5xvq-cp9x-6p6r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5xvq-cp9x-6p6r"/>
+    <published>2026-07-24T16:45:26Z</published>
+    <updated>2026-07-24T17:01:27Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Pre-auth remote panic via all-zero Curve25519 peer public value (encode_mpint OOB)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A pre-authentication denial-of-service panic in `russh` 0.62.2 (commit
+`c4be19f1915c8682f4615c3fd50008512b474491`, current default branch `main` as
+of 2026-07-22). An unauthenticated client sends a single `SSH_MSG_KEX_ECDH_INIT`
+whose `Q_C` is 32 zero bytes. russh&amp;#x27;s Curve25519 KEX does not reject the
+all-zero peer public value, so `server_dh()` computes the all-zero shared
+secret and `compute_exchange_hash()` then calls `encode_mpint(&amp;amp;shared.0, ...)`,
+which indexes `s[i]` at `i == s.len()` and **panics** (`index out of bounds:
+the len is 32 but the index is 32`) **before host-key signature verification**.
+The server KEX task dies on the first KEX message, before authentication.
+
+This is reachable with the **default** server configuration
+(`Config::default()` → `Preferred::DEFAULT`, whose k…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-5xvq-cp9x-6p6r"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-5xvq-cp9x-6p6r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/a7fc1eb5717264e31c3c5f7dd849b73989a08f3d"&gt;https://github.com/Eugeny/russh/commit/a7fc1eb5717264e31c3c5f7dd849b73989a08f3d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.4"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5xvq-cp9x-6p6r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g9hv-x236-4qp3: Russh: client wrong-length X25519 `clone_from_slice` panic (pre-auth DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-g9hv-x236-4qp3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g9hv-x236-4qp3"/>
+    <published>2026-07-24T16:47:16Z</published>
+    <updated>2026-07-24T17:01:27Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: client wrong-length X25519 `clone_from_slice` panic (pre-auth DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A malicious SSH server can crash a `russh` client session with a single
+malformed key-exchange reply, causing a pre-authentication Denial-of-Service
+before the server host key is verified. The embedding process itself stays
+up, but the connection is killed deterministically.
+
+### Details
+Every *other* kex path in `russh` validates the peer ephemeral length before
+cloning:
+
+- `Curve25519Kex::server_dh` (`russh/src/kex/curve25519.rs:61-65`) checks
+  `if pubkey_len != 32 { return Err(crate::Error::Kex); }` before
+  `clone_from_slice`.
+- The hybrid ML-KEM, ECDH-NIST, and DH/GEX paths all validate lengths.
+
+Only the client-side curve25519 `compute_shared_secret` is missing the check.
+This asymmetric validation gap makes the bug easy to miss in code review: a
+malicious *client* canno…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-g9hv-x236-4qp3"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-g9hv-x236-4qp3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/a7fc1eb5717264e31c3c5f7dd849b73989a08f3d"&gt;https://github.com/Eugeny/russh/commit/a7fc1eb5717264e31c3c5f7dd849b73989a08f3d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.4"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g9hv-x236-4qp3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4w2j-m93h-cj5j: Quinn: Remote memory exhaustion in quinn-proto from unbounded out-of-order stream reassembly</title>
+    <id>https://osv.dev/vulnerability/GHSA-4w2j-m93h-cj5j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4w2j-m93h-cj5j"/>
+    <published>2026-07-24T14:07:54Z</published>
+    <updated>2026-07-24T14:16:00Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-25800"/>
+    <category term="RUSTSEC-2026-0185"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Quinn: Remote memory exhaustion in quinn-proto from unbounded out-of-order stream reassembly&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25800, RUSTSEC-2026-0185&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;quinn-proto&lt;/code&gt; — fixed in 0.11.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `Assembler` component that assembles unordered stream fragments into consecutive chunks of the stream incurs some overhead for non-contiguous fragments. Readers that read from a `RecvStream` in order (through an `AsyncRead` impl for example) will be sensitive to peers that send fragments while leaving out early parts of the stream, and in particular, fragments with many gaps (because these cannot be defragmented). In such a scenario, the receiving connection suffers from high buffer overhead, enabling memory exhaustion.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/quinn-rs/quinn/security/advisories/GHSA-4w2j-m93h-cj5j"&gt;https://github.com/quinn-rs/quinn/security/advisories/GHSA-4w2j-m93h-cj5j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quinn-rs/quinn/pull/2694"&gt;https://github.com/quinn-rs/quinn/pull/2694&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quinn-rs/quinn/commit/fed0321a9a672819662caab37f5662f1ad91308e"&gt;https://github.com/quinn-rs/quinn/commit/fed0321a9a672819662caab37f5662f1ad91308e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quinn-rs/quinn"&gt;https://github.com/quinn-rs/quinn&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quinn-rs/quinn/releases/tag/quinn-proto-0.11.15"&gt;https://github.com/quinn-rs/quinn/releases/tag/quinn-proto-0.11.15&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0185.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0185.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4w2j-m93h-cj5j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0185:  Remote memory exhaustion in quinn-proto from unbounded out-of-order stream reassembly</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0185</id>
@@ -306,39 +388,5 @@ Recommended alternatives:
 It is considered malicious because: The package communicates with a domain associated with malicious activity. The package executes one or more commands associated with malicious behavior.
 
 This advisory is to retrospectively document this attack. The download records of the malicious crate are no longer available. The related malicious crates have been deleted.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/replit_ruspty"&gt;https://crates.io/crates/replit_ruspty&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0154.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0154.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ossf/malicious-packages/blob/main/osv/malicious/crates.io/replit_ruspty/MAL-2025-49350.json"&gt;https://github.com/ossf/malicious-packages/blob/main/osv/malicious/crates.io/replit_ruspty/MAL-2025-49350.json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0154"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2023-0085: HPACK decoder panics on invalid input</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2023-0085</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2023-0085"/>
-    <published>2023-09-15T12:00:00Z</published>
-    <updated>2026-07-22T17:45:03Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-w7hm-hmxv-pvhf"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;HPACK decoder panics on invalid input&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-w7hm-hmxv-pvhf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hpack&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Due to insufficient checking of input data, decoding certain data sequences can
-lead to _Decoder::decode_ panicking rather than returning an error.
-
-Example code that triggers this vulnerability looks like this:
-
-```rust
-use hpack::Decoder;
-
-pub fn main() {
-  let input = &amp;amp;[0x3f];
-  let mut decoder = Decoder::new();
-  let _ = decoder.decode(input);
-}
-```
-
-hpack is unmaintained. A crate with the panics fixed has been published as
-[hpack-patched](https://crates.io/crates/hpack-patched).
-
-Also consider using
-[loona-hpack](https://crates.io/crates/loona-hpack) or
-[httlib-huffman](https://crates.io/crates/httlib-huffman) as an alternative.
-
-Version 0.3.1 of
-[fluke-hpack](https://crates.io/crates/fluke-hpack) still reproduces the panic
-described in this advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/hpack"&gt;https://crates.io/crates/hpack&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2023-0085.html"&gt;https://rustsec.org/advisories/RUSTSEC-2023-0085.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlalic/hpack-rs/issues/11"&gt;https://github.com/mlalic/hpack-rs/issues/11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sno2/hpack-rs-patched/commit/d669282924a95311599e9e7dd53869ee96b3a2f5"&gt;https://github.com/sno2/hpack-rs-patched/commit/d669282924a95311599e9e7dd53869ee96b3a2f5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2023-0085"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

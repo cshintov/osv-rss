@@ -3,12 +3,1335 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-27T09:11:42Z</updated>
+  <updated>2026-07-27T17:11:45Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-rjvx-x5h2-6px5: Gitea: API Fork Endpoint Authorization Bypass Allows Organization Members to Bypass Repository Creation Restrictions</title>
+    <id>https://osv.dev/vulnerability/GHSA-rjvx-x5h2-6px5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rjvx-x5h2-6px5"/>
+    <published>2026-07-21T20:26:37Z</published>
+    <updated>2026-07-27T17:11:45Z</updated>
+    <category term="Go"/>
+    <category term="GO-2026-6074"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: API Fork Endpoint Authorization Bypass Allows Organization Members to Bypass Repository Creation Restrictions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GO-2026-6074&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The API endpoint used to fork repositories into organizations performs a weaker authorization check than the corresponding web UI and other repository creation endpoints.
+
+When a repository is forked into an organization through the API, the endpoint only verifies that the user is an organization member (`IsOrgMember()`), but does not verify whether the user is allowed to create repositories in that organization (`CanCreateOrgRepo()`).
+
+As a result, organization members belonging to teams with `can_create_org_repo=false` can still create repositories inside the organization by using the fork API.
+
+### Details
+
+Affected endpoint:
+
+```
+POST /api/v1/repos/{owner}/{repo}/forks
+```
+
+In `routers/api/v1/repo/fork.go`, the endpoint performs the following authorization check:
+
+```go
+if…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rjvx-x5h2-6px5"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rjvx-x5h2-6px5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/36950"&gt;https://github.com/go-gitea/gitea/pull/36950&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/686d10b7f0c26baf91171124b382cbcdfa7bf025"&gt;https://github.com/go-gitea/gitea/commit/686d10b7f0c26baf91171124b382cbcdfa7bf025&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rjvx-x5h2-6px5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mx64-mj3q-7prj: iskorotkov/avro: Denial-of-Service Vulnerability in Decoder</title>
+    <id>https://osv.dev/vulnerability/GHSA-mx64-mj3q-7prj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mx64-mj3q-7prj"/>
+    <published>2026-05-18T12:59:58Z</published>
+    <updated>2026-07-27T17:11:45Z</updated>
+    <category term="Go"/>
+    <category term="GO-2026-5048"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;iskorotkov/avro: Denial-of-Service Vulnerability in Decoder&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GO-2026-5048&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/iskorotkov/avro/v2&lt;/code&gt; — fixed in 2.33.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Memory Exhaustion via Unbounded Map Allocations in Avro Decoder
+
+## Summary
+
+The Avro map decoder accepted attacker-controlled block-element counts from the wire format and grew the destination map without enforcing an upper bound. The slice decoder already had `Config.MaxSliceAllocSize` for the equivalent attack against arrays; the map decoder had no analogous limit, so a producer could declare an arbitrarily large map (in one block, or chunked across many sub-limit blocks) and exhaust process memory until the OOM killer fired.
+
+The fix introduces `Config.MaxMapAllocSize` with cumulative enforcement across block boundaries. **The new limit is opt-in**: the field defaults to zero, which preserves the previous unbounded behavior for backward compatibility. **Upgrading to `v2.33.0` alone d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/security/advisories/GHSA-mx64-mj3q-7prj"&gt;https://github.com/iskorotkov/avro/security/advisories/GHSA-mx64-mj3q-7prj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro"&gt;https://github.com/iskorotkov/avro&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mx64-mj3q-7prj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-hrxh-6v49-42gf: gRPC-Go: xDS RBAC and HTTP/2 Vulnerabilities</title>
+    <id>https://osv.dev/vulnerability/GHSA-hrxh-6v49-42gf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hrxh-6v49-42gf"/>
+    <published>2026-07-21T22:03:55Z</published>
+    <updated>2026-07-27T17:11:45Z</updated>
+    <category term="Go"/>
+    <category term="GO-2026-6061"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;gRPC-Go: xDS RBAC and HTTP/2 Vulnerabilities&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GO-2026-6061&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.82.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Multiple security vulnerabilities have been identified and addressed in grpc-go affecting the xDS RBAC authorization engine (internal/xds/rbac) and the HTTP/2 transport server implementation (internal/transport). These vulnerabilities could result in:
+
+- Authorization Bypass (Fail-Open) when translating xDS RBAC policies containing `Metadata` or `RequestedServerName` fields.
+- Denial of Service (High CPU Consumption) due to an HTTP/2 Rapid Reset mitigation bypass during client-initiated stream resets.
+- Denial of Service (Server Panic) when parsing crafted xDS RBAC policies containing `NOT` rules around unsupported fields.
+
+
+### Impact
+_What kind of vulnerability is it? Who is impacted?_
+
+#### xDS RBAC Authorization Bypass via `Metadata` &amp;amp; `RequestedServerName` matchers
+
+- Affected Compone…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-hrxh-6v49-42gf"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-hrxh-6v49-42gf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9236"&gt;https://github.com/grpc/grpc-go/pull/9236&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/4ea465d4ab98013f72a142fe0fc89c19770b2935"&gt;https://github.com/grpc/grpc-go/commit/4ea465d4ab98013f72a142fe0fc89c19770b2935&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go"&gt;https://github.com/grpc/grpc-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/releases/tag/v1.82.1"&gt;https://github.com/grpc/grpc-go/releases/tag/v1.82.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hrxh-6v49-42gf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xxjv-752h-3vp2: Gitea: Public-only repository tokens can update private PR head branches</title>
+    <id>https://osv.dev/vulnerability/GHSA-xxjv-752h-3vp2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xxjv-752h-3vp2"/>
+    <published>2026-07-21T20:38:06Z</published>
+    <updated>2026-07-27T17:11:44Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58443"/>
+    <category term="GO-2026-6086"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Public-only repository tokens can update private PR head branches&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58443, GO-2026-6086&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Gitea allows a `public-only,write:repository` token to update a private pull request head branch through a public base repository route.
+
+The vulnerable endpoint is:
+
+```text
+POST /api/v1/repos/{public-owner}/{public-repo}/pulls/{index}/update
+```
+
+Gitea checks the token&amp;#x27;s public-only restriction against the route repository, which is the public base repository. `UpdatePullRequest()` then authorizes the pull request head repository with ordinary user RBAC and calls the pull update service. If the head repository is private, the active token&amp;#x27;s public-only restriction is not re-applied to that private repository before Gitea pushes changes into it.
+
+As a result, the same token that cannot directly write to the private repository can still cause Gitea to push public base commits i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-xxjv-752h-3vp2"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-xxjv-752h-3vp2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xxjv-752h-3vp2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mg4f-x9v4-6h2p: Gitea: OIDC userinfo Endpoint Returns Identity Claims Without Enforcing API Token Scopes</title>
+    <id>https://osv.dev/vulnerability/GHSA-mg4f-x9v4-6h2p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mg4f-x9v4-6h2p"/>
+    <published>2026-07-21T20:42:05Z</published>
+    <updated>2026-07-27T17:11:44Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55982"/>
+    <category term="GO-2026-6065"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: OIDC userinfo Endpoint Returns Identity Claims Without Enforcing API Token Scopes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55982, GO-2026-6065&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The OIDC userinfo endpoint (`GET /login/oauth/userinfo`) accepts Gitea API tokens as bearer credentials but does not enforce API token scopes before returning identity claims.
+
+A personal access token scoped only to `read:misc` can successfully retrieve user information from the OIDC userinfo endpoint, even though the same token is denied access to user-related REST API endpoints that enforce scope checks.
+
+As a result, identity information remains accessible through the OIDC endpoint regardless of the scopes assigned to the API token.
+
+### Details
+
+Gitea supports scoped personal access tokens and enforces scope checks on user-related REST API endpoints.
+
+For example, a token scoped only to `read:misc` is denied access to endpoints such as:
+
+| Endpoint | Required Scope |
+|----…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-mg4f-x9v4-6h2p"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-mg4f-x9v4-6h2p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mg4f-x9v4-6h2p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q3fv-x8vg-qqm4: Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser</title>
+    <id>https://osv.dev/vulnerability/GHSA-q3fv-x8vg-qqm4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q3fv-x8vg-qqm4"/>
+    <published>2026-07-14T19:52:14Z</published>
+    <updated>2026-07-27T17:11:43Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54448"/>
+    <category term="GO-2026-5983"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54448, GO-2026-5983&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/aquasecurity/trivy&lt;/code&gt; — fixed in 0.71.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+When Trivy scans a Helm chart archive (`.tgz`), its custom tar unpacker reads each entry with `io.ReadAll(tr)` and no size limit. An attacker who can place a malicious `.tgz` file in the scanned path can craft a small compressed archive that decompresses to gigabytes, causing the Trivy process to be killed by the OS OOM killer.
+
+## Affected configurations
+
+Exploitation requires the attacker to place a crafted `.tgz` file in a location that Trivy will scan as a Helm chart. This applies to the following scan targets:
+
+| Command | Condition |
+| --- | --- |
+| `trivy config &amp;lt;dir&amp;gt;` | Directory contains a crafted `.tgz` Helm chart (misconfiguration scanning is always enabled) |
+| `trivy filesystem --scanners misconf &amp;lt;dir&amp;gt;` | Directory contains a crafted `.tgz` Helm chart **and** `--sc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4"&gt;https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54448"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54448&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/pull/10718"&gt;https://github.com/aquasecurity/trivy/pull/10718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4"&gt;https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy"&gt;https://github.com/aquasecurity/trivy&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/releases/tag/v0.71.0"&gt;https://github.com/aquasecurity/trivy/releases/tag/v0.71.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q3fv-x8vg-qqm4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xv9x-fj9g-vj6h: Gitea: Cross-repository IDOR in issue-dependency removal lets an attacker tamper with and comment on private repos they cannot access</title>
+    <id>https://osv.dev/vulnerability/GHSA-xv9x-fj9g-vj6h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xv9x-fj9g-vj6h"/>
+    <published>2026-07-21T20:36:59Z</published>
+    <updated>2026-07-27T17:11:41Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58438"/>
+    <category term="GO-2026-6085"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Cross-repository IDOR in issue-dependency removal lets an attacker tamper with and comment on private repos they cannot access&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58438, GO-2026-6085&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Details
+`RemoveDependency` in `routers/web/repo/issue_dependency.go` takes a `removeDependencyID` form parameter identifying the other issue by its global numeric ID, and fetches it with `issues_model.GetIssueByID(ctx, depID)` - no repository or permission check at all. It then calls `issues_model.RemoveIssueDependency(ctx, ctx.Doer, issue, dep, depType)` (`models/issues/dependency.go`), which deletes the dependency join row and then writes a comment referencing the removal, attributed to the calling user, onto the dependency record.
+
+The sibling function in the very same file, `AddDependency`, does this correctly when the two issues are in different repos (which `ALLOW_CROSS_REPOSITORY_DEPENDENCIES`, on by default, permits):
+
+```go
+if issue.RepoID != dep.RepoID {
+  if !setting.Service…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-xv9x-fj9g-vj6h"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-xv9x-fj9g-vj6h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xv9x-fj9g-vj6h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-wrf9-r3h7-7x5v: Gitea: Fork Synchronization Continues After Parent Repository Changes from Public to Private</title>
+    <id>https://osv.dev/vulnerability/GHSA-wrf9-r3h7-7x5v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wrf9-r3h7-7x5v"/>
+    <published>2026-07-21T21:42:28Z</published>
+    <updated>2026-07-27T17:11:40Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-24451"/>
+    <category term="GO-2026-6081"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Fork Synchronization Continues After Parent Repository Changes from Public to Private&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-24451, GO-2026-6081&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `POST /api/v1/repos/{owner}/{repo}/merge-upstream` endpoint continues to synchronize commits from a parent repository after the parent repository has been changed from public to private.
+
+A fork created while the parent repository was public can still receive commits made after the parent repository becomes private. As a result, content added during the private period becomes available through the fork repository after synchronization.
+
+### Details
+
+Gitea provides the `merge-upstream` API to synchronize a fork with its parent repository.
+
+A typical workflow is:
+
+1. A repository is public.
+2. Another user creates a fork.
+3. The fork owner uses `merge-upstream` to receive updates from the parent repository.
+
+However, if the parent repository is later changed from public to p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-wrf9-r3h7-7x5v"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-wrf9-r3h7-7x5v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-24451"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-24451&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38151"&gt;https://github.com/go-gitea/gitea/pull/38151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.3-and-1.26.4"&gt;https://blog.gitea.com/release-of-1.26.3-and-1.26.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.3"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wrf9-r3h7-7x5v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-49p4-px3h-rq49: Build breakout using malicious Containerfile and Git Smart HTTP server or GitHub release tar archive</title>
+    <id>https://osv.dev/vulnerability/GHSA-49p4-px3h-rq49</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-49p4-px3h-rq49"/>
+    <published>2026-06-22T20:15:48Z</published>
+    <updated>2026-07-27T17:11:40Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-44517"/>
+    <category term="GO-2026-5116"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Build breakout using malicious Containerfile and Git Smart HTTP server or GitHub release tar archive&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44517, GO-2026-5116&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containers/buildah&lt;/code&gt; — fixed in 1.43.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+When processing a build contexts or `add`/`copy` instructions, a malicious server serving a Git repository or a tar archive file can cause files outside of the build context directory to be included in the build context or copied into the build.
+
+### Patches
+
+Fixed in Buildah 1.44 and 1.43.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containers/buildah/security/advisories/GHSA-49p4-px3h-rq49"&gt;https://github.com/containers/buildah/security/advisories/GHSA-49p4-px3h-rq49&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/buildah/security/advisories/GHSA-49p4-px3h-rq49"&gt;https://github.com/podman-container-tools/buildah/security/advisories/GHSA-49p4-px3h-rq49&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/buildah"&gt;https://github.com/podman-container-tools/buildah&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-49p4-px3h-rq49"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-v73x-hx65-6pf4: Gitea: Unauthorized Access to Labels of Private Organizations</title>
+    <id>https://osv.dev/vulnerability/GHSA-v73x-hx65-6pf4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v73x-hx65-6pf4"/>
+    <published>2026-07-21T21:46:39Z</published>
+    <updated>2026-07-27T17:11:39Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-25038"/>
+    <category term="GO-2026-6076"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Unauthorized Access to Labels of Private Organizations&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25038, GO-2026-6076&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Gitea 1.26.2 does not properly enforce organization visibility restrictions on organization label read endpoints.
+
+A user without access to a private organization can retrieve labels belonging to that organization through the Organization Labels API. As a result, label metadata intended to be restricted to organization members may be disclosed.
+
+The issue is limited to unauthorized read access. No unauthorized modification of labels was observed.
+
+## Details
+
+The following endpoints are affected:
+
+* `GET /api/v1/orgs/{org}/labels`
+* `GET /api/v1/orgs/{org}/labels/{id}`
+
+During testing, a private organization was created and a label was added to that organization.
+
+Access to the organization itself was correctly restricted. A user without membership in the organization received …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-v73x-hx65-6pf4"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-v73x-hx65-6pf4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-25038"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-25038&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38151"&gt;https://github.com/go-gitea/gitea/pull/38151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/99f8b3d9a1d32f4c39828e07971455a18191e0b9"&gt;https://github.com/go-gitea/gitea/commit/99f8b3d9a1d32f4c39828e07971455a18191e0b9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.3-and-1.26.4"&gt;https://blog.gitea.com/release-of-1.26.3-and-1.26.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.3"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v73x-hx65-6pf4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-hg5r-vq93-9fv6: Gitea Actions Artifacts V4 signed URL HMAC ambiguity allows cross-repository artifact read and cross-task upload-state write</title>
+    <id>https://osv.dev/vulnerability/GHSA-hg5r-vq93-9fv6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hg5r-vq93-9fv6"/>
+    <published>2026-07-21T20:36:38Z</published>
+    <updated>2026-07-27T17:11:37Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58426"/>
+    <category term="GO-2026-6060"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea Actions Artifacts V4 signed URL HMAC ambiguity allows cross-repository artifact read and cross-task upload-state write&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58426, GO-2026-6060&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Gitea Actions Artifacts V4 signed upload/download URLs can be rewritten to access a different running task and repository context while preserving the original HMAC signature. An attacker with permission to run a Gitea Actions job can turn a signed URL for an attacker-controlled artifact into a URL that reads artifacts from another task context, or writes attacker-controlled data into another task&amp;#x27;s artifact upload staging context, including in a private repository.
+
+This is one vulnerability with two exploit paths:
+
+- `DownloadArtifact`: cross-task/cross-repository artifact read, giving `C:H`.
+- `UploadArtifact`: cross-task artifact staging write and metadata mutation, giving `I:H`.
+
+### Details
+
+The root cause is that the V4 artifact signed URL signature is built from raw co…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-hg5r-vq93-9fv6"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-hg5r-vq93-9fv6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-58426"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-58426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/37707"&gt;https://github.com/go-gitea/gitea/pull/37707&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/1c2d5e9b03f71dd12d450b2af9a79f2557b50226"&gt;https://github.com/go-gitea/gitea/commit/1c2d5e9b03f71dd12d450b2af9a79f2557b50226&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.2"&gt;https://blog.gitea.com/release-of-1.26.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.2"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hg5r-vq93-9fv6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-rqhx-647v-wx32: Gitea: SSRF via HTTP Redirect in Repository Migration</title>
+    <id>https://osv.dev/vulnerability/GHSA-rqhx-647v-wx32</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rqhx-647v-wx32"/>
+    <published>2026-07-21T20:33:52Z</published>
+    <updated>2026-07-27T17:11:37Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58418"/>
+    <category term="GO-2026-6075"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: SSRF via HTTP Redirect in Repository Migration&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58418, GO-2026-6075&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Gitea 1.25.4 validates the initial URL provided to the repository migration endpoint (`POST /api/v1/repos/migrate`) and correctly blocks requests to internal addresses like `127.0.0.1` or RFC1918 ranges. However, if the initial URL points to an attacker-controlled server that responds with an HTTP 302 redirect to an internal address, Gitea follows the redirect without performing a second validation. This allows a low-privilege user to reach internal services through Gitea as a proxy.
+
+## Affected Version
+
+Gitea 1.25.4 (latest stable at time of writing), default configuration.
+
+## Prerequisites
+
+1. A regular Gitea user account (no admin privileges required)
+2. An attacker-controlled server reachable from the internet that serves HTTP 302 redirects
+
+## Reproduction
+
+### Environme…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rqhx-647v-wx32"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rqhx-647v-wx32&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-58418"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-58418&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38108"&gt;https://github.com/go-gitea/gitea/pull/38108&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/9e84deb969aff5c1115c2984e41250f28c78451f"&gt;https://github.com/go-gitea/gitea/commit/9e84deb969aff5c1115c2984e41250f28c78451f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.3-and-1.26.4"&gt;https://blog.gitea.com/release-of-1.26.3-and-1.26.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.4"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rqhx-647v-wx32"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-wwqq-x6w4-frm2: Gitea: Denial of Service via Unbounded io.ReadAll in NPM Package Tag Endpoint</title>
+    <id>https://osv.dev/vulnerability/GHSA-wwqq-x6w4-frm2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wwqq-x6w4-frm2"/>
+    <published>2026-07-21T20:39:37Z</published>
+    <updated>2026-07-27T17:11:37Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-42931"/>
+    <category term="GO-2026-6082"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Denial of Service via Unbounded io.ReadAll in NPM Package Tag Endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42931, GO-2026-6082&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+An unbounded `io.ReadAll(ctx.Req.Body)` call in the NPM package tag API endpoint allows any authenticated user to crash the Gitea server by sending a single large HTTP request. The request body is read entirely into memory with no size limit, causing an Out-of-Memory (OOM) kill. With concurrent requests, the attack produces a persistent denial of service that survives automatic restarts.
+
+### Details
+The [`AddPackageTag`](https://github.com/go-gitea/gitea/blob/a12f9807933bd463368c6111dbc283d8a65f20f7/routers/api/packages/npm/npm.go#L336) function reads the entire HTTP request body into memory using `io.ReadAll()` with no size validation:
+
+```go
+// routers/api/packages/npm/npm.go:332-341
+func AddPackageTag(ctx *context.Context) {
+    packageName := packageNameFromParams(ctx)
+
+  …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-wwqq-x6w4-frm2"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-wwqq-x6w4-frm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wwqq-x6w4-frm2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-w8j3-pq8g-8m7w: iskorotkov/avro: CPU Exhaustion in Decoder</title>
+    <id>https://osv.dev/vulnerability/GHSA-w8j3-pq8g-8m7w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w8j3-pq8g-8m7w"/>
+    <published>2026-05-18T16:33:43Z</published>
+    <updated>2026-07-27T17:11:35Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46385"/>
+    <category term="GO-2026-5046"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;iskorotkov/avro: CPU Exhaustion in Decoder&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46385, GO-2026-5046&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/iskorotkov/avro/v2&lt;/code&gt; — fixed in 2.33.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# CPU Exhaustion in Avro Decoder via Unbounded Block-Count Iteration
+
+## Summary
+
+The Avro array and map decoders looped over an attacker-controlled block-count value without checking the underlying reader&amp;#x27;s error state inside the loop body. `Reader.ReadBlockHeader` returns the count as a Go `int`, which is 64-bit on `amd64` / `arm64` targets — so a producer can declare a block of up to `math.MaxInt64` (~9.2 × 10¹⁸) elements followed by EOF (or any truncated payload), and the decoder will attempt that many no-op iterations before propagating the error. The realistic ceiling is &amp;quot;indefinite until the worker is killed externally&amp;quot; — a single hostile payload pins a CPU core until the process is OOM-killed, deadline-cancelled, or terminated. Remote, unauthenticated denial-of-service.
+
+The fix ex…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/security/advisories/GHSA-w8j3-pq8g-8m7w"&gt;https://github.com/iskorotkov/avro/security/advisories/GHSA-w8j3-pq8g-8m7w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46385"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46385&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro"&gt;https://github.com/iskorotkov/avro&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w8j3-pq8g-8m7w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-x77v-q46j-393g: Gitea: Blind SSRF in OAuth2 avatar synchronization via unvalidated OIDC picture claim</title>
+    <id>https://osv.dev/vulnerability/GHSA-x77v-q46j-393g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x77v-q46j-393g"/>
+    <published>2026-07-21T20:22:23Z</published>
+    <updated>2026-07-27T17:11:33Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-23603"/>
+    <category term="GO-2026-6083"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Blind SSRF in OAuth2 avatar synchronization via unvalidated OIDC picture claim&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-23603, GO-2026-6083&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+When `[oauth2_client] UPDATE_AVATAR = true` is enabled, Gitea fetches the avatar URL received from an OAuth2/OIDC provider using Go&amp;#x27;s default HTTP client. The URL comes from the user&amp;#x27;s OAuth/OIDC avatar value, commonly the OIDC `picture` claim.
+
+The affected code path calls `http.Get(url)` without applying outbound host or IP restrictions. A low-privileged user who can influence their own `picture` claim under an already-configured OAuth2/OIDC source can cause the Gitea server to make arbitrary outbound HTTP GET requests. This includes requests to loopback addresses, RFC 1918 private network addresses, and IPv4 link-local addresses such as `169.254.169.254`.
+
+This is a blind SSRF by default. Impact can increase in deployments where the Gitea host can reach cloud metadata servic…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-x77v-q46j-393g"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-x77v-q46j-393g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38406"&gt;https://github.com/go-gitea/gitea/pull/38406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38426"&gt;https://github.com/go-gitea/gitea/pull/38426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/de4b8277e9cb576f2315fb03b5ab6478b42a1d31"&gt;https://github.com/go-gitea/gitea/commit/de4b8277e9cb576f2315fb03b5ab6478b42a1d31&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/f69e15afe7496cc62e96dab244629c69eb31a7bf"&gt;https://github.com/go-gitea/gitea/commit/f69e15afe7496cc62e96dab244629c69eb31a7bf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x77v-q46j-393g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-rh79-75qm-gwjr: Gitea LFS Deploy-Key Privilege Escalation</title>
+    <id>https://osv.dev/vulnerability/GHSA-rh79-75qm-gwjr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rh79-75qm-gwjr"/>
+    <published>2026-07-21T21:00:51Z</published>
+    <updated>2026-07-27T17:11:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58435"/>
+    <category term="GO-2026-6073"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea LFS Deploy-Key Privilege Escalation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58435, GO-2026-6073&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability Header
+
+| Field               | Value                                                       |
+| ------------------- | ----------------------------------------------------------- |
+| Vulnerability Title | Gitea LFS Deploy-Key Privilege Escalation                   |
+| Severity Rating     | High                                                        |
+| Bug Category        | Insufficient Authorization                                  |
+| Location            | `services/lfs/server.go:268`, `routers/private/serv.go:275` |
+| Affected Versions   | 1.25.5                                                      |
+
+## Executive Summary
+
+Gitea&amp;#x27;s LFS server (`services/lfs/server.go:268`) uses the `UserID` embedded in an LFS JWT to make cross-repository authorization decisions via `LFSOb…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rh79-75qm-gwjr"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rh79-75qm-gwjr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rh79-75qm-gwjr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-rgv6-xp99-6mgj: Gitea Remember-Me Token Theft Not Invalidating Attacker Session</title>
+    <id>https://osv.dev/vulnerability/GHSA-rgv6-xp99-6mgj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rgv6-xp99-6mgj"/>
+    <published>2026-07-21T20:20:21Z</published>
+    <updated>2026-07-27T17:11:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-56750"/>
+    <category term="GO-2026-6072"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea Remember-Me Token Theft Not Invalidating Attacker Session&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56750, GO-2026-6072&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The vulnerability is in the Remember-Me (gitea_incredible) token validation logic, specifically when handling a compromised token (hash mismatch).
+
+The vulnerable function is this one:
+
+https://github.com/go-gitea/gitea/blob/689ace1ce28fd74244b8aa335d9928cdbf6b22f9/services/auth/auth_token.go#L33-L64
+
+### Affected Endpoint
+POST `/user/login` (and any endpoint triggering `autoSignIn` via the Remember-Me cookie).
+
+### Description
+Gitea implements Remember-Me cookies using a split token design (ID:Hash), [citing the Paragonie secure remember-me guide](https://github.com/go-gitea/gitea/blob/689ace1ce28fd74244b8aa335d9928cdbf6b22f9/services/auth/auth_token.go#L21). When a token is used, its Hash is rotated, but the ID remains the same.
+
+If an attacker steals a user&amp;#x27;s Remember-Me token and uses …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rgv6-xp99-6mgj"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rgv6-xp99-6mgj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38406"&gt;https://github.com/go-gitea/gitea/pull/38406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38426"&gt;https://github.com/go-gitea/gitea/pull/38426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/de4b8277e9cb576f2315fb03b5ab6478b42a1d31"&gt;https://github.com/go-gitea/gitea/commit/de4b8277e9cb576f2315fb03b5ab6478b42a1d31&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/f69e15afe7496cc62e96dab244629c69eb31a7bf"&gt;https://github.com/go-gitea/gitea/commit/f69e15afe7496cc62e96dab244629c69eb31a7bf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rgv6-xp99-6mgj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q9pg-jj6x-j9p6: Gitea: draft release attachment disclosure via missing web authorization</title>
+    <id>https://osv.dev/vulnerability/GHSA-q9pg-jj6x-j9p6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q9pg-jj6x-j9p6"/>
+    <published>2026-07-21T20:19:25Z</published>
+    <updated>2026-07-27T17:11:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58432"/>
+    <category term="GO-2026-6070"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: draft release attachment disclosure via missing web authorization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58432, GO-2026-6070&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Gitea&amp;#x27;s draft-release access control is enforced only on the API release endpoints (`/api/v1/repos/{owner}/{repo}/releases/{id}` and its `/assets/...` sub-routes) but not on the web-level UUID-based attachment endpoints (`/attachments/{uuid}`, `/{owner}/{repo}/attachments/{uuid}`, `/{owner}/{repo}/releases/attachments/{uuid}`). Anyone (including unauthenticated callers) who has, learns, or otherwise obtains the UUID of an attachment belonging to a draft release can download its full contents, despite the draft release itself being correctly hidden from listings and direct-by-ID API lookups.
+
+The `browser_download_url` field returned by the API (visible to anyone with write access to the repo) embeds the UUID. Forwarding this URL by email, log scrape, browser history, screensho…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-q9pg-jj6x-j9p6"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-q9pg-jj6x-j9p6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38318"&gt;https://github.com/go-gitea/gitea/pull/38318&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38325"&gt;https://github.com/go-gitea/gitea/pull/38325&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/ab10e37acf7fabf7829a485cc3e13d118638a856"&gt;https://github.com/go-gitea/gitea/commit/ab10e37acf7fabf7829a485cc3e13d118638a856&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/f7fd51022495737cf960b8c4053a27d69148f664"&gt;https://github.com/go-gitea/gitea/commit/f7fd51022495737cf960b8c4053a27d69148f664&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q9pg-jj6x-j9p6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jr5x-6h83-wrxf: Gitea: REST API exposes organization membership of private organizations to public</title>
+    <id>https://osv.dev/vulnerability/GHSA-jr5x-6h83-wrxf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jr5x-6h83-wrxf"/>
+    <published>2026-07-21T20:40:55Z</published>
+    <updated>2026-07-27T17:11:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58417"/>
+    <category term="GO-2026-6063"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: REST API exposes organization membership of private organizations to public&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58417, GO-2026-6063&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The endpoint  &amp;quot;/orgs/{org}/public_members/{username}&amp;quot; + GET exposes organization membership of public members in a private organization.
+
+### PoC
+
+1. Spin up the nightly container of Gitea.
+2. Perform the default installation.
+3. Register a new user (let&amp;#x27;s call this user &amp;quot;user1&amp;quot;).
+4. Create a new organization with &amp;quot;private&amp;quot; visibility. We will refer to this organization as &amp;quot;user1org&amp;quot;.
+5. Make the user &amp;quot;user1&amp;quot; inside the organization visible.
+6. Log out and register a new user (&amp;quot;user2&amp;quot;).
+7. Create an access token for &amp;quot;user2&amp;quot; with full access to the API.
+8. Use the endpoint &amp;quot;/orgs/{org}/public_members/{username}&amp;quot; + GET with the correct username of &amp;quot;user1&amp;quot;, organization name, and access token of &amp;quot;user2&amp;quot; to query whether &amp;quot;user1&amp;quot; is a member of the organization. The following curl …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-jr5x-6h83-wrxf"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-jr5x-6h83-wrxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38145"&gt;https://github.com/go-gitea/gitea/pull/38145&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/685b62c60fc595e3612a85f0895471876db56292"&gt;https://github.com/go-gitea/gitea/commit/685b62c60fc595e3612a85f0895471876db56292&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jr5x-6h83-wrxf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xmj7-xj85-hfc3: Gitea: SSRF in restore-repo via unsanitized pull_request.yml Head.CloneURL</title>
+    <id>https://osv.dev/vulnerability/GHSA-xmj7-xj85-hfc3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xmj7-xj85-hfc3"/>
+    <published>2026-07-21T20:37:29Z</published>
+    <updated>2026-07-27T17:11:27Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58441"/>
+    <category term="GO-2026-6084"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: SSRF in restore-repo via unsanitized pull_request.yml Head.CloneURL&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58441, GO-2026-6084&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Gitea&amp;#x27;s `restore-repo` CLI command restores a repository from a dump
+directory/archive. When parsing `pull_request.yml` from that dump, the
+`Head.CloneURL` field is used to add a git remote and fetch from it with
+no validation, because the safety check that&amp;#x27;s supposed to guard it
+(`CheckAndEnsureSafePR`) is called with an empty `commonCloneBaseURL`,
+which silently disables it. This lets a malicious dump make the Gitea
+server execute `git fetch` against an attacker-chosen URL (SSRF), or
+disclose a local git repository via `file://`. This is a different root
+cause from the recently fixed path-traversal issue in the same command
+(#38215), which patched `DownloadURL`/`PatchURL` but not `Head.CloneURL`.
+
+### Details
+`services/migrations/restore.go`&amp;#x27;s `GetPullRequests()` unmarshals
+`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-xmj7-xj85-hfc3"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-xmj7-xj85-hfc3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xmj7-xj85-hfc3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-prr9-9mp4-5gp2: Gitea: Private org member list leaked via /members API endpoint — incomplete fix for PR #38145</title>
+    <id>https://osv.dev/vulnerability/GHSA-prr9-9mp4-5gp2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-prr9-9mp4-5gp2"/>
+    <published>2026-07-21T21:49:00Z</published>
+    <updated>2026-07-27T17:11:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58427"/>
+    <category term="GO-2026-6068"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Private org member list leaked via /members API endpoint — incomplete fix for PR #38145&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58427, GO-2026-6068&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+PR #38145 fixed ListPublicMembers and IsPublicMember but missed 
+ListMembers. Any authenticated user can enumerate ALL members 
+(not just public ones) of a private organization.
+
+## Affected Versions
+&amp;lt;= v1.26.4 (latest) and main branch
+
+## Root Cause
+routers/api/v1/org/member.go — ListMembers():
+
+// Missing check:
+if !organization.HasOrgOrUserVisible(ctx, 
+    ctx.Org.Organization.AsUser(), ctx.Doer) {
+    ctx.APIErrorNotFound()
+    return
+}
+
+## Proof of Concept
+
+# Setup: privateorg (private), alice = member, bob = outsider
+
+# Bob lists ALL members of private org
+curl -s &amp;quot;http://gitea/api/v1/orgs/privateorg/members&amp;quot; \
+  -H &amp;quot;Authorization: token BOB_TOKEN&amp;quot;
+
+# Result: HTTP 200
+[{&amp;quot;login&amp;quot;:&amp;quot;alice&amp;quot;,&amp;quot;email&amp;quot;:&amp;quot;alice@test.com&amp;quot;,...}]
+# Expected: HTTP 404
+
+## Note
+This is an incomplete fix …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-prr9-9mp4-5gp2"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-prr9-9mp4-5gp2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-prr9-9mp4-5gp2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-qf2f-qh6p-7v89: Gitea CVE-2026-20800 sibling endpoints not covered: revoked user still reads private repo objects via `/api/v1/user/starred` and private issue titles via `/api/v1/user/times`</title>
+    <id>https://osv.dev/vulnerability/GHSA-qf2f-qh6p-7v89</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qf2f-qh6p-7v89"/>
+    <published>2026-07-21T20:13:03Z</published>
+    <updated>2026-07-27T17:11:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-59766"/>
+    <category term="GO-2026-6071"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea CVE-2026-20800 sibling endpoints not covered: revoked user still reads private repo objects via `/api/v1/user/starred` and private issue titles via `/api/v1/user/times`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59766, GO-2026-6071&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+CVE-2026-20800 fixed private-info leakage to revoked users only for the notification endpoint. Two
+sibling endpoints that return data keyed on the caller&amp;#x27;s own relationship still do not re-check repo
+access at output time:
+- `GET /api/v1/user/starred` — `getStarredRepos()` computes a per-repo permission but still lists every
+  starred repo (no filtering), so the full repo object (`full_name`, `private`, `clone_url`, `ssh_url`)
+  of a now-inaccessible private repo is returned.
+- `GET /api/v1/user/times` — `ListMyTrackedTimes()` queries by `UserID` only and `LoadAttributes` brings
+  in the issue (`title`, `state`), leaking private issue titles after revocation.
+
+## Steps to reproduce
+Using the provided reproduction materials, as a revoked user:
+1. Control: `GET /api/v1/repos/admin…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-qf2f-qh6p-7v89"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-qf2f-qh6p-7v89&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qf2f-qh6p-7v89"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q423-49rw-g9mh: Gitea: GHSA-8fwc-qjw5-rvgp ClearRepoWatches fix not applied to API EditRepo path — sister code path retains stale watches on public-&gt;private</title>
+    <id>https://osv.dev/vulnerability/GHSA-q423-49rw-g9mh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q423-49rw-g9mh"/>
+    <published>2026-07-21T21:51:41Z</published>
+    <updated>2026-07-27T17:11:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58510"/>
+    <category term="GO-2026-6069"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: GHSA-8fwc-qjw5-rvgp ClearRepoWatches fix not applied to API EditRepo path — sister code path retains stale watches on public-&amp;gt;private&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58510, GO-2026-6069&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+GHSA-8fwc-qjw5-rvgp (&amp;quot;Gitea may send release notification emails for private repositories to users whose access has been revoked&amp;quot;, fix in PR #36319 / commit 8a98ac22) added `repo_model.ClearRepoWatches` as a defense for the state transition public→private. The cleanup was wired into `services/repository/repository.go::MakeRepoPrivate` only. The sister helper `services/repository/repository.go::updateRepository` — which is the function used by the API path `PATCH /api/v1/repos/{owner}/{repo}` — was not patched and still calls `ClearRepoStars` only.
+
+As a result, when a public repository is flipped to private via the REST API (rather than via the web Settings → Danger Zone UI), the watch records persist. Affected users can:
+
+- See the now-private repository in `GET /api/v1/user/s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-q423-49rw-g9mh"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-q423-49rw-g9mh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q423-49rw-g9mh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h2x6-g7q6-344v: Gitea: Repository migration SSRF via multi-answer DNS allow-list bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-h2x6-g7q6-344v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h2x6-g7q6-344v"/>
+    <published>2026-07-21T20:37:45Z</published>
+    <updated>2026-07-27T17:11:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58442"/>
+    <category term="GO-2026-6058"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Repository migration SSRF via multi-answer DNS allow-list bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58442, GO-2026-6058&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Gitea&amp;#x27;s repository migration URL validation can be bypassed when a migration hostname resolves to multiple IP addresses. The validation logic accepts the destination if **any** resolved IP is allowed, even if another resolved IP is loopback, private, or otherwise blocked. The later `git clone` operation resolves the hostname again outside of that validation decision, so it can connect to the internal address.
+
+An authenticated low-privilege user who can create repository migrations can use an attacker-controlled DNS name to make Gitea connect to internal-only Git services and import their contents into a repository controlled by the attacker.
+
+### Details
+
+The issue is in `services/migrations/migrate.go`, in the migration allow/block-list check.
+
+Current logic computes whether…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-h2x6-g7q6-344v"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-h2x6-g7q6-344v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h2x6-g7q6-344v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-w5pg-649r-p6gg: Gitea: Branch Protection Bypass via PR Retargeting Preserves Stale `official` Approval Flag</title>
+    <id>https://osv.dev/vulnerability/GHSA-w5pg-649r-p6gg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w5pg-649r-p6gg"/>
+    <published>2026-07-21T20:14:12Z</published>
+    <updated>2026-07-27T17:11:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58439"/>
+    <category term="GO-2026-6080"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Branch Protection Bypass via PR Retargeting Preserves Stale `official` Approval Flag&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58439, GO-2026-6080&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;go-gitea/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Gitea does not re-evaluate the `official` flag on existing pull request reviews when a PR&amp;#x27;s target branch is changed. An attacker with write access to a repository can obtain an `official: true` approval on a PR targeting an unprotected branch, then retarget the PR to a protected branch (e.g., `master`). The approval, which would have been `official: false` if submitted against the protected branch, is preserved and satisfies the protected branch&amp;#x27;s required approvals, allowing the attacker to merge without legitimate maintainer approval.
+
+- Confirmed on Gitea **1.25.4** (`1.25.4+41-g96515c0f20`)
+
+## Vulnerability Details
+
+### Root Cause
+
+When a review is submitted on a pull request, Gitea computes the `official` flag by checking whether the reviewer is in the **target branch&amp;#x27;s*…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-w5pg-649r-p6gg"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-w5pg-649r-p6gg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38319"&gt;https://github.com/go-gitea/gitea/pull/38319&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38402"&gt;https://github.com/go-gitea/gitea/pull/38402&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/74ad781db9c37134ee9280c69a6b1de53801503e"&gt;https://github.com/go-gitea/gitea/commit/74ad781db9c37134ee9280c69a6b1de53801503e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/8401fe7c544abff1ecc49d7f3166fd4ee0c174ef"&gt;https://github.com/go-gitea/gitea/commit/8401fe7c544abff1ecc49d7f3166fd4ee0c174ef&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w5pg-649r-p6gg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-m932-crvm-gcp5: Gitea: Null Pointer Dereference in AddTime API Causes Authenticated Denial of Service</title>
+    <id>https://osv.dev/vulnerability/GHSA-m932-crvm-gcp5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m932-crvm-gcp5"/>
+    <published>2026-07-21T20:59:14Z</published>
+    <updated>2026-07-27T17:11:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55984"/>
+    <category term="GO-2026-6064"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Null Pointer Dereference in AddTime API Causes Authenticated Denial of Service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55984, GO-2026-6064&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The AddTime API handler continues execution after an error returned by `GetUserByName()`.
+
+When a repository administrator specifies a non-existent user name, an error response is generated but execution does not stop. Subsequent code dereferences a nil user pointer, resulting in a runtime panic.
+
+### Details
+
+Affected endpoint:
+
+```http
+POST /api/v1/repos/{owner}/{repo}/issues/{index}/times
+```
+
+Affected file:
+
+```text
+routers/api/v1/repo/issue_tracked_time.go
+```
+
+Relevant code:
+
+```go
+user, err = user_model.GetUserByName(ctx, form.User)
+if err != nil {
+    ctx.APIErrorInternal(err)
+    // missing return
+}
+```
+
+Execution continues to:
+
+```go
+trackedTime, err := issues_model.AddTime(
+    ctx,
+    user,
+    issue,
+    form.Time,
+    created,
+)
+```
+
+When `GetUserByName()` fails…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-m932-crvm-gcp5"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-m932-crvm-gcp5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m932-crvm-gcp5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vrhc-jjfc-m3m3: Gitea: OAuth2 sign-in reactivates an administrator-deactivated account on auth sources without refresh tokens (incomplete fix of #38009)</title>
+    <id>https://osv.dev/vulnerability/GHSA-vrhc-jjfc-m3m3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vrhc-jjfc-m3m3"/>
+    <published>2026-07-21T21:02:10Z</published>
+    <updated>2026-07-27T17:11:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55987"/>
+    <category term="GO-2026-6078"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: OAuth2 sign-in reactivates an administrator-deactivated account on auth sources without refresh tokens (incomplete fix of #38009)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55987, GO-2026-6078&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
+
+Gitea&amp;#x27;s OAuth2 sign-in callback reactivates a deactivated user account (`IsActive=false`) when the user signs in through an authentication source that does not issue refresh tokens (notably GitHub, and any OIDC/OAuth2 source configured without `offline_access`). PR #38009 added a gate intended to reactivate users only when the OAuth2 auto-sync cron had disabled them, using &amp;quot;the stored refresh token is empty&amp;quot; as the signal. That signal is wrong: for sources that never issue refresh tokens, an empty refresh token is the normal state of every user, so the gate cannot distinguish a cron-disabled account from one an administrator deliberately deactivated. The next time the administrator-deactivated user signs in through the provider, Gitea sets `IsActive=true` and grants a full …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-vrhc-jjfc-m3m3"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-vrhc-jjfc-m3m3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vrhc-jjfc-m3m3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-x8qc-fggm-mpqg: Ollama contains a heap out-of-bounds read vulnerability in the GGUF model loader</title>
+    <id>https://osv.dev/vulnerability/GHSA-x8qc-fggm-mpqg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x8qc-fggm-mpqg"/>
+    <published>2026-05-04T15:31:14Z</published>
+    <updated>2026-07-27T17:11:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-7482"/>
+    <category term="GO-2026-5748"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Ollama contains a heap out-of-bounds read vulnerability in the GGUF model loader&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-7482, GO-2026-5748&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:H/SC:N/SI:N/SA:N/AU:Y/R:A/V:D/RE:L/U:Red&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/ollama/ollama&lt;/code&gt; — fixed in 0.17.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Ollama before 0.17.1 contains a heap out-of-bounds read vulnerability in the GGUF model loader. The /api/create endpoint accepts an attacker-supplied GGUF file in which the declared tensor offset and size exceed the file&amp;#x27;s actual length; during quantization in fs/ggml/gguf.go and server/quantization.go (WriteTo()), the server reads past the allocated heap buffer. The leaked memory contents may include environment variables, API keys, system prompts, and concurrent users&amp;#x27; conversation data, and can be exfiltrated by uploading the resulting model artifact through the /api/push endpoint to an attacker-controlled registry. The /api/create and /api/push endpoints have no authentication in the upstream distribution. Default deployments bind to 127.0.0.1, but the documented OLLAMA_HOST=0.0.0.0 co…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-7482"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-7482&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama/pull/14406"&gt;https://github.com/ollama/ollama/pull/14406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama/commit/88d57d0483cca907e0b23a968c83627a20b21047"&gt;https://github.com/ollama/ollama/commit/88d57d0483cca907e0b23a968c83627a20b21047&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama"&gt;https://github.com/ollama/ollama&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama/releases/tag/v0.17.1"&gt;https://github.com/ollama/ollama/releases/tag/v0.17.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x8qc-fggm-mpqg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-v96j-25gv-g2w9: Gitea: Unauthenticated ReDoS via CODEOWNERS pattern matching allows denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-v96j-25gv-g2w9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v96j-25gv-g2w9"/>
+    <published>2026-07-21T20:34:33Z</published>
+    <updated>2026-07-27T17:11:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58421"/>
+    <category term="GO-2026-6077"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Unauthenticated ReDoS via CODEOWNERS pattern matching allows denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58421, GO-2026-6077&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This issue has been found by a security agent and review by myself.
+
+Gitea&amp;#x27;s CODEOWNERS feature uses the regexp2 library to match file paths against ownership rules. User-supplied patterns are passed directly to regexp2.Compile with no sanitisation and no match timeout. This allows an attacker to write a pattern that causes the regex engine to backtrack exponentially when evaluated against a crafted file path.
+
+### Who can trigger it
+
+Any registered user on the instance. The attacker needs only:
+1. A repository they own (created via normal signup)
+2. A `CODEOWNERS` file on the default branch containing malicious patterns
+3. A pull request branch containing a file with a crafted name
+
+No elevated permissions, no admin access, no existing repositories required.
+
+### How it is triggered
+
+The …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-v96j-25gv-g2w9"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-v96j-25gv-g2w9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-58421"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-58421&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38011"&gt;https://github.com/go-gitea/gitea/pull/38011&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/ea35af1b68d57522c7686618bd61d3216d91589f"&gt;https://github.com/go-gitea/gitea/commit/ea35af1b68d57522c7686618bd61d3216d91589f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.3-and-1.26.4"&gt;https://blog.gitea.com/release-of-1.26.3-and-1.26.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.4"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v96j-25gv-g2w9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-x99g-8v8j-25j2: Ollama is Vulnerable to Path Traversal</title>
+    <id>https://osv.dev/vulnerability/GHSA-x99g-8v8j-25j2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x99g-8v8j-25j2"/>
+    <published>2026-04-26T06:31:16Z</published>
+    <updated>2026-07-27T17:11:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-7020"/>
+    <category term="GO-2026-5750"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Ollama is Vulnerable to Path Traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-7020, GO-2026-5750&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/ollama/ollama&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A security flaw has been discovered in Ollama up to 0.20.2. This affects the function digestToPath of the file x/imagegen/transfer/transfer.go of the component Tensor Model Transfer Handler. The manipulation of the argument digest results in path traversal. The attack may be performed from remote. This attack is characterized by high complexity. The exploitability is reported as difficult. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-7020"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-7020&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama"&gt;https://github.com/ollama/ollama&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/797576"&gt;https://vuldb.com/submit/797576&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/359599"&gt;https://vuldb.com/vuln/359599&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/359599/cti"&gt;https://vuldb.com/vuln/359599/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x99g-8v8j-25j2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-p4mj-98mv-xq26: Gitea: Private Repository Existence Disclosure via go-get Meta Endpoint</title>
+    <id>https://osv.dev/vulnerability/GHSA-p4mj-98mv-xq26</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p4mj-98mv-xq26"/>
+    <published>2026-07-21T20:23:48Z</published>
+    <updated>2026-07-27T17:11:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58507"/>
+    <category term="GO-2026-6066"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Private Repository Existence Disclosure via go-get Meta Endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58507, GO-2026-6066&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;| Field | Value |
+|-------|-------|
+| **Affected File** | `routers/web/repo/githttp.go`, `services/context/repo.go` |
+| **Affected Functions** | `httpBase()`, `EarlyResponseForGoGetMeta()` |
+| **Affected Lines** | `githttp.go:63–66`, `services/context/repo.go:374–396` |
+| **Prerequisite** | None — fully unauthenticated |
+
+---
+
+#### Description
+
+Gitea implements a special behavior for requests containing the `?go-get=1` query parameter. This parameter is sent by the Go toolchain (`go get`, `go install`) to discover VCS metadata for module imports. When Gitea detects this parameter in the HTTP request path for a repository, it bypasses the normal authentication and authorization stack and returns an HTTP 200 response containing `&amp;lt;meta name=&amp;quot;go-import&amp;quot;&amp;gt;` and `&amp;lt;meta name=&amp;quot;go-source&amp;quot;&amp;gt;` tags — r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-p4mj-98mv-xq26"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-p4mj-98mv-xq26&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p4mj-98mv-xq26"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h56g-4qw7-2mxg: Gitea: Public-only API token restriction is not enforced on team API routes</title>
+    <id>https://osv.dev/vulnerability/GHSA-h56g-4qw7-2mxg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h56g-4qw7-2mxg"/>
+    <published>2026-07-21T21:50:11Z</published>
+    <updated>2026-07-27T17:11:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58431"/>
+    <category term="GO-2026-6059"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Public-only API token restriction is not enforced on team API routes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58431, GO-2026-6059&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Gitea&amp;#x27;s `/api/v1/teams/{id}` API routes do not correctly enforce the `public-only` access token restriction.
+
+A `public-only` token is intended to limit API access to public repositories and public organizations. However, several team API routes continue to return private team repository metadata and private team activity feed entries when called with a `public-only` token.
+
+### Details
+
+The `/api/v1/teams/{teamid}` route group uses:
+
+```go
+orgAssignment(false, true)
+```
+
+This loads `ctx.Org.Team`, but does not load `ctx.Org.Organization`.
+
+The `checkTokenPublicOnly` middleware checks organization visibility through `ctx.Org.Organization`. When `ctx.Org.Organization` is nil, the organization visibility check silently passes.
+
+In addition, the team repository handlers return re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-h56g-4qw7-2mxg"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-h56g-4qw7-2mxg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h56g-4qw7-2mxg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-74j5-xf3v-crq8: dd-trace-go: Improper parsing of W3C baggage headers may lead to DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-74j5-xf3v-crq8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-74j5-xf3v-crq8"/>
+    <published>2026-07-15T23:05:19Z</published>
+    <updated>2026-07-27T17:11:17Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50274"/>
+    <category term="GO-2026-6000"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;dd-trace-go: Improper parsing of W3C baggage headers may lead to DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50274, GO-2026-6000&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/DataDog/dd-trace-go&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/DataDog/dd-trace-go/v2&lt;/code&gt; — fixed in 2.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+Datadog tracing libraries that implement W3C baggage propagation parse incoming baggage HTTP headers without enforcing item-count or byte-size limits on the extract path. The DD_TRACE_BAGGAGE_MAX_ITEMS (default 64) and DD_TRACE_BAGGAGE_MAX_BYTES (default 8192) limits were applied only to baggage injection, not extraction. A remote, unauthenticated attacker can send a request whose baggage header contains an arbitrarily large number of comma-separated key-value pairs (or a single very large value). The tracer allocates a hash-map entry for each pair on every request, causing unbounded CPU and memory consumption and enabling a remote Denial of Service against any HTTP service that has the baggage propagation style enabled.
+The baggage propagation style is enabled by default in mos…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-go/security/advisories/GHSA-74j5-xf3v-crq8"&gt;https://github.com/DataDog/dd-trace-go/security/advisories/GHSA-74j5-xf3v-crq8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-go"&gt;https://github.com/DataDog/dd-trace-go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-74j5-xf3v-crq8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-j2w3-9c3r-g83q: Gitea: Private Repository Metadata Remains Accessible After Access Revocation</title>
+    <id>https://osv.dev/vulnerability/GHSA-j2w3-9c3r-g83q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j2w3-9c3r-g83q"/>
+    <published>2026-07-21T20:41:49Z</published>
+    <updated>2026-07-27T17:11:16Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58434"/>
+    <category term="GO-2026-6062"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Private Repository Metadata Remains Accessible After Access Revocation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58434, GO-2026-6062&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A user who previously had access to a private repository can continue to obtain repository metadata through `GET /api/v1/user/starred` after their access to the repository has been revoked.
+
+After a collaborator is removed from a private repository, direct access to the repository is correctly denied. However, the repository may still appear in the user&amp;#x27;s starred repository list, and the endpoint continues to return repository metadata. Changes made to that metadata after access revocation are also reflected in subsequent responses.
+
+### Details
+
+The issue affects the authenticated endpoint:
+
+```http
+GET /api/v1/user/starred
+```
+
+The same behavior was also observed on:
+
+```http
+GET /api/v1/user/subscriptions
+```
+
+A reproducible scenario is:
+
+1. User `alice` creates a private r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-j2w3-9c3r-g83q"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-j2w3-9c3r-g83q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38321"&gt;https://github.com/go-gitea/gitea/pull/38321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38390"&gt;https://github.com/go-gitea/gitea/pull/38390&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/362539b78e50dfcc4bd1b9368fdd2a1b8cab0129"&gt;https://github.com/go-gitea/gitea/commit/362539b78e50dfcc4bd1b9368fdd2a1b8cab0129&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/500a09e044156d7a8d6eb58d67a28b8a1512c887"&gt;https://github.com/go-gitea/gitea/commit/500a09e044156d7a8d6eb58d67a28b8a1512c887&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j2w3-9c3r-g83q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vxv2-8j6r-pcpg: Gitea: OAuth token introspection returns metadata of tokens issued to other clients (RFC 7662 section 4 violation)</title>
+    <id>https://osv.dev/vulnerability/GHSA-vxv2-8j6r-pcpg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vxv2-8j6r-pcpg"/>
+    <published>2026-07-21T20:21:33Z</published>
+    <updated>2026-07-27T17:11:15Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58425"/>
+    <category term="GO-2026-6079"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: OAuth token introspection returns metadata of tokens issued to other clients (RFC 7662 section 4 violation)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58425, GO-2026-6079&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Live reproduction against Gitea 1.26.1
+
+Setup: Gitea 1.26.1 docker stack with two users (`admin` and `victim`) and two OAuth applications owned by different users:
+
+```
+Client A: id=5dda747d-7fdd-4694-85ff-ce4f893ce51e   owner=admin
+Client B: id=588f778f-4a41-4914-ae01-85d776c369db   owner=victim
+```
+
+`admin` runs an OAuth flow against Client A and obtains an access token. `victim` (acting through Client B&amp;#x27;s credentials) calls the introspection endpoint with Client A&amp;#x27;s access token in the body:
+
+```
+$ curl -s -u &amp;quot;$B_ID:$B_SEC&amp;quot; -X POST http://localhost:3001/login/oauth/introspect \
+       --data-urlencode &amp;quot;token=$CLIENT_A_ACCESS_TOKEN&amp;quot;
+{
+    &amp;quot;active&amp;quot;: true,
+    &amp;quot;username&amp;quot;: &amp;quot;admin&amp;quot;,
+    &amp;quot;iss&amp;quot;: &amp;quot;http://localhost:3001&amp;quot;,
+    &amp;quot;sub&amp;quot;: &amp;quot;1&amp;quot;,
+    &amp;quot;aud&amp;quot;: [
+        &amp;quot;5dda747d-7fdd-4694-85ff-ce4f893ce…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-vxv2-8j6r-pcpg"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-vxv2-8j6r-pcpg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38042"&gt;https://github.com/go-gitea/gitea/pull/38042&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/c9920b7bd0f6ec1f7590f104711b09d55917f9e8"&gt;https://github.com/go-gitea/gitea/commit/c9920b7bd0f6ec1f7590f104711b09d55917f9e8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vxv2-8j6r-pcpg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mc57-h6j3-3hmv: iskorotkov/avro: Integer Overflow in Decoder</title>
+    <id>https://osv.dev/vulnerability/GHSA-mc57-h6j3-3hmv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mc57-h6j3-3hmv"/>
+    <published>2026-05-18T16:22:27Z</published>
+    <updated>2026-07-27T17:11:15Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46384"/>
+    <category term="GO-2026-5047"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;iskorotkov/avro: Integer Overflow in Decoder&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46384, GO-2026-5047&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/iskorotkov/avro/v2&lt;/code&gt; — fixed in 2.33.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Integer Overflow in Avro Decoder
+
+## Summary
+
+Several Avro decoder paths read attacker-controlled 64-bit values from the wire format and either narrowed them to platform-sized `int` before bounds-checking, or summed them with overflow-prone signed-`int` arithmetic. On 32-bit targets (`GOARCH=386`, `arm`, `mips`, `wasm`, etc.), the truncation paths can silently bypass byte-slice limits, select the wrong union branch, or hit the OCF negative-`make` panic via wrap. Three sub-issues are not 32-bit-specific: cumulative-size arithmetic overflow in `arrayDecoder.Decode` / `mapDecoder.Decode` / `mapDecoderUnmarshaler.Decode` (wraps at `math.MaxInt64` on amd64 / arm64 and bypasses `MaxSliceAllocSize` / `MaxMapAllocSize`), `math.MinInt` negation in block-header handling, and `make([]byte, size)` w…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/security/advisories/GHSA-mc57-h6j3-3hmv"&gt;https://github.com/iskorotkov/avro/security/advisories/GHSA-mc57-h6j3-3hmv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46384"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46384&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro"&gt;https://github.com/iskorotkov/avro&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mc57-h6j3-3hmv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-pgqf-926r-548m: Gitea: Cross-repository label-ID enumeration oracle via unscoped DeleteIssueLabel API</title>
+    <id>https://osv.dev/vulnerability/GHSA-pgqf-926r-548m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pgqf-926r-548m"/>
+    <published>2026-07-21T20:39:22Z</published>
+    <updated>2026-07-27T17:11:14Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58445"/>
+    <category term="GO-2026-6067"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Cross-repository label-ID enumeration oracle via unscoped DeleteIssueLabel API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58445, GO-2026-6067&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The API endpoint `DELETE /repos/{owner}/{repo}/issues/{index}/labels/{id}` loads the label by ID with a **global,
+unscoped** lookup and never verifies the label belongs to the URL&amp;#x27;s repository (or its owning organization). Because
+the response status differs by whether the label ID exists **anywhere on the instance** (204) versus not (422), an
+authenticated user can use the endpoint as a **cross-repository label-ID existence / enumeration oracle**, including
+for labels in repositories and organizations they cannot access.
+
+## Severity
+
+- The leaked information is minimal (existence/count of label IDs instance-wide); **no label name, color, or owning
+  repository is disclosed, and no cross-repository write occurs.**
+
+## Affected / patched versions
+
+- **Affected:** through **1.26…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-pgqf-926r-548m"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-pgqf-926r-548m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pgqf-926r-548m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h69g-9hx6-f3v4: Excelize: Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-h69g-9hx6-f3v4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h69g-9hx6-f3v4"/>
+    <published>2026-07-10T19:25:20Z</published>
+    <updated>2026-07-27T17:11:14Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54063"/>
+    <category term="GO-2026-5960"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excelize: Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54063, GO-2026-5960&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/xuri/excelize/v2&lt;/code&gt; — fixed in 2.11.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS)
+
+### Summary
+The `checkSheet()` function in `github.com/xuri/excelize/v2` uses an attacker-controlled `&amp;lt;row r=&amp;quot;N&amp;quot;&amp;gt;` XML attribute value directly as the length argument to `make([]xlsxRow, row)` without validating it against the Excel row limit (`TotalRows = 1,048,576`). A specially crafted XLSX file can trigger two denial-of-service variants: (A) an out-of-memory process kill when `r=2147483647` forces a ~16 GB allocation attempt, and (B) a runtime panic via out-of-bounds slice indexing when `r=-1`. Any service that opens attacker-supplied XLSX files and calls `GetCellValue` is affected. No authentication is required.
+
+### Details
+The vulnerable code path is triggered by calling `GetCellValue` (or any API that…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize/security/advisories/GHSA-h69g-9hx6-f3v4"&gt;https://github.com/qax-os/excelize/security/advisories/GHSA-h69g-9hx6-f3v4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54063"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54063&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize"&gt;https://github.com/qax-os/excelize&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize/releases/tag/v2.11.0"&gt;https://github.com/qax-os/excelize/releases/tag/v2.11.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h69g-9hx6-f3v4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6072: Gitea Remember-Me Token Theft Not Invalidating Attacker Session in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6072</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6072"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:27Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-56750"/>
+    <category term="GHSA-rgv6-xp99-6mgj"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea Remember-Me Token Theft Not Invalidating Attacker Session in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56750, GHSA-rgv6-xp99-6mgj&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea Remember-Me Token Theft Not Invalidating Attacker Session in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rgv6-xp99-6mgj"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rgv6-xp99-6mgj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/de4b8277e9cb576f2315fb03b5ab6478b42a1d31"&gt;https://github.com/go-gitea/gitea/commit/de4b8277e9cb576f2315fb03b5ab6478b42a1d31&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/f69e15afe7496cc62e96dab244629c69eb31a7bf"&gt;https://github.com/go-gitea/gitea/commit/f69e15afe7496cc62e96dab244629c69eb31a7bf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38406"&gt;https://github.com/go-gitea/gitea/pull/38406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38426"&gt;https://github.com/go-gitea/gitea/pull/38426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6072"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6082: Gitea: Denial of Service via Unbounded io.ReadAll in NPM Package Tag Endpoint in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6082</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6082"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:27Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-42931"/>
+    <category term="GHSA-wwqq-x6w4-frm2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Denial of Service via Unbounded io.ReadAll in NPM Package Tag Endpoint in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42931, GHSA-wwqq-x6w4-frm2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Denial of Service via Unbounded io.ReadAll in NPM Package Tag Endpoint in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-wwqq-x6w4-frm2"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-wwqq-x6w4-frm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6082"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6076: Gitea: Unauthorized Access to Labels of Private Organizations in code.gitea.io/gitea</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6076</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6076"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-25038"/>
+    <category term="GHSA-v73x-hx65-6pf4"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Unauthorized Access to Labels of Private Organizations in code.gitea.io/gitea&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-25038, GHSA-v73x-hx65-6pf4&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Unauthorized Access to Labels of Private Organizations in code.gitea.io/gitea&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-v73x-hx65-6pf4"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-v73x-hx65-6pf4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-25038"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-25038&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.3-and-1.26.4"&gt;https://blog.gitea.com/release-of-1.26.3-and-1.26.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/99f8b3d9a1d32f4c39828e07971455a18191e0b9"&gt;https://github.com/go-gitea/gitea/commit/99f8b3d9a1d32f4c39828e07971455a18191e0b9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38151"&gt;https://github.com/go-gitea/gitea/pull/38151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.3"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6076"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6084: Gitea: SSRF in restore-repo via unsanitized pull_request.yml Head.CloneURL in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6084</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6084"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58441"/>
+    <category term="GHSA-xmj7-xj85-hfc3"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: SSRF in restore-repo via unsanitized pull_request.yml Head.CloneURL in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58441, GHSA-xmj7-xj85-hfc3&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: SSRF in restore-repo via unsanitized pull_request.yml Head.CloneURL in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-xmj7-xj85-hfc3"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-xmj7-xj85-hfc3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6084"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6078: Gitea: OAuth2 sign-in reactivates an administrator-deactivated account on auth sources without refresh tokens (incomplete fix of #38009) in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6078</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6078"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55987"/>
+    <category term="GHSA-vrhc-jjfc-m3m3"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: OAuth2 sign-in reactivates an administrator-deactivated account on auth sources without refresh tokens (incomplete fix of #38009) in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55987, GHSA-vrhc-jjfc-m3m3&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: OAuth2 sign-in reactivates an administrator-deactivated account on auth sources without refresh tokens (incomplete fix of #38009) in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-vrhc-jjfc-m3m3"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-vrhc-jjfc-m3m3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6078"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6085: Gitea: Cross-repository IDOR in issue-dependency removal lets an attacker tamper with and comment on private repos they cannot access in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6085</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6085"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58438"/>
+    <category term="GHSA-xv9x-fj9g-vj6h"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Cross-repository IDOR in issue-dependency removal lets an attacker tamper with and comment on private repos they cannot access in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58438, GHSA-xv9x-fj9g-vj6h&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Cross-repository IDOR in issue-dependency removal lets an attacker tamper with and comment on private repos they cannot access in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-xv9x-fj9g-vj6h"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-xv9x-fj9g-vj6h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6085"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6086: Gitea: Public-only repository tokens can update private PR head branches in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6086</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6086"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58443"/>
+    <category term="GHSA-xxjv-752h-3vp2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Public-only repository tokens can update private PR head branches in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58443, GHSA-xxjv-752h-3vp2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Public-only repository tokens can update private PR head branches in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-xxjv-752h-3vp2"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-xxjv-752h-3vp2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6086"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6081: Gitea: Fork Synchronization Continues After Parent Repository Changes from Public to Private in code.gitea.io/gitea</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6081</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6081"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-24451"/>
+    <category term="GHSA-wrf9-r3h7-7x5v"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Fork Synchronization Continues After Parent Repository Changes from Public to Private in code.gitea.io/gitea&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-24451, GHSA-wrf9-r3h7-7x5v&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Fork Synchronization Continues After Parent Repository Changes from Public to Private in code.gitea.io/gitea&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-wrf9-r3h7-7x5v"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-wrf9-r3h7-7x5v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-24451"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-24451&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.3-and-1.26.4"&gt;https://blog.gitea.com/release-of-1.26.3-and-1.26.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38151"&gt;https://github.com/go-gitea/gitea/pull/38151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.3"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6081"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6073: Gitea LFS Deploy-Key Privilege Escalation in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6073</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6073"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58435"/>
+    <category term="GHSA-rh79-75qm-gwjr"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea LFS Deploy-Key Privilege Escalation in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58435, GHSA-rh79-75qm-gwjr&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea LFS Deploy-Key Privilege Escalation in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rh79-75qm-gwjr"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rh79-75qm-gwjr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6073"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6080: Gitea: Branch Protection Bypass via PR Retargeting Preserves Stale `official` Approval Flag in go-gitea/gitea</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6080</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6080"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58439"/>
+    <category term="GHSA-w5pg-649r-p6gg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Branch Protection Bypass via PR Retargeting Preserves Stale `official` Approval Flag in go-gitea/gitea&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58439, GHSA-w5pg-649r-p6gg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Branch Protection Bypass via PR Retargeting Preserves Stale `official` Approval Flag in go-gitea/gitea.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: code.gitea.io/gitea before v1.27.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-w5pg-649r-p6gg"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-w5pg-649r-p6gg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/74ad781db9c37134ee9280c69a6b1de53801503e"&gt;https://github.com/go-gitea/gitea/commit/74ad781db9c37134ee9280c69a6b1de53801503e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/8401fe7c544abff1ecc49d7f3166fd4ee0c174ef"&gt;https://github.com/go-gitea/gitea/commit/8401fe7c544abff1ecc49d7f3166fd4ee0c174ef&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38319"&gt;https://github.com/go-gitea/gitea/pull/38319&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38402"&gt;https://github.com/go-gitea/gitea/pull/38402&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6080"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6077: Gitea: Unauthenticated ReDoS via CODEOWNERS pattern matching allows denial of service in code.gitea.io/gitea</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6077</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6077"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58421"/>
+    <category term="GHSA-v96j-25gv-g2w9"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Unauthenticated ReDoS via CODEOWNERS pattern matching allows denial of service in code.gitea.io/gitea&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58421, GHSA-v96j-25gv-g2w9&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Unauthenticated ReDoS via CODEOWNERS pattern matching allows denial of service in code.gitea.io/gitea&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-v96j-25gv-g2w9"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-v96j-25gv-g2w9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-58421"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-58421&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.3-and-1.26.4"&gt;https://blog.gitea.com/release-of-1.26.3-and-1.26.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/ea35af1b68d57522c7686618bd61d3216d91589f"&gt;https://github.com/go-gitea/gitea/commit/ea35af1b68d57522c7686618bd61d3216d91589f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38011"&gt;https://github.com/go-gitea/gitea/pull/38011&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.4"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6077"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6079: Gitea: OAuth token introspection returns metadata of tokens issued to other clients (RFC 7662 section 4 violation) in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6079</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6079"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58425"/>
+    <category term="GHSA-vxv2-8j6r-pcpg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: OAuth token introspection returns metadata of tokens issued to other clients (RFC 7662 section 4 violation) in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58425, GHSA-vxv2-8j6r-pcpg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: OAuth token introspection returns metadata of tokens issued to other clients (RFC 7662 section 4 violation) in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-vxv2-8j6r-pcpg"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-vxv2-8j6r-pcpg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/c9920b7bd0f6ec1f7590f104711b09d55917f9e8"&gt;https://github.com/go-gitea/gitea/commit/c9920b7bd0f6ec1f7590f104711b09d55917f9e8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38042"&gt;https://github.com/go-gitea/gitea/pull/38042&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6079"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6075: Gitea: SSRF via HTTP Redirect in Repository Migration in code.gitea.io/gitea</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6075</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6075"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58418"/>
+    <category term="GHSA-rqhx-647v-wx32"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: SSRF via HTTP Redirect in Repository Migration in code.gitea.io/gitea&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58418, GHSA-rqhx-647v-wx32&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: SSRF via HTTP Redirect in Repository Migration in code.gitea.io/gitea&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rqhx-647v-wx32"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rqhx-647v-wx32&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-58418"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-58418&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.3-and-1.26.4"&gt;https://blog.gitea.com/release-of-1.26.3-and-1.26.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/9e84deb969aff5c1115c2984e41250f28c78451f"&gt;https://github.com/go-gitea/gitea/commit/9e84deb969aff5c1115c2984e41250f28c78451f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38108"&gt;https://github.com/go-gitea/gitea/pull/38108&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.4"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6075"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6074: Gitea: API Fork Endpoint Authorization Bypass Allows Organization Members to Bypass Repository Creation Restrictions in code.gitea.io/gitea</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6074</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6074"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:25Z</updated>
+    <category term="Go"/>
+    <category term="GHSA-rjvx-x5h2-6px5"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: API Fork Endpoint Authorization Bypass Allows Organization Members to Bypass Repository Creation Restrictions in code.gitea.io/gitea&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-rjvx-x5h2-6px5&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: API Fork Endpoint Authorization Bypass Allows Organization Members to Bypass Repository Creation Restrictions in code.gitea.io/gitea&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rjvx-x5h2-6px5"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rjvx-x5h2-6px5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/686d10b7f0c26baf91171124b382cbcdfa7bf025"&gt;https://github.com/go-gitea/gitea/commit/686d10b7f0c26baf91171124b382cbcdfa7bf025&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/36950"&gt;https://github.com/go-gitea/gitea/pull/36950&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6074"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6062: Gitea: Private Repository Metadata Remains Accessible After Access Revocation in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6062</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6062"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58434"/>
+    <category term="GHSA-j2w3-9c3r-g83q"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Private Repository Metadata Remains Accessible After Access Revocation in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58434, GHSA-j2w3-9c3r-g83q&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Private Repository Metadata Remains Accessible After Access Revocation in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-j2w3-9c3r-g83q"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-j2w3-9c3r-g83q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/362539b78e50dfcc4bd1b9368fdd2a1b8cab0129"&gt;https://github.com/go-gitea/gitea/commit/362539b78e50dfcc4bd1b9368fdd2a1b8cab0129&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/500a09e044156d7a8d6eb58d67a28b8a1512c887"&gt;https://github.com/go-gitea/gitea/commit/500a09e044156d7a8d6eb58d67a28b8a1512c887&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38321"&gt;https://github.com/go-gitea/gitea/pull/38321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38390"&gt;https://github.com/go-gitea/gitea/pull/38390&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6062"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6065: Gitea: OIDC userinfo Endpoint Returns Identity Claims Without Enforcing API Token Scopes in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6065</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6065"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55982"/>
+    <category term="GHSA-mg4f-x9v4-6h2p"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: OIDC userinfo Endpoint Returns Identity Claims Without Enforcing API Token Scopes in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55982, GHSA-mg4f-x9v4-6h2p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: OIDC userinfo Endpoint Returns Identity Claims Without Enforcing API Token Scopes in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-mg4f-x9v4-6h2p"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-mg4f-x9v4-6h2p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6065"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6069: Gitea: GHSA-8fwc-qjw5-rvgp ClearRepoWatches fix not applied to API EditRepo path — sister code path retains stale watches on public-&gt;private in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6069</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6069"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58510"/>
+    <category term="GHSA-q423-49rw-g9mh"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: GHSA-8fwc-qjw5-rvgp ClearRepoWatches fix not applied to API EditRepo path — sister code path retains stale watches on public-&amp;gt;private in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58510, GHSA-q423-49rw-g9mh&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: GHSA-8fwc-qjw5-rvgp ClearRepoWatches fix not applied to API EditRepo path — sister code path retains stale watches on public-&amp;gt;private in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-q423-49rw-g9mh"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-q423-49rw-g9mh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6069"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6083: Gitea: Blind SSRF in OAuth2 avatar synchronization via unvalidated OIDC picture claim in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6083</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6083"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-23603"/>
+    <category term="GHSA-x77v-q46j-393g"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Blind SSRF in OAuth2 avatar synchronization via unvalidated OIDC picture claim in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-23603, GHSA-x77v-q46j-393g&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Blind SSRF in OAuth2 avatar synchronization via unvalidated OIDC picture claim in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-x77v-q46j-393g"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-x77v-q46j-393g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/de4b8277e9cb576f2315fb03b5ab6478b42a1d31"&gt;https://github.com/go-gitea/gitea/commit/de4b8277e9cb576f2315fb03b5ab6478b42a1d31&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/f69e15afe7496cc62e96dab244629c69eb31a7bf"&gt;https://github.com/go-gitea/gitea/commit/f69e15afe7496cc62e96dab244629c69eb31a7bf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38406"&gt;https://github.com/go-gitea/gitea/pull/38406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38426"&gt;https://github.com/go-gitea/gitea/pull/38426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6083"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6059: Gitea: Public-only API token restriction is not enforced on team API routes in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6059</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6059"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58431"/>
+    <category term="GHSA-h56g-4qw7-2mxg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Public-only API token restriction is not enforced on team API routes in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58431, GHSA-h56g-4qw7-2mxg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Public-only API token restriction is not enforced on team API routes in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-h56g-4qw7-2mxg"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-h56g-4qw7-2mxg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6059"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6070: Gitea: draft release attachment disclosure via missing web authorization in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6070</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6070"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58432"/>
+    <category term="GHSA-q9pg-jj6x-j9p6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: draft release attachment disclosure via missing web authorization in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58432, GHSA-q9pg-jj6x-j9p6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: draft release attachment disclosure via missing web authorization in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-q9pg-jj6x-j9p6"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-q9pg-jj6x-j9p6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/ab10e37acf7fabf7829a485cc3e13d118638a856"&gt;https://github.com/go-gitea/gitea/commit/ab10e37acf7fabf7829a485cc3e13d118638a856&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/f7fd51022495737cf960b8c4053a27d69148f664"&gt;https://github.com/go-gitea/gitea/commit/f7fd51022495737cf960b8c4053a27d69148f664&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38318"&gt;https://github.com/go-gitea/gitea/pull/38318&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38325"&gt;https://github.com/go-gitea/gitea/pull/38325&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6070"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6071: Gitea CVE-2026-20800 sibling endpoints not covered: revoked user still reads private repo objects via `/api/v1/user/starred` and private issue titles via `/api/v1/user/times` in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6071</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6071"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-59766"/>
+    <category term="GHSA-qf2f-qh6p-7v89"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea CVE-2026-20800 sibling endpoints not covered: revoked user still reads private repo objects via `/api/v1/user/starred` and private issue titles via `/api/v1/user/times` in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59766, GHSA-qf2f-qh6p-7v89&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea CVE-2026-20800 sibling endpoints not covered: revoked user still reads private repo objects via `/api/v1/user/starred` and private issue titles via `/api/v1/user/times` in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-qf2f-qh6p-7v89"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-qf2f-qh6p-7v89&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6071"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6067: Gitea: Cross-repository label-ID enumeration oracle via unscoped DeleteIssueLabel API in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6067</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6067"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58445"/>
+    <category term="GHSA-pgqf-926r-548m"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Cross-repository label-ID enumeration oracle via unscoped DeleteIssueLabel API in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58445, GHSA-pgqf-926r-548m&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Cross-repository label-ID enumeration oracle via unscoped DeleteIssueLabel API in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-pgqf-926r-548m"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-pgqf-926r-548m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6067"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6064: Gitea: Null Pointer Dereference in AddTime API Causes Authenticated Denial of Service in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6064</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6064"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-55984"/>
+    <category term="GHSA-m932-crvm-gcp5"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Null Pointer Dereference in AddTime API Causes Authenticated Denial of Service in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55984, GHSA-m932-crvm-gcp5&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Null Pointer Dereference in AddTime API Causes Authenticated Denial of Service in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-m932-crvm-gcp5"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-m932-crvm-gcp5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6064"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6068: Gitea: Private org member list leaked via /members API endpoint — incomplete fix for PR #38145 in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6068</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6068"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58427"/>
+    <category term="GHSA-prr9-9mp4-5gp2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Private org member list leaked via /members API endpoint — incomplete fix for PR #38145 in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58427, GHSA-prr9-9mp4-5gp2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Private org member list leaked via /members API endpoint — incomplete fix for PR #38145 in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-prr9-9mp4-5gp2"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-prr9-9mp4-5gp2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6068"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6060: Gitea Actions Artifacts V4 signed URL HMAC ambiguity allows cross-repository artifact read and cross-task upload-state write in code.gitea.io/gitea</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6060</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6060"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58426"/>
+    <category term="GHSA-hg5r-vq93-9fv6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea Actions Artifacts V4 signed URL HMAC ambiguity allows cross-repository artifact read and cross-task upload-state write in code.gitea.io/gitea&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58426, GHSA-hg5r-vq93-9fv6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea Actions Artifacts V4 signed URL HMAC ambiguity allows cross-repository artifact read and cross-task upload-state write in code.gitea.io/gitea&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-hg5r-vq93-9fv6"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-hg5r-vq93-9fv6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-58426"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-58426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.26.2"&gt;https://blog.gitea.com/release-of-1.26.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/1c2d5e9b03f71dd12d450b2af9a79f2557b50226"&gt;https://github.com/go-gitea/gitea/commit/1c2d5e9b03f71dd12d450b2af9a79f2557b50226&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/37707"&gt;https://github.com/go-gitea/gitea/pull/37707&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.26.2"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.26.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6060"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6063: Gitea: REST API exposes organization membership of private organizations to public in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6063</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6063"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58417"/>
+    <category term="GHSA-jr5x-6h83-wrxf"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: REST API exposes organization membership of private organizations to public in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58417, GHSA-jr5x-6h83-wrxf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: REST API exposes organization membership of private organizations to public in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-jr5x-6h83-wrxf"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-jr5x-6h83-wrxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/685b62c60fc595e3612a85f0895471876db56292"&gt;https://github.com/go-gitea/gitea/commit/685b62c60fc595e3612a85f0895471876db56292&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38145"&gt;https://github.com/go-gitea/gitea/pull/38145&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6063"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6061: Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6061</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6061"/>
+    <published>2026-07-27T15:30:50Z</published>
+    <updated>2026-07-27T17:00:23Z</updated>
+    <category term="Go"/>
+    <category term="GHSA-hrxh-6v49-42gf"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-hrxh-6v49-42gf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.82.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-hrxh-6v49-42gf"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-hrxh-6v49-42gf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/4ea465d4ab98013f72a142fe0fc89c19770b2935"&gt;https://github.com/grpc/grpc-go/commit/4ea465d4ab98013f72a142fe0fc89c19770b2935&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9236"&gt;https://github.com/grpc/grpc-go/pull/9236&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/releases/tag/v1.82.1"&gt;https://github.com/grpc/grpc-go/releases/tag/v1.82.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6061"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6066: Gitea: Private Repository Existence Disclosure via go-get Meta Endpoint in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6066</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6066"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58507"/>
+    <category term="GHSA-p4mj-98mv-xq26"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Private Repository Existence Disclosure via go-get Meta Endpoint in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58507, GHSA-p4mj-98mv-xq26&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Private Repository Existence Disclosure via go-get Meta Endpoint in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-p4mj-98mv-xq26"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-p4mj-98mv-xq26&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6066"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6058: Gitea: Repository migration SSRF via multi-answer DNS allow-list bypass in gitea.dev</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6058</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6058"/>
+    <published>2026-07-27T15:32:45Z</published>
+    <updated>2026-07-27T17:00:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58442"/>
+    <category term="GHSA-h2x6-g7q6-344v"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Repository migration SSRF via multi-answer DNS allow-list bypass in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58442, GHSA-h2x6-g7q6-344v&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Repository migration SSRF via multi-answer DNS allow-list bypass in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-h2x6-g7q6-344v"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-h2x6-g7q6-344v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6058"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5983: Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5983</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5983"/>
+    <published>2026-07-27T15:30:50Z</published>
+    <updated>2026-07-27T17:00:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54448"/>
+    <category term="GHSA-q3fv-x8vg-qqm4"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54448, GHSA-q3fv-x8vg-qqm4&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/aquasecurity/trivy&lt;/code&gt; — fixed in 0.71.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4"&gt;https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4"&gt;https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/pull/10718"&gt;https://github.com/aquasecurity/trivy/pull/10718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/releases/tag/v0.71.0"&gt;https://github.com/aquasecurity/trivy/releases/tag/v0.71.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5983"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5960: Excelize: Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS) in github.com/xuri/excelize</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5960</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5960"/>
+    <published>2026-07-27T15:30:50Z</published>
+    <updated>2026-07-27T17:00:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54063"/>
+    <category term="GHSA-h69g-9hx6-f3v4"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excelize: Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS) in github.com/xuri/excelize&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54063, GHSA-h69g-9hx6-f3v4&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/xuri/excelize/v2&lt;/code&gt; — fixed in 2.11.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Excelize: Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS) in github.com/xuri/excelize&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize/security/advisories/GHSA-h69g-9hx6-f3v4"&gt;https://github.com/qax-os/excelize/security/advisories/GHSA-h69g-9hx6-f3v4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize/commit/875b959ba62fc9bf45bb0de547ae7c7f7549835c"&gt;https://github.com/qax-os/excelize/commit/875b959ba62fc9bf45bb0de547ae7c7f7549835c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/qax-os/excelize/releases/tag/v2.11.0"&gt;https://github.com/qax-os/excelize/releases/tag/v2.11.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5960"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6000: Improper parsing of W3C baggage headers may lead to DoS in github.com/DataDog/dd-trace-go</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6000</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6000"/>
+    <published>2026-07-27T16:28:49Z</published>
+    <updated>2026-07-27T17:00:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50274"/>
+    <category term="GHSA-74j5-xf3v-crq8"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Improper parsing of W3C baggage headers may lead to DoS in github.com/DataDog/dd-trace-go&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50274, GHSA-74j5-xf3v-crq8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/DataDog/dd-trace-go&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/DataDog/dd-trace-go/v2&lt;/code&gt; — fixed in 2.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper parsing of W3C baggage headers may lead to DoS in github.com/DataDog/dd-trace-go&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-go/security/advisories/GHSA-74j5-xf3v-crq8"&gt;https://github.com/DataDog/dd-trace-go/security/advisories/GHSA-74j5-xf3v-crq8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6000"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5841: OOB read in github.com/klauspost/compress/s2</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5841</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5841"/>
+    <published>2026-07-27T16:16:22Z</published>
+    <updated>2026-07-27T17:00:22Z</updated>
+    <category term="Go"/>
+    <category term="GHSA-259r-337f-4rfw"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OOB read in github.com/klauspost/compress/s2&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-259r-337f-4rfw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klauspost/compress&lt;/code&gt; — fixed in 1.18.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Providing a specially crafted dictionary to s2.NewDict and using it to encode data can make the encoder read out of bounds.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw"&gt;https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/commit/8668e357e776d5152ed62f33c17f21b8690664fa"&gt;https://github.com/klauspost/compress/commit/8668e357e776d5152ed62f33c17f21b8690664fa&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5841"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5781: Uncatchable stack-overflow denial of service in rsc.io/pdf</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5781</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5781"/>
+    <published>2026-07-27T16:16:22Z</published>
+    <updated>2026-07-27T17:00:22Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Uncatchable stack-overflow denial of service in rsc.io/pdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rsc.io/pdf&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;pdf.Open and PDF object resolution in rsc.io/pdf recurse without bound on nested arrays and dictionaries. A sufficiently deeply nested document exhausts the goroutine stack limit and triggers a fatal, uncatchable stack overflow. Any service that parses untrusted PDFs with rsc.io/pdf can therefore be taken down by a single small input.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/golang/vulndb/issues/5781"&gt;https://github.com/golang/vulndb/issues/5781&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rsc/pdf"&gt;https://github.com/rsc/pdf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5781"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5750: Ollama is Vulnerable to Path Traversal in github.com/ollama/ollama</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5750</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5750"/>
+    <published>2026-07-27T16:28:49Z</published>
+    <updated>2026-07-27T17:00:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-7020"/>
+    <category term="GHSA-x99g-8v8j-25j2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Ollama is Vulnerable to Path Traversal in github.com/ollama/ollama&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-7020, GHSA-x99g-8v8j-25j2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/ollama/ollama&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Ollama is Vulnerable to Path Traversal in github.com/ollama/ollama&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-x99g-8v8j-25j2"&gt;https://github.com/advisories/GHSA-x99g-8v8j-25j2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/797576"&gt;https://vuldb.com/submit/797576&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/359599"&gt;https://vuldb.com/vuln/359599&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/359599/cti"&gt;https://vuldb.com/vuln/359599/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5750"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5748: Ollama contains a heap out-of-bounds read vulnerability in the GGUF model loader in github.com/ollama/ollama</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5748</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5748"/>
+    <published>2026-07-27T15:30:50Z</published>
+    <updated>2026-07-27T17:00:22Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-7482"/>
+    <category term="GHSA-x8qc-fggm-mpqg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Ollama contains a heap out-of-bounds read vulnerability in the GGUF model loader in github.com/ollama/ollama&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-7482, GHSA-x8qc-fggm-mpqg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/ollama/ollama&lt;/code&gt; — fixed in 0.17.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Ollama is vulnerable to a heap out-of-bounds read in its GGUF model loader. A specially crafted GGUF file can cause the loader to read beyond the allocated heap buffer, potentially leading to a denial of service (crash).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-x8qc-fggm-mpqg"&gt;https://github.com/advisories/GHSA-x8qc-fggm-mpqg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama/commit/88d57d0483cca907e0b23a968c83627a20b21047"&gt;https://github.com/ollama/ollama/commit/88d57d0483cca907e0b23a968c83627a20b21047&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama/pull/14406"&gt;https://github.com/ollama/ollama/pull/14406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama/releases/tag/v0.17.1"&gt;https://github.com/ollama/ollama/releases/tag/v0.17.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5748"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5116: Build breakout using malicious Containerfile or Git HTTP server in github.com/containers/buildah</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5116</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5116"/>
+    <published>2026-07-27T15:30:50Z</published>
+    <updated>2026-07-27T17:00:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-44517"/>
+    <category term="GHSA-49p4-px3h-rq49"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Build breakout using malicious Containerfile or Git HTTP server in github.com/containers/buildah&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44517, GHSA-49p4-px3h-rq49&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containers/buildah&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Buildah allows a build-time breakout when using a malicious Containerfile or a malicious Git HTTP server. A crafted Git URL or Containerfile can cause Buildah to access files outside of the build context during an ADD or COPY operation.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containers/buildah/security/advisories/GHSA-49p4-px3h-rq49"&gt;https://github.com/containers/buildah/security/advisories/GHSA-49p4-px3h-rq49&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5116"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5047: Integer overflow in Avro decoder in github.com/iskorotkov/avro/v2 and github.com/hamba/avro/v2</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5047</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5047"/>
+    <published>2026-07-27T16:16:22Z</published>
+    <updated>2026-07-27T17:00:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46384"/>
+    <category term="GHSA-mc57-h6j3-3hmv"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Integer overflow in Avro decoder in github.com/iskorotkov/avro/v2 and github.com/hamba/avro/v2&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46384, GHSA-mc57-h6j3-3hmv&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/iskorotkov/avro/v2&lt;/code&gt; — fixed in 2.33.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/hamba/avro/v2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Several Avro decoder paths read attacker-controlled 64-bit values from the wire format and either narrowed them to platform-sized int before bounds-checking, or summed them with overflow-prone signed-int arithmetic. On 32-bit targets, the truncation paths can silently bypass byte-slice limits, select the wrong union branch, or hit a negative-make panic via wrap.
+
+Three sub-issues are not 32-bit-specific: cumulative-size arithmetic overflow in array and map decoders, negation of MinInt in block-header handling, and negative size in block reads. All three panic or bypass caps on any platform, giving an attacker a denial-of-service primitive. Exploitation requires only an untrusted Avro stream.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/security/advisories/GHSA-mc57-h6j3-3hmv"&gt;https://github.com/iskorotkov/avro/security/advisories/GHSA-mc57-h6j3-3hmv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/commit/bed99b315ec097a1a5eb7ae074ef57a91848c583"&gt;https://github.com/iskorotkov/avro/commit/bed99b315ec097a1a5eb7ae074ef57a91848c583&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/commit/e1a570f9a8a4fe4b1bc2b4b1fb6d24e4a5f04358"&gt;https://github.com/iskorotkov/avro/commit/e1a570f9a8a4fe4b1bc2b4b1fb6d24e4a5f04358&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5047"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5051: Out-of-bounds read and panic in ReadDir in github.com/cloudsoda/go-smb2 and github.com/hirochachacha/go-smb2</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5051</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5051"/>
+    <published>2026-07-27T16:16:22Z</published>
+    <updated>2026-07-27T17:00:19Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Out-of-bounds read and panic in ReadDir in github.com/cloudsoda/go-smb2 and github.com/hirochachacha/go-smb2&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cloudsoda/go-smb2&lt;/code&gt; — fixed in 0.0.0-20260609183447-7b96c35f5f4b&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/hirochachacha/go-smb2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;ReadDir and ReadDirPlus parse the QUERY_DIRECTORY SMB response by advancing through entries using the server-supplied NextEntryOffset field. The pre-fix code does not bound next against the remaining buffer before re-slicing, and the entry decoder IsInvalid check performs length arithmetic in int after narrowing from uint16.
+
+A guest or anonymous directory listing against an attacker-controlled or man-in-the-middle SMB server crashes the Go client process with a runtime panic when the response contains an entry whose NextEntryOffset is larger than the remaining buffer, or whose declared FileNameLength produces a length that does not match the actual buffer size.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cloudsoda/go-smb2/commit/7b96c35f5f4babfc9d68a60baf5e85f2303d4a4b"&gt;https://github.com/cloudsoda/go-smb2/commit/7b96c35f5f4babfc9d68a60baf5e85f2303d4a4b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/golang/vulndb/issues/5051"&gt;https://github.com/golang/vulndb/issues/5051&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5051"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5046: CPU exhaustion in Avro decoder in github.com/iskorotkov/avro/v2 and github.com/hamba/avro/v2</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5046</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5046"/>
+    <published>2026-07-27T16:16:22Z</published>
+    <updated>2026-07-27T17:00:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-46385"/>
+    <category term="GHSA-w8j3-pq8g-8m7w"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;CPU exhaustion in Avro decoder in github.com/iskorotkov/avro/v2 and github.com/hamba/avro/v2&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46385, GHSA-w8j3-pq8g-8m7w&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/iskorotkov/avro/v2&lt;/code&gt; — fixed in 2.33.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/hamba/avro/v2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The Avro array and map decoders loop over an attacker-controlled block-count value without checking the underlying reader&amp;#x27;s error state inside the loop body. Reader.ReadBlockHeader returns the count as a Go int, which is 64-bit on amd64 and arm64 targets. A producer can declare a block of up to math.MaxInt64 elements followed by EOF or any truncated payload, and the decoder will attempt that many no-op iterations before propagating the error.
+
+The realistic ceiling is indefinite until the worker is killed externally. A single hostile payload pins a CPU core until the process is OOM-killed, deadline-cancelled, or terminated, resulting in a remote, unauthenticated denial-of-service.
+
+The fix exits the loop on the first inner-decode error.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/security/advisories/GHSA-w8j3-pq8g-8m7w"&gt;https://github.com/iskorotkov/avro/security/advisories/GHSA-w8j3-pq8g-8m7w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/commit/2ce4242e6095d93470ab3b37ed6082b0596f325c"&gt;https://github.com/iskorotkov/avro/commit/2ce4242e6095d93470ab3b37ed6082b0596f325c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/commit/b124caa58a821f68f100d86f045f9753b88881e8"&gt;https://github.com/iskorotkov/avro/commit/b124caa58a821f68f100d86f045f9753b88881e8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5046"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5048: Denial of service via unbounded map allocations in github.com/iskorotkov/avro/v2 and github.com/hamba/avro/v2</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5048</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5048"/>
+    <published>2026-07-27T16:16:22Z</published>
+    <updated>2026-07-27T17:00:19Z</updated>
+    <category term="Go"/>
+    <category term="GHSA-mx64-mj3q-7prj"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Denial of service via unbounded map allocations in github.com/iskorotkov/avro/v2 and github.com/hamba/avro/v2&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-mx64-mj3q-7prj&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/iskorotkov/avro/v2&lt;/code&gt; — fixed in 2.33.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/hamba/avro/v2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The Avro map decoder accepts attacker-controlled block-element counts from the wire format and grows the destination map without enforcing an upper bound. A producer can declare an arbitrarily large map (in one block, or chunked across many sub-limit blocks) and exhaust process memory until the OOM killer fires.
+
+The fix introduces Config.MaxMapAllocSize with cumulative enforcement across block boundaries. The new limit is opt-in: the field defaults to zero, which preserves the previous unbounded behavior for backward compatibility. Upgrading to v2.33.0 alone does not mitigate the issue; consumers of untrusted Avro data must explicitly set MaxMapAllocSize on their avro.Config.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/security/advisories/GHSA-mx64-mj3q-7prj"&gt;https://github.com/iskorotkov/avro/security/advisories/GHSA-mx64-mj3q-7prj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/iskorotkov/avro/commit/5192df96a158999344ac96ebcb1f7461d626f6d7"&gt;https://github.com/iskorotkov/avro/commit/5192df96a158999344ac96ebcb1f7461d626f6d7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5048"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-ghfh-fmx4-26h8: OpenBao leaks HTTPRawBody in Audit Logs</title>
     <id>https://osv.dev/vulnerability/GHSA-ghfh-fmx4-26h8</id>
@@ -988,144 +2311,5 @@ webtransport-go used `io.ReadAll` when skipping …&lt;/p&gt;&lt;p&gt;References
     <category term="CVE-2026-40898"/>
     <category term="GHSA-vvgj-x9jq-8cj9"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;HTTP/3 QPACK Trailer Expansion Memory Exhaustion in github.com/quic-go/quic-go&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40898, GHSA-vvgj-x9jq-8cj9&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/quic-go/quic-go&lt;/code&gt; — fixed in 0.59.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;HTTP/3 QPACK Trailer Expansion Memory Exhaustion in github.com/quic-go/quic-go&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/security/advisories/GHSA-vvgj-x9jq-8cj9"&gt;https://github.com/quic-go/quic-go/security/advisories/GHSA-vvgj-x9jq-8cj9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/commit/c56e8c79d1627cc1ed6005b421b4b0adadd83665"&gt;https://github.com/quic-go/quic-go/commit/c56e8c79d1627cc1ed6005b421b4b0adadd83665&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/pull/5642"&gt;https://github.com/quic-go/quic-go/pull/5642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-g754-hx8w-x2g6"&gt;https://github.com/advisories/GHSA-g754-hx8w-x2g6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/quic-go/quic-go/releases/tag/v0.59.1"&gt;https://github.com/quic-go/quic-go/releases/tag/v0.59.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5676"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9g5q-2w5x-hmxf: chi Middleware Vulnerable to Potential IP Spoofing via `X-Forwarded-For` Header in `Request.RemoteAddr` Resolution</title>
-    <id>https://osv.dev/vulnerability/GHSA-9g5q-2w5x-hmxf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9g5q-2w5x-hmxf"/>
-    <published>2026-06-25T18:18:56Z</published>
-    <updated>2026-07-25T15:44:47Z</updated>
-    <category term="Go"/>
-    <category term="GO-2026-5775"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;chi Middleware Vulnerable to Potential IP Spoofing via `X-Forwarded-For` Header in `Request.RemoteAddr` Resolution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GO-2026-5775&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/middleware&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v2/middleware&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v3/middleware&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v4/middleware&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v5/middleware&lt;/code&gt; — fixed in 5.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The vulnerability allows the `Request.RemoteAddr` to be spoofed when determining the request source IP via the `X-Forwarded-For` header. This could result in misidentification of the request source and potentially compromise access control and logging integrity.
-
-### Details
-Currently, the `RealIP()` implementation splits the `X-Forwarded-For` header by `,` and uses the first IP.
-https://github.com/go-chi/chi/blob/v5.1.0/middleware/realip.go#L50-L54
-
-However, relying on the first IP in the `X-Forwarded-For` header is insecure because it can be manipulated by attackers to falsify the source IP.
-
-Malicious Case:
-1. A malicious client sends a request with a forged IP in the X-Forwarded-For header: `X-Forwarded-For: &amp;lt;forged-ip&amp;gt;`
-2. The proxy appends the actual client’s IP and forwa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/security/advisories/GHSA-9g5q-2w5x-hmxf"&gt;https://github.com/go-chi/chi/security/advisories/GHSA-9g5q-2w5x-hmxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi"&gt;https://github.com/go-chi/chi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/releases/tag/v5.3.0"&gt;https://github.com/go-chi/chi/releases/tag/v5.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9g5q-2w5x-hmxf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rjr7-jggh-pgcp: chi's RealIP Middleware allows IP spoofing via unvalidated X-Forwarded-For header</title>
-    <id>https://osv.dev/vulnerability/GHSA-rjr7-jggh-pgcp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rjr7-jggh-pgcp"/>
-    <published>2026-06-25T18:19:15Z</published>
-    <updated>2026-07-25T15:44:47Z</updated>
-    <category term="Go"/>
-    <category term="GO-2026-5777"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;chi&amp;#x27;s RealIP Middleware allows IP spoofing via unvalidated X-Forwarded-For header&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GO-2026-5777&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/middleware&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v2/middleware&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v3/middleware&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v4/middleware&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v5/middleware&lt;/code&gt; — fixed in 5.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-realip middleware in go-chi/chi trusts headers like x-forwarded-for without checking them, so attackers can fake their ip and bypass rate limits or access controls
-
-### Details
-
-the vuln is in middleware/realip.go , the realIP() function pulls IPs straight from client headers and replaces r.RemoteAddr without checking if the request came from a trusted proxy
-
-```go
-func realIP(r *http.Request) string {
-    var ip string
-    if tcip := r.Header.Get(trueClientIP); tcip != &amp;quot;&amp;quot; {
-        ip = tcip  // controlled by attacker
-    } else if xrip := r.Header.Get(xRealIP); xrip != &amp;quot;&amp;quot; {
-        ip = xrip  // controlled by attacker
-    } else if xff := r.Header.Get(xForwardedFor); xff != &amp;quot;&amp;quot; {
-        ip, _, _ = strings.Cut(xff, &amp;quot;,&amp;quot;)  // controlled by attacker
-    }
-    // ...
-    return ip…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/security/advisories/GHSA-rjr7-jggh-pgcp"&gt;https://github.com/go-chi/chi/security/advisories/GHSA-rjr7-jggh-pgcp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi"&gt;https://github.com/go-chi/chi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/releases/tag/v5.3.0"&gt;https://github.com/go-chi/chi/releases/tag/v5.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rjr7-jggh-pgcp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5736: Etcd RBAC bypass via PrevKv/lease in nested transactions in go.etcd.io/etcd/v3 in go.etcd.io/etcd/server</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5736</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5736"/>
-    <published>2026-07-24T18:35:55Z</published>
-    <updated>2026-07-25T15:44:46Z</updated>
-    <category term="Go"/>
-    <category term="BIT-etcd-2026-44283"/>
-    <category term="CVE-2026-44283"/>
-    <category term="GHSA-x35m-3gp4-4fh5"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Etcd RBAC bypass via PrevKv/lease in nested transactions in go.etcd.io/etcd/v3 in go.etcd.io/etcd/server&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-etcd-2026-44283, CVE-2026-44283, GHSA-x35m-3gp4-4fh5&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;go.etcd.io/etcd/server/v3&lt;/code&gt; — fixed in 3.5.30, 3.6.11&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Etcd RBAC bypass via PrevKv/lease in nested transactions in go.etcd.io/etcd/v3 in go.etcd.io/etcd/server&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/etcd-io/etcd/security/advisories/GHSA-x35m-3gp4-4fh5"&gt;https://github.com/etcd-io/etcd/security/advisories/GHSA-x35m-3gp4-4fh5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5736"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5775: Chi Middleware vulnerable to IP spoofing via X-Forwarded-For header in github.com/go-chi/chi</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5775</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5775"/>
-    <published>2026-07-24T18:35:55Z</published>
-    <updated>2026-07-25T15:44:46Z</updated>
-    <category term="Go"/>
-    <category term="GHSA-9g5q-2w5x-hmxf"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Chi Middleware vulnerable to IP spoofing via X-Forwarded-For header in github.com/go-chi/chi&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-9g5q-2w5x-hmxf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v5&lt;/code&gt; — fixed in 5.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Chi Middleware vulnerable to IP spoofing via X-Forwarded-For header in github.com/go-chi/chi&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/security/advisories/GHSA-9g5q-2w5x-hmxf"&gt;https://github.com/go-chi/chi/security/advisories/GHSA-9g5q-2w5x-hmxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/pull/967"&gt;https://github.com/go-chi/chi/pull/967&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/releases/tag/v5.3.0"&gt;https://github.com/go-chi/chi/releases/tag/v5.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5775"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5774: Chi has an IP spoofing vulnerability in middleware.RealIP in github.com/go-chi/chi</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5774</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5774"/>
-    <published>2026-07-24T18:35:55Z</published>
-    <updated>2026-07-25T15:44:46Z</updated>
-    <category term="Go"/>
-    <category term="GHSA-3fxj-6jh8-hvhx"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Chi has an IP spoofing vulnerability in middleware.RealIP in github.com/go-chi/chi&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-3fxj-6jh8-hvhx&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v5&lt;/code&gt; — fixed in 5.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Chi has an IP spoofing vulnerability in middleware.RealIP in github.com/go-chi/chi&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/security/advisories/GHSA-3fxj-6jh8-hvhx"&gt;https://github.com/go-chi/chi/security/advisories/GHSA-3fxj-6jh8-hvhx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/pull/967"&gt;https://github.com/go-chi/chi/pull/967&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5774"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-gcjh-h69q-9w9g: cel-go: JSON Private Fields Exposed via NativeTypes and ParseStructTag</title>
-    <id>https://osv.dev/vulnerability/GHSA-gcjh-h69q-9w9g</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gcjh-h69q-9w9g"/>
-    <published>2026-07-24T16:48:56Z</published>
-    <updated>2026-07-25T15:44:46Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;cel-go: JSON Private Fields Exposed via NativeTypes and ParseStructTag&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/google/cel-go&lt;/code&gt; — fixed in 0.29.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The function `ext.NativeTypes(ParseStructTag(&amp;quot;json&amp;quot;))` does not honour the `encoding/json` skip directive `json:&amp;quot;-&amp;quot;`. Fields tagged `json:&amp;quot;-&amp;quot;` are registered in the CEL type system under the literal name `&amp;quot;-&amp;quot;` and are readable from any user-submitted CEL expression via `dyn(obj)[&amp;quot;-&amp;quot;]`. 
-
-Additionally, `newNativeTypes` silently registers every nested struct reachable from the type passed to `NativeTypes`, including types from third-party dependencies the developer never examined.
-
-## Root cause
-
-In `fieldNameByTag`, the helper used by `ParseStructTag(&amp;quot;json&amp;quot;)` to translate Go struct tags into CEL field names.
-
-See at `ext/native.go:146`:
-
-```go
-func fieldNameByTag(structTagToParse string) func(field reflect.StructField) string {
-    return func(field reflect.StructField) string {
-        tag…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cel-expr/cel-go/security/advisories/GHSA-gcjh-h69q-9w9g"&gt;https://github.com/cel-expr/cel-go/security/advisories/GHSA-gcjh-h69q-9w9g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cel-expr/cel-go"&gt;https://github.com/cel-expr/cel-go&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gcjh-h69q-9w9g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-3fxj-6jh8-hvhx: chi Has an IP Spoofing Vulnerability in `middleware.RealIP`</title>
-    <id>https://osv.dev/vulnerability/GHSA-3fxj-6jh8-hvhx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3fxj-6jh8-hvhx"/>
-    <published>2026-06-25T18:21:37Z</published>
-    <updated>2026-07-25T15:44:46Z</updated>
-    <category term="Go"/>
-    <category term="GO-2026-5774"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;chi Has an IP Spoofing Vulnerability in `middleware.RealIP`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GO-2026-5774&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v5/middleware&lt;/code&gt; — fixed in 5.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-The `RealIP` middleware in `go-chi/chi` is vulnerable to IP spoofing because it blindly trusts the first (leftmost) element of the `X-Forwarded-For` HTTP header. This allows a remote attacker to bypass IP-based access control lists (ACLs) and rate-limiting mechanisms by providing a spoofed IP address in the header.
-
-## Details
-In `middleware/realip.go`, the `realIP` function parses the `X-Forwarded-For` header and extracts the first comma-separated value:
-
-```go
-func realIP(r *http.Request) string {
-    // ...
-    } else if xff := r.Header.Get(xForwardedFor); xff != &amp;quot;&amp;quot; {
-        ip, _, _ = strings.Cut(xff, &amp;quot;,&amp;quot;)
-    }
-    // ...
-}
-```
-
-Standard practice for `X-Forwarded-For` is that each proxy appends the client&amp;#x27;s IP to the end of the list. However, since the client can also prov…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/security/advisories/GHSA-3fxj-6jh8-hvhx"&gt;https://github.com/go-chi/chi/security/advisories/GHSA-3fxj-6jh8-hvhx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi"&gt;https://github.com/go-chi/chi&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3fxj-6jh8-hvhx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5777: Chi's RealIP Middleware allows IP spoofing via unvalidated X-Forwarded-For header in github.com/go-chi/chi</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5777</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5777"/>
-    <published>2026-07-24T18:35:55Z</published>
-    <updated>2026-07-25T15:44:46Z</updated>
-    <category term="Go"/>
-    <category term="GHSA-rjr7-jggh-pgcp"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Chi&amp;#x27;s RealIP Middleware allows IP spoofing via unvalidated X-Forwarded-For header in github.com/go-chi/chi&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-rjr7-jggh-pgcp&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-chi/chi/v5&lt;/code&gt; — fixed in 5.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Chi&amp;#x27;s RealIP Middleware allows IP spoofing via unvalidated X-Forwarded-For header in github.com/go-chi/chi&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/security/advisories/GHSA-rjr7-jggh-pgcp"&gt;https://github.com/go-chi/chi/security/advisories/GHSA-rjr7-jggh-pgcp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/pull/967"&gt;https://github.com/go-chi/chi/pull/967&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/releases/tag/v5.3.0"&gt;https://github.com/go-chi/chi/releases/tag/v5.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5777"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

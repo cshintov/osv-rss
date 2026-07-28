@@ -3,12 +3,144 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-28T14:30:38Z</updated>
+  <updated>2026-07-28T16:30:37Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-6r28-9ppf-4hj5: GoPacket's Diameter AVP decoder: uint32 underflow on vendor header size leads to unbounded ~4 GiB allocation (unauthenticated remote DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5"/>
+    <published>2026-07-28T16:14:36Z</published>
+    <updated>2026-07-28T16:30:37Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54345"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoPacket&amp;#x27;s Diameter AVP decoder: uint32 underflow on vendor header size leads to unbounded ~4 GiB allocation (unauthenticated remote DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54345&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gopacket/gopacket&lt;/code&gt; — fixed in 1.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The Diameter AVP decoder in `github.com/gopacket/gopacket` computes `dataLength := avp.Length - uint32(headerSize)` without first ensuring `avp.Length &amp;gt;= headerSize`. When the Vendor flag is set, `headerSize` is 12, but the only length guard upstream rejects `avp.Length &amp;lt; 8`. An AVP with the Vendor flag set and a 24-bit Length field of 8, 9, 10, or 11 therefore underflows the `uint32` subtraction to ~4,294,967,292, which is passed straight to `make([]byte, dataLength)`. A single 32-byte Diameter message forces a ~4 GiB allocation; a short burst of such messages exhausts memory and OOM-kills memory-constrained collectors. This is an unauthenticated remote denial of service (CWE-191 integer underflow -&amp;gt; CWE-770 unbounded allocation).
+
+## Root cause (file:line @ v1.6.0)
+
+`layers/d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/security/advisories/GHSA-6r28-9ppf-4hj5"&gt;https://github.com/gopacket/gopacket/security/advisories/GHSA-6r28-9ppf-4hj5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/commit/145859d0eaee1a6f5925ffb93851c976449c3311"&gt;https://github.com/gopacket/gopacket/commit/145859d0eaee1a6f5925ffb93851c976449c3311&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket"&gt;https://github.com/gopacket/gopacket&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/releases/tag/v1.6.1"&gt;https://github.com/gopacket/gopacket/releases/tag/v1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g6v3-7xmc-w563: GoPacket's sFlow ExtendedGatewayFlow decoder: unbounded attacker-controlled allocation (104-byte UDP datagram -&gt; up to 16 GiB make) -&gt; unauthenticated remote DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563"/>
+    <published>2026-07-28T16:17:26Z</published>
+    <updated>2026-07-28T16:30:36Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54332"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoPacket&amp;#x27;s sFlow ExtendedGatewayFlow decoder: unbounded attacker-controlled allocation (104-byte UDP datagram -&amp;gt; up to 16 GiB make) -&amp;gt; unauthenticated remote DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54332&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gopacket/gopacket&lt;/code&gt; — fixed in 1.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The sFlow `ExtendedGatewayFlow` record decoder in `github.com/gopacket/gopacket` allocates a slice with `make([]uint32, n)` where `n` is an attacker-controlled 32-bit wire field that has no upper bound. Because the allocation happens *before* the read loop that would consume the corresponding bytes, a single small UDP datagram can force a multi-gigabyte allocation. A 104-byte sFlow datagram can request up to 16 GiB and OOM-kill any service that parses sFlow with gopacket. This is an unauthenticated remote denial of service (CWE-770).
+
+## Root cause (file:line @ v1.6.0)
+
+Two sinks in `layers/sflow.go`, both in the `ExtendedGatewayFlow` (record type 1003) decode path:
+
+1. `layers/sflow.go:1306` in `decodeExtendedGatewayFlowRecord`:
+```go
+*data, communitiesLength = (*data)[4:], bi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/security/advisories/GHSA-g6v3-7xmc-w563"&gt;https://github.com/gopacket/gopacket/security/advisories/GHSA-g6v3-7xmc-w563&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/commit/76119086f5936aacd7088bdf97d565501bb6c4cc"&gt;https://github.com/gopacket/gopacket/commit/76119086f5936aacd7088bdf97d565501bb6c4cc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket"&gt;https://github.com/gopacket/gopacket&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/releases/tag/v1.6.1"&gt;https://github.com/gopacket/gopacket/releases/tag/v1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5617: Race condition in 'docker cp' in github.com/docker/docker allows bind mount redirection</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5617</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5617"/>
+    <published>2026-06-25T22:34:34Z</published>
+    <updated>2026-07-28T16:30:26Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-42306"/>
+    <category term="GHSA-rg2x-37c3-w2rh"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Race condition in &amp;#x27;docker cp&amp;#x27; in github.com/docker/docker allows bind mount redirection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-42306, GHSA-rg2x-37c3-w2rh&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/docker/docker&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/moby/moby&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/moby/moby/v2&lt;/code&gt; — fixed in 2.0.0-beta.14&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A race condition in the Docker daemon allows an attacker to redirect bind mounts to arbitrary host paths during a &amp;quot;docker cp&amp;quot; operation.
+
+The affected code is in the daemon package, specifically the openContainerFS method. This is daemon-owned, Linux-specific code and is not intended for external use as a Go library.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/moby/moby/security/advisories/GHSA-rg2x-37c3-w2rh"&gt;https://github.com/moby/moby/security/advisories/GHSA-rg2x-37c3-w2rh&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5617"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8r6w-3qq5-4p4r: Pterodactyl's improper JWT scoping allows subuser to upload files when not explicitly granted `file.create` permissions</title>
+    <id>https://osv.dev/vulnerability/GHSA-8r6w-3qq5-4p4r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8r6w-3qq5-4p4r"/>
+    <published>2026-07-28T15:43:25Z</published>
+    <updated>2026-07-28T16:00:25Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54593"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pterodactyl&amp;#x27;s improper JWT scoping allows subuser to upload files when not explicitly granted `file.create` permissions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54593&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pterodactyl/panel&lt;/code&gt; — fixed in 1.12.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/pterodactyl/wings&lt;/code&gt; — fixed in 1.12.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A privilege escalation vulnerability exists in the Wings /upload/file endpoint due to insufficient validation of panel-signed JWTs. Wings accepts any valid panel-signed JWT containing `server_uuid`, `user_uuid`, and `unique_id`, regardless of the token’s intended purpose. Because the Panel issues JWTs with these same claims for other lower-privilege operations (such as WebSocket authentication and file download links), an authenticated subuser can reuse one of those tokens to upload arbitrary files without possessing the required `file.create` permission.
+
+### Impact
+Any subuser with permission to connect to a server&amp;#x27;s console, download files, or download backups could reuse those tokens to upload arbitrary files to the _same server_. A user that does not have access to a serve…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/panel/security/advisories/GHSA-8r6w-3qq5-4p4r"&gt;https://github.com/pterodactyl/panel/security/advisories/GHSA-8r6w-3qq5-4p4r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/panel/pull/5636"&gt;https://github.com/pterodactyl/panel/pull/5636&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/panel/commit/7ffcd636310bb72b54bac3280d2a15e727feded7"&gt;https://github.com/pterodactyl/panel/commit/7ffcd636310bb72b54bac3280d2a15e727feded7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/commit/d0ddc80844479302abdaf9654de3bacd511c0f5c"&gt;https://github.com/pterodactyl/wings/commit/d0ddc80844479302abdaf9654de3bacd511c0f5c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/panel"&gt;https://github.com/pterodactyl/panel&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8r6w-3qq5-4p4r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-78mq-xcr3-xm33: golang.org/x/crypto is vulnerable to invoking server panic during CheckHostKey/Authenticate flow</title>
+    <id>https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33"/>
+    <published>2026-06-25T22:15:17Z</published>
+    <updated>2026-07-28T15:57:12Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39835"/>
+    <category term="GO-2026-5015"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto is vulnerable to invoking server panic during CheckHostKey/Authenticate flow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39835, GO-2026-5015&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SSH servers which use CertChecker as a public key callback without setting IsUserAuthority or IsHostAuthority could be caused to panic by a client presenting a certificate. CertChecker now returns an error instead of panicking when these callbacks are nil.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39835"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39835&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40945"&gt;https://access.redhat.com/errata/RHSA-2026:40945&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40969"&gt;https://access.redhat.com/errata/RHSA-2026:40969&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40972"&gt;https://access.redhat.com/errata/RHSA-2026:40972&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40974"&gt;https://access.redhat.com/errata/RHSA-2026:40974&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41019"&gt;https://access.redhat.com/errata/RHSA-2026:41019&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41031"&gt;https://access.redhat.com/errata/RHSA-2026:41031&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41036"&gt;https://access.redhat.com/errata/RHSA-2026:41036&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-78mq-xcr3-xm33"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vgwf-h737-ff37: golang.org/x/crypto: Invoking client can cause server deadlock on unexpected responses</title>
+    <id>https://osv.dev/vulnerability/GHSA-vgwf-h737-ff37</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vgwf-h737-ff37"/>
+    <published>2026-06-25T22:18:17Z</published>
+    <updated>2026-07-28T15:57:12Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39830"/>
+    <category term="GO-2026-5017"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;golang.org/x/crypto: Invoking client can cause server deadlock on unexpected responses&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39830, GO-2026-5017&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A malicious SSH peer could send unsolicited global request responses to fill an internal buffer, blocking the connection&amp;#x27;s read loop. The blocked goroutine could not be released by calling Close(), resulting in a resource leak per connection. Unsolicited global responses are now discarded.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39830"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39830&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:29455"&gt;https://access.redhat.com/errata/RHSA-2026:29455&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40969"&gt;https://access.redhat.com/errata/RHSA-2026:40969&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40972"&gt;https://access.redhat.com/errata/RHSA-2026:40972&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40974"&gt;https://access.redhat.com/errata/RHSA-2026:40974&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41019"&gt;https://access.redhat.com/errata/RHSA-2026:41019&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41031"&gt;https://access.redhat.com/errata/RHSA-2026:41031&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41036"&gt;https://access.redhat.com/errata/RHSA-2026:41036&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vgwf-h737-ff37"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6061: Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6061</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6061"/>
+    <published>2026-07-27T15:30:50Z</published>
+    <updated>2026-07-28T15:15:01Z</updated>
+    <category term="Go"/>
+    <category term="GHSA-hrxh-6v49-42gf"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-hrxh-6v49-42gf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.82.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-hrxh-6v49-42gf"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-hrxh-6v49-42gf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/4ea465d4ab98013f72a142fe0fc89c19770b2935"&gt;https://github.com/grpc/grpc-go/commit/4ea465d4ab98013f72a142fe0fc89c19770b2935&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9236"&gt;https://github.com/grpc/grpc-go/pull/9236&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/releases/tag/v1.82.1"&gt;https://github.com/grpc/grpc-go/releases/tag/v1.82.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6061"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5983: Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5983</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5983"/>
+    <published>2026-07-27T15:30:50Z</published>
+    <updated>2026-07-28T15:15:01Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54448"/>
+    <category term="GHSA-q3fv-x8vg-qqm4"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54448, GHSA-q3fv-x8vg-qqm4&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/aquasecurity/trivy&lt;/code&gt; — fixed in 0.71.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4"&gt;https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4"&gt;https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/pull/10718"&gt;https://github.com/aquasecurity/trivy/pull/10718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/releases/tag/v0.71.0"&gt;https://github.com/aquasecurity/trivy/releases/tag/v0.71.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5983"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-w4q6-qw23-4rg7: GitHub MCP Server has Nil Pointer Dereference DoS in completion/complete Handler</title>
+    <id>https://osv.dev/vulnerability/GHSA-w4q6-qw23-4rg7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w4q6-qw23-4rg7"/>
+    <published>2026-07-28T14:35:10Z</published>
+    <updated>2026-07-28T14:45:27Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-47427"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitHub MCP Server has Nil Pointer Dereference DoS in completion/complete Handler&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47427&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/github/github-mcp-server&lt;/code&gt; — fixed in 1.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A nil pointer dereference vulnerability in the GitHub MCP Server causes it to crash when receiving a malformed `completion/complete` request with missing or empty parameters. This allows any unauthenticated client to cause a complete denial of service.
+
+### Details
+
+The `CompletionsHandler` function in `pkg/github/server.go:198` accesses `params.Ref` without checking if it&amp;#x27;s nil first. When a client sends a `completion/complete` request with a missing `ref` field, the handler dereferences nil and the Go runtime panics.
+
+The crash occurs before any authentication or token validation, so even requests with fake tokens can trigger it.
+
+### PoC
+
+After completing the MCP initialization handshake, send either:
+
+**Empty params:**
+
+    {&amp;quot;jsonrpc&amp;quot;:&amp;quot;2.0&amp;quot;,&amp;quot;id&amp;quot;:2,&amp;quot;method&amp;quot;:&amp;quot;completion/comp…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/github/github-mcp-server/security/advisories/GHSA-w4q6-qw23-4rg7"&gt;https://github.com/github/github-mcp-server/security/advisories/GHSA-w4q6-qw23-4rg7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/github/github-mcp-server/pull/2502"&gt;https://github.com/github/github-mcp-server/pull/2502&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/github/github-mcp-server/commit/c88d2ecdd3bb07f7bdd75296e3ee676febf14f58"&gt;https://github.com/github/github-mcp-server/commit/c88d2ecdd3bb07f7bdd75296e3ee676febf14f58&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/github/github-mcp-server"&gt;https://github.com/github/github-mcp-server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/github/github-mcp-server/releases/tag/v1.1.0"&gt;https://github.com/github/github-mcp-server/releases/tag/v1.1.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w4q6-qw23-4rg7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-w6p7-2fxx-4f44: Pocket ID: OIDC refresh token flow bypasses authorization revocation, account disabling, and group restrictions</title>
     <id>https://osv.dev/vulnerability/GHSA-w6p7-2fxx-4f44</id>
@@ -1428,16 +1560,6 @@ The additional affected modules and versions are: code.gitea.io/gitea before v1.
     <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: REST API exposes organization membership of private organizations to public in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58417, GHSA-jr5x-6h83-wrxf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: REST API exposes organization membership of private organizations to public in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-jr5x-6h83-wrxf"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-jr5x-6h83-wrxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/685b62c60fc595e3612a85f0895471876db56292"&gt;https://github.com/go-gitea/gitea/commit/685b62c60fc595e3612a85f0895471876db56292&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38145"&gt;https://github.com/go-gitea/gitea/pull/38145&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6063"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GO-2026-6061: Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6061</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6061"/>
-    <published>2026-07-27T15:30:50Z</published>
-    <updated>2026-07-27T17:00:23Z</updated>
-    <category term="Go"/>
-    <category term="GHSA-hrxh-6v49-42gf"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-hrxh-6v49-42gf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.82.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Vulnerabilities in the xDS RBAC authorization engine and the HTTP/2 transport server implementation in google.golang.org/grpc&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-hrxh-6v49-42gf"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-hrxh-6v49-42gf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/4ea465d4ab98013f72a142fe0fc89c19770b2935"&gt;https://github.com/grpc/grpc-go/commit/4ea465d4ab98013f72a142fe0fc89c19770b2935&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9236"&gt;https://github.com/grpc/grpc-go/pull/9236&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/releases/tag/v1.82.1"&gt;https://github.com/grpc/grpc-go/releases/tag/v1.82.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6061"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] GO-2026-6066: Gitea: Private Repository Existence Disclosure via go-get Meta Endpoint in gitea.dev</title>
     <id>https://osv.dev/vulnerability/GO-2026-6066</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6066"/>
@@ -1458,17 +1580,6 @@ The additional affected modules and versions are: code.gitea.io/gitea before v1.
     <category term="CVE-2026-58442"/>
     <category term="GHSA-h2x6-g7q6-344v"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Repository migration SSRF via multi-answer DNS allow-list bypass in gitea.dev&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58442, GHSA-h2x6-g7q6-344v&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea: Repository migration SSRF via multi-answer DNS allow-list bypass in gitea.dev&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-h2x6-g7q6-344v"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-h2x6-g7q6-344v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.27.0"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.27.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6058"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GO-2026-5983: Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5983</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5983"/>
-    <published>2026-07-27T15:30:50Z</published>
-    <updated>2026-07-27T17:00:23Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54448"/>
-    <category term="GHSA-q3fv-x8vg-qqm4"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54448, GHSA-q3fv-x8vg-qqm4&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/aquasecurity/trivy&lt;/code&gt; — fixed in 0.71.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Trivy: Helm chart tar bomb causes OOM via unbounded io.ReadAll in parser in github.com/aquasecurity/trivy&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4"&gt;https://github.com/aquasecurity/trivy/security/advisories/GHSA-q3fv-x8vg-qqm4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4"&gt;https://github.com/aquasecurity/trivy/commit/441251e51ae46cbcf7f436547e0a5766b25328b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/pull/10718"&gt;https://github.com/aquasecurity/trivy/pull/10718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aquasecurity/trivy/releases/tag/v0.71.0"&gt;https://github.com/aquasecurity/trivy/releases/tag/v0.71.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5983"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GO-2026-5960: Excelize: Unbounded Row Index Allocation in Worksheet Parser (checkSheet OOM/Panic DoS) in github.com/xuri/excelize</title>
@@ -2453,51 +2564,5 @@ This will be patched in OpenBao v2.5.3.
 Users may manually remove mounts prior to deleting the namespace. 
 
 Audit logs may be used to identify repeated deletion attempts against the same namespace; `sys/raw` can be used to see what leases were not correctly deleted.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-vv66-6rp4-wr4f"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-vv66-6rp4-wr4f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42186"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42186&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/6d2e0506e2b41be0eaa6643bf7b4efc9a2c09445"&gt;https://github.com/openbao/openbao/commit/6d2e0506e2b41be0eaa6643bf7b4efc9a2c09445&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.3"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vv66-6rp4-wr4f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5674: OpenBao's Namespace Deletion May Not Delete Data Properly in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5674</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5674"/>
-    <published>2026-06-25T22:34:38Z</published>
-    <updated>2026-07-27T09:11:15Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2026-42186"/>
-    <category term="CVE-2026-42186"/>
-    <category term="GHSA-vv66-6rp4-wr4f"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao&amp;#x27;s Namespace Deletion May Not Delete Data Properly in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2026-42186, CVE-2026-42186, GHSA-vv66-6rp4-wr4f&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20260420173541-6d2e0506e2b4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao&amp;#x27;s Namespace Deletion May Not Delete Data Properly in github.com/openbao/openbao&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-vv66-6rp4-wr4f"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-vv66-6rp4-wr4f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42186"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42186&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/6d2e0506e2b41be0eaa6643bf7b4efc9a2c09445"&gt;https://github.com/openbao/openbao/commit/6d2e0506e2b41be0eaa6643bf7b4efc9a2c09445&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.3"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5674"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-cpj3-3r2f-xj59: OpenBao has Reflected XSS in its OIDC authentication error message</title>
-    <id>https://osv.dev/vulnerability/GHSA-cpj3-3r2f-xj59</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cpj3-3r2f-xj59"/>
-    <published>2026-03-26T18:37:09Z</published>
-    <updated>2026-07-27T09:11:13Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2026-33758"/>
-    <category term="CVE-2026-33758"/>
-    <category term="GO-2026-4862"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao has Reflected XSS in its OIDC authentication error message&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2026-33758, CVE-2026-33758, GO-2026-4862&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20260325133417-6e2b2dd84f0e&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-OpenBao installations that have an OIDC/JWT authentication method enabled and a role with `callback_mode=direct` configured are vulnerable to XSS via the  `error_description` parameter on the page for a failed authentication.
-
-This allows an attacker access to the token used in the Web UI by a victim.
-
-### Patches
-The `error_description` parameter has been replaced with a static error message in v2.5.2
-
-### Workarounds
-The vulnerability can be mitigated by removing any roles with `callback_mode` set to `direct`.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-cpj3-3r2f-xj59"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-cpj3-3r2f-xj59&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33758"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-33758&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/2709"&gt;https://github.com/openbao/openbao/pull/2709&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/6e2b2dd84f0e47cebc90d6e79609dd5274732662"&gt;https://github.com/openbao/openbao/commit/6e2b2dd84f0e47cebc90d6e79609dd5274732662&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.2"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cpj3-3r2f-xj59"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-4862: OpenBao has Reflected XSS in its OIDC authentication error message in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4862</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4862"/>
-    <published>2026-03-26T20:33:09Z</published>
-    <updated>2026-07-27T09:11:13Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2026-33758"/>
-    <category term="CVE-2026-33758"/>
-    <category term="GHSA-cpj3-3r2f-xj59"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao has Reflected XSS in its OIDC authentication error message in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2026-33758, CVE-2026-33758, GHSA-cpj3-3r2f-xj59&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20260325133417-6e2b2dd84f0e&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao has Reflected XSS in its OIDC authentication error message in github.com/openbao/openbao&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-cpj3-3r2f-xj59"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-cpj3-3r2f-xj59&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/6e2b2dd84f0e47cebc90d6e79609dd5274732662"&gt;https://github.com/openbao/openbao/commit/6e2b2dd84f0e47cebc90d6e79609dd5274732662&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/2709"&gt;https://github.com/openbao/openbao/pull/2709&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.2"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4862"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

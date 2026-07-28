@@ -3,12 +3,200 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-28T03:14:46Z</updated>
+  <updated>2026-07-28T14:30:38Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-w6p7-2fxx-4f44: Pocket ID: OIDC refresh token flow bypasses authorization revocation, account disabling, and group restrictions</title>
+    <id>https://osv.dev/vulnerability/GHSA-w6p7-2fxx-4f44</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w6p7-2fxx-4f44"/>
+    <published>2026-07-28T14:12:44Z</published>
+    <updated>2026-07-28T14:30:38Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-43983"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pocket ID: OIDC refresh token flow bypasses authorization revocation, account disabling, and group restrictions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-43983&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/pocket-id/pocket-id/backend&lt;/code&gt; — fixed in 0.0.0-20260419162744-978ac87deffe&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# OIDC Refresh Token Flow Bypasses Authorization Revocation, Account Disabling, and Group Restrictions
+
+## Summary
+
+The `createTokenFromRefreshToken` function (oidc_service.go:451) validates the refresh token&amp;#x27;s cryptographic integrity but does not re-validate the user&amp;#x27;s current authorization state before issuing new tokens. This allows three bypasses:
+
+1. **Authorization revocation bypass**: After a user revokes an OIDC client&amp;#x27;s authorization, the client can continue refreshing tokens indefinitely because `RevokeAuthorizedClient` does not delete associated refresh tokens, and the refresh flow does not check if the authorization record still exists.
+
+2. **Disabled user bypass**: After an admin disables a user account, pre-existing refresh tokens continue to work because the OIDC token endpo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pocket-id/pocket-id/security/advisories/GHSA-w6p7-2fxx-4f44"&gt;https://github.com/pocket-id/pocket-id/security/advisories/GHSA-w6p7-2fxx-4f44&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-43983"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-43983&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pocket-id/pocket-id/commit/978ac87deffec58beaccd15aead975e91b94c8a5"&gt;https://github.com/pocket-id/pocket-id/commit/978ac87deffec58beaccd15aead975e91b94c8a5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pocket-id/pocket-id"&gt;https://github.com/pocket-id/pocket-id&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pocket-id/pocket-id/releases/tag/v2.6.0"&gt;https://github.com/pocket-id/pocket-id/releases/tag/v2.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w6p7-2fxx-4f44"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hp74-gm6m-2qm5: Pocket ID has a reauthentication bypass via one-time access token login — passkey step-up requirement defeated by JWT freshness check that accepts any login method</title>
+    <id>https://osv.dev/vulnerability/GHSA-hp74-gm6m-2qm5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hp74-gm6m-2qm5"/>
+    <published>2026-07-28T14:25:30Z</published>
+    <updated>2026-07-28T14:30:38Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pocket ID has a reauthentication bypass via one-time access token login — passkey step-up requirement defeated by JWT freshness check that accepts any login method&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/pocket-id/pocket-id/backend&lt;/code&gt; — fixed in 0.0.0-20260419162744-978ac87deffe&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Reauthentication Bypass via One-Time Access Token Login
+
+## Summary
+
+A weaker authentication method (OTA token or signup token) is accepted as passkey step-up proof, yielding unauthorized renewable 30-day OIDC refresh tokens for clients explicitly configured with `RequiresReauthentication: true`. The `POST /api/webauthn/reauthenticate` endpoint&amp;#x27;s access-token fallback checks only JWT freshness (`IssuedAt` within 60 seconds), not the authentication method used. The session cookie gate is also non-validating -- any arbitrary cookie value (e.g. `session=deadbeef`) is accepted, collapsing the reauth boundary to token recency alone.
+
+The bypass needs to succeed only once. The resulting OIDC grant includes a 30-day refresh token that can be rotated indefinitely, providing persistent victim-imp…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pocket-id/pocket-id/security/advisories/GHSA-hp74-gm6m-2qm5"&gt;https://github.com/pocket-id/pocket-id/security/advisories/GHSA-hp74-gm6m-2qm5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pocket-id/pocket-id/commit/978ac87deffec58beaccd15aead975e91b94c8a5"&gt;https://github.com/pocket-id/pocket-id/commit/978ac87deffec58beaccd15aead975e91b94c8a5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pocket-id/pocket-id"&gt;https://github.com/pocket-id/pocket-id&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pocket-id/pocket-id/releases/tag/v2.6.0"&gt;https://github.com/pocket-id/pocket-id/releases/tag/v2.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hp74-gm6m-2qm5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4866: Case-sensitive excludedSubtrees name constraints cause Auth Bypass in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4866</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4866"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-28T10:59:57Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-33810"/>
+    <category term="CVE-2026-33810"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Case-sensitive excludedSubtrees name constraints cause Auth Bypass in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-33810, CVE-2026-33810&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When verifying a certificate chain containing excluded DNS constraints, these constraints are not correctly applied to wildcard DNS SANs which use a different case than the constraint.
+
+This only affects validation of otherwise trusted certificate chains, issued by a root CA in the VerifyOptions.Roots CertPool, or in the system certificate pool.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/763763"&gt;https://go.dev/cl/763763&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78332"&gt;https://go.dev/issue/78332&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4947: Unexpected work during chain building in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4947</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4947"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-28T10:59:56Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-32280"/>
+    <category term="CVE-2026-32280"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unexpected work during chain building in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32280, CVE-2026-32280&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;During chain building, the amount of work that is done is not correctly limited when a large number of intermediate certificates are passed in VerifyOptions.Intermediates, which can lead to a denial of service. This affects both direct users of crypto/x509 and users of crypto/tls.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/758320"&gt;https://go.dev/cl/758320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78282"&gt;https://go.dev/issue/78282&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4947"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4341: Memory exhaustion in query parameter parsing in net/url</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4341</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4341"/>
+    <published>2026-01-28T19:08:18Z</published>
+    <updated>2026-07-28T10:59:56Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2025-61726"/>
+    <category term="CVE-2025-61726"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Memory exhaustion in query parameter parsing in net/url&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2025-61726, CVE-2025-61726&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.24.12, 1.25.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The net/url package does not set a limit on the number of query parameters in a query.
+
+While the maximum size of query parameters in URLs is generally limited by the maximum request header size, the net/http.Request.ParseForm method can parse large URL-encoded forms. Parsing a large form containing many unique query parameters can cause excessive memory consumption.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/736712"&gt;https://go.dev/cl/736712&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77101"&gt;https://go.dev/issue/77101&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc"&gt;https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4341"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5037: Inefficient candidate hostname parsing in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5037</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5037"/>
+    <published>2026-06-02T21:39:47Z</published>
+    <updated>2026-07-28T10:59:55Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-27145"/>
+    <category term="CVE-2026-27145"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Inefficient candidate hostname parsing in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-27145, CVE-2026-27145&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.11, 1.26.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;(*x509.Certificate).VerifyHostname previously called matchHostnames in a loop over all DNS Subject Alternative Name (SAN) entries. This caused strings.Split(host, &amp;quot;.&amp;quot;) to execute repeatedly on the same input hostname.
+
+With a large DNS SAN list, verification costs scaled quadratically based on the number of SAN entries multiplied by the hostname&amp;#x27;s label count. Because x509.Verify validates hostnames before building the certificate chain, this overhead occurred even for untrusted certificates.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/783621"&gt;https://go.dev/cl/783621&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79694"&gt;https://go.dev/issue/79694&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw"&gt;https://groups.google.com/g/golang-announce/c/tKs3rmcBcKw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5037"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4601: Incorrect parsing of IPv6 host literals in net/url</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4601</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4601"/>
+    <published>2026-03-06T21:03:42Z</published>
+    <updated>2026-07-28T10:59:54Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-25679"/>
+    <category term="CVE-2026-25679"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Incorrect parsing of IPv6 host literals in net/url&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-25679, CVE-2026-25679&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.8, 1.26.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;url.Parse insufficiently validated the host/authority component and accepted some invalid URLs.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/752180"&gt;https://go.dev/cl/752180&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77578"&gt;https://go.dev/issue/77578&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk"&gt;https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4601"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4864: TOCTOU permits root escape on Linux via Root.Chmod in os in internal/syscall/unix</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4864</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4864"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-28T10:59:54Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-32282"/>
+    <category term="CVE-2026-32282"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;TOCTOU permits root escape on Linux via Root.Chmod in os in internal/syscall/unix&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32282, CVE-2026-32282&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;On Linux, if the target of Root.Chmod is replaced with a symlink while the chmod operation is in progress, Chmod can operate on the target of the symlink, even when the target lies outside the root.
+
+The Linux fchmodat syscall silently ignores the AT_SYMLINK_NOFOLLOW flag, which Root.Chmod uses to avoid symlink traversal. Root.Chmod checks its target before acting and returns an error if the target is a symlink lying outside the root, so the impact is limited to cases where the target is replaced with a symlink between the check and operation.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/763761"&gt;https://go.dev/cl/763761&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78293"&gt;https://go.dev/issue/78293&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4864"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4946: Inefficient policy validation in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4946</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4946"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-28T10:59:53Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-32281"/>
+    <category term="CVE-2026-32281"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Inefficient policy validation in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32281, CVE-2026-32281&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Validating certificate chains which use policies is unexpectedly inefficient when certificates in the chain contain a very large number of policy mappings, possibly causing denial of service.
+
+This only affects validation of otherwise trusted certificate chains, issued by a root CA in the VerifyOptions.Roots CertPool, or in the system certificate pool.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/758061"&gt;https://go.dev/cl/758061&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78281"&gt;https://go.dev/issue/78281&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4946"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5026: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5026</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5026"/>
+    <published>2026-05-22T02:46:43Z</published>
+    <updated>2026-07-28T10:59:53Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39821"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39821&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.55.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The ToASCII and ToUnicode functions incorrectly accept Punycode-encoded labels that decode to an ASCII-only label. For example, ToUnicode(&amp;quot;xn--example-.com&amp;quot;) incorrectly returns the name &amp;quot;example.com&amp;quot; rather than an error.
+
+This behavior can lead to privilege escalation in programs using the idna package. For example, a program which performs privilege checks on the ASCII hostname may reject &amp;quot;example.com&amp;quot; but permit &amp;quot;xn--example-.com&amp;quot;. If that program subsequently converts the ASCII hostname to Unicode, it will inadvertently permits access to the Unicode name &amp;quot;example.com&amp;quot;.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/767220"&gt;https://go.dev/cl/767220&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78760"&gt;https://go.dev/issue/78760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8"&gt;https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5026"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2025-4155: Excessive resource consumption when printing error string for host certificate validation in crypto/x509</title>
+    <id>https://osv.dev/vulnerability/GO-2025-4155</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-4155"/>
+    <published>2025-12-02T18:30:24Z</published>
+    <updated>2026-07-28T10:59:52Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2025-61729"/>
+    <category term="CVE-2025-61729"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excessive resource consumption when printing error string for host certificate validation in crypto/x509&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2025-61729, CVE-2025-61729&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.24.11, 1.25.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Within HostnameError.Error(), when constructing an error string, there is no limit to the number of hosts that will be printed out. Furthermore, the error string is constructed by repeated string concatenation, leading to quadratic runtime. Therefore, a certificate provided by a malicious actor can result in excessive resource consumption.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/725920"&gt;https://go.dev/cl/725920&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/76445"&gt;https://go.dev/issue/76445&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/8FJoBkPddm4"&gt;https://groups.google.com/g/golang-announce/c/8FJoBkPddm4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-4155"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4870: Unauthenticated TLS 1.3 KeyUpdate record can cause persistent connection retention and DoS in crypto/tls</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4870</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4870"/>
+    <published>2026-04-07T22:53:49Z</published>
+    <updated>2026-07-28T10:59:52Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2026-32283"/>
+    <category term="CVE-2026-32283"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unauthenticated TLS 1.3 KeyUpdate record can cause persistent connection retention and DoS in crypto/tls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-32283, CVE-2026-32283&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.9, 1.26.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;If one side of the TLS connection sends multiple key update messages post-handshake in a single record, the connection can deadlock, causing uncontrolled consumption of resources. This can lead to a denial of service.
+
+This only affects TLS 1.3.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/763767"&gt;https://go.dev/cl/763767&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78334"&gt;https://go.dev/issue/78334&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU"&gt;https://groups.google.com/g/golang-announce/c/0uYbvbPZRWU&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4870"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4342: Excessive CPU consumption when building archive index in archive/zip</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4342</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4342"/>
+    <published>2026-01-28T19:08:28Z</published>
+    <updated>2026-07-28T10:59:52Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2025-61728"/>
+    <category term="CVE-2025-61728"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excessive CPU consumption when building archive index in archive/zip&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2025-61728, CVE-2025-61728&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.24.12, 1.25.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;archive/zip uses a super-linear file name indexing algorithm that is invoked the first time a file in an archive is opened. This can lead to a denial of service when consuming a maliciously constructed ZIP archive.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/736713"&gt;https://go.dev/cl/736713&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77102"&gt;https://go.dev/issue/77102&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc"&gt;https://groups.google.com/g/golang-announce/c/Vd2tYVM8eUc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4342"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-4337: Unexpected session resumption in crypto/tls</title>
+    <id>https://osv.dev/vulnerability/GO-2026-4337</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4337"/>
+    <published>2026-02-05T17:23:09Z</published>
+    <updated>2026-07-28T10:59:52Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2025-68121"/>
+    <category term="CVE-2025-68121"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unexpected session resumption in crypto/tls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2025-68121, CVE-2025-68121&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.24.13, 1.25.7, 1.26.0-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;During session resumption in crypto/tls, if the underlying Config has its ClientCAs or RootCAs fields mutated between the initial handshake and the resumed handshake, the resumed handshake may succeed when it should have failed. This may happen when a user calls Config.Clone and mutates the returned Config, or uses Config.GetConfigForClient. This can cause a client to resume a session with a server that it would not have resumed with during the initial handshake, or cause a server to resume a session with a client that it would not have resumed with during the initial handshake.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/K09ubi9FQFk"&gt;https://groups.google.com/g/golang-announce/c/K09ubi9FQFk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/737700"&gt;https://go.dev/cl/737700&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77217"&gt;https://go.dev/issue/77217&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4337"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5841: OOB read in github.com/klauspost/compress/s2</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5841</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5841"/>
+    <published>2026-07-27T16:16:22Z</published>
+    <updated>2026-07-28T08:59:52Z</updated>
+    <category term="Go"/>
+    <category term="GHSA-259r-337f-4rfw"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OOB read in github.com/klauspost/compress/s2&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-259r-337f-4rfw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klauspost/compress&lt;/code&gt; — fixed in 1.18.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Providing a specially crafted dictionary to s2.NewDict and using it to encode data can make the encoder read out of bounds.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw"&gt;https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/commit/8668e357e776d5152ed62f33c17f21b8690664fa"&gt;https://github.com/klauspost/compress/commit/8668e357e776d5152ed62f33c17f21b8690664fa&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5841"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-x99g-8v8j-25j2: Ollama is Vulnerable to Path Traversal</title>
     <id>https://osv.dev/vulnerability/GHSA-x99g-8v8j-25j2</id>
@@ -1303,16 +1491,6 @@ The additional affected modules and versions are: code.gitea.io/gitea before v1.
     <category term="CVE-2026-50274"/>
     <category term="GHSA-74j5-xf3v-crq8"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Improper parsing of W3C baggage headers may lead to DoS in github.com/DataDog/dd-trace-go&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50274, GHSA-74j5-xf3v-crq8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/DataDog/dd-trace-go&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/DataDog/dd-trace-go/v2&lt;/code&gt; — fixed in 2.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper parsing of W3C baggage headers may lead to DoS in github.com/DataDog/dd-trace-go&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-go/security/advisories/GHSA-74j5-xf3v-crq8"&gt;https://github.com/DataDog/dd-trace-go/security/advisories/GHSA-74j5-xf3v-crq8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6000"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GO-2026-5841: OOB read in github.com/klauspost/compress/s2</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5841</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5841"/>
-    <published>2026-07-27T16:16:22Z</published>
-    <updated>2026-07-27T17:00:22Z</updated>
-    <category term="Go"/>
-    <category term="GHSA-259r-337f-4rfw"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OOB read in github.com/klauspost/compress/s2&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-259r-337f-4rfw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klauspost/compress&lt;/code&gt; — fixed in 1.18.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Providing a specially crafted dictionary to s2.NewDict and using it to encode data can make the encoder read out of bounds.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw"&gt;https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/commit/8668e357e776d5152ed62f33c17f21b8690664fa"&gt;https://github.com/klauspost/compress/commit/8668e357e776d5152ed62f33c17f21b8690664fa&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5841"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GO-2026-5781: Uncatchable stack-overflow denial of service in rsc.io/pdf</title>

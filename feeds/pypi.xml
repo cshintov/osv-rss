@@ -3,12 +3,250 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-07-28T19:15:31Z</updated>
+  <updated>2026-07-28T22:00:32Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-8359-h9fx-j6v9: datamodel-code-generator vulnerable to arbitrary local file read via JSON-Schema `$ref` (`file://` and `../` traversal), bypassing `--no-allow-remote-refs`</title>
+    <id>https://osv.dev/vulnerability/GHSA-8359-h9fx-j6v9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8359-h9fx-j6v9"/>
+    <published>2026-07-28T21:49:34Z</published>
+    <updated>2026-07-28T22:00:32Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55389"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;datamodel-code-generator vulnerable to arbitrary local file read via JSON-Schema `$ref` (`file://` and `../` traversal), bypassing `--no-allow-remote-refs`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55389&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.62.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`datamodel-code-generator` resolves JSON-Schema `$ref` targets that point at the local filesystem without restricting them to the input/base directory and without honoring the remote-reference security control. In the default configuration, an attacker who controls an input schema (a &amp;quot;paste your OpenAPI/JSON-Schema&amp;quot; service, a CI job that generates models from a submitted spec, or any multi-tenant codegen platform) can read any file the process user can read and map the host filesystem. This works via either a `file://` absolute URI or a `../`-escaped relative reference, and it succeeds even when `--no-allow-remote-refs` is set.
+
+This is an unauthenticated path-traversal / information-disclosure issue (CWE-22 / CWE-200) plus a bypass of a documented security control.
+
+### Deta…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-8359-h9fx-j6v9"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-8359-h9fx-j6v9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/2ff4a72b4550a2b2069754c5b075b1655067e5fb"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/2ff4a72b4550a2b2069754c5b075b1655067e5fb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.62.0"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.62.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8359-h9fx-j6v9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8m8r-38jm-f355: `datamodel-code-generator` vulnerable to code execution on import via unescaped `validators` entries in --extra-template-data</title>
+    <id>https://osv.dev/vulnerability/GHSA-8m8r-38jm-f355</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8m8r-38jm-f355"/>
+    <published>2026-07-28T21:44:09Z</published>
+    <updated>2026-07-28T22:00:32Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54656"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`datamodel-code-generator` vulnerable to code execution on import via unescaped `validators` entries in --extra-template-data&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54656&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.60.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When the Pydantic v2 output mode is in use, `datamodel-code-generator` reads a `validators` array from each model entry in the `--extra-template-data` file and synthesises a Pydantic `@field_validator(...)` decorator from each entry. The field names and the validator mode are interpolated into the decorator call wrapped in *unescaped* single quotes. A value containing `&amp;#x27;` breaks out of the string literal, letting an attacker emit an arbitrary positional Python expression into the decorator. The expression is evaluated at class-definition time, i.e. the moment the developer imports the generated module. This is the same trust model as the recently-published GHSA-wjv6-jcfj-mf9r (extras-file comment injection) but the impact is full RCE rather than a docstring leak.
+
+### Details
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-8m8r-38jm-f355"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-8m8r-38jm-f355&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/a43d02906111a2fdcaf13ee5b62eb2da85376f19"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/a43d02906111a2fdcaf13ee5b62eb2da85376f19&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.2"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8m8r-38jm-f355"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wjv6-jcfj-mf9r: `datamodel-code-generator` vulnerable to code injection via unescaped carriage return in `--extra-template-data` `comment` field</title>
+    <id>https://osv.dev/vulnerability/GHSA-wjv6-jcfj-mf9r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wjv6-jcfj-mf9r"/>
+    <published>2026-07-28T21:50:09Z</published>
+    <updated>2026-07-28T22:00:32Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54654"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`datamodel-code-generator` vulnerable to code injection via unescaped carriage return in `--extra-template-data` `comment` field&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54654&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.60.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`datamodel-code-generator` is vulnerable to code injection when a developer passes an `--extra-template-data` file whose `comment` value contains a literal `\r` (carriage return). The `comment` variable is rendered into a Python `#` comment in six built-in templates with **no** line-terminator escaping. Python&amp;#x27;s tokenizer treats a bare CR as a physical-line terminator (see [Python language reference — Physical lines](https://docs.python.org/3/reference/lexical_analysis.html#physical-lines)), so the comment ends at the `\r` and the text after it is parsed as Python, including, when the CR is followed by suitable indentation, as a statement within the class body that follows on the next template line.
+
+### Details
+
+The vulnerable templates each contain `# {{ comment }}` with no …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-wjv6-jcfj-mf9r"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-wjv6-jcfj-mf9r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/b73abb5cd703a50471b8950bbd3bd0b82ad71de7"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/b73abb5cd703a50471b8950bbd3bd0b82ad71de7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.2"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wjv6-jcfj-mf9r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-954p-556p-r752: datamodel-code-generator vulnerable to SSRF via JSON-Schema `$ref` to HTTP URL (silent by default)</title>
+    <id>https://osv.dev/vulnerability/GHSA-954p-556p-r752</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-954p-556p-r752"/>
+    <published>2026-07-28T21:42:22Z</published>
+    <updated>2026-07-28T22:00:32Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54690"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;datamodel-code-generator vulnerable to SSRF via JSON-Schema `$ref` to HTTP URL (silent by default)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54690&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.61.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+JSON-Schema `$ref` values pointing at HTTP or HTTPS URLs are silently dereferenced by `datamodel-code-generator` with no IP/host validation, no scheme allow-list, and redirects followed unconditionally. The `--allow-remote-refs` gate added in 0.56.0 defaults to `None`, which only emits a deprecation warning and then fetches the URL anyway; only explicit `--allow-remote-refs=false` blocks the request. The fetched body is parsed as a sub-schema and reflected verbatim into the generated `.py` source. As a result, any JSON-Schema document the developer feeds to `datamodel-codegen` — including documents authored by an attacker — can pivot to arbitrary internal addresses and leak the response into the generated code, with no developer cooperation beyond running the tool.
+
+### Detail…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-954p-556p-r752"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-954p-556p-r752&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/5fdba4a09f2d7a9996a504975b7ef7d63e3715bb"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/5fdba4a09f2d7a9996a504975b7ef7d63e3715bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.61.0"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.61.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-954p-556p-r752"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vx7x-vcc2-c44g: datamodel-code-generator vulnerable to SSRF protection bypass via DNS rebinding</title>
+    <id>https://osv.dev/vulnerability/GHSA-vx7x-vcc2-c44g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vx7x-vcc2-c44g"/>
+    <published>2026-07-28T21:45:48Z</published>
+    <updated>2026-07-28T22:00:31Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55391"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;datamodel-code-generator vulnerable to SSRF protection bypass via DNS rebinding&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55391&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.63.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`datamodel-code-generator`&amp;#x27;s anti-SSRF guard validates the resolved IP of a fetch target once and then lets `httpx` perform its own independent DNS resolution to connect, so the validated address is never pinned. A hostname that resolves to a public IP at validation time and a private IP at connection time (DNS rebinding) bypasses the guard and reaches loopback, link-local cloud-metadata endpoints (`169.254.169.254`), and other internal services — even with the default `allow_private_network=False`. This is a server-side request forgery reachable when the tool fetches an attacker-influenced URL (remote `$ref`, or `--url`).
+
+### Details
+
+In `src/datamodel_code_generator/http.py`, `get_body()` calls `_validate_url_for_fetch()`, which resolves the host via `_get_ips_from_host()` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-vx7x-vcc2-c44g"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-vx7x-vcc2-c44g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/25c8b7e497419eb20b230fa3318c04f9bebc5a6f"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/25c8b7e497419eb20b230fa3318c04f9bebc5a6f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.63.0"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.63.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vx7x-vcc2-c44g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-386q-5hp3-95m9: `datamodel-code-generator` vulnerable to code injection in via attacker-controlled `default_factory` schema field</title>
+    <id>https://osv.dev/vulnerability/GHSA-386q-5hp3-95m9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-386q-5hp3-95m9"/>
+    <published>2026-07-28T21:48:14Z</published>
+    <updated>2026-07-28T22:00:31Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54653"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`datamodel-code-generator` vulnerable to code injection in via attacker-controlled `default_factory` schema field&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54653&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.60.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`datamodel-code-generator` is vulnerable to code injection when generating Python models from an attacker-controlled JSON Schema, OpenAPI, YAML, JSON, Avro, Protobuf, or XSD schema. When a property carries a `&amp;quot;default_factory&amp;quot;` key, its value is interpolated verbatim — as a raw Python expression — into the generated `Field(default_factory=...)` / `field(default_factory=...)` call. Because this assignment is evaluated at class-definition time (i.e. on `import` of the generated module), an attacker who controls the schema controls a Python expression that runs in the consumer&amp;#x27;s process. No special CLI flags are required.
+
+### Details
+
+The vulnerable chain spans the JSON-Schema-shaped parser and three sink locations (Pydantic v2, dataclass, msgspec):
+
+**Source — schema → `extras`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-386q-5hp3-95m9"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-386q-5hp3-95m9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/17fc235e234cbcfaaadef8c74cb72c9687db0d1d"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/17fc235e234cbcfaaadef8c74cb72c9687db0d1d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.2"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-386q-5hp3-95m9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-r5vv-ff45-prp2: datamodel-code-generator: Authorization / request headers leaked to cross-origin redirect target when fetching remote schemas</title>
+    <id>https://osv.dev/vulnerability/GHSA-r5vv-ff45-prp2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r5vv-ff45-prp2"/>
+    <published>2026-07-28T21:32:08Z</published>
+    <updated>2026-07-28T21:46:37Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55403"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;datamodel-code-generator: Authorization / request headers leaked to cross-origin redirect target when fetching remote schemas&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55403&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.63.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When `datamodel-code-generator` fetches a remote schema and follows an HTTP redirect, it re-sends the original request headers, including any `Authorization` header, to the redirect target even when the redirect changes origin (host/port/scheme). Credentials that an operator scoped to a trusted schema host are therefore forwarded to an attacker-controlled or otherwise different host, leaking them.
+
+### Details
+
+In `src/datamodel_code_generator/http.py`, `get_body()` follows redirects manually and re-issues each hop with the same `headers` argument, with no check that the origin is unchanged:
+
+```python
+for redirect_count in range(MAX_HTTP_REDIRECTS + 1):
+    _validate_url_for_fetch(current_url, allow_private_network=allow_private_network)
+    response = httpx.get(current_url, …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-r5vv-ff45-prp2"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-r5vv-ff45-prp2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/a585c037c8307b7aae815de193b7fe1c4c44994b"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/a585c037c8307b7aae815de193b7fe1c4c44994b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.63.0"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.63.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r5vv-ff45-prp2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5578-w22f-pfx9: datamodel-code-generator vulnerable to code injection via `x-python-import` / `customTypePath` in generated import statements</title>
+    <id>https://osv.dev/vulnerability/GHSA-5578-w22f-pfx9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5578-w22f-pfx9"/>
+    <published>2026-07-28T21:40:20Z</published>
+    <updated>2026-07-28T21:46:37Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55415"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;datamodel-code-generator vulnerable to code injection via `x-python-import` / `customTypePath` in generated import statements&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55415&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.64.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
+
+A malicious input schema (OpenAPI / JSON Schema) can execute arbitrary Python code on the machine that **imports** the generated model. The `x-python-import` and `customTypePath` schema extensions flow, unsanitized, into the `import` statements datamodel-code-generator emits. A newline embedded in the extension value breaks out of the `from … import …` line and injects an attacker-controlled statement at module scope, which runs at import time. This is an unauthenticated, schema-content–driven remote code execution against any consumer of the generated code (e.g. arbitrary file read,the PoC exfiltrates `/etc/passwd`). It survives the v0.61.0 security release that fixed the related `x-python-type`, `default_factory`, GraphQL-union-description, and `validators` sinks  those fix…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-5578-w22f-pfx9"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-5578-w22f-pfx9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/577d49569c2254c371a97e495020ae2238a73b84"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/577d49569c2254c371a97e495020ae2238a73b84&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.64.0"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.64.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5578-w22f-pfx9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-j884-q54q-mmx3: `datamodel-code-generator` vulnerable to code injection via unescaped carriage return in GraphQL Union description</title>
+    <id>https://osv.dev/vulnerability/GHSA-j884-q54q-mmx3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j884-q54q-mmx3"/>
+    <published>2026-07-28T21:35:49Z</published>
+    <updated>2026-07-28T21:46:37Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54621"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`datamodel-code-generator` vulnerable to code injection via unescaped carriage return in GraphQL Union description&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54621&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.60.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`datamodel-code-generator` is vulnerable to code injection when generating Python models from an attacker-controlled GraphQL schema. A description on a Union type, written in the regular-string form (`&amp;quot;...&amp;quot;`) with a literal `\r` escape, is rendered into a Python `#` comment by a Jinja2 filter that handles only `\n`. Python&amp;#x27;s tokenizer treats a bare CR as a physical-line terminator, so the comment ends at the `\r` and the text after it is parsed as module-level Python. The injected code executes at `import` time of the generated `.py`, in the context of any consumer that imports the model. No special CLI flags are required.
+
+This affects versions `&amp;gt;=0.25.0, &amp;lt;0.60.1` and is fixed in `0.60.1`.
+
+### Details
+
+The vulnerable output was generated by the GraphQL Union templates:
+
+- `s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-j884-q54q-mmx3"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-j884-q54q-mmx3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.1"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j884-q54q-mmx3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-m34r-v34r-rf9q: `datamodel-code-generator` vulnerable to code execution on import via `x-python-type` JSON-Schema extension in datamodel-code-generator</title>
+    <id>https://osv.dev/vulnerability/GHSA-m34r-v34r-rf9q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m34r-v34r-rf9q"/>
+    <published>2026-07-28T21:33:57Z</published>
+    <updated>2026-07-28T21:46:37Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54655"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`datamodel-code-generator` vulnerable to code execution on import via `x-python-type` JSON-Schema extension in datamodel-code-generator&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54655&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.60.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`datamodel-code-generator` honours a custom `x-python-type` JSON-Schema extension that lets a schema author override the generated Python type for a field. The value is forwarded verbatim into the generated Python source as the field annotation, with a single sanitisation pass that is trivial to bypass. An attacker who controls a JSON Schema fed to `datamodel-codegen` can therefore embed an arbitrary Python statement in the generated module, which executes at class-definition time the moment the developer imports the file. No `--extra-template-data` and no special flags are required; the vulnerable code is reachable with default settings.
+
+### Details
+Sink: `src/datamodel_code_generator/parser/jsonschema.py`, `_get_python_type_override` (lines 2055–2096, at tag `0.60.1` / commi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-m34r-v34r-rf9q"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-m34r-v34r-rf9q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/2c93c9b712f43391dcfa975a1e4aa0b7c93ccbba"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/2c93c9b712f43391dcfa975a1e4aa0b7c93ccbba&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.2"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.60.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m34r-v34r-rf9q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rfr2-mq9m-x2qx: datamodel-code-generator vulnerable to SSRF via --url: no host/IP validation, follows redirects</title>
+    <id>https://osv.dev/vulnerability/GHSA-rfr2-mq9m-x2qx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rfr2-mq9m-x2qx"/>
+    <published>2026-07-28T21:30:18Z</published>
+    <updated>2026-07-28T21:46:37Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54691"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;datamodel-code-generator vulnerable to SSRF via --url: no host/IP validation, follows redirects&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54691&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.61.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`datamodel-code-generator`&amp;#x27;s built-in HTTP fetcher (`http.get_body`) issues an `httpx.GET` against any URL passed to `--url` (or reached via a redirect chain) with **no allow-list, no deny-list, no IP/host validation, and `follow_redirects=True`**. Loopback addresses, RFC1918 ranges, link-local (`169.254.169.254` cloud metadata), unique-local IPv6 and any other network-accessible target are all reachable. The JSON/YAML response body is parsed as a schema and reflected into the generated `.py` source, exfiltrating the response to anyone with access to that file (commonly committed to a repository).
+
+### Details
+
+Sink: `src/datamodel_code_generator/http.py`, `get_body` (lines 31–61, at tag `0.60.1` / commit `a321547e`):
+
+```python
+def get_body(url, headers=None, ignore_tls=False…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-rfr2-mq9m-x2qx"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-rfr2-mq9m-x2qx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/5fdba4a09f2d7a9996a504975b7ef7d63e3715bb"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/5fdba4a09f2d7a9996a504975b7ef7d63e3715bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.61.0"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.61.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rfr2-mq9m-x2qx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-442q-2j6p-642g: datamodel-code-generator vulnerable to arbitrary local file read via XSD `schemaLocation` (`xs:include`/`xs:import`) path traversal, with no remote-ref gate</title>
+    <id>https://osv.dev/vulnerability/GHSA-442q-2j6p-642g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-442q-2j6p-642g"/>
+    <published>2026-07-28T21:26:41Z</published>
+    <updated>2026-07-28T21:30:52Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55390"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;datamodel-code-generator vulnerable to arbitrary local file read via XSD `schemaLocation` (`xs:include`/`xs:import`) path traversal, with no remote-ref gate&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55390&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datamodel-code-generator&lt;/code&gt; — fixed in 0.62.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When generating models from an XML Schema (`--input-file-type xmlschema`), `datamodel-code-generator` resolves `&amp;lt;xs:include&amp;gt;`, `&amp;lt;xs:import&amp;gt;`, `&amp;lt;xs:redefine&amp;gt;`, and `&amp;lt;xs:override&amp;gt;` `schemaLocation` attributes against the source directory and reads the target with no restriction to the input/base directory. An attacker who controls the input XSD can read arbitrary files via `../` traversal or an absolute path, and the included schema&amp;#x27;s contents (type names, restrictions, enumerations) are folded into the generated output. Unlike the JSON-Schema `$ref` path, there is no `allow_remote_refs` control for XSD, so `--no-allow-remote-refs` does not mitigate it. This is an unauthenticated path-traversal / information-disclosure issue reachable in the default configuration.
+
+### Details
+
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-442q-2j6p-642g"&gt;https://github.com/koxudaxi/datamodel-code-generator/security/advisories/GHSA-442q-2j6p-642g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/commit/d2d5cecd9fd3a2a6dbf148bf0740b83a11fc6820"&gt;https://github.com/koxudaxi/datamodel-code-generator/commit/d2d5cecd9fd3a2a6dbf148bf0740b83a11fc6820&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator"&gt;https://github.com/koxudaxi/datamodel-code-generator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.62.0"&gt;https://github.com/koxudaxi/datamodel-code-generator/releases/tag/0.62.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-442q-2j6p-642g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-43px-gpwc-q84v: zilliztech deep-searcher has an Incorrect Privilege Assignment issue</title>
+    <id>https://osv.dev/vulnerability/GHSA-43px-gpwc-q84v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-43px-gpwc-q84v"/>
+    <published>2026-06-08T00:30:25Z</published>
+    <updated>2026-07-28T21:01:37Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-11466"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zilliztech deep-searcher has an Incorrect Privilege Assignment issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11466&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;deepsearcher&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A weakness has been identified in zilliztech deep-searcher up to 0.0.2. This affects the function CollectionRouter.invoke of the file deepsearcher/agent/collection_router.py. This manipulation of the argument kwargs causes improper access controls. Remote exploitation of the attack is possible. The exploit has been made available to the public and could be used for attacks. The pull request to fix this issue awaits acceptance.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11466"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11466&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zilliztech/deep-searcher/issues/267"&gt;https://github.com/zilliztech/deep-searcher/issues/267&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zilliztech/deep-searcher/pull/268"&gt;https://github.com/zilliztech/deep-searcher/pull/268&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zilliztech/deep-searcher"&gt;https://github.com/zilliztech/deep-searcher&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-11466"&gt;https://vuldb.com/cve/CVE-2026-11466&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/833652"&gt;https://vuldb.com/submit/833652&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369086"&gt;https://vuldb.com/vuln/369086&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369086/cti"&gt;https://vuldb.com/vuln/369086/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-43px-gpwc-q84v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-1808: Pulp incorrectly assigns RBAC permissions in tasks that create objects</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-1808</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-1808"/>
+    <published>2026-07-07T14:34:38Z</published>
+    <updated>2026-07-28T20:45:34Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2024-7143"/>
+    <category term="GHSA-9m5j-4xx9-44j9"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pulp incorrectly assigns RBAC permissions in tasks that create objects&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-7143, GHSA-9m5j-4xx9-44j9&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:H/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pulpcore&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A flaw was found in the Pulp package. When a role-based access control (RBAC) object in Pulp is set to assign permissions on its creation, it uses the `AutoAddObjPermsMixin` (typically the add_roles_for_object_creator method). This method finds the object creator by checking the current authenticated user. For objects that are created within a task, this current user is set by the first user with any permissions on the task object. This means the oldest user with model/domain-level task permissions will always be set as the current user of a task, even if they didn&amp;#x27;t dispatch the task. Therefore, all objects created in tasks will have their permissions assigned to this oldest user, and the creating user will receive nothing.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-7143"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-7143&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2024:6765"&gt;https://access.redhat.com/errata/RHSA-2024:6765&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2024-7143"&gt;https://access.redhat.com/security/cve/CVE-2024-7143&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2300125"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2300125&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pulp/pulpcore"&gt;https://github.com/pulp/pulpcore&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pulp/pulpcore/blob/93f241f34c503da0fbac94bdba739feda2636e12/pulpcore/tasking/_util.py#L108"&gt;https://github.com/pulp/pulpcore/blob/93f241f34c503da0fbac94bdba739feda2636e12/pulpcore/tasking/_util.py#L108&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pulp/pulpcore/blob/main/CHANGES.md"&gt;https://github.com/pulp/pulpcore/blob/main/CHANGES.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pulpcore"&gt;https://pypi.org/project/pulpcore&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-1808"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-33qv-c5qm-799v: hermes-agent has an Injection issue</title>
+    <id>https://osv.dev/vulnerability/GHSA-33qv-c5qm-799v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-33qv-c5qm-799v"/>
+    <published>2026-06-01T06:30:27Z</published>
+    <updated>2026-07-28T20:01:39Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-10223"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;hermes-agent has an Injection issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-10223&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hermes-agent&lt;/code&gt; — fixed in 0.15.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A weakness has been identified in NousResearch hermes-agent up to 2026.4.30. This affects the function _scan_memory_content of the file tools/memory_tool.py. This manipulation causes injection. The attack can be initiated remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-10223"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-10223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/commit/0dee92df22bdc0cfbcad90ca954aa14916f018de"&gt;https://github.com/NousResearch/hermes-agent/commit/0dee92df22bdc0cfbcad90ca954aa14916f018de&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/YLChen-007/a1fb77ad2488c545a35d0f66356ea7b4"&gt;https://gist.github.com/YLChen-007/a1fb77ad2488c545a35d0f66356ea7b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent"&gt;https://github.com/NousResearch/hermes-agent&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-10223"&gt;https://vuldb.com/cve/CVE-2026-10223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/822021"&gt;https://vuldb.com/submit/822021&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/367502"&gt;https://vuldb.com/vuln/367502&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/367502/cti"&gt;https://vuldb.com/vuln/367502/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-33qv-c5qm-799v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-pmqc-57g8-c22c: hermes-agent has an Uncontrolled Resource Consumption issue</title>
+    <id>https://osv.dev/vulnerability/GHSA-pmqc-57g8-c22c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pmqc-57g8-c22c"/>
+    <published>2026-06-01T06:30:27Z</published>
+    <updated>2026-07-28T20:01:39Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-10224"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;hermes-agent has an Uncontrolled Resource Consumption issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-10224&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hermes-agent&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A security vulnerability has been detected in NousResearch hermes-agent up to 2026.4.30. This vulnerability affects the function _handle_webhook_request of the file gateway/platforms/feishu.py of the component Webhook Endpoint. Such manipulation leads to resource consumption. The attack can be launched remotely. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-10224"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-10224&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/issues/29154"&gt;https://github.com/NousResearch/hermes-agent/issues/29154&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/pull/73406"&gt;https://github.com/NousResearch/hermes-agent/pull/73406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/YLChen-007/0304e313d811f187ade93d3b01de0f87"&gt;https://gist.github.com/YLChen-007/0304e313d811f187ade93d3b01de0f87&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent"&gt;https://github.com/NousResearch/hermes-agent&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-10224"&gt;https://vuldb.com/cve/CVE-2026-10224&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/822022"&gt;https://vuldb.com/submit/822022&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/367503"&gt;https://vuldb.com/vuln/367503&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pmqc-57g8-c22c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-mv8x-fg99-32mf: hermes-agent has an Injection issue</title>
     <id>https://osv.dev/vulnerability/GHSA-mv8x-fg99-32mf</id>
@@ -419,37 +657,5 @@ Reasons (based on the campaign):
     <category term="GHSA-5pcm-hx3q-hm94"/>
     <category term="PYSEC-2024-252"/>
     <content type="html">&lt;p&gt;Aliases: BIT-pytorch-2024-31580, CVE-2024-31580, GHSA-5pcm-hx3q-hm94, PYSEC-2024-252&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;torch-npu&lt;/code&gt; — fixed in 2.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;PyTorch before v2.2.0 was discovered to contain a heap buffer overflow vulnerability in the component /runtime/vararg_functions.cpp. This vulnerability allows attackers to cause a Denial of Service (DoS) via a crafted input.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://gist.github.com/1047524396/038c78f2f007345e6f497698ace2aa3d"&gt;https://gist.github.com/1047524396/038c78f2f007345e6f497698ace2aa3d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pytorch/pytorch/commit/b5c3a17c2c207ebefcb85043f0cf94be9b2fef81"&gt;https://github.com/pytorch/pytorch/commit/b5c3a17c2c207ebefcb85043f0cf94be9b2fef81&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2024-328"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-11068: Malicious code in random-ua-generator (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11068</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11068"/>
-    <published>2026-07-26T19:36:57Z</published>
-    <updated>2026-07-26T20:34:19Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in random-ua-generator (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;random-ua-generator&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (543206058a0b8e85c8227a0bfdd4752fc61779b24968a0bd5d50ae6b3040387b)
-During import, the code starts a keylogger and exfiltrates data from cryptowallets.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-07-random-ua-generator
-
-
-Reasons (based on the campaign):
-
-
- - keylogger
-
-
- - exfiltration-crypto
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/random-ua-generator"&gt;https://bad-packages.kam193.eu/pypi/package/random-ua-generator&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11068"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

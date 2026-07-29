@@ -3,12 +3,328 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-28T16:30:37Z</updated>
+  <updated>2026-07-28T22:30:30Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-964w-f6gj-5236: goshs has ACL Bypass &amp; Path Traversal</title>
+    <id>https://osv.dev/vulnerability/GHSA-964w-f6gj-5236</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-964w-f6gj-5236"/>
+    <published>2026-07-28T22:26:28Z</published>
+    <updated>2026-07-28T22:30:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-66064"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;goshs has ACL Bypass &amp;amp; Path Traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-66064&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs/v2&lt;/code&gt; — fixed in 2.1.5-0.20260727065949-f3ef599e4091&lt;/li&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs/v2&lt;/code&gt; — fixed in 2.1.5-0.20260727065949-f3ef599e4091&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`sendFile` derives the served filename from the raw request path while opening the file from the cleaned path, so appending a trailing slash empties the derived name and defeats both the never-serve rule for the ACL file and the block list. 
+
+## Finding (Medium): trailing-slash ACL and hidden-file bypass
+
+httpserver/handler.go, sendFile (lines 789-801) takes the filename from the RAW req.URL.Path while the file itself is opened from the filepath.Clean-ed path. The two disagree, and a trailing slash makes the derived name the empty string. Both protections key on that derived name, so both are defeated: the rule that never serves the .goshs ACL file, and the acl.Block list.
+
+Measured, with negative controls:
+
+```
+GET /blocked/secret.txt    -&amp;gt; 404          (control, correctly blo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/security/advisories/GHSA-964w-f6gj-5236"&gt;https://github.com/goshs-labs/goshs/security/advisories/GHSA-964w-f6gj-5236&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/pull/222"&gt;https://github.com/goshs-labs/goshs/pull/222&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/commit/f3ef599e409151d1380866e47de8b1afb0bb54fa"&gt;https://github.com/goshs-labs/goshs/commit/f3ef599e409151d1380866e47de8b1afb0bb54fa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs"&gt;https://github.com/goshs-labs/goshs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-964w-f6gj-5236"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-whmm-qj9r-wvr2: td has pre-auth denial of service via unbounded memory allocation in proto.UnencryptedMessage.Decode</title>
+    <id>https://osv.dev/vulnerability/GHSA-whmm-qj9r-wvr2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-whmm-qj9r-wvr2"/>
+    <published>2026-07-28T22:15:28Z</published>
+    <updated>2026-07-28T22:30:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54638"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;td has pre-auth denial of service via unbounded memory allocation in proto.UnencryptedMessage.Decode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54638&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gotd/td&lt;/code&gt; — fixed in 0.145.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A remote, unauthenticated attacker can cause excessive memory allocation (and resulting CPU / GC pressure, potentially OOM termination) by sending a crafted unencrypted MTProto packet.
+
+`(*proto.UnencryptedMessage).Decode` read an attacker-controlled 32-bit `dataLen` field and immediately allocated a buffer of that size via `make([]byte, dataLen)` **before** validating that the underlying buffer actually contained that many bytes. A 20-byte packet declaring a ~1.75 GB payload (e.g. `dataLen = 0x70000000`) forces the runtime to provision and zero-initialize a multi-gigabyte heap allocation before the length is rejected.
+
+Unencrypted messages are part of the unauthenticated MTProto handshake path, so no credentials or established session are required to reach the vulnerable code.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gotd/td/security/advisories/GHSA-whmm-qj9r-wvr2"&gt;https://github.com/gotd/td/security/advisories/GHSA-whmm-qj9r-wvr2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gotd/td/issues/1711"&gt;https://github.com/gotd/td/issues/1711&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gotd/td/commit/9d5d1f31ea5022d9798d84ccce15de2e91ba6baa"&gt;https://github.com/gotd/td/commit/9d5d1f31ea5022d9798d84ccce15de2e91ba6baa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gotd/td"&gt;https://github.com/gotd/td&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gotd/td/releases/tag/v0.145.1"&gt;https://github.com/gotd/td/releases/tag/v0.145.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-whmm-qj9r-wvr2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fh2f-xfxc-q9cc: openhole-server vulnerable to path traversal via URL-decoded request path</title>
+    <id>https://osv.dev/vulnerability/GHSA-fh2f-xfxc-q9cc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fh2f-xfxc-q9cc"/>
+    <published>2026-07-28T22:20:51Z</published>
+    <updated>2026-07-28T22:30:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54650"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;openhole-server vulnerable to path traversal via URL-decoded request path&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54650&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/bablilayoub/openhole&lt;/code&gt; — fixed in 0.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+openhole-server forwarded the URL-decoded request path (`r.URL.Path`) to tunnel clients instead of the original request-target. Percent-encoded dot-segments (`%2e`) and separators (`%2f`) were decoded to `../` and `/` before reaching the local service.
+
+Go&amp;#x27;s ServeMux rejects literal `../` paths, but percent-encoded traversal sequences bypassed this and were delivered to backends as working path traversal.
+
+## Impact
+
+An unauthenticated remote attacker could read files outside the published web root on tunneled local services that resolve paths without canonicalization.
+
+Example:
+- `/%2e%2e/secret.txt` → file outside web root
+- `/%2e%2e/%2e%2e/etc/passwd` → sensitive files
+
+Encoded slashes (`/a%2fb`) could also bypass path-based access controls.
+
+## Fix
+
+v0.1.2 forwards `r.URL.E…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bablilayoub/openhole/security/advisories/GHSA-fh2f-xfxc-q9cc"&gt;https://github.com/bablilayoub/openhole/security/advisories/GHSA-fh2f-xfxc-q9cc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bablilayoub/openhole/commit/a28c27adde2a7ed0c347b730c8707208c0f78ed3"&gt;https://github.com/bablilayoub/openhole/commit/a28c27adde2a7ed0c347b730c8707208c0f78ed3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bablilayoub/openhole"&gt;https://github.com/bablilayoub/openhole&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bablilayoub/openhole/releases/tag/v0.1.2"&gt;https://github.com/bablilayoub/openhole/releases/tag/v0.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fh2f-xfxc-q9cc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rmxw-pq4x-3fvh: goshs: File-based .goshs ACL authorization bypass via the ?bulk zip-download route (unauthenticated read; residual of GHSA-wvhv-qcqf-f3cx)</title>
+    <id>https://osv.dev/vulnerability/GHSA-rmxw-pq4x-3fvh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rmxw-pq4x-3fvh"/>
+    <published>2026-07-28T21:59:48Z</published>
+    <updated>2026-07-28T22:15:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54719"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;goshs: File-based .goshs ACL authorization bypass via the ?bulk zip-download route (unauthenticated read; residual of GHSA-wvhv-qcqf-f3cx)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54719&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs/v2&lt;/code&gt; — fixed in 2.1.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs/v2&lt;/code&gt; — fixed in 2.1.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;GHSA-wvhv-qcqf-f3cx fixed the per-folder .goshs ACL bypass on the state-changing routes (PUT/POST upload/?mkdir/?delete) and added recursive ACL resolution, and its description states the read/list path correctly enforces .goshs. That premise does not hold for the ?bulk zip-download route. bulkDownload (httpserver/updown.go) takes one or more ?file= parameters, runs each through sanitizePath(fs.Webroot, file), and streams the contents back as a ZIP without ever calling findEffectiveACL/applyCustomAuth. It is dispatched from earlyBreakParameters (?bulk) before the normal doDir/doFile/sendFile flow that performs the ACL check. An unauthenticated attacker can therefore read any file under the webroot protected solely by a .goshs ACL, bypassing both the folder auth (401 on the normal path) and…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/security/advisories/GHSA-rmxw-pq4x-3fvh"&gt;https://github.com/goshs-labs/goshs/security/advisories/GHSA-rmxw-pq4x-3fvh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/commit/7cf911a26ace737e1a55b7dc073e307a25f7fd1d"&gt;https://github.com/goshs-labs/goshs/commit/7cf911a26ace737e1a55b7dc073e307a25f7fd1d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs"&gt;https://github.com/goshs-labs/goshs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/releases/tag/v2.1.1"&gt;https://github.com/goshs-labs/goshs/releases/tag/v2.1.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rmxw-pq4x-3fvh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wg2q-39h6-66x9: goshs has a Path Traversal issue</title>
+    <id>https://osv.dev/vulnerability/GHSA-wg2q-39h6-66x9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wg2q-39h6-66x9"/>
+    <published>2026-07-28T22:08:53Z</published>
+    <updated>2026-07-28T22:15:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-66063"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;goshs has a Path Traversal issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-66063&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs/v2&lt;/code&gt; — fixed in 2.1.5-0.20260727065949-f3ef599e4091&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs/v2&lt;/code&gt; — fixed in 2.1.5-0.20260727065949-f3ef599e4091&lt;/li&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The multipart upload filename fix splits on the path separator but never rejects dot-dot, allowing a write outside the served tree.
+
+## Finding (Medium): upload filename escapes the served tree (residual of CVE-2026-35393)
+
+The multipart filename fix (updown.go lines 135-136) splits on the path separator but never rejects &amp;quot;..&amp;quot;. Uploading with filename=&amp;quot;..&amp;quot; results in os.Create against the parent of the upload folder with a trailing marker character, outside the served tree, and the subsequent failed rename leaves that file behind. Verified: a file containing ESCAPED_WRITE_PROOF was written outside the webroot, unauthenticated, with the default configuration. Not claimed: a Windows-specific variant (Go&amp;#x27;s Part.FileName() already applies filepath.Base).
+
+## Suggested fixes
+
+1. Rej…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/security/advisories/GHSA-wg2q-39h6-66x9"&gt;https://github.com/goshs-labs/goshs/security/advisories/GHSA-wg2q-39h6-66x9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/commit/f3ef599e409151d1380866e47de8b1afb0bb54fa"&gt;https://github.com/goshs-labs/goshs/commit/f3ef599e409151d1380866e47de8b1afb0bb54fa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs"&gt;https://github.com/goshs-labs/goshs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wg2q-39h6-66x9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hq33-8jgp-8qq3: goshs --no-delete WebDAV MOVE bypass allows file deletion/overwrite</title>
+    <id>https://osv.dev/vulnerability/GHSA-hq33-8jgp-8qq3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hq33-8jgp-8qq3"/>
+    <published>2026-07-28T22:03:12Z</published>
+    <updated>2026-07-28T22:15:29Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-64863"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;goshs --no-delete WebDAV MOVE bypass allows file deletion/overwrite&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-64863&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs/v2&lt;/code&gt; — fixed in 2.1.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs/v2&lt;/code&gt; — fixed in 2.1.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The WebDAV mode-flag guard added to fix GHSA-3whc-qvhv-xqjp still does not enforce `--no-delete` on the WebDAV `MOVE` verb. `MOVE` deletes the source file (rename removes it from its original path), and with `Overwrite: T` it additionally performs an explicit `RemoveAll` on the destination. Under `-w --no-delete`, `DELETE` is correctly blocked (403) but `MOVE` still destroys existing files, defeating the documented &amp;quot;Disable the delete option&amp;quot; boundary.
+
+This is a residual of the parent fix: the guard classifies `MOVE`/`COPY` as write-only verbs (blocked only under `--read-only`) and never treats `MOVE` as a delete, so the `--no-delete` branch never covers it.
+
+## Affected
+
+goshs v2.1.3 (current release, commit `ba00ce3`). The guard was introduced when GHSA-3whc-qvhv-xqjp was fi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/security/advisories/GHSA-hq33-8jgp-8qq3"&gt;https://github.com/goshs-labs/goshs/security/advisories/GHSA-hq33-8jgp-8qq3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/commit/0444ac6b1a8176ddae70d940adf7a26b2e5a6c29"&gt;https://github.com/goshs-labs/goshs/commit/0444ac6b1a8176ddae70d940adf7a26b2e5a6c29&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs"&gt;https://github.com/goshs-labs/goshs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/releases/tag/v2.1.4"&gt;https://github.com/goshs-labs/goshs/releases/tag/v2.1.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hq33-8jgp-8qq3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rjrw-mjq6-hpmm: goshs SFTP authentication bypass via empty password (incomplete fix of CVE-2026-40884)</title>
+    <id>https://osv.dev/vulnerability/GHSA-rjrw-mjq6-hpmm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rjrw-mjq6-hpmm"/>
+    <published>2026-07-28T21:56:28Z</published>
+    <updated>2026-07-28T22:00:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-62325"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;goshs SFTP authentication bypass via empty password (incomplete fix of CVE-2026-40884)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-62325&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/patrickhener/goshs/v2&lt;/code&gt; — fixed in 2.1.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;goshs.de/goshs/v2&lt;/code&gt; — fixed in 2.1.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Start goshs v2.1.3 with `-b &amp;#x27;admin:&amp;#x27; -sftp`. No `-fkf`. SFTP accepts connections without password. CVE-2026-40884 blocks the empty-username variant (`-b &amp;#x27;:pass&amp;#x27;`). The empty-password variant bypasses that fix.
+
+## CVE-2026-40884
+
+**CVE-2026-40884** (GHSA-c29w-qq4m-2gcv, Apr 13 2026) reported the empty-username case: `-b &amp;#x27;:pass&amp;#x27;` with `-sftp`. `sftpserver.go:85` uses `&amp;amp;&amp;amp;`:
+
+```go
+if s.Username != &amp;quot;&amp;quot; &amp;amp;&amp;amp; s.Password != &amp;quot;&amp;quot; {
+    sshServer.PasswordHandler = func(ctx ssh.Context, password string) bool {
+        return subtle.ConstantTimeCompare([]byte(ctx.User()), []byte(s.Username)) == 1 &amp;amp;&amp;amp; subtle.ConstantTimeCompare([]byte(password), []byte(s.Password)) == 1
+    }
+}
+```
+
+Empty username → `Username != &amp;quot;&amp;quot;` false → `PasswordHandler` nil. No `-fkf` means `PublicKeyHandler` also nil. gli…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/security/advisories/GHSA-rjrw-mjq6-hpmm"&gt;https://github.com/goshs-labs/goshs/security/advisories/GHSA-rjrw-mjq6-hpmm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/commit/32f4a0e1790a709f722d0f3b2341f139d003180a"&gt;https://github.com/goshs-labs/goshs/commit/32f4a0e1790a709f722d0f3b2341f139d003180a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs"&gt;https://github.com/goshs-labs/goshs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/goshs-labs/goshs/releases/tag/v2.1.4"&gt;https://github.com/goshs-labs/goshs/releases/tag/v2.1.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rjrw-mjq6-hpmm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6h35-9p2w-3j3r: grepai Uses a Broken or Risky Cryptographic Algorithm</title>
+    <id>https://osv.dev/vulnerability/GHSA-6h35-9p2w-3j3r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6h35-9p2w-3j3r"/>
+    <published>2026-06-08T03:47:24Z</published>
+    <updated>2026-07-28T21:01:37Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-11479"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;grepai Uses a Broken or Risky Cryptographic Algorithm&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11479&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/yoanbernabeu/grepai&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability has been found in yoanbernabeu grepai 0.35.0. This issue affects some unknown processing of the file indexer/chunker.go of the component Qdrant Backend. Such manipulation leads to use of weak hash. The attack may be performed from remote. Attacks of this nature are highly complex. The exploitability is assessed as difficult. The exploit has been disclosed to the public and may be used. The pull request to fix this issue awaits acceptance.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11479"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11479&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yoanbernabeu/grepai/issues/247"&gt;https://github.com/yoanbernabeu/grepai/issues/247&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yoanbernabeu/grepai/pull/248"&gt;https://github.com/yoanbernabeu/grepai/pull/248&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yoanbernabeu/grepai"&gt;https://github.com/yoanbernabeu/grepai&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-11479"&gt;https://vuldb.com/cve/CVE-2026-11479&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/833971"&gt;https://vuldb.com/submit/833971&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369099"&gt;https://vuldb.com/vuln/369099&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369099/cti"&gt;https://vuldb.com/vuln/369099/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6h35-9p2w-3j3r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2rx5-2g7j-2659: Cosmos-Server has an authentication bypass via forward-auth header smuggling on Constellation tunnel</title>
+    <id>https://osv.dev/vulnerability/GHSA-2rx5-2g7j-2659</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2rx5-2g7j-2659"/>
+    <published>2026-07-28T20:44:33Z</published>
+    <updated>2026-07-28T21:01:37Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-49446"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cosmos-Server has an authentication bypass via forward-auth header smuggling on Constellation tunnel&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49446&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/azukaar/cosmos-server&lt;/code&gt; — fixed in 0.22.19&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Constellation-tunnel bypass branch in `tokenMiddleware` at `src/proxy/routerGen.go:53-66` returns to the upstream handler before the request&amp;#x27;s `x-cosmos-user`, `x-cosmos-role`, `x-cosmos-user-role`, and `x-cosmos-mfa` headers are stripped at lines 68-72, and before the `AdminOnlyWithRedirect` gate at lines 109-117 runs. Any holder of a valid Constellation device API key sends `x-cosmos-user: admin` to a proxied backend; the documented forward-auth integration treats the caller as admin with no JWT cookie, password, or MFA.
+
+### Preconditions
+
+- Cosmos is deployed with Constellation enabled and at least one device enrolled.
+- Attacker holds a valid `x-cstln-auth` API key for an enrolled device.
+- Attacker reaches Cosmos over the Constellation Nebula tunnel.
+- Target proxy r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/azukaar/Cosmos-Server/security/advisories/GHSA-2rx5-2g7j-2659"&gt;https://github.com/azukaar/Cosmos-Server/security/advisories/GHSA-2rx5-2g7j-2659&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/azukaar/Cosmos-Server"&gt;https://github.com/azukaar/Cosmos-Server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/azukaar/Cosmos-Server/releases/tag/v0.22.19"&gt;https://github.com/azukaar/Cosmos-Server/releases/tag/v0.22.19&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2rx5-2g7j-2659"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q76h-p6jh-9rw3: grepai Uses a Broken or Risky Cryptographic Algorithm</title>
+    <id>https://osv.dev/vulnerability/GHSA-q76h-p6jh-9rw3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q76h-p6jh-9rw3"/>
+    <published>2026-06-08T03:47:24Z</published>
+    <updated>2026-07-28T21:01:37Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-11481"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;grepai Uses a Broken or Risky Cryptographic Algorithm&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11481&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:N/A:N · CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/yoanbernabeu/grepai&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability was determined in yoanbernabeu grepai up to 0.35.0. The affected element is the function PostgresStore.LookupByContentHash of the file indexer/chunker.go of the component Postgres Embedding Cache. Executing a manipulation of the argument content_hash can lead to use of weak hash. The attack needs to be launched locally. The attack requires a high level of complexity. The exploitability is described as difficult. The exploit has been publicly disclosed and may be utilized. The pull request to fix this issue awaits acceptance.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11481"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11481&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yoanbernabeu/grepai/issues/249"&gt;https://github.com/yoanbernabeu/grepai/issues/249&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yoanbernabeu/grepai/pull/250"&gt;https://github.com/yoanbernabeu/grepai/pull/250&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yoanbernabeu/grepai"&gt;https://github.com/yoanbernabeu/grepai&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-11481"&gt;https://vuldb.com/cve/CVE-2026-11481&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/833997"&gt;https://vuldb.com/submit/833997&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369101"&gt;https://vuldb.com/vuln/369101&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369101/cti"&gt;https://vuldb.com/vuln/369101/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q76h-p6jh-9rw3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jxr7-mqhw-9p98: K3s: ZIP Archive Path Traversal Vulnerability in etcd Snapshot Decompression</title>
+    <id>https://osv.dev/vulnerability/GHSA-jxr7-mqhw-9p98</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jxr7-mqhw-9p98"/>
+    <published>2026-07-14T17:54:14Z</published>
+    <updated>2026-07-28T21:00:01Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54250"/>
+    <category term="GO-2026-5973"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;K3s: ZIP Archive Path Traversal Vulnerability in etcd Snapshot Decompression&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54250, GO-2026-5973&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:H/UI:R/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/k3s-io/k3s&lt;/code&gt; — fixed in 1.35.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/k3s-io/k3s&lt;/code&gt; — fixed in 1.34.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/k3s-io/k3s&lt;/code&gt; — fixed in 1.33.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
+
+A path traversal vulnerability exists in K3s&amp;#x27;s etcd snapshot decompression functionality. Zip files containing archive members with maliciously crafted names (e.g., `../../../../etc/password`) can be written to arbitrary locations on the filesystem when an administrator restores the archive as a compressed etcd snapshot.
+
+#### Mitigations
+
+* Enable golang&amp;#x27;s built-in [insecure path protections](https://pkg.go.dev/archive/zip#NewReader) when restoring snapshots by setting the`GODEBUG` environment variable:
+    ```bash
+    GODEBUG=zipinsecurepath=0 k3s server --cluster-reset --cluster-reset-restore-path=/path/to/snapshot.zip
+    ```
+* Manually extract the snapshot from the zip archive before restoring it. If the snapshot to be restored does not end with `.zip`, the vulnerable ex…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/k3s-io/k3s/security/advisories/GHSA-jxr7-mqhw-9p98"&gt;https://github.com/k3s-io/k3s/security/advisories/GHSA-jxr7-mqhw-9p98&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54250"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54250&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/k3s-io/k3s"&gt;https://github.com/k3s-io/k3s&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jxr7-mqhw-9p98"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5973: K3s: ZIP Archive Path Traversal Vulnerability in etcd Snapshot Decompression in github.com/k3s-io/k3s</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5973</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5973"/>
+    <published>2026-07-17T19:42:05Z</published>
+    <updated>2026-07-28T21:00:01Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54250"/>
+    <category term="GHSA-jxr7-mqhw-9p98"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;K3s: ZIP Archive Path Traversal Vulnerability in etcd Snapshot Decompression in github.com/k3s-io/k3s&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54250, GHSA-jxr7-mqhw-9p98&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/k3s-io/k3s&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;K3s: ZIP Archive Path Traversal Vulnerability in etcd Snapshot Decompression in github.com/k3s-io/k3s.
+
+NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
+
+(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
+
+The additional affected modules and versions are: github.com/k3s-io/k3s before v1.33.10, from v1.34.0-rc1 before v1.34.6, from v1.35.0-rc1 before v1.35.3.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/k3s-io/k3s/security/advisories/GHSA-jxr7-mqhw-9p98"&gt;https://github.com/k3s-io/k3s/security/advisories/GHSA-jxr7-mqhw-9p98&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54250"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54250&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5973"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5fqm-cc34-fcf5: Cosmos-Server's constellation public-devices endpoint accepts arbitrary bearer tokens</title>
+    <id>https://osv.dev/vulnerability/GHSA-5fqm-cc34-fcf5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5fqm-cc34-fcf5"/>
+    <published>2026-07-28T20:32:34Z</published>
+    <updated>2026-07-28T20:45:32Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-49447"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cosmos-Server&amp;#x27;s constellation public-devices endpoint accepts arbitrary bearer tokens&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49447&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/azukaar/cosmos-server&lt;/code&gt; — fixed in 0.22.19&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`GET /cosmos/api/constellation/public-devices` discloses Constellation device metadata to a requester that supplies any non-empty `Authorization` header. The handler strips the string `Bearer ` from the header but never validates the resulting token and never uses it in the database query.
+
+This was confirmed locally by routing a request through the real `tokenMiddleware` with `Authorization: Bearer not-a-real-token`. The request returned public Constellation device metadata from a disposable fixture. A missing-header negative control returned `401 Unauthorized`, proving the bypass is specifically the acceptance of arbitrary bearer values.
+
+### Details
+Source-to-sink path:
+
+- `src/httpServer.go:690` registers `/api/constellation/public-devices` on the authenticated admin API ro…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/azukaar/Cosmos-Server/security/advisories/GHSA-5fqm-cc34-fcf5"&gt;https://github.com/azukaar/Cosmos-Server/security/advisories/GHSA-5fqm-cc34-fcf5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/azukaar/Cosmos-Server/commit/59c561d686c8f9843b3e092b50f6346c481d8bbf"&gt;https://github.com/azukaar/Cosmos-Server/commit/59c561d686c8f9843b3e092b50f6346c481d8bbf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/azukaar/Cosmos-Server"&gt;https://github.com/azukaar/Cosmos-Server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/azukaar/Cosmos-Server/releases/tag/v0.22.19"&gt;https://github.com/azukaar/Cosmos-Server/releases/tag/v0.22.19&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5fqm-cc34-fcf5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vchh-r53j-8mpw: Fission: HTTPTrigger admission omits RelativeURL / Prefix validation; kubectl apply bypasses CLI checks</title>
+    <id>https://osv.dev/vulnerability/GHSA-vchh-r53j-8mpw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vchh-r53j-8mpw"/>
+    <published>2026-07-28T20:16:00Z</published>
+    <updated>2026-07-28T20:30:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50569"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fission: HTTPTrigger admission omits RelativeURL / Prefix validation; kubectl apply bypasses CLI checks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50569&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fission/fission&lt;/code&gt; — fixed in 1.25.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`HTTPTriggerSpec.Validate()` validated `Methods`, `FunctionReference`, `Host`, `IngressConfig`, and `CorsConfig`, but silently skipped `RelativeURL` and `Prefix`. Those two fields were validated at the CLI level only
+(`pkg/fission-cli/cmd/httptrigger/create.go:83`). The post-CRD-modernization webhook for HTTPTrigger was retired in favor of API-server CEL — and CEL had no rules on those fields either — so an HTTPTrigger created via `kubectl apply` or
+a direct Kubernetes REST API call bypassed every URL-level check.
+
+A tenant with HTTPTrigger create permission could therefore create triggers whose `RelativeURL` or `Prefix`:
+
+- was empty (with both fields unset, the trigger has no URL),
+- did not start with `/`,
+- was exactly `/` (claiming the entire router root),
+- contained `..` traversal s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/security/advisories/GHSA-vchh-r53j-8mpw"&gt;https://github.com/fission/fission/security/advisories/GHSA-vchh-r53j-8mpw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50569"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50569&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3464"&gt;https://github.com/fission/fission/pull/3464&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/commit/0deed6bf3f26bc0f10e9130cd0d479b0b9f5f609"&gt;https://github.com/fission/fission/commit/0deed6bf3f26bc0f10e9130cd0d479b0b9f5f609&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission"&gt;https://github.com/fission/fission&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/releases/tag/v1.25.0"&gt;https://github.com/fission/fission/releases/tag/v1.25.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vchh-r53j-8mpw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-r5jh-q2mw-gcx4: Fission: SanitizeFilePath lexical HasPrefix bypass permits sibling-directory escape</title>
+    <id>https://osv.dev/vulnerability/GHSA-r5jh-q2mw-gcx4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r5jh-q2mw-gcx4"/>
+    <published>2026-07-28T20:18:30Z</published>
+    <updated>2026-07-28T20:30:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50568"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fission: SanitizeFilePath lexical HasPrefix bypass permits sibling-directory escape&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50568&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fission/fission&lt;/code&gt; — fixed in 1.25.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`SanitizeFilePath` in `pkg/utils/utils.go` validated that a path stayed under a safe directory by calling `strings.HasPrefix(path, safedir)`. This is a lexical check, not a directory boundary check: `/packages-extra/evil` starts with
+`/packages`, so it passed. The function did not enforce a path-separator boundary, so any sibling directory whose name began with the safe-directory string was accepted.
+
+Callers included the builder&amp;#x27;s `Clean` handler (`pkg/builder/builder.go:208`) and the fetcher&amp;#x27;s `Fetch` / `Upload` handlers (`pkg/fetcher/fetcher.go`). A tenant who could pre-create or control a sibling directory under the fetcher /
+builder&amp;#x27;s shared volume could induce a write or read outside the intended safe directory.
+
+### Affected
+
+- Project: `github.com/fission/fission`
+- Versions: all v…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/security/advisories/GHSA-r5jh-q2mw-gcx4"&gt;https://github.com/fission/fission/security/advisories/GHSA-r5jh-q2mw-gcx4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50568"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50568&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3445"&gt;https://github.com/fission/fission/pull/3445&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3446"&gt;https://github.com/fission/fission/pull/3446&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/commit/5aac6f0bcdf840e28f3f06c846ca7ae1866b3957"&gt;https://github.com/fission/fission/commit/5aac6f0bcdf840e28f3f06c846ca7ae1866b3957&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/commit/8298e33ea7457702f893eae11077987cf905edb4"&gt;https://github.com/fission/fission/commit/8298e33ea7457702f893eae11077987cf905edb4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission"&gt;https://github.com/fission/fission&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/releases/tag/v1.25.0"&gt;https://github.com/fission/fission/releases/tag/v1.25.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r5jh-q2mw-gcx4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q6vm-xqc9-v3ff:  Fission: Zip Slip in pkg/utils/zip.go:Unarchive allows fetcher to write outside the destination directory</title>
+    <id>https://osv.dev/vulnerability/GHSA-q6vm-xqc9-v3ff</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q6vm-xqc9-v3ff"/>
+    <published>2026-07-28T20:16:52Z</published>
+    <updated>2026-07-28T20:30:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50567"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt; Fission: Zip Slip in pkg/utils/zip.go:Unarchive allows fetcher to write outside the destination directory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50567&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fission/fission&lt;/code&gt; — fixed in 1.25.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`Unarchive` in `pkg/utils/zip.go` joined each archive entry name with the destination directory via `filepath.Join` and wrote the result without checking whether the resolved path stayed under the destination. A zip entry named
+  `../../tmp/evil` therefore landed at `/tmp/evil`. An attacker who could control a `Package.Spec.Source.URL` or `Deployment.URL` archive could induce the fetcher (running as the per-environment pod&amp;#x27;s `fission-fetcher` sidecar) to write
+  files anywhere that process could reach: into other tenants&amp;#x27; `/packages/&amp;lt;ns&amp;gt;/` directories, into mounted secret/config volumes, or into the fetcher&amp;#x27;s own binary.
+
+  ### Affected
+
+  - Project: `github.com/fission/fission`
+  - Versions: all up to and including v1.24.0
+  - Audited commit: `647c141`
+  - Component: `pkg/utils/zip.go` (`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/security/advisories/GHSA-q6vm-xqc9-v3ff"&gt;https://github.com/fission/fission/security/advisories/GHSA-q6vm-xqc9-v3ff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50567"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50567&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3444"&gt;https://github.com/fission/fission/pull/3444&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission"&gt;https://github.com/fission/fission&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/releases/tag/v1.25.0"&gt;https://github.com/fission/fission/releases/tag/v1.25.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q6vm-xqc9-v3ff"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qf5v-m7p4-95rp: Fission: Incomplete capability denylist in Environment/Function PodSpec validation allows tenant-added CAP_SYS_TIME and cross-tenant node wall-clock corruption</title>
+    <id>https://osv.dev/vulnerability/GHSA-qf5v-m7p4-95rp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qf5v-m7p4-95rp"/>
+    <published>2026-07-28T20:12:45Z</published>
+    <updated>2026-07-28T20:16:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-50570"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fission: Incomplete capability denylist in Environment/Function PodSpec validation allows tenant-added CAP_SYS_TIME and cross-tenant node wall-clock corruption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50570&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/fission/fission&lt;/code&gt; — fixed in 1.25.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Fission v1.24.0 added PodSpec safety validation for tenant-facing Environment and Function CRDs (`ValidatePodSpecSafety` / `ValidateContainerSafety` admission webhook + `sanitizeContainerSecurityContext` executor merge layer), but the
+capability check was implemented as a fixed **denylist of six Linux capabilities** (SYS_ADMIN, NET_ADMIN, SYS_PTRACE, SYS_MODULE, DAC_READ_SEARCH, DAC_OVERRIDE). The denylist omitted **CAP_SYS_TIME**, among others. As a result, a tenant
+who could create a Function or Environment CRD could request `securityContext.capabilities.add: [&amp;quot;SYS_TIME&amp;quot;]`, pass Fission&amp;#x27;s admission validation and merge-layer sanitization, and run attacker-controlled code with `CAP_SYS_TIME` in the
+resulting function or runtime container.
+
+Demonstrated consequence: cross-tenant node integ…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/security/advisories/GHSA-qf5v-m7p4-95rp"&gt;https://github.com/fission/fission/security/advisories/GHSA-qf5v-m7p4-95rp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50570"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50570&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/pull/3465"&gt;https://github.com/fission/fission/pull/3465&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/commit/2569b42bfadbcb7d78b55a00a60f77937e522699"&gt;https://github.com/fission/fission/commit/2569b42bfadbcb7d78b55a00a60f77937e522699&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission"&gt;https://github.com/fission/fission&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fission/fission/releases/tag/v1.25.0"&gt;https://github.com/fission/fission/releases/tag/v1.25.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qf5v-m7p4-95rp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7v3v-cp44-vc8m: songquanpeng one-api has an issue that results in business logic errors</title>
+    <id>https://osv.dev/vulnerability/GHSA-7v3v-cp44-vc8m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7v3v-cp44-vc8m"/>
+    <published>2026-06-08T00:30:25Z</published>
+    <updated>2026-07-28T20:16:31Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-11465"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;songquanpeng one-api has an issue that results in business logic errors&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11465&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/songquanpeng/one-api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A security flaw has been discovered in songquanpeng one-api up to 0.6.11-preview.7. Affected by this issue is the function Redeem of the file model/redemption.go of the component Redemption Code Top-Up Endpoint. The manipulation results in business logic errors. The attack may be launched remotely. The attack requires a high level of complexity. The exploitation is known to be difficult. The exploit has been released to the public and may be used for attacks. The pull request to fix this issue awaits acceptance.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11465"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11465&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/songquanpeng/one-api/issues/2397"&gt;https://github.com/songquanpeng/one-api/issues/2397&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/songquanpeng/one-api/pull/2399"&gt;https://github.com/songquanpeng/one-api/pull/2399&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/songquanpeng/one-api"&gt;https://github.com/songquanpeng/one-api&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-11465"&gt;https://vuldb.com/cve/CVE-2026-11465&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/833320"&gt;https://vuldb.com/submit/833320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369085"&gt;https://vuldb.com/vuln/369085&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369085/cti"&gt;https://vuldb.com/vuln/369085/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7v3v-cp44-vc8m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-6r28-9ppf-4hj5: GoPacket's Diameter AVP decoder: uint32 underflow on vendor header size leads to unbounded ~4 GiB allocation (unauthenticated remote DoS)</title>
     <id>https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5</id>
@@ -2186,383 +2502,5 @@ This issue was disclosed to HashiCorp and is the OpenBao equivalent of the follo
 
 - https://discuss.hashicorp.com/t/hcsec-2025-16-vault-userpass-and-ldap-user-lockout-bypass/76035
 - https://nvd.nist.gov/vuln/detail/CVE-2025-6004&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-j3xv-7fxp-gfhx"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-j3xv-7fxp-gfhx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-54998"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-54998&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6004"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6004&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/c52795c1ef746c7f2c510f9225aa8ccbbd44f9fc"&gt;https://github.com/openbao/openbao/commit/c52795c1ef746c7f2c510f9225aa8ccbbd44f9fc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-16-vault-userpass-and-ldap-user-lockout-bypass/76035"&gt;https://discuss.hashicorp.com/t/hcsec-2025-16-vault-userpass-and-ldap-user-lockout-bypass/76035&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j3xv-7fxp-gfhx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2025-3855: OpenBao Userpass and LDAP User Lockout Bypass in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2025-3855</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-3855"/>
-    <published>2025-08-11T17:59:12Z</published>
-    <updated>2026-07-27T09:11:27Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-54998"/>
-    <category term="CVE-2025-54998"/>
-    <category term="GHSA-j3xv-7fxp-gfhx"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao Userpass and LDAP User Lockout Bypass in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-54998, CVE-2025-54998, GHSA-j3xv-7fxp-gfhx&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250807212521-c52795c1ef74&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao Userpass and LDAP User Lockout Bypass in github.com/openbao/openbao.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: github.com/openbao/openbao before v2.3.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-j3xv-7fxp-gfhx"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-j3xv-7fxp-gfhx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-54998"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-54998&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/c52795c1ef746c7f2c510f9225aa8ccbbd44f9fc"&gt;https://github.com/openbao/openbao/commit/c52795c1ef746c7f2c510f9225aa8ccbbd44f9fc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-16-vault-userpass-and-ldap-user-lockout-bypass/76035"&gt;https://discuss.hashicorp.com/t/hcsec-2025-16-vault-userpass-and-ldap-user-lockout-bypass/76035&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6004"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6004&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-3855"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rxp7-9q75-vj3p: OpenBao Login MFA Bypass of Rate Limiting and TOTP Token Reuse</title>
-    <id>https://osv.dev/vulnerability/GHSA-rxp7-9q75-vj3p</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rxp7-9q75-vj3p"/>
-    <published>2025-08-08T14:44:49Z</published>
-    <updated>2026-07-27T09:11:27Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-55003"/>
-    <category term="CVE-2025-55003"/>
-    <category term="GO-2025-3856"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao Login MFA Bypass of Rate Limiting and TOTP Token Reuse&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-55003, CVE-2025-55003, GO-2025-3856&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 2.3.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250807113757-8340a6918f6c&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-OpenBao&amp;#x27;s Login Multi-Factor Authentication (MFA) system allows enforcing MFA using Time-based One Time Password (TOTP). Due to normalization applied by the underlying TOTP library, codes were accepted which could contain whitespace; this whitespace could bypass internal rate limiting of the MFA method and allow reuse of existing MFA codes.
-
-### Patches
-
-OpenBao v2.3.2 will patch this issue.
-
-### Workarounds
-
-Use of rate-limiting quotas can limit an attacker&amp;#x27;s ability to exploit this: https://openbao.org/api-docs/system/rate-limit-quotas/
-
-### References
-
-This issue was disclosed to HashiCorp and is the OpenBao equivalent of the following tickets:
-
-- https://discuss.hashicorp.com/t/hcsec-2025-19-vault-login-mfa-bypass-of-rate-limiting-and-totp-token-reuse/76038
-- https://nvd.ni…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-rxp7-9q75-vj3p"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-rxp7-9q75-vj3p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-55003"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-55003&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6015"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6015&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/8340a6918f6c41d8f75b6c3845c376d9dc32ed19"&gt;https://github.com/openbao/openbao/commit/8340a6918f6c41d8f75b6c3845c376d9dc32ed19&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-19-vault-login-mfa-bypass-of-rate-limiting-and-totp-token-reuse/76038"&gt;https://discuss.hashicorp.com/t/hcsec-2025-19-vault-login-mfa-bypass-of-rate-limiting-and-totp-token-reuse/76038&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rxp7-9q75-vj3p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2025-3856: OpenBao Login MFA Bypass of Rate Limiting and TOTP Token Reuse in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2025-3856</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-3856"/>
-    <published>2025-08-11T17:59:12Z</published>
-    <updated>2026-07-27T09:11:27Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-55003"/>
-    <category term="CVE-2025-55003"/>
-    <category term="GHSA-rxp7-9q75-vj3p"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao Login MFA Bypass of Rate Limiting and TOTP Token Reuse in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-55003, CVE-2025-55003, GHSA-rxp7-9q75-vj3p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250807113757-8340a6918f6c&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao Login MFA Bypass of Rate Limiting and TOTP Token Reuse in github.com/openbao/openbao.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: github.com/openbao/openbao before v2.3.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-rxp7-9q75-vj3p"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-rxp7-9q75-vj3p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-55003"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-55003&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/8340a6918f6c41d8f75b6c3845c376d9dc32ed19"&gt;https://github.com/openbao/openbao/commit/8340a6918f6c41d8f75b6c3845c376d9dc32ed19&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-19-vault-login-mfa-bypass-of-rate-limiting-and-totp-token-reuse/76038"&gt;https://discuss.hashicorp.com/t/hcsec-2025-19-vault-login-mfa-bypass-of-rate-limiting-and-totp-token-reuse/76038&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6015"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6015&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-3856"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f7c3-mhj2-9pvg: OpenBao TOTP Secrets Engine Code Reuse</title>
-    <id>https://osv.dev/vulnerability/GHSA-f7c3-mhj2-9pvg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f7c3-mhj2-9pvg"/>
-    <published>2025-08-08T14:42:49Z</published>
-    <updated>2026-07-27T09:11:26Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-55000"/>
-    <category term="CVE-2025-55000"/>
-    <category term="GO-2025-3853"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao TOTP Secrets Engine Code Reuse&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-55000, CVE-2025-55000, GO-2025-3853&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 2.3.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250806193153-183891f8d535&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-OpenBao&amp;#x27;s TOTP secrets engine could accept valid codes multiple times rather than strictly-once. This was caused by unexpected normalization in the underlying TOTP library.
-
-### Patches
-
-OpenBao v2.3.2 will patch this issue.
-
-In patching, codes which were not normalized (strictly N numeric digits) will now be rejected. This is a potentially breaking change.
-
-### Workarounds
-
-TOTP code verification is a privileged action; only trusted systems should be verifying codes. Ensure that all codes are first normalized before submitting to the OpenBao endpoint.
-
-### References
-
-This issue was disclosed to HashiCorp and is the OpenBao equivalent of the following tickets:
-
-- https://discuss.hashicorp.com/t/hcsec-2025-17-vault-totp-secrets-engine-code-reuse/76036
-- https://nvd.nist.gov/vul…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-f7c3-mhj2-9pvg"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-f7c3-mhj2-9pvg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-55000"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-55000&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6014"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6014&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/183891f8d535d5b6eb3d79fda8200cade6de99e1"&gt;https://github.com/openbao/openbao/commit/183891f8d535d5b6eb3d79fda8200cade6de99e1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-17-vault-totp-secrets-engine-code-reuse/76036"&gt;https://discuss.hashicorp.com/t/hcsec-2025-17-vault-totp-secrets-engine-code-reuse/76036&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f7c3-mhj2-9pvg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2025-3853: OpenBao TOTP Secrets Engine Code Reuse in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2025-3853</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-3853"/>
-    <published>2025-08-11T17:59:12Z</published>
-    <updated>2026-07-27T09:11:26Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-55000"/>
-    <category term="CVE-2025-55000"/>
-    <category term="GHSA-f7c3-mhj2-9pvg"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao TOTP Secrets Engine Code Reuse in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-55000, CVE-2025-55000, GHSA-f7c3-mhj2-9pvg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250806193153-183891f8d535&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao TOTP Secrets Engine Code Reuse in github.com/openbao/openbao.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: github.com/openbao/openbao before v2.3.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-f7c3-mhj2-9pvg"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-f7c3-mhj2-9pvg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-55000"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-55000&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/183891f8d535d5b6eb3d79fda8200cade6de99e1"&gt;https://github.com/openbao/openbao/commit/183891f8d535d5b6eb3d79fda8200cade6de99e1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-17-vault-totp-secrets-engine-code-reuse/76036"&gt;https://discuss.hashicorp.com/t/hcsec-2025-17-vault-totp-secrets-engine-code-reuse/76036&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6014"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6014&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-3853"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-vf84-mxrq-crqc: OpenBao Root Namespace Operator May Elevate Token Privileges</title>
-    <id>https://osv.dev/vulnerability/GHSA-vf84-mxrq-crqc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vf84-mxrq-crqc"/>
-    <published>2025-08-08T14:32:42Z</published>
-    <updated>2026-07-27T09:11:26Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-54996"/>
-    <category term="CVE-2025-54996"/>
-    <category term="GO-2025-3857"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao Root Namespace Operator May Elevate Token Privileges&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-54996, CVE-2025-54996, GO-2025-3857&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 2.3.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250806193240-9b0b5d4f345f&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-Accounts with access to the highly-privileged identity entity system in the root namespace may increase their scope directly to the `root` policy. While the identity system always allowed adding arbitrary policies, which in turn could contain capability grants on arbitrary paths, the `root` policy is restricted to manual generation using unseal or recovery key shares. The global `root` policy is not accessible from child namespaces.
-
-### Patches
-
-OpenBao v2.3.2 will patch this issue.
-
-### Workarounds
-
-Use of `denied_parameters` in any policy which has access to the affected identity endpoints (on [identity entities](https://openbao.org/api-docs/secret/identity/entity/)) may be sufficient to prohibit this type of attack. 
-
-### References
-
-This issue was disclosed to HashiCorp an…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-vf84-mxrq-crqc"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-vf84-mxrq-crqc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-54996"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-54996&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/1627"&gt;https://github.com/openbao/openbao/pull/1627&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/9b0b5d4f345fdfb1065956f042b12cbd86cd6e0f"&gt;https://github.com/openbao/openbao/commit/9b0b5d4f345fdfb1065956f042b12cbd86cd6e0f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-13-vault-root-namespace-operator-may-elevate-token-privileges/76032"&gt;https://discuss.hashicorp.com/t/hcsec-2025-13-vault-root-namespace-operator-may-elevate-token-privileges/76032&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.3.2"&gt;https://github.com/openbao/openbao/releases/tag/v2.3.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/cve-2025-5999"&gt;https://nvd.nist.gov/vuln/detail/cve-2025-5999&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vf84-mxrq-crqc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2025-3857: OpenBao Root Namespace Operator May Elevate Token Privileges in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2025-3857</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-3857"/>
-    <published>2025-08-11T17:59:12Z</published>
-    <updated>2026-07-27T09:11:26Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-54996"/>
-    <category term="CVE-2025-54996"/>
-    <category term="GHSA-vf84-mxrq-crqc"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao Root Namespace Operator May Elevate Token Privileges in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-54996, CVE-2025-54996, GHSA-vf84-mxrq-crqc&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250806193240-9b0b5d4f345f&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao Root Namespace Operator May Elevate Token Privileges in github.com/openbao/openbao.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: github.com/openbao/openbao before v2.3.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-vf84-mxrq-crqc"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-vf84-mxrq-crqc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-54996"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-54996&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/cve-2025-5999"&gt;https://nvd.nist.gov/vuln/detail/cve-2025-5999&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/9b0b5d4f345fdfb1065956f042b12cbd86cd6e0f"&gt;https://github.com/openbao/openbao/commit/9b0b5d4f345fdfb1065956f042b12cbd86cd6e0f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/1627"&gt;https://github.com/openbao/openbao/pull/1627&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-13-vault-root-namespace-operator-may-elevate-token-privileges/76032"&gt;https://discuss.hashicorp.com/t/hcsec-2025-13-vault-root-namespace-operator-may-elevate-token-privileges/76032&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.3.2"&gt;https://github.com/openbao/openbao/releases/tag/v2.3.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-3857"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rc54-2g2c-g36g: OpenBao and Vault Leak []byte Fields in Audit Logs </title>
-    <id>https://osv.dev/vulnerability/GHSA-rc54-2g2c-g36g</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rc54-2g2c-g36g"/>
-    <published>2025-10-22T19:55:40Z</published>
-    <updated>2026-07-27T09:11:21Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-62705"/>
-    <category term="CVE-2025-62705"/>
-    <category term="GO-2025-4052"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao and Vault Leak []byte Fields in Audit Logs &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-62705, CVE-2025-62705, GO-2025-4052&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:P/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20251022165510-cc2c476bac66&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-OpenBao&amp;#x27;s audit log did not appropriately redact fields when relevant subsystems sent `[]byte` response parameters rather than `string`s. This includes, but is not limited to:
-
-- `sys/raw` with use of `encoding=base64`, all data would be emitted unredacted to the audit log.
-- Transit, when performing a signing operation with a derived Ed25519 key, would emit public keys to the audit log.
-
-Third-party plugins may be affected.
-
-This issue has been present since HashiCorp Vault and continues to impact Vault as of v1.20.4. 
-
-### Patches
-
-OpenBao v2.4.2 will patch this issue.
-
-### Workarounds
-
-If users do not use the above functionality, they are not impacted. To prohibit the use of `sys/raw` globally, ensure `raw_storage_endpoint=false` is set or missing from the server configurati…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-rc54-2g2c-g36g"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-rc54-2g2c-g36g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-62705"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-62705&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/cc2c476bac66e1d94776c2629793daec3af625f8"&gt;https://github.com/openbao/openbao/commit/cc2c476bac66e1d94776c2629793daec3af625f8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rc54-2g2c-g36g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2025-4052: OpenBao and Vault Leak []byte Fields in Audit Logs in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2025-4052</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-4052"/>
-    <published>2025-10-30T15:02:33Z</published>
-    <updated>2026-07-27T09:11:21Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-62705"/>
-    <category term="CVE-2025-62705"/>
-    <category term="GHSA-rc54-2g2c-g36g"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao and Vault Leak []byte Fields in Audit Logs in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-62705, CVE-2025-62705, GHSA-rc54-2g2c-g36g&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20251022165510-cc2c476bac66&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao and Vault Leak []byte Fields in Audit Logs in github.com/openbao/openbao&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-rc54-2g2c-g36g"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-rc54-2g2c-g36g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-62705"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-62705&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/cc2c476bac66e1d94776c2629793daec3af625f8"&gt;https://github.com/openbao/openbao/commit/cc2c476bac66e1d94776c2629793daec3af625f8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-4052"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-p49j-v9wc-wg57: OpenBao's Token Store Allows Cross-Namespace Renewal, Revocation</title>
-    <id>https://osv.dev/vulnerability/GHSA-p49j-v9wc-wg57</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p49j-v9wc-wg57"/>
-    <published>2026-04-21T18:27:42Z</published>
-    <updated>2026-07-27T09:11:20Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2026-40264"/>
-    <category term="CVE-2026-40264"/>
-    <category term="GO-2026-5526"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao&amp;#x27;s Token Store Allows Cross-Namespace Renewal, Revocation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2026-40264, CVE-2026-40264, GO-2026-5526&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20260420162526-f58111d2ca54&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-OpenBao&amp;#x27;s namespaces provide multi-tenant separation. A tenant who leaks token accessors can have their token revoked or renewed by a privileged administrator in another tenant.
-
-### Patches
-
-This was addressed in v2.5.3.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-p49j-v9wc-wg57"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-p49j-v9wc-wg57&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40264"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40264&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/2934"&gt;https://github.com/openbao/openbao/pull/2934&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/059cc5950303688335d5c8ab9af8e453795d693a"&gt;https://github.com/openbao/openbao/commit/059cc5950303688335d5c8ab9af8e453795d693a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.3"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p49j-v9wc-wg57"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5526: OpenBao's Token Store Allows Cross-Namespace Renewal, Revocation in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5526</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5526"/>
-    <published>2026-06-25T22:34:34Z</published>
-    <updated>2026-07-27T09:11:20Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2026-40264"/>
-    <category term="CVE-2026-40264"/>
-    <category term="GHSA-p49j-v9wc-wg57"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao&amp;#x27;s Token Store Allows Cross-Namespace Renewal, Revocation in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2026-40264, CVE-2026-40264, GHSA-p49j-v9wc-wg57&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20260420162526-f58111d2ca54&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao&amp;#x27;s Token Store Allows Cross-Namespace Renewal, Revocation in github.com/openbao/openbao&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-p49j-v9wc-wg57"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-p49j-v9wc-wg57&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40264"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40264&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/059cc5950303688335d5c8ab9af8e453795d693a"&gt;https://github.com/openbao/openbao/commit/059cc5950303688335d5c8ab9af8e453795d693a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/2934"&gt;https://github.com/openbao/openbao/pull/2934&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.3"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5526"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-xp75-r577-cvhp: Privileged OpenBao Operator May Execute Code on the Underlying Host</title>
-    <id>https://osv.dev/vulnerability/GHSA-xp75-r577-cvhp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xp75-r577-cvhp"/>
-    <published>2025-08-08T14:37:22Z</published>
-    <updated>2026-07-27T09:11:20Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-54997"/>
-    <category term="CVE-2025-54997"/>
-    <category term="GO-2025-3858"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Privileged OpenBao Operator May Execute Code on the Underlying Host&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-54997, CVE-2025-54997, GO-2025-3858&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 2.3.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250806194004-a14053c9679d&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-Under certain threat models, OpenBao operators with privileged API access may not be system administrators and thus normally lack the ability to update binaries or execute code on the system. Additionally, privileged API operators should be unable to perform TCP connections to arbitrary hosts in the environment OpenBao is executing within. The API-driven audit subsystem granted privileged API operators the ability to do both with an attacker-controlled log prefix. Access to these endpoints should be restricted.
-
-### Patches
-
-OpenBao v2.3.2 will patch this issue.
-
-### Workarounds
-
-Users may deny all access to the `sys/audit/*` interface (with `create` and `update`) permission via policies with explicit deny grants. This would not restrict `root` level operators, however, for who…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-xp75-r577-cvhp"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-xp75-r577-cvhp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-54997"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-54997&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6000"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6000&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/1634"&gt;https://github.com/openbao/openbao/pull/1634&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/a14053c9679d6e9cf370f00cf933476cda6d84a2"&gt;https://github.com/openbao/openbao/commit/a14053c9679d6e9cf370f00cf933476cda6d84a2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-14-privileged-vault-operator-may-execute-code-on-the-underlying-host/76033"&gt;https://discuss.hashicorp.com/t/hcsec-2025-14-privileged-vault-operator-may-execute-code-on-the-underlying-host/76033&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.3.2"&gt;https://github.com/openbao/openbao/releases/tag/v2.3.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xp75-r577-cvhp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2025-3858: Privileged OpenBao Operator May Execute Code on the Underlying Host in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2025-3858</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-3858"/>
-    <published>2025-08-11T17:59:12Z</published>
-    <updated>2026-07-27T09:11:20Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-54997"/>
-    <category term="CVE-2025-54997"/>
-    <category term="GHSA-xp75-r577-cvhp"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Privileged OpenBao Operator May Execute Code on the Underlying Host in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-54997, CVE-2025-54997, GHSA-xp75-r577-cvhp&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250806194004-a14053c9679d&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Privileged OpenBao Operator May Execute Code on the Underlying Host in github.com/openbao/openbao.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: github.com/openbao/openbao before v2.3.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-xp75-r577-cvhp"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-xp75-r577-cvhp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-54997"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-54997&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/a14053c9679d6e9cf370f00cf933476cda6d84a2"&gt;https://github.com/openbao/openbao/commit/a14053c9679d6e9cf370f00cf933476cda6d84a2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/1634"&gt;https://github.com/openbao/openbao/pull/1634&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-14-privileged-vault-operator-may-execute-code-on-the-underlying-host/76033"&gt;https://discuss.hashicorp.com/t/hcsec-2025-14-privileged-vault-operator-may-execute-code-on-the-underlying-host/76033&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.3.2"&gt;https://github.com/openbao/openbao/releases/tag/v2.3.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6000"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6000&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-3858"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-r65v-xgwc-g56j: OpenBao: Decompression Bomb via Unbounded Copy in OCI Plugin Extraction (DoS)</title>
-    <id>https://osv.dev/vulnerability/GHSA-r65v-xgwc-g56j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r65v-xgwc-g56j"/>
-    <published>2026-04-21T18:24:10Z</published>
-    <updated>2026-07-27T09:11:19Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2026-39396"/>
-    <category term="CVE-2026-39396"/>
-    <category term="GO-2026-5609"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao: Decompression Bomb via Unbounded Copy in OCI Plugin Extraction (DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2026-39396, CVE-2026-39396, GO-2026-5609&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20260420180337-2b2a901aa9f7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`ExtractPluginFromImage()` in OpenBao&amp;#x27;s OCI plugin downloader extracts a plugin binary from a container image by streaming decompressed tar data via `io.Copy` with no upper bound on the number of bytes written.
-An attacker who controls or compromises the OCI registry referenced in the victim&amp;#x27;s configuration can serve a crafted image containing a decompression bomb that decompresses to an arbitrarily large file.
-
-The SHA256 integrity check occurs after the full file is written to disk, meaning the hash mismatch is detected only after the damage (disk exhaustion) has already occurred. This allow the attacker to replace **legit plugin image** with no need to change its signature.
-
-### Details
-
-#### Root cause
-
-`helper/pluginutil/oci/downloader.go:301`:
-
-```go
-if _, copyErr := io.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-r65v-xgwc-g56j"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-r65v-xgwc-g56j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39396"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39396&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/2941"&gt;https://github.com/openbao/openbao/pull/2941&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/af576af5322c6552a017ad10fd76aa4f40fd021e"&gt;https://github.com/openbao/openbao/commit/af576af5322c6552a017ad10fd76aa4f40fd021e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.3"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r65v-xgwc-g56j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5609: OpenBao: Decompression Bomb via Unbounded Copy in OCI Plugin Extraction (DoS) in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5609</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5609"/>
-    <published>2026-06-25T22:34:34Z</published>
-    <updated>2026-07-27T09:11:19Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2026-39396"/>
-    <category term="CVE-2026-39396"/>
-    <category term="GHSA-r65v-xgwc-g56j"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao: Decompression Bomb via Unbounded Copy in OCI Plugin Extraction (DoS) in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2026-39396, CVE-2026-39396, GHSA-r65v-xgwc-g56j&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20260420180337-2b2a901aa9f7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao: Decompression Bomb via Unbounded Copy in OCI Plugin Extraction (DoS) in github.com/openbao/openbao&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-r65v-xgwc-g56j"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-r65v-xgwc-g56j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-39396"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-39396&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/af576af5322c6552a017ad10fd76aa4f40fd021e"&gt;https://github.com/openbao/openbao/commit/af576af5322c6552a017ad10fd76aa4f40fd021e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/pull/2941"&gt;https://github.com/openbao/openbao/pull/2941&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.3"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5609"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2q8q-8fgw-9p6p: OpenBao LDAP MFA Enforcement Bypass When Using Username As Alias</title>
-    <id>https://osv.dev/vulnerability/GHSA-2q8q-8fgw-9p6p</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2q8q-8fgw-9p6p"/>
-    <published>2025-08-08T15:17:09Z</published>
-    <updated>2026-07-27T09:11:18Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-55001"/>
-    <category term="CVE-2025-55001"/>
-    <category term="GO-2025-3859"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao LDAP MFA Enforcement Bypass When Using Username As Alias&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-55001, CVE-2025-55001, GO-2025-3859&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 2.3.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250807212521-c52795c1ef74&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-OpenBao allows assignment of policies and MFA attribution based upon entity aliases, chosen by the underlying auth method. When using the `username_as_alias=true` parameter in the LDAP auth method, the caller-supplied username is used verbatim without normalization, allowing an attacker to bypass alias-specific MFA requirements.
-
-### Patches
-
-OpenBao v2.3.2 will patch this issue.
-
-### Workarounds
-
-LDAP methods are only vulnerable if using `username_as_alias=true`. Remove all usage of this parameter and update any entity aliases accordingly.
-
-### References
-
-This issue was disclosed to HashiCorp and is the OpenBao equivalent of the following tickets:
-
-- https://discuss.hashicorp.com/t/hcsec-2025-20-vault-ldap-mfa-enforcement-bypass-when-using-username-as-alias/76092
-- https://nv…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-2q8q-8fgw-9p6p"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-2q8q-8fgw-9p6p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-55001"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-55001&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6013"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6013&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/c52795c1ef746c7f2c510f9225aa8ccbbd44f9fc"&gt;https://github.com/openbao/openbao/commit/c52795c1ef746c7f2c510f9225aa8ccbbd44f9fc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-20-vault-ldap-mfa-enforcement-bypass-when-using-username-as-alias/76092"&gt;https://discuss.hashicorp.com/t/hcsec-2025-20-vault-ldap-mfa-enforcement-bypass-when-using-username-as-alias/76092&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2q8q-8fgw-9p6p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2025-3859: OpenBao LDAP MFA Enforcement Bypass When Using Username As Alias in github.com/openbao/openbao</title>
-    <id>https://osv.dev/vulnerability/GO-2025-3859</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-3859"/>
-    <published>2025-08-11T17:59:12Z</published>
-    <updated>2026-07-27T09:11:18Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2025-55001"/>
-    <category term="CVE-2025-55001"/>
-    <category term="GHSA-2q8q-8fgw-9p6p"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao LDAP MFA Enforcement Bypass When Using Username As Alias in github.com/openbao/openbao&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2025-55001, CVE-2025-55001, GHSA-2q8q-8fgw-9p6p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20250807212521-c52795c1ef74&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;OpenBao LDAP MFA Enforcement Bypass When Using Username As Alias in github.com/openbao/openbao.
-
-NOTE: The source advisory for this report contains additional versions that could not be automatically mapped to standard Go module versions.
-
-(If this is causing false-positive reports from vulnerability scanners, please suggest an edit to the report.)
-
-The additional affected modules and versions are: github.com/openbao/openbao before v2.3.2.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-2q8q-8fgw-9p6p"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-2q8q-8fgw-9p6p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-55001"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-55001&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/c52795c1ef746c7f2c510f9225aa8ccbbd44f9fc"&gt;https://github.com/openbao/openbao/commit/c52795c1ef746c7f2c510f9225aa8ccbbd44f9fc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.hashicorp.com/t/hcsec-2025-20-vault-ldap-mfa-enforcement-bypass-when-using-username-as-alias/76092"&gt;https://discuss.hashicorp.com/t/hcsec-2025-20-vault-ldap-mfa-enforcement-bypass-when-using-username-as-alias/76092&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-6013"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-6013&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-3859"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-vv66-6rp4-wr4f: OpenBao's Namespace Deletion May Not Delete Data Properly</title>
-    <id>https://osv.dev/vulnerability/GHSA-vv66-6rp4-wr4f</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vv66-6rp4-wr4f"/>
-    <published>2026-05-05T20:02:52Z</published>
-    <updated>2026-07-27T09:11:15Z</updated>
-    <category term="Go"/>
-    <category term="BIT-openbao-2026-42186"/>
-    <category term="CVE-2026-42186"/>
-    <category term="GO-2026-5674"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenBao&amp;#x27;s Namespace Deletion May Not Delete Data Properly&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-openbao-2026-42186, CVE-2026-42186, GO-2026-5674&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openbao/openbao&lt;/code&gt; — fixed in 0.0.0-20260420173541-6d2e0506e2b4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-When OpenBao&amp;#x27;s initial namespace deletion fails, subsequent retries fail to properly remove all data before marking the namespace as deleted. This can affect any outstanding leases as well as potentially leaving unrelated storage entries around. 
-
-### Patches
-
-This will be patched in OpenBao v2.5.3.
-
-### Workarounds
-
-Users may manually remove mounts prior to deleting the namespace. 
-
-Audit logs may be used to identify repeated deletion attempts against the same namespace; `sys/raw` can be used to see what leases were not correctly deleted.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/security/advisories/GHSA-vv66-6rp4-wr4f"&gt;https://github.com/openbao/openbao/security/advisories/GHSA-vv66-6rp4-wr4f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42186"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42186&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/commit/6d2e0506e2b41be0eaa6643bf7b4efc9a2c09445"&gt;https://github.com/openbao/openbao/commit/6d2e0506e2b41be0eaa6643bf7b4efc9a2c09445&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao"&gt;https://github.com/openbao/openbao&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openbao/openbao/releases/tag/v2.5.3"&gt;https://github.com/openbao/openbao/releases/tag/v2.5.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vv66-6rp4-wr4f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,48 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-29T17:15:32Z</updated>
+  <updated>2026-07-29T21:14:53Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-6r28-9ppf-4hj5: GoPacket's Diameter AVP decoder: uint32 underflow on vendor header size leads to unbounded ~4 GiB allocation (unauthenticated remote DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5"/>
+    <published>2026-07-28T16:14:36Z</published>
+    <updated>2026-07-29T21:14:53Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54345"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoPacket&amp;#x27;s Diameter AVP decoder: uint32 underflow on vendor header size leads to unbounded ~4 GiB allocation (unauthenticated remote DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54345&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gopacket/gopacket&lt;/code&gt; — fixed in 1.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The Diameter AVP decoder in `github.com/gopacket/gopacket` computes `dataLength := avp.Length - uint32(headerSize)` without first ensuring `avp.Length &amp;gt;= headerSize`. When the Vendor flag is set, `headerSize` is 12, but the only length guard upstream rejects `avp.Length &amp;lt; 8`. An AVP with the Vendor flag set and a 24-bit Length field of 8, 9, 10, or 11 therefore underflows the `uint32` subtraction to ~4,294,967,292, which is passed straight to `make([]byte, dataLength)`. A single 32-byte Diameter message forces a ~4 GiB allocation; a short burst of such messages exhausts memory and OOM-kills memory-constrained collectors. This is an unauthenticated remote denial of service (CWE-191 integer underflow -&amp;gt; CWE-770 unbounded allocation).
+
+## Root cause (file:line @ v1.6.0)
+
+`layers/d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/security/advisories/GHSA-6r28-9ppf-4hj5"&gt;https://github.com/gopacket/gopacket/security/advisories/GHSA-6r28-9ppf-4hj5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/commit/145859d0eaee1a6f5925ffb93851c976449c3311"&gt;https://github.com/gopacket/gopacket/commit/145859d0eaee1a6f5925ffb93851c976449c3311&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket"&gt;https://github.com/gopacket/gopacket&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/releases/tag/v1.6.1"&gt;https://github.com/gopacket/gopacket/releases/tag/v1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g6v3-7xmc-w563: GoPacket's sFlow ExtendedGatewayFlow decoder: unbounded attacker-controlled allocation (104-byte UDP datagram -&gt; up to 16 GiB make) -&gt; unauthenticated remote DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563"/>
+    <published>2026-07-28T16:17:26Z</published>
+    <updated>2026-07-29T21:14:53Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54332"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GoPacket&amp;#x27;s sFlow ExtendedGatewayFlow decoder: unbounded attacker-controlled allocation (104-byte UDP datagram -&amp;gt; up to 16 GiB make) -&amp;gt; unauthenticated remote DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54332&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gopacket/gopacket&lt;/code&gt; — fixed in 1.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The sFlow `ExtendedGatewayFlow` record decoder in `github.com/gopacket/gopacket` allocates a slice with `make([]uint32, n)` where `n` is an attacker-controlled 32-bit wire field that has no upper bound. Because the allocation happens *before* the read loop that would consume the corresponding bytes, a single small UDP datagram can force a multi-gigabyte allocation. A 104-byte sFlow datagram can request up to 16 GiB and OOM-kill any service that parses sFlow with gopacket. This is an unauthenticated remote denial of service (CWE-770).
+
+## Root cause (file:line @ v1.6.0)
+
+Two sinks in `layers/sflow.go`, both in the `ExtendedGatewayFlow` (record type 1003) decode path:
+
+1. `layers/sflow.go:1306` in `decodeExtendedGatewayFlowRecord`:
+```go
+*data, communitiesLength = (*data)[4:], bi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/security/advisories/GHSA-g6v3-7xmc-w563"&gt;https://github.com/gopacket/gopacket/security/advisories/GHSA-g6v3-7xmc-w563&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/commit/76119086f5936aacd7088bdf97d565501bb6c4cc"&gt;https://github.com/gopacket/gopacket/commit/76119086f5936aacd7088bdf97d565501bb6c4cc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket"&gt;https://github.com/gopacket/gopacket&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/releases/tag/v1.6.1"&gt;https://github.com/gopacket/gopacket/releases/tag/v1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-xvg2-cgv6-6h7v: netfoil: Incorrect block responses could lead to localhost traffic</title>
     <id>https://osv.dev/vulnerability/GHSA-xvg2-cgv6-6h7v</id>
@@ -463,42 +499,6 @@ Demonstrated consequence: cross-tenant node integ…&lt;/p&gt;&lt;p&gt;Reference
     <content type="html">&lt;p&gt;&lt;strong&gt;songquanpeng one-api has an issue that results in business logic errors&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11465&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/songquanpeng/one-api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A security flaw has been discovered in songquanpeng one-api up to 0.6.11-preview.7. Affected by this issue is the function Redeem of the file model/redemption.go of the component Redemption Code Top-Up Endpoint. The manipulation results in business logic errors. The attack may be launched remotely. The attack requires a high level of complexity. The exploitation is known to be difficult. The exploit has been released to the public and may be used for attacks. The pull request to fix this issue awaits acceptance.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11465"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11465&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/songquanpeng/one-api/issues/2397"&gt;https://github.com/songquanpeng/one-api/issues/2397&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/songquanpeng/one-api/pull/2399"&gt;https://github.com/songquanpeng/one-api/pull/2399&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/songquanpeng/one-api"&gt;https://github.com/songquanpeng/one-api&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-11465"&gt;https://vuldb.com/cve/CVE-2026-11465&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/833320"&gt;https://vuldb.com/submit/833320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369085"&gt;https://vuldb.com/vuln/369085&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369085/cti"&gt;https://vuldb.com/vuln/369085/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7v3v-cp44-vc8m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-6r28-9ppf-4hj5: GoPacket's Diameter AVP decoder: uint32 underflow on vendor header size leads to unbounded ~4 GiB allocation (unauthenticated remote DoS)</title>
-    <id>https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5"/>
-    <published>2026-07-28T16:14:36Z</published>
-    <updated>2026-07-28T16:30:37Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54345"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;GoPacket&amp;#x27;s Diameter AVP decoder: uint32 underflow on vendor header size leads to unbounded ~4 GiB allocation (unauthenticated remote DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54345&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gopacket/gopacket&lt;/code&gt; — fixed in 1.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The Diameter AVP decoder in `github.com/gopacket/gopacket` computes `dataLength := avp.Length - uint32(headerSize)` without first ensuring `avp.Length &amp;gt;= headerSize`. When the Vendor flag is set, `headerSize` is 12, but the only length guard upstream rejects `avp.Length &amp;lt; 8`. An AVP with the Vendor flag set and a 24-bit Length field of 8, 9, 10, or 11 therefore underflows the `uint32` subtraction to ~4,294,967,292, which is passed straight to `make([]byte, dataLength)`. A single 32-byte Diameter message forces a ~4 GiB allocation; a short burst of such messages exhausts memory and OOM-kills memory-constrained collectors. This is an unauthenticated remote denial of service (CWE-191 integer underflow -&amp;gt; CWE-770 unbounded allocation).
-
-## Root cause (file:line @ v1.6.0)
-
-`layers/d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/security/advisories/GHSA-6r28-9ppf-4hj5"&gt;https://github.com/gopacket/gopacket/security/advisories/GHSA-6r28-9ppf-4hj5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/commit/145859d0eaee1a6f5925ffb93851c976449c3311"&gt;https://github.com/gopacket/gopacket/commit/145859d0eaee1a6f5925ffb93851c976449c3311&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket"&gt;https://github.com/gopacket/gopacket&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/releases/tag/v1.6.1"&gt;https://github.com/gopacket/gopacket/releases/tag/v1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6r28-9ppf-4hj5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-g6v3-7xmc-w563: GoPacket's sFlow ExtendedGatewayFlow decoder: unbounded attacker-controlled allocation (104-byte UDP datagram -&gt; up to 16 GiB make) -&gt; unauthenticated remote DoS</title>
-    <id>https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563"/>
-    <published>2026-07-28T16:17:26Z</published>
-    <updated>2026-07-28T16:30:36Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54332"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;GoPacket&amp;#x27;s sFlow ExtendedGatewayFlow decoder: unbounded attacker-controlled allocation (104-byte UDP datagram -&amp;gt; up to 16 GiB make) -&amp;gt; unauthenticated remote DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54332&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gopacket/gopacket&lt;/code&gt; — fixed in 1.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The sFlow `ExtendedGatewayFlow` record decoder in `github.com/gopacket/gopacket` allocates a slice with `make([]uint32, n)` where `n` is an attacker-controlled 32-bit wire field that has no upper bound. Because the allocation happens *before* the read loop that would consume the corresponding bytes, a single small UDP datagram can force a multi-gigabyte allocation. A 104-byte sFlow datagram can request up to 16 GiB and OOM-kill any service that parses sFlow with gopacket. This is an unauthenticated remote denial of service (CWE-770).
-
-## Root cause (file:line @ v1.6.0)
-
-Two sinks in `layers/sflow.go`, both in the `ExtendedGatewayFlow` (record type 1003) decode path:
-
-1. `layers/sflow.go:1306` in `decodeExtendedGatewayFlowRecord`:
-```go
-*data, communitiesLength = (*data)[4:], bi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/security/advisories/GHSA-g6v3-7xmc-w563"&gt;https://github.com/gopacket/gopacket/security/advisories/GHSA-g6v3-7xmc-w563&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/commit/76119086f5936aacd7088bdf97d565501bb6c4cc"&gt;https://github.com/gopacket/gopacket/commit/76119086f5936aacd7088bdf97d565501bb6c4cc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket"&gt;https://github.com/gopacket/gopacket&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/releases/tag/v1.6.1"&gt;https://github.com/gopacket/gopacket/releases/tag/v1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] GO-2026-5617: Race condition in 'docker cp' in github.com/docker/docker allows bind mount redirection</title>
     <id>https://osv.dev/vulnerability/GO-2026-5617</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5617"/>
@@ -759,91 +759,5 @@ This only affects TLS 1.3.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;
     <category term="Go"/>
     <category term="GHSA-259r-337f-4rfw"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;OOB read in github.com/klauspost/compress/s2&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-259r-337f-4rfw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klauspost/compress&lt;/code&gt; — fixed in 1.18.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Providing a specially crafted dictionary to s2.NewDict and using it to encode data can make the encoder read out of bounds.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw"&gt;https://github.com/klauspost/compress/security/advisories/GHSA-259r-337f-4rfw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/commit/8668e357e776d5152ed62f33c17f21b8690664fa"&gt;https://github.com/klauspost/compress/commit/8668e357e776d5152ed62f33c17f21b8690664fa&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5841"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-x99g-8v8j-25j2: Ollama is Vulnerable to Path Traversal</title>
-    <id>https://osv.dev/vulnerability/GHSA-x99g-8v8j-25j2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x99g-8v8j-25j2"/>
-    <published>2026-04-26T06:31:16Z</published>
-    <updated>2026-07-28T03:14:46Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-7020"/>
-    <category term="GO-2026-5750"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Ollama is Vulnerable to Path Traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-7020, GO-2026-5750&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/ollama/ollama&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A security flaw has been discovered in Ollama up to 0.20.2. This affects the function digestToPath of the file x/imagegen/transfer/transfer.go of the component Tensor Model Transfer Handler. The manipulation of the argument digest results in path traversal. The attack may be performed from remote. This attack is characterized by high complexity. The exploitability is reported as difficult. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-7020"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-7020&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ollama/ollama"&gt;https://github.com/ollama/ollama&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/797576"&gt;https://vuldb.com/submit/797576&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/359599"&gt;https://vuldb.com/vuln/359599&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/359599/cti"&gt;https://vuldb.com/vuln/359599/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x99g-8v8j-25j2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-pgh9-mpwc-8jjf: Harvester's SUSE Virtualization Registration Client Vulnerable to MITM and DOS</title>
-    <id>https://osv.dev/vulnerability/GHSA-pgh9-mpwc-8jjf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pgh9-mpwc-8jjf"/>
-    <published>2026-05-06T20:16:08Z</published>
-    <updated>2026-07-28T03:14:45Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2025-71261"/>
-    <category term="GO-2026-5538"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Harvester&amp;#x27;s SUSE Virtualization Registration Client Vulnerable to MITM and DOS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71261, GO-2026-5538&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/harvester/harvester&lt;/code&gt; — fixed in 1.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-A vulnerability has been identified in the [SUSE Virtualization (Harvester) Rancher integration mechanism](https://docs.harvesterhci.io/v1.7/rancher/rancher-integration) where by default the registration client uses an insecure TLS option that fails to verify  the remote server’s certificate. This security gap could allow the execution of a man-in-the-middle (MitM) attack against SUSE Virtualization.
-
-An attacker with network-level access between the SUSE Virtualization and Rancher Manager could interfere with the TLS handshake and abuse it to bypass TLS as a security control. The registration client could be misled to send cluster registration requests to an impersonated remote service. Additionally, because the system processes response payloads without performing size valida…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/harvester/harvester/security/advisories/GHSA-pgh9-mpwc-8jjf"&gt;https://github.com/harvester/harvester/security/advisories/GHSA-pgh9-mpwc-8jjf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-71261"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-71261&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/harvester/harvester"&gt;https://github.com/harvester/harvester&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pgh9-mpwc-8jjf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5538: Harvester's SUSE Virtualization Registration Client Vulnerable to MITM and DOS in github.com/harvester/harvester</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5538</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5538"/>
-    <published>2026-06-25T22:34:34Z</published>
-    <updated>2026-07-28T03:14:45Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2025-71261"/>
-    <category term="GHSA-pgh9-mpwc-8jjf"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Harvester&amp;#x27;s SUSE Virtualization Registration Client Vulnerable to MITM and DOS in github.com/harvester/harvester&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71261, GHSA-pgh9-mpwc-8jjf&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/harvester/harvester&lt;/code&gt; — fixed in 1.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Harvester&amp;#x27;s SUSE Virtualization Registration Client Vulnerable to MITM and DOS in github.com/harvester/harvester&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/harvester/harvester/security/advisories/GHSA-pgh9-mpwc-8jjf"&gt;https://github.com/harvester/harvester/security/advisories/GHSA-pgh9-mpwc-8jjf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5538"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-wwj6-vghv-5p64: Kata Container to Guest micro VM privilege escalation</title>
-    <id>https://osv.dev/vulnerability/GHSA-wwj6-vghv-5p64</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wwj6-vghv-5p64"/>
-    <published>2026-02-19T15:25:54Z</published>
-    <updated>2026-07-28T02:00:32Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-24834"/>
-    <category term="GO-2026-4517"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Kata Container to Guest micro VM privilege escalation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-24834, GO-2026-4517&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kata-containers/kata-containers/src/runtime&lt;/code&gt; — fixed in 0.0.0-20260219090056-6a672503973b&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-An issue in Kata with Cloud Hypervisor allows a user of the container to modify the file system used by the Guest micro VM ultimately achieving arbitrary code execution as root in said VM. The current understinding is this doesn’t impact the security of the Host or of other containers / VMs running on that Host (note that arm64 QEMU lacks NVDIMM read-only support: It is believed that until the upstream QEMU gains this capability, a guest write could reach the image file).
-
-### Details
-
-_Linux virtio-pmem_
-The `virtio-pmem` probe path always registers the region as a generic pagemap that supports asynchronous flushes, but it never marks the region as read-only.  Only the `ND_REGION_PAGEMAP` and `ND_REGION_ASYNC` bits are set before the region is created, so `nd_region-&amp;gt;ro alway…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/security/advisories/GHSA-wwj6-vghv-5p64"&gt;https://github.com/kata-containers/kata-containers/security/advisories/GHSA-wwj6-vghv-5p64&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-24834"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-24834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/commit/6a672503973bf7c687053e459bfff8a9652e16bf"&gt;https://github.com/kata-containers/kata-containers/commit/6a672503973bf7c687053e459bfff8a9652e16bf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-24834"&gt;https://access.redhat.com/security/cve/CVE-2026-24834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2441025"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2441025&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers"&gt;https://github.com/kata-containers/kata-containers&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/releases/tag/3.27.0"&gt;https://github.com/kata-containers/kata-containers/releases/tag/3.27.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-24834.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-24834.json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wwj6-vghv-5p64"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rr59-xxvx-96qr: Kata Containers have VM Escape via virtiofsd Argument Injection through Default-Enabled Pod Annotations</title>
-    <id>https://osv.dev/vulnerability/GHSA-rr59-xxvx-96qr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rr59-xxvx-96qr"/>
-    <published>2026-05-26T23:57:58Z</published>
-    <updated>2026-07-28T02:00:32Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-44210"/>
-    <category term="GO-2026-5638"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Kata Containers have VM Escape via virtiofsd Argument Injection through Default-Enabled Pod Annotations&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44210, GO-2026-5638&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:H/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kata-containers/kata-containers&lt;/code&gt; — fixed in 0.0.0-20260519062212-ffa59ce3aa78&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Kata Containers ships with a default configuration that allows pod creators to inject arbitrary command-line arguments into the virtiofsd process through the `io.katacontainers.config.hypervisor.virtio_fs_extra_args` pod annotation. By injecting `-o source=/` along with `--no-announce-submounts` and `--sandbox=none`, an attacker can override the virtiofsd shared directory to serve the entire host root filesystem into the guest VM. Combined with the `kernel_params` annotation (also enabled by default) to activate the agent debug console, the attacker can mount the host filesystem from inside the VM and read or write any file on the host, including /etc/shadow.
-
-## Details
-
-The default Kata configuration at configuration.toml line 1 contains:
-
-```
-enable_annotations = [&amp;quot;enable_io…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/security/advisories/GHSA-rr59-xxvx-96qr"&gt;https://github.com/kata-containers/kata-containers/security/advisories/GHSA-rr59-xxvx-96qr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44210"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44210&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers/commit/ffa59ce3aa7877d067c9a372df0c329a23a01744"&gt;https://github.com/kata-containers/kata-containers/commit/ffa59ce3aa7877d067c9a372df0c329a23a01744&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kata-containers/kata-containers"&gt;https://github.com/kata-containers/kata-containers&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rr59-xxvx-96qr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5158: Opentelemetry-go's baggage parsing no longer caps raw header length in go.opentelemetry.io/otel</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5158</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5158"/>
-    <published>2026-07-24T18:35:55Z</published>
-    <updated>2026-07-27T21:59:42Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-41178"/>
-    <category term="GHSA-5wrp-cwcj-q835"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Opentelemetry-go&amp;#x27;s baggage parsing no longer caps raw header length in go.opentelemetry.io/otel&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41178, GHSA-5wrp-cwcj-q835&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel&lt;/code&gt; — fixed in 1.42.0, 1.44.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Opentelemetry-go&amp;#x27;s baggage parsing no longer caps raw header length in go.opentelemetry.io/otel&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-5wrp-cwcj-q835"&gt;https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-5wrp-cwcj-q835&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/pull/7880"&gt;https://github.com/open-telemetry/opentelemetry-go/pull/7880&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5158"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

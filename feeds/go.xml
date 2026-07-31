@@ -3,12 +3,178 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-07-31T10:44:49Z</updated>
+  <updated>2026-07-31T18:00:19Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-r2v3-8gwf-7ghm: vault-addr annotation SSRF -- webhook makes outbound HTTP call to attacker URL during admission; vault-serviceaccount enables cluster-wide SA token theft via TokenRequest API</title>
+    <id>https://osv.dev/vulnerability/GHSA-r2v3-8gwf-7ghm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r2v3-8gwf-7ghm"/>
+    <published>2026-07-31T17:45:02Z</published>
+    <updated>2026-07-31T18:00:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-54725"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vault-addr annotation SSRF -- webhook makes outbound HTTP call to attacker URL during admission; vault-serviceaccount enables cluster-wide SA token theft via TokenRequest API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54725&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/bank-vaults/vault-secrets-webhook&lt;/code&gt; — fixed in 1.23.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The vault-secrets-webhook reads the `vault.security.banzaicloud.io/vault-addr` annotation from any ConfigMap or Secret being admitted and uses it as the Vault server address without any validation or allowlist. When a ConfigMap or Secret contains a value prefixed with `vault:`, the webhook&amp;#x27;s admission handler synchronously calls the Vault API at the attacker-supplied address from inside the webhook process during the admission review. The webhook additionally grants `serviceaccounts/token:create` cluster-wide, and the `vault-serviceaccount` annotation controls which ServiceAccount&amp;#x27;s JWT is fetched and sent to that address. An attacker who can create ConfigMaps or Secrets in a watched namespace can cause the webhook process to make arbitrary outbound HTTP connections and exfiltr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bank-vaults/vault-secrets-webhook/security/advisories/GHSA-r2v3-8gwf-7ghm"&gt;https://github.com/bank-vaults/vault-secrets-webhook/security/advisories/GHSA-r2v3-8gwf-7ghm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bank-vaults/vault-secrets-webhook/commit/76db45976fee0f54cafd94dffa425e6b542f65a0"&gt;https://github.com/bank-vaults/vault-secrets-webhook/commit/76db45976fee0f54cafd94dffa425e6b542f65a0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bank-vaults/vault-secrets-webhook"&gt;https://github.com/bank-vaults/vault-secrets-webhook&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bank-vaults/vault-secrets-webhook/releases/tag/v1.23.1"&gt;https://github.com/bank-vaults/vault-secrets-webhook/releases/tag/v1.23.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r2v3-8gwf-7ghm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-68cj-mvg9-rgm2: Capsule: CapsuleConfiguration NodeMetadata regex fields lack webhook validation, allowing MustCompile panic on all Node admission requests</title>
+    <id>https://osv.dev/vulnerability/GHSA-68cj-mvg9-rgm2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-68cj-mvg9-rgm2"/>
+    <published>2026-07-31T16:53:25Z</published>
+    <updated>2026-07-31T17:00:21Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-65834"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Capsule: CapsuleConfiguration NodeMetadata regex fields lack webhook validation, allowing MustCompile panic on all Node admission requests&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-65834&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/projectcapsule/capsule&lt;/code&gt; — fixed in 0.13.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`CapsuleConfiguration.Spec.NodeMetadata.ForbiddenLabels.Regex` and `ForbiddenAnnotations.Regex` are never validated by any admission webhook. A Cluster Admin can persist a malformed regex to etcd without being blocked. Once stored, every Node `CREATE`, `UPDATE`, or `PATCH` request triggers `regexp.MustCompile()` in `pkg/api/forbidden_list.go:36`, which **panics** and crashes the node admission webhook — causing a cluster-wide Denial of Service for all Node operations.
+
+### Root cause
+
+`internal/webhook/tenant/validation/` contains dedicated regex validators for every Tenant regex field (hostname, storageclass, ingressclass, containerregistry, etc.). `internal/webhook/cfg/` contains **no regex validator at all** — only `owners.go`, `serviceaccount.go`, and `warnings.go`.
+
+The d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/projectcapsule/capsule/security/advisories/GHSA-68cj-mvg9-rgm2"&gt;https://github.com/projectcapsule/capsule/security/advisories/GHSA-68cj-mvg9-rgm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-65834"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-65834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcapsule/capsule"&gt;https://github.com/projectcapsule/capsule&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcapsule/capsule/releases/tag/v0.13.8"&gt;https://github.com/projectcapsule/capsule/releases/tag/v0.13.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-68cj-mvg9-rgm2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jr6p-8pjj-mfx6: Capsule has an incomplete fix of CVE-2026-22872: TenantResource RawItems and Generators still allow cluster-scoped resource creation (cross-tenant privilege escalation)</title>
+    <id>https://osv.dev/vulnerability/GHSA-jr6p-8pjj-mfx6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jr6p-8pjj-mfx6"/>
+    <published>2026-07-31T16:53:42Z</published>
+    <updated>2026-07-31T17:00:20Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-65835"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Capsule has an incomplete fix of CVE-2026-22872: TenantResource RawItems and Generators still allow cluster-scoped resource creation (cross-tenant privilege escalation)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-65835&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/projectcapsule/capsule&lt;/code&gt; — fixed in 0.13.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+CVE-2026-22872 (GHSA-qjjm-7j9w-pw72) reported that a Tenant Owner could create cluster-scoped resources
+(e.g. `ClusterRole`, `ValidatingWebhookConfiguration`) through a `TenantResource`, because the controller
+applies them with its cluster-admin ServiceAccount and `SetNamespace` is ineffective for cluster-scoped
+kinds. The v0.13.0 fix added a cluster-scope rejection guard, but **only on the NamespacedItems selection
+path** (`ResourceReference.LoadResources` -&amp;gt; `IsNamespacedGVK`, error `&amp;quot;cluster-scoped kind ... is not
+allowed&amp;quot;`). The **RawItems create path — the exact vector the original advisory named — and the Generators
+path were not given this guard.** The vulnerability therefore persists in all releases **v0.13.0 through
+v0.13.7** and on trunk HEAD (`8d89d6865d`).
+
+### Deta…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/projectcapsule/capsule/security/advisories/GHSA-jr6p-8pjj-mfx6"&gt;https://github.com/projectcapsule/capsule/security/advisories/GHSA-jr6p-8pjj-mfx6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-65835"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-65835&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcapsule/capsule"&gt;https://github.com/projectcapsule/capsule&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/projectcapsule/capsule/releases/tag/v0.13.8"&gt;https://github.com/projectcapsule/capsule/releases/tag/v0.13.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jr6p-8pjj-mfx6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-pfvc-3p5h-x7h6: Wings exposes node configuration secrets through egg configuration-file templating</title>
+    <id>https://osv.dev/vulnerability/GHSA-pfvc-3p5h-x7h6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pfvc-3p5h-x7h6"/>
+    <published>2026-07-31T16:16:46Z</published>
+    <updated>2026-07-31T16:30:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52855"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Wings exposes node configuration secrets through egg configuration-file templating&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52855&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/pterodactyl/wings&lt;/code&gt; — fixed in 1.12.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+**Type:** Exposure of sensitive information / insufficiently protected credentials
+leading to privilege escalation and full node compromise.
+
+Wings exposes its **entire** daemon configuration to the egg configuration-file
+templating engine. When Wings renders a server&amp;#x27;s configuration files, any
+`{{config.&amp;lt;path&amp;gt;}}` placeholder in a replacement value is resolved against the
+full marshalled daemon configuration, with no restriction on which paths may be
+read.
+
+Because the Panel substitutes **user-controlled** egg variable values into these
+replacements before sending them to Wings, a low-privileged user can smuggle a
+`{{config.*}}` placeholder through a variable value. The placeholder is then
+resolved by Wings and written into a file inside the user&amp;#x27;s own server, where it
+can be r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/security/advisories/GHSA-pfvc-3p5h-x7h6"&gt;https://github.com/pterodactyl/wings/security/advisories/GHSA-pfvc-3p5h-x7h6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/commit/eb65e27ae077a63e38518c490768486af1cd86a9"&gt;https://github.com/pterodactyl/wings/commit/eb65e27ae077a63e38518c490768486af1cd86a9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings"&gt;https://github.com/pterodactyl/wings&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/releases/tag/v1.12.3"&gt;https://github.com/pterodactyl/wings/releases/tag/v1.12.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pfvc-3p5h-x7h6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q6hh-gp44-4hcm: Wings: Maliciously or erroneously created parsed config files can cause wings process to OOM</title>
+    <id>https://osv.dev/vulnerability/GHSA-q6hh-gp44-4hcm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q6hh-gp44-4hcm"/>
+    <published>2026-07-31T16:10:57Z</published>
+    <updated>2026-07-31T16:30:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52857"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Wings: Maliciously or erroneously created parsed config files can cause wings process to OOM&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52857&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/pterodactyl/wings&lt;/code&gt; — fixed in 1.13.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Config file parsers, `json`, `yaml`, `xml` etc in parser.go have no file size limit/checks, allowing for a giant config file to potentially OOM the wings process.
+
+### Impact
+All wings users who have an egg with a non-`file` parser configuration file setting.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/security/advisories/GHSA-q6hh-gp44-4hcm"&gt;https://github.com/pterodactyl/wings/security/advisories/GHSA-q6hh-gp44-4hcm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/commit/5f71f65711b6b9e6f913bec94a7b36d9a5eaae49"&gt;https://github.com/pterodactyl/wings/commit/5f71f65711b6b9e6f913bec94a7b36d9a5eaae49&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings"&gt;https://github.com/pterodactyl/wings&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/releases/tag/v1.13.0"&gt;https://github.com/pterodactyl/wings/releases/tag/v1.13.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q6hh-gp44-4hcm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-ghrq-5wpp-hxx5: Wings: Maliciously crafted packet during SFTP connection handshake causes denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-ghrq-5wpp-hxx5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ghrq-5wpp-hxx5"/>
+    <published>2026-07-31T16:20:25Z</published>
+    <updated>2026-07-31T16:30:19Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-52856"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Wings: Maliciously crafted packet during SFTP connection handshake causes denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-52856&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/pterodactyl/wings&lt;/code&gt; — fixed in 1.13.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A maliciously crafted packet received &amp;amp; parsed during the SFTP connection handshake will cause a Go panic.
+
+### Impact
+All wings users with an open SFTP port.
+
+### Workarounds
+Close SFTP port.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/security/advisories/GHSA-ghrq-5wpp-hxx5"&gt;https://github.com/pterodactyl/wings/security/advisories/GHSA-ghrq-5wpp-hxx5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/commit/8e49c7c0eda815d3ada171831876a1c14c493026"&gt;https://github.com/pterodactyl/wings/commit/8e49c7c0eda815d3ada171831876a1c14c493026&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings"&gt;https://github.com/pterodactyl/wings&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pterodactyl/wings/releases/tag/v1.13.0"&gt;https://github.com/pterodactyl/wings/releases/tag/v1.13.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ghrq-5wpp-hxx5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-v553-g2w6-295p: Apache Answer has an Unrestricted Upload of File with Dangerous Type vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-v553-g2w6-295p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v553-g2w6-295p"/>
+    <published>2026-06-09T09:32:07Z</published>
+    <updated>2026-07-31T16:01:14Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-33582"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Answer has an Unrestricted Upload of File with Dangerous Type vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-33582&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/apache/incubator-answer&lt;/code&gt; — fixed in 1.7.2-0.20260325113131-cfc3e54f30cc&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Unrestricted Upload of File with Dangerous Type vulnerability in Apache Answer.
+
+This issue affects Apache Answer: through 2.0.0.
+
+A crafted TIFF image could trigger excessive memory allocation during image decoding, allowing an authenticated user to cause the server process to crash.
+Users are recommended to upgrade to version 2.0.1, which fixes the issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33582"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-33582&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer/commit/cfc3e54f30cc5e01afb7110ecc1da9152d0a3a41"&gt;https://github.com/apache/answer/commit/cfc3e54f30cc5e01afb7110ecc1da9152d0a3a41&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer"&gt;https://github.com/apache/answer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer/releases/tag/v2.0.1"&gt;https://github.com/apache/answer/releases/tag/v2.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/3sgpx4cwsgpnt66xv3cqvtc8z4st1kbq"&gt;https://lists.apache.org/thread/3sgpx4cwsgpnt66xv3cqvtc8z4st1kbq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/09/5"&gt;http://www.openwall.com/lists/oss-security/2026/06/09/5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v553-g2w6-295p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-x4f6-mqg6-28xx: Apache Answer has an Unrestricted Upload of File with Dangerous Type vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-x4f6-mqg6-28xx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x4f6-mqg6-28xx"/>
+    <published>2026-06-09T09:32:07Z</published>
+    <updated>2026-07-31T16:01:14Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34031"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Answer has an Unrestricted Upload of File with Dangerous Type vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34031&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/apache/incubator-answer&lt;/code&gt; — fixed in 1.7.2-0.20260511040518-11091244f64e&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Unrestricted Upload of File with Dangerous Type vulnerability in Apache Answer.
+
+This issue affects Apache Answer: through 2.0.0.
+
+The server did not sufficiently validate user-supplied image URLs, allowing arbitrary external content to be embedded as profile images, which could expose users to unintended external requests and tracking by third-party servers.
+Users are recommended to upgrade to version 2.0.1, which fixes the issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34031"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34031&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer/commit/11091244f64e5a7e472edcd477c1ff4124eca7c3"&gt;https://github.com/apache/answer/commit/11091244f64e5a7e472edcd477c1ff4124eca7c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer"&gt;https://github.com/apache/answer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer/releases/tag/v2.0.1"&gt;https://github.com/apache/answer/releases/tag/v2.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/rwtxy39t54to9kv3dqtbjsbdpyk4jkd2"&gt;https://lists.apache.org/thread/rwtxy39t54to9kv3dqtbjsbdpyk4jkd2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/09/4"&gt;http://www.openwall.com/lists/oss-security/2026/06/09/4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x4f6-mqg6-28xx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-85r2-pvg8-89r9: Apache Answer has an Exposure of Sensitive Information to an Unauthorized Actor vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-85r2-pvg8-89r9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-85r2-pvg8-89r9"/>
+    <published>2026-06-09T09:32:07Z</published>
+    <updated>2026-07-31T16:01:14Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34905"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Answer has an Exposure of Sensitive Information to an Unauthorized Actor vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34905&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/apache/incubator-answer&lt;/code&gt; — fixed in 1.7.2-0.20260509071350-11c80384f13a&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Exposure of Sensitive Information to an Unauthorized Actor vulnerability in Apache Answer.
+
+This issue affects Apache Answer: through 2.0.0.
+
+The unlisted question feature did not enforce access restrictions on direct API endpoints, allowing authenticated users to discover and access unlisted questions, their answers, comments, and revision history.
+Users are recommended to upgrade to version 2.0.1, which fixes the issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34905"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34905&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer/commit/11c80384f13a27e27c871c05bb353489d1363ee2"&gt;https://github.com/apache/answer/commit/11c80384f13a27e27c871c05bb353489d1363ee2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer"&gt;https://github.com/apache/answer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer/releases/tag/v2.0.1"&gt;https://github.com/apache/answer/releases/tag/v2.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/khxoft96sptr2kh0cpzgw7f6qwv0ltcf"&gt;https://lists.apache.org/thread/khxoft96sptr2kh0cpzgw7f6qwv0ltcf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/09/2"&gt;http://www.openwall.com/lists/oss-security/2026/06/09/2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-85r2-pvg8-89r9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6qwm-5fm9-cvjx: Apache Answer vulnerable to Cross-site Scripting</title>
+    <id>https://osv.dev/vulnerability/GHSA-6qwm-5fm9-cvjx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6qwm-5fm9-cvjx"/>
+    <published>2026-06-09T09:32:07Z</published>
+    <updated>2026-07-31T16:01:14Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34033"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Answer vulnerable to Cross-site Scripting&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34033&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/apache/incubator-answer&lt;/code&gt; — fixed in 1.7.2-0.20260509080709-d1a4092c61cc&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS) vulnerability in Apache Answer.
+
+This issue affects Apache Answer: through 2.0.0.
+
+User-supplied content was included in notification emails without proper escaping, allowing authenticated users to inject arbitrary HTML into emails sent to other users.
+Users are recommended to upgrade to version 2.0.1, which fixes the issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34033"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34033&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer/commit/d1a4092c61ccd41988d1033fce47eb513adb433e"&gt;https://github.com/apache/answer/commit/d1a4092c61ccd41988d1033fce47eb513adb433e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer"&gt;https://github.com/apache/answer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/answer/releases/tag/v2.0.1"&gt;https://github.com/apache/answer/releases/tag/v2.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/wrfd9blbfotfg479jr8vlwfx6pwr9sgj"&gt;https://lists.apache.org/thread/wrfd9blbfotfg479jr8vlwfx6pwr9sgj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/09/3"&gt;http://www.openwall.com/lists/oss-security/2026/06/09/3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6qwm-5fm9-cvjx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-5856: Invoking Encrypted Client Hello privacy leak in crypto/tls</title>
     <id>https://osv.dev/vulnerability/GO-2026-5856</id>
@@ -306,96 +472,5 @@ Two sinks in `layers/sflow.go`, both in the `ExtendedGatewayFlow` (record type 1
 1. `layers/sflow.go:1306` in `decodeExtendedGatewayFlowRecord`:
 ```go
 *data, communitiesLength = (*data)[4:], bi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/security/advisories/GHSA-g6v3-7xmc-w563"&gt;https://github.com/gopacket/gopacket/security/advisories/GHSA-g6v3-7xmc-w563&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/commit/76119086f5936aacd7088bdf97d565501bb6c4cc"&gt;https://github.com/gopacket/gopacket/commit/76119086f5936aacd7088bdf97d565501bb6c4cc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket"&gt;https://github.com/gopacket/gopacket&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gopacket/gopacket/releases/tag/v1.6.1"&gt;https://github.com/gopacket/gopacket/releases/tag/v1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6v3-7xmc-w563"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-xvg2-cgv6-6h7v: netfoil: Incorrect block responses could lead to localhost traffic</title>
-    <id>https://osv.dev/vulnerability/GHSA-xvg2-cgv6-6h7v</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xvg2-cgv6-6h7v"/>
-    <published>2026-07-29T17:03:48Z</published>
-    <updated>2026-07-29T17:15:32Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;netfoil: Incorrect block responses could lead to localhost traffic&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/tinfoil-factory/netfoil&lt;/code&gt; — fixed in 0.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-`0.0.0.0` was used instead of NXDOMAIN for block responses. On Linux, which is the target platform for netfoil, the `0.0.0.0` is sent to localhost rather than just dropped.
-
-### Impact
-Unintended traffic could be sent to localhost. Impact depends on running services and firewall rules.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tinfoil-factory/netfoil/security/advisories/GHSA-xvg2-cgv6-6h7v"&gt;https://github.com/tinfoil-factory/netfoil/security/advisories/GHSA-xvg2-cgv6-6h7v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tinfoil-factory/netfoil/pull/33"&gt;https://github.com/tinfoil-factory/netfoil/pull/33&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tinfoil-factory/netfoil/commit/891d3513c77999a9deef9f23506807d9653ee448"&gt;https://github.com/tinfoil-factory/netfoil/commit/891d3513c77999a9deef9f23506807d9653ee448&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tinfoil-factory/netfoil"&gt;https://github.com/tinfoil-factory/netfoil&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tinfoil-factory/netfoil/releases/tag/v0.4.0"&gt;https://github.com/tinfoil-factory/netfoil/releases/tag/v0.4.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xvg2-cgv6-6h7v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-mjqf-28ph-426h: Logging operator has Fluentd configuration injection that allows remote code execution</title>
-    <id>https://osv.dev/vulnerability/GHSA-mjqf-28ph-426h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mjqf-28ph-426h"/>
-    <published>2026-07-29T17:01:29Z</published>
-    <updated>2026-07-29T17:15:32Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54680"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Logging operator has Fluentd configuration injection that allows remote code execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54680&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kube-logging/logging-operator&lt;/code&gt; — fixed in 0.0.0-20260608145523-cf437d7f1e05&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The Fluentd configuration renderer in Logging operator writes strings from CRDs such as `Flow` directly into `fluent.conf` without escaping them. As a result, a user who can create `Flow` resources can inject Fluentd configuration by providing values that contain newlines.
-
-In the confirmed path, a value in `record_transformer.records` can close the current `&amp;lt;record&amp;gt;` / `&amp;lt;filter&amp;gt;` block and add a new `&amp;lt;match **&amp;gt;` block. By specifying Fluentd&amp;#x27;s core `@type exec` plugin in that injected block, an attacker can execute arbitrary commands inside the Fluentd aggregator.
-
-### Details
-
-The issue is in `FluentRender` in `pkg/sdk/logging/model/render/fluent.go`.
-
-https://github.com/kube-logging/logging-operator/blob/98275d2984aa8d731c4c975b8006aa433fc7bafa/pkg/sdk/logging/model/render/f…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kube-logging/logging-operator/security/advisories/GHSA-mjqf-28ph-426h"&gt;https://github.com/kube-logging/logging-operator/security/advisories/GHSA-mjqf-28ph-426h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kube-logging/logging-operator/commit/cf437d7f1e056c78740bf5716ac8bdebcf002425"&gt;https://github.com/kube-logging/logging-operator/commit/cf437d7f1e056c78740bf5716ac8bdebcf002425&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kube-logging/logging-operator"&gt;https://github.com/kube-logging/logging-operator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kube-logging/logging-operator/releases/tag/6.6.0"&gt;https://github.com/kube-logging/logging-operator/releases/tag/6.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mjqf-28ph-426h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-jq8w-8q2f-ffm9: ZITADEL Users Can Self-Verify Email/Phone via API</title>
-    <id>https://osv.dev/vulnerability/GHSA-jq8w-8q2f-ffm9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jq8w-8q2f-ffm9"/>
-    <published>2026-07-29T16:54:49Z</published>
-    <updated>2026-07-29T17:00:30Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54693"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;ZITADEL Users Can Self-Verify Email/Phone via API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54693&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zitadel/zitadel&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/zitadel/zitadel&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/zitadel/zitadel&lt;/code&gt; — fixed in 1.80.0-v2.20.0.20260608144108-ed09b3df7f43&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-A vulnerability in Zitadel&amp;#x27;s self-management capability allowed users to mark their email and phone as verified without going through an actual verification process.
-
-While [`GHSA-282g-fhmx-xf54`](https://github.com/zitadel/zitadel/security/advisories/GHSA-282g-fhmx-xf54) (CVE-2026-27946, &amp;quot;Users Can Self-Verify Email/Phone via UpdateHumanUser API&amp;quot;) closed the path that let any authenticated user mark an arbitrary email or phone as verified on their own account by calling `UpdateHumanUser` with `email.is_verified: true`, additional paths were discovered.
-
-### Impact 
-
-Zitadel provides an API for managing users. The API also allows users to self-manage their own data including updating the email and phone.
-
-Due to an improper permission check, the API allowed returning the verif…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/security/advisories/GHSA-jq8w-8q2f-ffm9"&gt;https://github.com/zitadel/zitadel/security/advisories/GHSA-jq8w-8q2f-ffm9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/commit/90f310212d3a5075084a603bf61fed549c92956d"&gt;https://github.com/zitadel/zitadel/commit/90f310212d3a5075084a603bf61fed549c92956d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/commit/a1748b2f0326ddf7be0de44b4f980ae2c07c0151"&gt;https://github.com/zitadel/zitadel/commit/a1748b2f0326ddf7be0de44b4f980ae2c07c0151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/commit/ed09b3df7f43e870423e4d8f2757e6894481604f"&gt;https://github.com/zitadel/zitadel/commit/ed09b3df7f43e870423e4d8f2757e6894481604f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel"&gt;https://github.com/zitadel/zitadel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/releases/tag/v3.4.11"&gt;https://github.com/zitadel/zitadel/releases/tag/v3.4.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zitadel/zitadel/releases/tag/v4.15.1"&gt;https://github.com/zitadel/zitadel/releases/tag/v4.15.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jq8w-8q2f-ffm9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4p3g-4hcj-wpvx: prebid-server's request forgery vulnerability allows for possible host environment data extraction</title>
-    <id>https://osv.dev/vulnerability/GHSA-4p3g-4hcj-wpvx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4p3g-4hcj-wpvx"/>
-    <published>2026-07-29T16:00:36Z</published>
-    <updated>2026-07-29T16:15:30Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-54735"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;prebid-server&amp;#x27;s request forgery vulnerability allows for possible host environment data extraction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54735&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/prebid/prebid-server/v4&lt;/code&gt; — fixed in 4.4.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prebid/prebid-server/v3&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prebid/prebid-server/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prebid/prebid-server&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-Certain bidder adapters accept user-supplied parameters that are interpolated into outbound request URLs. Without proper input validation, a malicious actor could craft bid request parameters that cause the server to send HTTP requests to unintended destinations, potentially exposing internal network services or sensitive server endpoints to unauthorized access.
-
-### Patches
-Patched in [v4.4.0](https://github.com/prebid/prebid-server/releases/tag/v4.4.0)
-
-### Workarounds
-If one is unable to update, please make sure that the affected bidder adapters are disabled.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prebid/prebid-server/security/advisories/GHSA-4p3g-4hcj-wpvx"&gt;https://github.com/prebid/prebid-server/security/advisories/GHSA-4p3g-4hcj-wpvx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prebid/prebid-server/pull/4802"&gt;https://github.com/prebid/prebid-server/pull/4802&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prebid/prebid-server/commit/494ac271cd4b5024df9123ef25ca3cff96390be3"&gt;https://github.com/prebid/prebid-server/commit/494ac271cd4b5024df9123ef25ca3cff96390be3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prebid/prebid-server"&gt;https://github.com/prebid/prebid-server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prebid/prebid-server/releases/tag/v4.4.0"&gt;https://github.com/prebid/prebid-server/releases/tag/v4.4.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4p3g-4hcj-wpvx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jqpm-wf57-qx5c: Weaviate has an Improper Authorization issue</title>
-    <id>https://osv.dev/vulnerability/GHSA-jqpm-wf57-qx5c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jqpm-wf57-qx5c"/>
-    <published>2026-06-08T12:30:28Z</published>
-    <updated>2026-07-29T15:52:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-11500"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Weaviate has an Improper Authorization issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-11500&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/weaviate/weaviate&lt;/code&gt; — fixed in 1.38.0-rc.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability was identified in Weaviate up to 1.37.7. This vulnerability affects the function validateConfig of the file usecases/auth/authentication/apikey/client.go of the component Static API Key Handler. The manipulation of the argument StaticApiKey leads to authorization bypass. It is possible to initiate the attack remotely. The complexity of an attack is rather high. It is stated that the exploitability is difficult. The exploit is publicly available and might be used. Upgrading to version 1.38.0-rc.0 is able to resolve this issue. The identifier of the patch is 40f2cc32279f0f8a51016c3c6870a2c0c808e6c0. You should upgrade the affected component.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-11500"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-11500&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/weaviate/weaviate/issues/11392"&gt;https://github.com/weaviate/weaviate/issues/11392&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/weaviate/weaviate/commit/40f2cc32279f0f8a51016c3c6870a2c0c808e6c0"&gt;https://github.com/weaviate/weaviate/commit/40f2cc32279f0f8a51016c3c6870a2c0c808e6c0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/weaviate/weaviate"&gt;https://github.com/weaviate/weaviate&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/weaviate/weaviate/releases/tag/v1.38.0-rc.0"&gt;https://github.com/weaviate/weaviate/releases/tag/v1.38.0-rc.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-11500"&gt;https://vuldb.com/cve/CVE-2026-11500&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/835080"&gt;https://vuldb.com/submit/835080&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/369120"&gt;https://vuldb.com/vuln/369120&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jqpm-wf57-qx5c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6000: Improper parsing of W3C baggage headers may lead to DoS in github.com/DataDog/dd-trace-go</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6000</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6000"/>
-    <published>2026-07-27T16:28:49Z</published>
-    <updated>2026-07-29T14:59:46Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-50274"/>
-    <category term="GHSA-74j5-xf3v-crq8"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Improper parsing of W3C baggage headers may lead to DoS in github.com/DataDog/dd-trace-go&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50274, GHSA-74j5-xf3v-crq8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/DataDog/dd-trace-go&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/DataDog/dd-trace-go/v2&lt;/code&gt; — fixed in 2.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper parsing of W3C baggage headers may lead to DoS in github.com/DataDog/dd-trace-go&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-go/security/advisories/GHSA-74j5-xf3v-crq8"&gt;https://github.com/DataDog/dd-trace-go/security/advisories/GHSA-74j5-xf3v-crq8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6000"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,48 @@
   <title>OSV — new &amp; updated vulnerabilities: Maven (Java)</title>
   <subtitle>Open-source vulns affecting Maven (Java) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:maven</id>
-  <updated>2026-08-02T02:59:55Z</updated>
+  <updated>2026-08-02T03:56:47Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/maven.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-x8mg-6r4p-87pf: ArcadeDB has cross-database IDOR: /ts/*, /batch/*, Prometheus and Grafana handlers bypass authorization</title>
+    <id>https://osv.dev/vulnerability/GHSA-x8mg-6r4p-87pf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x8mg-6r4p-87pf"/>
+    <published>2026-07-16T20:20:22Z</published>
+    <updated>2026-08-02T03:56:47Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-67342"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ArcadeDB has cross-database IDOR: /ts/*, /batch/*, Prometheus and Grafana handlers bypass authorization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-67342&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;com.arcadedb:arcadedb-server&lt;/code&gt; — fixed in 26.7.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;About 14 HTTP handlers resolve the {database} path param and call getDatabase(...) WITHOUT user.canAccessToDatabase(...) and without setting the engine principal, because they extend AbstractServerHttpHandler directly instead of DatabaseAbstractHandler (which holds the only per-database gate at DatabaseAbstractHandler.java:69,88-90). Affected: PostBatchHandler:129, PostTimeSeriesWriteHandler:115, PostPrometheusWriteHandler:83, PostTimeSeriesQueryHandler:69, GetTimeSeriesLatestHandler:58, PostGrafanaQueryHandler:69, GetGrafanaHealthHandler:49, GetGrafanaMetadataHandler:52, GetPromQLQueryHandler:63, GetPromQLQueryRangeHandler:71, GetPromQLLabelsHandler:56, GetPromQLLabelValuesHandler:62, GetPromQLSeriesHandler:72, PostPrometheusReadHandler:85. The engine fallback is also void: LocalDatabase.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb/security/advisories/GHSA-x8mg-6r4p-87pf"&gt;https://github.com/ArcadeData/arcadedb/security/advisories/GHSA-x8mg-6r4p-87pf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb"&gt;https://github.com/ArcadeData/arcadedb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb/releases/tag/26.7.2"&gt;https://github.com/ArcadeData/arcadedb/releases/tag/26.7.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x8mg-6r4p-87pf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-x9f9-r4m8-9xc2: ArcadeDB: Trigger scripts run with java.lang.* allowed, enabling OS command execution (RCE)</title>
+    <id>https://osv.dev/vulnerability/GHSA-x9f9-r4m8-9xc2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x9f9-r4m8-9xc2"/>
+    <published>2026-07-16T20:15:36Z</published>
+    <updated>2026-08-02T03:56:46Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-67340"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ArcadeDB: Trigger scripts run with java.lang.* allowed, enabling OS command execution (RCE)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-67340&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;com.arcadedb:arcadedb-engine&lt;/code&gt; — fixed in 26.7.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;ScriptTriggerExecutor sets allowedPackages to java.lang.*, java.util.*, java.time.*, java.math.* (ScriptTriggerExecutor.java:56); trigger creation is gated only at UPDATE_SCHEMA (LocalSchema.createTrigger:636). Permitting java.lang.* host-class lookup lets a trigger script do Java.type(&amp;quot;java.lang.Runtime&amp;quot;).getRuntime().exec(...) (or ProcessBuilder). The reflection denylist does not block Java.type host lookups, and allowCreateProcess(false) only restricts GraalVM&amp;#x27;s guest process API, not a host Runtime.exec reached through HostAccess.ALL.
+
+Exploit: a user with UPDATE_SCHEMA (schema admin, strictly less than security admin) runs CREATE TRIGGER ... EXECUTE JAVASCRIPT &amp;#x27;&amp;lt;runtime.exec&amp;gt;&amp;#x27; and obtains OS RCE when the trigger fires.
+
+Fix: remove java.lang.* (and narrow the rest) from the trigger al…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb/security/advisories/GHSA-x9f9-r4m8-9xc2"&gt;https://github.com/ArcadeData/arcadedb/security/advisories/GHSA-x9f9-r4m8-9xc2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb"&gt;https://github.com/ArcadeData/arcadedb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb/releases/tag/26.7.2"&gt;https://github.com/ArcadeData/arcadedb/releases/tag/26.7.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x9f9-r4m8-9xc2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vwjc-v7x7-cm6g: ArcadeDB: Scripting authorization gate (GHSA-48qw-824m-86pr) bypassed via SQL DEFINE FUNCTION ... LANGUAGE js</title>
+    <id>https://osv.dev/vulnerability/GHSA-vwjc-v7x7-cm6g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vwjc-v7x7-cm6g"/>
+    <published>2026-07-16T20:17:42Z</published>
+    <updated>2026-08-02T03:56:44Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-67341"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ArcadeDB: Scripting authorization gate (GHSA-48qw-824m-86pr) bypassed via SQL DEFINE FUNCTION ... LANGUAGE js&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-67341&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;com.arcadedb:arcadedb-engine&lt;/code&gt; — fixed in 26.7.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The GHSA-48qw-824m-86pr hardening added a checkPermissionsOnDatabase(UPDATE_SECURITY) gate on the polyglot engine (PolyglotQueryEngine.java:112-114,126,176,199), but only there. The SQL route to JavaScript never touches it: DefineFunctionStatement.executeSimple (DefineFunctionStatement.java:37-100), LocalSchema.registerFunctionLibrary, and SQLQueryEngine library-function invocation (SQLQueryEngine.java:198-224) do no scripting-permission check.
+
+Exploit: any user authorized for the DB (including a read-only role) runs POST /api/v1/command/&amp;lt;db&amp;gt; {&amp;quot;language&amp;quot;:&amp;quot;sql&amp;quot;,&amp;quot;command&amp;quot;:&amp;quot;DEFINE FUNCTION x.run \&amp;quot;&amp;lt;js&amp;gt;\&amp;quot; LANGUAGE js&amp;quot;} then SELECT x.run(), executing arbitrary JavaScript and defeating the control meant to restrict scripting to security admins. On this path allowedPackages is empty so Java.type…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb/security/advisories/GHSA-vwjc-v7x7-cm6g"&gt;https://github.com/ArcadeData/arcadedb/security/advisories/GHSA-vwjc-v7x7-cm6g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb"&gt;https://github.com/ArcadeData/arcadedb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb/releases/tag/26.7.2"&gt;https://github.com/ArcadeData/arcadedb/releases/tag/26.7.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vwjc-v7x7-cm6g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-88fw-v6x4-3f58: Spring Data: Unbounded property-path cache keyed by externally-supplied path string</title>
     <id>https://osv.dev/vulnerability/GHSA-88fw-v6x4-3f58</id>

@@ -3,12 +3,266 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-08-02T12:47:44Z</updated>
+  <updated>2026-08-03T21:30:27Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-m2h6-j472-rp4c: python-cryptography verifier accepts wildcard DNS names allowing escape from permittedSubtrees</title>
+    <id>https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c"/>
+    <published>2026-08-03T21:26:57Z</published>
+    <updated>2026-08-03T21:30:27Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69248"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;python-cryptography verifier accepts wildcard DNS names allowing escape from permittedSubtrees&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69248&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:H/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cryptography&lt;/code&gt; — fixed in 49.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+If an intermediate constrained CA permits the DNS name `foo.example.com`, and the leaf certificate has a wildcard in its DNS SAN of `*.example.com`, python-cryptography&amp;#x27;s verifier accepts which allows escaping outside of the permitted names.
+
+### PoC
+
+```
+#!/usr/bin/env python3
+&amp;quot;&amp;quot;&amp;quot;Standalone PoC: pyca&amp;#x27;s DNSConstraint::matches admits a too-broad wildcard SAN.
+
+Setup:
+  Sub-CA permitted constraint: dNSName = foo.example.com
+  Leaf SAN:                    dNSName = *.example.com
+Expected: rejection (RFC 5280 §4.2.1.10 + standard wildcard semantics).
+Observed: pyca accepts; further, asks server-verifier whether the leaf is
+authoritative for `bar.example.com` and pyca answers yes — a sub-CA scope
+escape.
+&amp;quot;&amp;quot;&amp;quot;
+import datetime
+from cryptography import x509
+from cryptography.x509.oid im…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/security/advisories/GHSA-m2h6-j472-rp4c"&gt;https://github.com/pyca/cryptography/security/advisories/GHSA-m2h6-j472-rp4c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/pull/14888"&gt;https://github.com/pyca/cryptography/pull/14888&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/commit/4d035a4225965edeffd312079a510ef25fcfdcb2"&gt;https://github.com/pyca/cryptography/commit/4d035a4225965edeffd312079a510ef25fcfdcb2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography"&gt;https://github.com/pyca/cryptography&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g6cj-pr64-35w5: cryptography: PKCS#7 EnvelopedData decryption exposes a Bleichenbacher oracle through distinguishable errors and timing</title>
+    <id>https://osv.dev/vulnerability/GHSA-g6cj-pr64-35w5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6cj-pr64-35w5"/>
+    <published>2026-08-03T21:17:00Z</published>
+    <updated>2026-08-03T21:30:27Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69247"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;cryptography: PKCS#7 EnvelopedData decryption exposes a Bleichenbacher oracle through distinguishable errors and timing&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69247&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cryptography&lt;/code&gt; — fixed in 50.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`pkcs7_decrypt_der`, `pkcs7_decrypt_pem`, and `pkcs7_decrypt_smime` reported the
+outcome of decrypting a `RecipientInfo`&amp;#x27;s `encryptedKey` in several
+distinguishable ways, one of which disclosed the exact length recovered from the
+RSA operation. The same distinction was also observable by timing. An
+application that decrypts attacker-supplied `EnvelopedData` and reflects the
+outcome gives the attacker a Bleichenbacher oracle against the
+content-encryption key.
+
+Introduced in 44.0.0. Fixed in 50.0.0.
+
+### Details
+
+Decryption ran as: RSA PKCS#1 v1.5 decrypt of `encryptedKey` → build an AES
+cipher from the result → AES-CBC decrypt and PKCS#7 unpad. Each stage failed
+differently, with no RFC 3218 mitigation:
+
+1. invalid RSA padding → `Decryption failed`
+2. valid padding, bad key le…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/security/advisories/GHSA-g6cj-pr64-35w5"&gt;https://github.com/pyca/cryptography/security/advisories/GHSA-g6cj-pr64-35w5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/pull/15369"&gt;https://github.com/pyca/cryptography/pull/15369&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/commit/53fccd93413a8d7f07d6d8999681f27b75cffa3f"&gt;https://github.com/pyca/cryptography/commit/53fccd93413a8d7f07d6d8999681f27b75cffa3f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography"&gt;https://github.com/pyca/cryptography&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6cj-pr64-35w5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jwv3-5hgf-82ww: python-cryptography: Duplicate self-signed intermediates can cause exponential path-building</title>
+    <id>https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww"/>
+    <published>2026-08-03T21:26:50Z</published>
+    <updated>2026-08-03T21:30:27Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69249"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;python-cryptography: Duplicate self-signed intermediates can cause exponential path-building&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69249&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cryptography&lt;/code&gt; — fixed in 49.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+When resolving invalid certificate chains that include duplicate copies of self-signed certificates, the processing recursively invokes the same candidate, leading to an exponential blowup. Although the limitation that the chain depth cannot exceed a specified maximum depth prevents unbounded recursion and guarantees termination, an attacker-controlled certificate chain can lead the processing to easily take more than 5s to reject in testing. This amplification could form the basis for a resource exhaustion denial of service attack.
+
+This work was completed by Trail of Bits as part of the Patch The Planet project in collaboration with OpenAI. The finding was identified primarily by the Codex coding agent, and manually reviewed before submission. 
+
+### Details
+The core issue ari…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/security/advisories/GHSA-jwv3-5hgf-82ww"&gt;https://github.com/pyca/cryptography/security/advisories/GHSA-jwv3-5hgf-82ww&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/pull/14960"&gt;https://github.com/pyca/cryptography/pull/14960&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/commit/4a12cf49675a184e47f912b00b04f3a629283582"&gt;https://github.com/pyca/cryptography/commit/4a12cf49675a184e47f912b00b04f3a629283582&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography"&gt;https://github.com/pyca/cryptography&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-11503: Malicious code in instalogin1234 (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-11503</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11503"/>
+    <published>2026-08-03T20:34:47Z</published>
+    <updated>2026-08-03T21:02:35Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in instalogin1234 (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;instalogin1234&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: kam193 (f6ed64b38b3e872668e1d36a02c53136da1ab70ec9dacd2ac3b7d38c31794ebe)
+The package promises to be an Instagram CLI and offers &amp;quot;login&amp;quot;. Entered credentials are sent to a Discord channel, and the user is presented with the Instagram website just opened in the browser.
+
+
+---
+
+Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
+
+
+Campaign: 2026-08-instalogin1234
+
+
+Reasons (based on the campaign):
+
+
+ - exfiltration-credentials
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/instalogin1234"&gt;https://bad-packages.kam193.eu/pypi/package/instalogin1234&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11503"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mfx4-hv73-q22v: AIOHTTP: HTTP request smuggling via WebSocket upgrade</title>
+    <id>https://osv.dev/vulnerability/GHSA-mfx4-hv73-q22v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mfx4-hv73-q22v"/>
+    <published>2026-08-03T20:46:10Z</published>
+    <updated>2026-08-03T21:00:23Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69243"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: HTTP request smuggling via WebSocket upgrade&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69243&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The HTTP parsers were vulnerable to a request smuggling attack relating to WebSocket upgrades.
+
+### Impact
+
+If using the server-side component, it may be possible for an attacker to execute a request smuggling vulnerability using an edge case in the WebSocket upgrade procedure. AIOHTT is unaware of any public exploit code.
+
+---
+
+Patch: https://github.com/aio-libs/aiohttp/commit/6ae358f0983c3f4d6f67692b2f8e65dc8e091c98&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-mfx4-hv73-q22v"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-mfx4-hv73-q22v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/pull/13017"&gt;https://github.com/aio-libs/aiohttp/pull/13017&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/6ae358f0983c3f4d6f67692b2f8e65dc8e091c98"&gt;https://github.com/aio-libs/aiohttp/commit/6ae358f0983c3f4d6f67692b2f8e65dc8e091c98&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.2"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mfx4-hv73-q22v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-cq5v-8q36-5273: AIOHTTP: Out-of-bounds heap read in C HTTP response parser error path (malformed chunked response)</title>
+    <id>https://osv.dev/vulnerability/GHSA-cq5v-8q36-5273</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cq5v-8q36-5273"/>
+    <published>2026-08-03T20:51:13Z</published>
+    <updated>2026-08-03T21:00:23Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69244"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: Out-of-bounds heap read in C HTTP response parser error path (malformed chunked response)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69244&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+An out-of-bounds heap read could occur in the C response parser while building an error message for a malformed response.
+
+### Impact
+
+An attacker controlled server, or possibly an accidental response could trigger a DoS in the client.
+
+### Workaround
+
+If unable to upgrade, the Python parser is unaffected and can be used with `AIOHTTP_NO_EXTENSIONS=1`.
+
+---
+
+Patch: https://github.com/aio-libs/aiohttp/commit/49f65d54150397892f7bcc4aae887767d51c322d&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-cq5v-8q36-5273"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-cq5v-8q36-5273&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/pull/13223"&gt;https://github.com/aio-libs/aiohttp/pull/13223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/49f65d54150397892f7bcc4aae887767d51c322d"&gt;https://github.com/aio-libs/aiohttp/commit/49f65d54150397892f7bcc4aae887767d51c322d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.3"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cq5v-8q36-5273"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mq44-7p77-q5h7: AIOHTTP: WebSocket client accepts compressed frames without negotiated permessage-deflate</title>
+    <id>https://osv.dev/vulnerability/GHSA-mq44-7p77-q5h7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mq44-7p77-q5h7"/>
+    <published>2026-08-03T20:40:55Z</published>
+    <updated>2026-08-03T20:45:22Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-59881"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: WebSocket client accepts compressed frames without negotiated permessage-deflate&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59881&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The client accepts and decompresses frames with the RSV1 bit set even when the `permessage-deflate` extension was not negotiated.
+
+### Impact
+
+A client may unexpectedly decompress WebSocket frames when explicitly opted out. This could lead to additional CPU/memory consumption, but is unlikely to be a significant issue unless a zip bomb vulnerability or similar is also present.
+
+---
+
+Patch: https://github.com/aio-libs/aiohttp/commit/47fb6ae354d4fa22048f4dbe7dbf82b625f0a2f6&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-mq44-7p77-q5h7"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-mq44-7p77-q5h7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59881"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59881&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/pull/12978"&gt;https://github.com/aio-libs/aiohttp/pull/12978&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/47fb6ae354d4fa22048f4dbe7dbf82b625f0a2f6"&gt;https://github.com/aio-libs/aiohttp/commit/47fb6ae354d4fa22048f4dbe7dbf82b625f0a2f6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://github.com/aio-libs/aiohttp/releases/tag/v3.14.2"&gt;http://github.com/aio-libs/aiohttp/releases/tag/v3.14.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mq44-7p77-q5h7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3936-cmfr-pm3m: Black: Arbitrary file writes from unsanitized user input in cache file name</title>
+    <id>https://osv.dev/vulnerability/GHSA-3936-cmfr-pm3m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3936-cmfr-pm3m"/>
+    <published>2026-03-12T18:33:10Z</published>
+    <updated>2026-08-03T20:45:22Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-32274"/>
+    <category term="PYSEC-2026-2121"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Black: Arbitrary file writes from unsanitized user input in cache file name&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-32274, PYSEC-2026-2121&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;black&lt;/code&gt; — fixed in 26.3.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Black writes a cache file, the name of which is computed from various formatting options. The value of the `--python-cell-magics` option was placed in the filename without sanitization, which allowed an attacker who controls the value of this argument to write cache files to arbitrary file system locations. 
+
+### Patches
+
+Fixed in Black 26.3.1.
+
+### Workarounds
+
+Do not allow untrusted user input into the value of the `--python-cell-magics` option.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/psf/black/security/advisories/GHSA-3936-cmfr-pm3m"&gt;https://github.com/psf/black/security/advisories/GHSA-3936-cmfr-pm3m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-32274"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-32274&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/psf/black/pull/4176"&gt;https://github.com/psf/black/pull/4176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/psf/black/pull/5038"&gt;https://github.com/psf/black/pull/5038&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/psf/black/commit/4937fe6cf241139ddbfc16b0bdbb5b422798909d"&gt;https://github.com/psf/black/commit/4937fe6cf241139ddbfc16b0bdbb5b422798909d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/psf/black/commit/ed770ba4dd50c419148a0fca2b43937a7447e1f9"&gt;https://github.com/psf/black/commit/ed770ba4dd50c419148a0fca2b43937a7447e1f9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:10184"&gt;https://access.redhat.com/errata/RHSA-2026:10184&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:13545"&gt;https://access.redhat.com/errata/RHSA-2026:13545&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3936-cmfr-pm3m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-539m-9xh6-q6rr: GitPython: Incomplete unsafe_git_archive_options denylist omits --add-file / --add-virtual-file, enabling arbitrary file read via Repo.archive()</title>
+    <id>https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr"/>
+    <published>2026-08-03T20:14:28Z</published>
+    <updated>2026-08-03T20:30:18Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Incomplete unsafe_git_archive_options denylist omits --add-file / --add-virtual-file, enabling arbitrary file read via Repo.archive()&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.57&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Target:** gitpython-developers/GitPython
+**Tested:** HEAD `07e80555` (2026-07-25), latest release 3.1.55, `git version 2.50.1`
+
+## Summary
+
+`Repo.archive()` does call the option guard, so this is not a missing-guard report. The guard is present and working; the **denylist it consults is incomplete**.
+
+```python
+# git/repo/base.py:169
+unsafe_git_archive_options = [
+    # Allows arbitrary command execution through the remote git-upload-archive command.
+    &amp;quot;--exec&amp;quot;,
+    # Writes output to a caller-controlled filesystem path.
+    &amp;quot;--output&amp;quot;,
+    &amp;quot;-o&amp;quot;,
+]
+```
+
+The comment on `--output` states the protected class in the project&amp;#x27;s own words: an option that lets the caller name **a filesystem path** is unsafe. `--output` is blocked because it *writes* to a caller-chosen path.
+
+`git archive` also…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-539m-9xh6-q6rr"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-539m-9xh6-q6rr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2193"&gt;https://github.com/gitpython-developers/GitPython/pull/2193&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/7a4f5dcb7bf3cbcbf6e438017efcdfe0bc0d36ca"&gt;https://github.com/gitpython-developers/GitPython/commit/7a4f5dcb7bf3cbcbf6e438017efcdfe0bc0d36ca&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p538-c434-8v24: GitPython: Arbitrary file truncation via git rev-list --output argument injection in unguarded Commit.count</title>
+    <id>https://osv.dev/vulnerability/GHSA-p538-c434-8v24</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p538-c434-8v24"/>
+    <published>2026-08-03T20:23:17Z</published>
+    <updated>2026-08-03T20:30:18Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Arbitrary file truncation via git rev-list --output argument injection in unguarded Commit.count&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.56&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+`Commit.count()` forwards `**kwargs` into `rev_list` with **no** `check_unsafe_options` guard (the guard exists only in the sibling `iter_items`, commit.py:341). `git rev-list --output=&amp;lt;path&amp;gt;` opens and truncates the target file to 0 bytes before revision parsing, so `count(output=&amp;#x27;/victim&amp;#x27;)` destroys/blanks an arbitrary file.
+
+## Root Cause
+`commit.py:290-291` calls `self.repo.git.rev_list(self.hexsha, **kwargs)` with no `check_unsafe_options` and no `allow_unsafe_options` parameter. The sibling `iter_items` (commit.py:341) is guarded; `count` is not. This is a distinct, uncovered sink — GHSA-956x-8gvw-wg5v fixed `iter_commits`/`blame`, not `count`.
+
+## Impact
+Destroy/blank an arbitrary file at process privilege (integrity/availability). Reachability is key-control only (`count…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-p538-c434-8v24"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-p538-c434-8v24&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2184"&gt;https://github.com/gitpython-developers/GitPython/pull/2184&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/38553b6fddc7f6a667cdb45a6762343a08fc72b2"&gt;https://github.com/gitpython-developers/GitPython/commit/38553b6fddc7f6a667cdb45a6762343a08fc72b2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.56"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.56&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p538-c434-8v24"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3f7w-8rr8-f37f: GitPython: Unguarded git option forwarding in IndexFile.checkout() and TagReference.create() enables arbitrary file overwrite and arbitrary file read</title>
+    <id>https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f"/>
+    <published>2026-08-03T20:09:56Z</published>
+    <updated>2026-08-03T20:15:17Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Unguarded git option forwarding in IndexFile.checkout() and TagReference.create() enables arbitrary file overwrite and arbitrary file read&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.57&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Target:** gitpython-developers/GitPython
+**Tested:** HEAD `07e80555` (2026-07-25), latest release 3.1.55, `git version 2.50.1`
+**Reported instances:** 2 exploitable, from a sweep of 14 unguarded call sites
+
+## Summary
+
+GitPython blocks dangerous git options through `Git.check_unsafe_options()`, gated per method by an `allow_unsafe_options` parameter. That guard is applied **per call site**, so any API that forwards `**kwargs` into a git command without calling it passes caller-controlled options straight to git.
+
+A mechanical sweep of every method that forwards `**kwargs` into a `.git.&amp;lt;command&amp;gt;(...)` call found **14 sites with no guard**. Two reach a git option that takes a filesystem path:
+
+| # | Call site | git option | Impact |
+|---|---|---|---|
+| 1 | `IndexFile.checkout()` → `git che…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3f7w-8rr8-f37f"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3f7w-8rr8-f37f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2193"&gt;https://github.com/gitpython-developers/GitPython/pull/2193&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/3af0c2516c5e18c829da30338614688f6b69b49c"&gt;https://github.com/gitpython-developers/GitPython/commit/3af0c2516c5e18c829da30338614688f6b69b49c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-11429: Malicious code in trongriden (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-11429</id>
@@ -200,203 +454,5 @@ File: git/config.py — GitPython 3.1.49 (latest patched version)
 ### Summary
 
 The 3.1.47 fix for CVE-2026-42215 blocks dangerous git options (`--upload-pack`, `--config`, `-c`, `-u` for clone; `--upload-pack` for fetch/pull; `-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-2f96-g7mh-g2hx"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-2f96-g7mh-g2hx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2161"&gt;https://github.com/gitpython-developers/GitPython/pull/2161&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/56806080c1348749b07daa4a2024ce47b3cad285"&gt;https://github.com/gitpython-developers/GitPython/commit/56806080c1348749b07daa4a2024ce47b3cad285&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.51"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.51&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2f96-g7mh-g2hx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-m4p7-r5rc-7g4j: pyasn1 BER/CER/DER decoder denial of service via unbounded long-form tag IDs</title>
-    <id>https://osv.dev/vulnerability/GHSA-m4p7-r5rc-7g4j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m4p7-r5rc-7g4j"/>
-    <published>2026-07-21T19:10:11Z</published>
-    <updated>2026-08-02T02:59:55Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59884"/>
-    <category term="PYSEC-2026-3455"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;pyasn1 BER/CER/DER decoder denial of service via unbounded long-form tag IDs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59884, PYSEC-2026-3455&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pyasn1&lt;/code&gt; — fixed in 0.6.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-The BER decoder (shared by the CER and DER codecs) parses long-form tags by accumulating continuation octets in a loop with no upper bound on the size of the tag ID. A crafted input can force the decoder to build an arbitrarily large integer, with CPU cost growing quadratically in input size — a ~1 MB input consumes over a minute of CPU. On Python 3.11+, the oversized tag ID can also trigger an unhandled `ValueError` (integer string conversion limit) while the decoder formats error messages, violating the documented `PyAsn1Error` contract and potentially bypassing caller error handling.
-
-Any application decoding untrusted BER/CER/DER input is affected.
-
-### Affected components
-- `pyasn1.codec.ber.decoder` — `decode()` and `StreamingDecoder`
-- `pyasn1.codec.cer.decoder` and `pyas…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pyasn1/pyasn1/security/advisories/GHSA-m4p7-r5rc-7g4j"&gt;https://github.com/pyasn1/pyasn1/security/advisories/GHSA-m4p7-r5rc-7g4j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59884"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59884&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyasn1/pyasn1/commit/628e36ecbb5277a3f01572ce418ef54271b165a5"&gt;https://github.com/pyasn1/pyasn1/commit/628e36ecbb5277a3f01572ce418ef54271b165a5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyasn1/pyasn1"&gt;https://github.com/pyasn1/pyasn1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyasn1/pyasn1/releases/tag/v0.6.4"&gt;https://github.com/pyasn1/pyasn1/releases/tag/v0.6.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/pyasn1/PYSEC-2026-3455.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/pyasn1/PYSEC-2026-3455.yaml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m4p7-r5rc-7g4j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2026-2946: PraisonAI: Coarse-Grained Tool Approval Cache Bypasses Per-Invocation Consent for Shell Commands</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-2946</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-2946"/>
-    <published>2026-07-13T14:36:52Z</published>
-    <updated>2026-08-01T18:26:32Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-56074"/>
-    <category term="GHSA-ffp3-3562-8cv3"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;PraisonAI: Coarse-Grained Tool Approval Cache Bypasses Per-Invocation Consent for Shell Commands&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56074, GHSA-ffp3-3562-8cv3&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;praisonaiagents&lt;/code&gt; — fixed in 4.5.128&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The approval system in PraisonAI Agents caches tool approval decisions by tool name only, not by invocation arguments. Once a user approves `execute_command` for any command (e.g., `ls -la`), all subsequent `execute_command` calls in that execution context bypass the approval prompt entirely. Combined with `os.environ.copy()` passing all process environment variables to subprocesses, this allows an LLM agent (potentially via prompt injection) to silently exfiltrate API keys and credentials without further user consent.
-
-## Details
-
-The `require_approval` decorator in `src/praisonai-agents/praisonaiagents/approval/__init__.py:176-178` checks approval status by tool name only:
-
-```python
-@wraps(func)
-def wrapper(*args, **kwargs):
-    if is_already_approved(tool_name):   # line 17…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-ffp3-3562-8cv3"&gt;https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-ffp3-3562-8cv3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-56074"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-56074&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI"&gt;https://github.com/MervinPraison/PraisonAI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/releases/tag/v4.5.128"&gt;https://github.com/MervinPraison/PraisonAI/releases/tag/v4.5.128&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/praisonai-tool-approval-cache-bypass-via-coarse-grained-caching"&gt;https://www.vulncheck.com/advisories/praisonai-tool-approval-cache-bypass-via-coarse-grained-caching&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/praisonaiagents"&gt;https://pypi.org/project/praisonaiagents&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-ffp3-3562-8cv3"&gt;https://github.com/advisories/GHSA-ffp3-3562-8cv3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-2946"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-11426: Malicious code in trtllm-subdir-test (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11426</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11426"/>
-    <published>2026-08-01T10:57:24Z</published>
-    <updated>2026-08-01T12:02:29Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in trtllm-subdir-test (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;trtllm-subdir-test&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (e8cdbb30c1c2ddf88a76d18b935d4accf68155f936b5df59a8864fafd7f4e06f)
-Installing the package or importing the module exfiltrates basic information about the host, and the package has no other purpose.
-
-
----
-
-Category: PROBABLY_PENTEST - Packages looking like typical pentest packages, but also anything that looks like testing, exploring pre-prepared kits, research &amp;amp; co, with clearly low-harm possibilities.
-
-
-Campaign: GENERIC-standard-pypi-install-pentest
-
-
-Reasons (based on the campaign):
-
-
- - The package contains code to exfiltrate basic data from the system, like IP or username. It has a limited risk.
-
-
- - The package overrides the install command in setup.py to execute malicious code during installation.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/trtllm-subdir-test"&gt;https://bad-packages.kam193.eu/pypi/package/trtllm-subdir-test&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11426"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-11425: Malicious code in nvtorch-oot-nightly (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11425</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11425"/>
-    <published>2026-08-01T10:58:03Z</published>
-    <updated>2026-08-01T12:02:29Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in nvtorch-oot-nightly (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nvtorch-oot-nightly&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (0f81b904b849df393cbe5c34f952af65d8b28e0797e33d62cf964df77d4929c7)
-Installing the package or importing the module exfiltrates basic information about the host, and the package has no other purpose.
-
-
----
-
-Category: PROBABLY_PENTEST - Packages looking like typical pentest packages, but also anything that looks like testing, exploring pre-prepared kits, research &amp;amp; co, with clearly low-harm possibilities.
-
-
-Campaign: GENERIC-standard-pypi-install-pentest
-
-
-Reasons (based on the campaign):
-
-
- - The package contains code to exfiltrate basic data from the system, like IP or username. It has a limited risk.
-
-
- - The package overrides the install command in setup.py to execute malicious code during installation.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/nvtorch-oot-nightly"&gt;https://bad-packages.kam193.eu/pypi/package/nvtorch-oot-nightly&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11425"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-11424: Malicious code in telerape (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11424</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11424"/>
-    <published>2026-07-31T22:25:45Z</published>
-    <updated>2026-07-31T23:02:30Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in telerape (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;telerape&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (21e8fc4f3dd969ec103ff1cb8a5bdba0d465bffffabe2615bc38d8e00606cffa)
-Package places a reverse shell in the PTH file. In analyzed versions, the target was on localhost.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-07-telerape
-
-
-Reasons (based on the campaign):
-
-
- - The package contains code to create a reverse shell, allowing an attacker to execute any commands on the victim&amp;#x27;s machine.
-
-
- - abuses-pth
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/telerape"&gt;https://bad-packages.kam193.eu/pypi/package/telerape&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11424"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-c5px-58j2-7fqp: gemini-bridge vulnerable to arbitrary local file read via consult_gemini_with_files inline mode</title>
-    <id>https://osv.dev/vulnerability/GHSA-c5px-58j2-7fqp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c5px-58j2-7fqp"/>
-    <published>2026-07-31T22:31:20Z</published>
-    <updated>2026-07-31T22:45:23Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54785"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;gemini-bridge vulnerable to arbitrary local file read via consult_gemini_with_files inline mode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54785&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gemini-bridge&lt;/code&gt; — fixed in 1.3.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-`consult_gemini_with_files` in **inline mode** read any file path supplied in
-the `files` argument without confining it to the working `directory`, then
-forwarded the contents to the Gemini CLI. Because the caller also controls
-`query`, the file contents are echoed back through the Gemini round-trip
-(and sent to Google), making this an arbitrary local file read.
-
-### Impact
-An MCP client — or an LLM that has been prompt-injected into calling the tool —
-can read **any file the server process can access** (SSH keys, cloud
-credentials, `.env`, source) and have it disclosed via the tool response.
-No code execution by itself.
-
-### Affected component
-- Tool: `consult_gemini_with_files(query, directory, files, …)`, `mode=&amp;quot;inline&amp;quot;`
-- Sink: `_read_file_for_inline` via `_prepare_inline_p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eLyiN/gemini-bridge/security/advisories/GHSA-c5px-58j2-7fqp"&gt;https://github.com/eLyiN/gemini-bridge/security/advisories/GHSA-c5px-58j2-7fqp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eLyiN/gemini-bridge/pull/9"&gt;https://github.com/eLyiN/gemini-bridge/pull/9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eLyiN/gemini-bridge/commit/8f3b85afd02b692c4bc974b5176e12fb277ea801"&gt;https://github.com/eLyiN/gemini-bridge/commit/8f3b85afd02b692c4bc974b5176e12fb277ea801&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eLyiN/gemini-bridge"&gt;https://github.com/eLyiN/gemini-bridge&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eLyiN/gemini-bridge/releases/tag/v1.3.1"&gt;https://github.com/eLyiN/gemini-bridge/releases/tag/v1.3.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c5px-58j2-7fqp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-89gg-p5r5-q6r4: MONAI: Unsafe functions lead to pickle deserialization rce</title>
-    <id>https://osv.dev/vulnerability/GHSA-89gg-p5r5-q6r4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-89gg-p5r5-q6r4"/>
-    <published>2026-04-07T20:17:21Z</published>
-    <updated>2026-07-31T22:15:22Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;MONAI: Unsafe functions lead to pickle deserialization rce&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:H/UI:R/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;monai&lt;/code&gt; — fixed in 1.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The `algo_from_pickle` function in `monai/auto3dseg/utils.py` causes `pickle.loads(data_bytes)` to be executed, and it does not perform any validation on the input parameters. This ultimately leads to insecure deserialization and can result in code execution vulnerabilities.
-
-### Details
-poc
-```
-import pickle
-import subprocess
-class MaliciousAlgo:
-    def __reduce__(self):
-        return (subprocess.call, ([&amp;#x27;calc.exe&amp;#x27;],))
-malicious_algo_bytes = pickle.dumps(MaliciousAlgo())
-
-attack_data = {
-    &amp;quot;algo_bytes&amp;quot;: malicious_algo_bytes,  
-     
-}
-attack_pickle_file = &amp;quot;attack_algo.pkl&amp;quot;
-with open(attack_pickle_file, &amp;quot;wb&amp;quot;) as f:
-    f.write(pickle.dumps(attack_data))
-
-```
-Generate the malicious file &amp;quot;attack_algo.pkl&amp;quot; through POC.
-
-```
-from monai.auto3dseg.utils import algo_from_pickle
-
-
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI/security/advisories/GHSA-89gg-p5r5-q6r4"&gt;https://github.com/Project-MONAI/MONAI/security/advisories/GHSA-89gg-p5r5-q6r4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI/issues/8874#issuecomment-4752023161"&gt;https://github.com/Project-MONAI/MONAI/issues/8874#issuecomment-4752023161&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI/commit/9078a72f3992e49bd4560db510be9ec4ccf972cc"&gt;https://github.com/Project-MONAI/MONAI/commit/9078a72f3992e49bd4560db510be9ec4ccf972cc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI"&gt;https://github.com/Project-MONAI/MONAI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI/releases/tag/1.6.0"&gt;https://github.com/Project-MONAI/MONAI/releases/tag/1.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-89gg-p5r5-q6r4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

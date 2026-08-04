@@ -3,12 +3,486 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-08-04T09:49:47Z</updated>
+  <updated>2026-08-04T18:15:17Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-wch5-xp77-fxg4: Flowise: Cross-Workspace OAuth2 Credential Metadata Leak</title>
+    <id>https://osv.dev/vulnerability/GHSA-wch5-xp77-fxg4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wch5-xp77-fxg4"/>
+    <published>2026-08-04T18:01:29Z</published>
+    <updated>2026-08-04T18:15:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-70474"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Cross-Workspace OAuth2 Credential Metadata Leak&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-70474&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Three OAuth2 credential endpoints look up credentials by `id` alone with no `workspaceId` filter. Two of these endpoints (`callback`, `refresh`) are whitelisted from all authentication. This allows:
+
+1. **Cross-workspace credential access** — Any authenticated user can initiate OAuth2 flows against credentials belonging to other workspaces.
+2. **Unauthenticated token injection** — An unauthenticated attacker can forge OAuth2 callbacks to overwrite tokens in any credential.
+3. **Unauthenticated token refresh** — An unauthenticated attacker can refresh tokens for any credential.
+
+---
+
+## Root Cause
+
+### Vulnerable code: no workspace scoping
+
+All three OAuth2 handlers query the `Credential` table by `id` only:
+
+**`packages/server/src/routes/oauth2/index.ts:80-82`** (authorize)
+```…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-wch5-xp77-fxg4"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-wch5-xp77-fxg4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wch5-xp77-fxg4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-x6vm-w76m-8j7g: Flowise: Remote Code Execution Vulnerability in CSVAgent</title>
+    <id>https://osv.dev/vulnerability/GHSA-x6vm-w76m-8j7g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x6vm-w76m-8j7g"/>
+    <published>2026-08-04T15:46:20Z</published>
+    <updated>2026-08-04T18:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69256"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Remote Code Execution Vulnerability in CSVAgent&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69256&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The CSVAgent node was observed to allow users to write Python code which gets executed via `pyodide`. The original intent was to allow users to utilise the `pandas` library for CSV processing. Although there is a denylist that checks for dangerous Python constructs from being passed in, `pandas` has a `read_pickle()` [function](https://pandas.pydata.org/docs/reference/api/pandas.read_pickle.html) that deserialises a pickled payload and this can be leveraged to achieve code execution.
+
+### Details
+
+The affected file is the `CSVAgent` node, found in: `flowise-components/nodes/agents/CSVAgent/CSVAgent.ts`.
+
+```js
+try {
+    const code = `import pandas as pd
+import base64
+from io import StringIO
+import json
+
+base64_string = &amp;quot;${base64String}&amp;quot;
+
+decoded_data = base64.b64decode(base64_…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-x6vm-w76m-8j7g"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-x6vm-w76m-8j7g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6257"&gt;https://github.com/FlowiseAI/Flowise/pull/6257&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/c79fe56a6c249850e96bce9b4859f7a0083e4507"&gt;https://github.com/FlowiseAI/Flowise/commit/c79fe56a6c249850e96bce9b4859f7a0083e4507&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x6vm-w76m-8j7g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8r8h-6vcc-xhrv: Flowise: RBAC Bypass Leading to Unauthorized Workspace Variables Disclosure</title>
+    <id>https://osv.dev/vulnerability/GHSA-8r8h-6vcc-xhrv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8r8h-6vcc-xhrv"/>
+    <published>2026-08-04T17:43:36Z</published>
+    <updated>2026-08-04T18:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-70471"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: RBAC Bypass Leading to Unauthorized Workspace Variables Disclosure&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-70471&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Finding — Unauthorized Workspace Variables disclosure via $vars injection (bypasses variables:view)
+
+  ### What’s wrong (code locations)
+
+  - Variables for the active workspace are fetched without checking “variables:view” at this call site: flowise-src/
+    packages/components/src/utils.ts:932
+  - Runtime variables are resolved from server environment variables: flowise-src/packages/components/src/utils.ts:976
+  - $vars is always injected into the code execution sandbox: flowise-src/packages/components/src/utils.ts:1782
+  - The official Variables API is permission-protected (contrast): flowise-src/packages/server/src/routes/variables/
+    index.ts:11
+
+  ### Why it is a privilege boundary bypass
+
+  A user/API key might be denied variables:view (and the /api/v1/variables route enforces i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-8r8h-6vcc-xhrv"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-8r8h-6vcc-xhrv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8r8h-6vcc-xhrv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-88pr-878c-24wf: Flowise: Authenticated arbitrary file write in the `S3 Directory` document loader via unsanitized S3 object keys                                                                                                  </title>
+    <id>https://osv.dev/vulnerability/GHSA-88pr-878c-24wf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-88pr-878c-24wf"/>
+    <published>2026-08-04T17:43:45Z</published>
+    <updated>2026-08-04T18:00:18Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Authenticated arbitrary file write in the `S3 Directory` document loader via unsanitized S3 object keys                                                                                                  &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary                                                                                                                                                                                                   
+                                          
+  Flowise on current `main` allows an authenticated user with
+  `documentStores:preview-process` permission to trigger the `S3 Directory`                                                                                                                                    
+  document loader with attacker-controlled S3 object keys. The loader joins
+  each returned S3 key with a temporary directory using `path.join(tempDir, key)`                                                                                                                            …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-88pr-878c-24wf"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-88pr-878c-24wf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6549"&gt;https://github.com/FlowiseAI/Flowise/pull/6549&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/571b5d6218b1c129588ac625c8f20e30905a67cb"&gt;https://github.com/FlowiseAI/Flowise/commit/571b5d6218b1c129588ac625c8f20e30905a67cb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-88pr-878c-24wf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rwrp-9823-p2xq: Flowise: Incomplete Credential Redaction Exposes Secrets via API</title>
+    <id>https://osv.dev/vulnerability/GHSA-rwrp-9823-p2xq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rwrp-9823-p2xq"/>
+    <published>2026-08-04T17:57:35Z</published>
+    <updated>2026-08-04T18:00:18Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Incomplete Credential Redaction Exposes Secrets via API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `GET /api/v1/credentials/:id` endpoint decrypts stored credential data and returns it in the `plainDataObj` field of the API response. While a `redactCredentialWithPasswordType()` function masks fields defined with `type: &amp;#x27;password&amp;#x27;` in their component schema, many credential types store highly sensitive data (database connection URLs with embedded passwords, Google service account JSON with RSA private keys, AWS access keys) in fields defined as `type: &amp;#x27;string&amp;#x27;`. These string-type fields are returned in **full plaintext** without any redaction.
+
+Any authenticated user with `credentials:view` permission can retrieve the raw secrets of any credential in their workspace by calling this endpoint.
+
+## Vulnerable Code
+
+### Service Layer
+
+**`packages/server/src/services/credentia…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-rwrp-9823-p2xq"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-rwrp-9823-p2xq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rwrp-9823-p2xq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-chm3-vqcf-52rx: Flowise: Cross-workspace credential IDOR in openai-assistants-vector-store</title>
+    <id>https://osv.dev/vulnerability/GHSA-chm3-vqcf-52rx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-chm3-vqcf-52rx"/>
+    <published>2026-08-04T17:51:48Z</published>
+    <updated>2026-08-04T18:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-70472"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Cross-workspace credential IDOR in openai-assistants-vector-store&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-70472&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Summary 
+
+These endpoints accept a client-controlled `credential` parameter. The server loads credentials by `id` and uses them directly, without checking whether that credential belongs to the caller’s workspace. If an attacker knows another workspace’s `credentialId`, they can use that workspace’s OpenAI key.
+
+# Details
+
+Route permissions (`assistants:*`) only check feature access. They do not check credential ownership. The controller passes `req.query.credential` straight to the service. The service does `findOneBy({ id: credentialId })`, decrypts the credential, and calls OpenAI APIs. There is no `workspaceId` check in this flow, so this is an IDOR.
+
+# Impact 
+
+
+- Cross-workspace unauthorized use of stored OpenAI keys.
+- Unauthorized read/modify/delete of victim vector stores and fi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-chm3-vqcf-52rx"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-chm3-vqcf-52rx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6170"&gt;https://github.com/FlowiseAI/Flowise/pull/6170&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/d81483b70c997ddf981acc9c49fbd9a02fa345cd"&gt;https://github.com/FlowiseAI/Flowise/commit/d81483b70c997ddf981acc9c49fbd9a02fa345cd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-chm3-vqcf-52rx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fr6g-7cq8-fg82: Flowise: Information Disclosure in GET /api/v1/upsert-history returns the entire server-wide upsert history</title>
+    <id>https://osv.dev/vulnerability/GHSA-fr6g-7cq8-fg82</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fr6g-7cq8-fg82"/>
+    <published>2026-08-04T17:57:27Z</published>
+    <updated>2026-08-04T18:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-70473"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Information Disclosure in GET /api/v1/upsert-history returns the entire server-wide upsert history&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-70473&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:L/SC:H/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The **GET `/api/v1/upsert-history`** endpoint returns the **entire server-wide upsert history** (response size **&amp;gt;100MB**) instead of being scoped to the requesting user/tenant/workspace. The response includes **sensitive configuration data** (e.g., Vector Store settings such as **Qdrant Server URL** and **collection name**), resulting in a **High severity information disclosure** that may enable further targeted attacks.
+
+### Details
+- **Affected endpoint:** `GET /api/v1/upsert-history`
+- **Observed behavior:** The API returns **global upsert history for the whole server**, indicating missing/insufficient:
+  - Authorization checks (RBAC/user-based access control)
+  - Data scoping (workspace/project/tenant isolation)
+  - Pagination/limits (excessive data exposure and very large…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-fr6g-7cq8-fg82"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-fr6g-7cq8-fg82&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6170"&gt;https://github.com/FlowiseAI/Flowise/pull/6170&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/d81483b70c997ddf981acc9c49fbd9a02fa345cd"&gt;https://github.com/FlowiseAI/Flowise/commit/d81483b70c997ddf981acc9c49fbd9a02fa345cd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fr6g-7cq8-fg82"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4j8x-x6v7-w9rq: Flowise: RCE via CSVAgent csvFile data URI base64 segment is interpolated into Python source without validation</title>
+    <id>https://osv.dev/vulnerability/GHSA-4j8x-x6v7-w9rq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4j8x-x6v7-w9rq"/>
+    <published>2026-08-04T17:43:48Z</published>
+    <updated>2026-08-04T18:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69264"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: RCE via CSVAgent csvFile data URI base64 segment is interpolated into Python source without validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69264&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Flowise&amp;#x27;s `CSVAgent` interpolates an attacker-controlled segment of the
+`csvFile` data URI directly into a Python source-code template that is then
+executed by Pyodide. Because Pyodide is loaded with the default `js` bridge
+to `globalThis` (which on Node.js exposes `eval` and dynamic `import()`), the
+attacker can break out of the Python string literal, hand a JS string to
+`js.eval`, dynamically import any Node built-in module (`fs`, `child_process`,
+…), and execute arbitrary file I/O or OS commands as the Flowise process.
+The two validator paths around this code (`validatePythonCodeForDataFrame`
+and `validateCustomReadCSVFunction`) are never applied to the bootstrap
+template.
+
+A workspace user with `chatflows:create` (or any `agentflows`/`chatflows`
+update permission) plants a …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-4j8x-x6v7-w9rq"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-4j8x-x6v7-w9rq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6499"&gt;https://github.com/FlowiseAI/Flowise/pull/6499&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/f4e2794f6a576b94578f2fdafbf49c2fb304626c"&gt;https://github.com/FlowiseAI/Flowise/commit/f4e2794f6a576b94578f2fdafbf49c2fb304626c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4j8x-x6v7-w9rq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-52fh-8v99-63c2: Flowise: Pyodide validator Unicode homoglyph bypass leads to RCE</title>
+    <id>https://osv.dev/vulnerability/GHSA-52fh-8v99-63c2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-52fh-8v99-63c2"/>
+    <published>2026-08-04T17:31:09Z</published>
+    <updated>2026-08-04T17:45:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-70470"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Pyodide validator Unicode homoglyph bypass leads to RCE&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-70470&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The validatePythonCodeForDataFrame blacklist in packages/components/src/pythonCodeValidator.ts can be bypassed with Unicode homoglyph identifiers, allowing arbitrary Python execution inside Pyodide and full OS command execution on the Flowise host via Pyodide&amp;#x27;s js module interop. This reopens the RCE paths patched as GHSA-3hjv-c53m-58jj (CSV Agent) and GHSA-v38x-c887-992f (Airtable Agent).
+
+### Details
+packages/components/src/pythonCodeValidator.ts gates every call to pyodide.runPythonAsync in packages/components/nodes/agents/CSVAgent/CSVAgent.ts (lines 147, 198) and packages/components/nodes/agents/AirtableAgent/AirtableAgent.ts (line 186). The gate is a regex blacklist:
+
+```ts
+{ pattern: /\bimport\b/g, ... },
+{ pattern: /\b__class__\b/g, ... },
+{ pattern: /\b__subclasses__\s*…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-52fh-8v99-63c2"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-52fh-8v99-63c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6499"&gt;https://github.com/FlowiseAI/Flowise/pull/6499&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/f4e2794f6a576b94578f2fdafbf49c2fb304626c"&gt;https://github.com/FlowiseAI/Flowise/commit/f4e2794f6a576b94578f2fdafbf49c2fb304626c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-52fh-8v99-63c2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xc48-889x-5qmw: Flowise: CVE-2025-8943 Patch Bypass: npm_config_yes bypasses MCP environment variable blocklist (Unauthenticated RCE)</title>
+    <id>https://osv.dev/vulnerability/GHSA-xc48-889x-5qmw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xc48-889x-5qmw"/>
+    <published>2026-08-04T17:09:48Z</published>
+    <updated>2026-08-04T17:15:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69263"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: CVE-2025-8943 Patch Bypass: npm_config_yes bypasses MCP environment variable blocklist (Unauthenticated RCE)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69263&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The mitigation shipped for CVE-2025-8943 blocks the `-y` and `--yes` flags on `npx` to stop auto-installation of arbitrary packages. That flag filter works. The environment-variable check in the same patch denies only four variable names by exact string match, and `npm` reads its configuration directly from `npm_config_*` environment variables. Setting `npm_config_yes=true` reproduces the `--yes` behaviour the flag filter is meant to prevent, so `npx` auto-installs and executes the named package. The mitigation is fully bypassed.
+
+This works with the MCP security check enabled (`CUSTOM_MCP_SECURITY_CHECK=true`). On a default Flowise deployment, which ships with no authentication, the result is unauthenticated remote code execution.
+
+## Root cause
+
+The patch treats this as a fla…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-xc48-889x-5qmw"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-xc48-889x-5qmw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6471"&gt;https://github.com/FlowiseAI/Flowise/pull/6471&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/a4c4e4988cded15edf725e762560575b889ae351"&gt;https://github.com/FlowiseAI/Flowise/commit/a4c4e4988cded15edf725e762560575b889ae351&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xc48-889x-5qmw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p5w8-m249-4r4v: Flowise: `DELETE /api/v1/chatflows/:id` does not validate resource type, allowing `agentflows:delete` and `chatflows:delete` to delete each other’s flow type</title>
+    <id>https://osv.dev/vulnerability/GHSA-p5w8-m249-4r4v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p5w8-m249-4r4v"/>
+    <published>2026-08-04T16:50:32Z</published>
+    <updated>2026-08-04T17:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69262"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: `DELETE /api/v1/chatflows/:id` does not validate resource type, allowing `agentflows:delete` and `chatflows:delete` to delete each other’s flow type&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69262&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# summary:
+In Flowise, `DELETE /api/v1/chatflows/:id` authorizes requests with `checkAnyPermission(&amp;#x27;chatflows:delete,agentflows:delete&amp;#x27;)`. Possession of either permission is sufficient to reach the delete path. The delete logic does not validate the target resource `type`, allowing a caller with only `agentflows:delete` to delete a `CHATFLOW`, and a caller with only `chatflows:delete` to delete an `AGENTFLOW`.
+
+# details:
+The delete route accepts either `chatflows:delete` or `agentflows:delete`. The subsequent logic only resolves the target record by `id` and `workspaceId`, then deletes by `id` without checking whether the target resource type matches the granted permission domain.
+
+As a result, there is no binding between permission scope and flow type:
+
+- `agentflows:delete` can be used …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-p5w8-m249-4r4v"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-p5w8-m249-4r4v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6445"&gt;https://github.com/FlowiseAI/Flowise/pull/6445&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/2f528ceced74afaa95fc7a282965e7788796448b"&gt;https://github.com/FlowiseAI/Flowise/commit/2f528ceced74afaa95fc7a282965e7788796448b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p5w8-m249-4r4v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-x3hf-7cj6-3r4m: Flowise RCE via SQLite Record Manager Node</title>
+    <id>https://osv.dev/vulnerability/GHSA-x3hf-7cj6-3r4m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x3hf-7cj6-3r4m"/>
+    <published>2026-08-04T16:05:10Z</published>
+    <updated>2026-08-04T16:15:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69259"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise RCE via SQLite Record Manager Node&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69259&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;=============================================================================
+                                                            Security Advisory
+                                                                       elttam
+
+Topic:          Flowise RCE via SQLite Record Manager Node
+
+Module:         FlowiseAI/Flowise
+Disclosed:      24-Apr-2026
+Credits:        Alex Brown
+Affects:        `FlowiseAI/Flowise 3.1.2`
+
+# I.   Background
+
+Flowise AI is an open-source, low-code platform for building AI applications—such as chatbots, workflows, and autonomous agents—through an intuitive drag-and-drop interface, minimising the need for extensive coding.
+
+Flowise allows users to connect to a local SQLite database for record management of Upsert Vector Store operations.
+
+# II.  Problem Descr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-x3hf-7cj6-3r4m"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-x3hf-7cj6-3r4m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6464"&gt;https://github.com/FlowiseAI/Flowise/pull/6464&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/d07186844263bad057008863037466aff7c3390f"&gt;https://github.com/FlowiseAI/Flowise/commit/d07186844263bad057008863037466aff7c3390f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x3hf-7cj6-3r4m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c6xh-wv4j-ppv5: Flowise: SSRF Protection Bypass via IPv4-Mapped IPv6 Addresses</title>
+    <id>https://osv.dev/vulnerability/GHSA-c6xh-wv4j-ppv5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c6xh-wv4j-ppv5"/>
+    <published>2026-08-04T15:51:58Z</published>
+    <updated>2026-08-04T16:00:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69257"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: SSRF Protection Bypass via IPv4-Mapped IPv6 Addresses&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69257&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Flowise&amp;#x27;s HTTP security module (`httpSecurity.ts`) fails to normalize IPv4-mapped IPv6 addresses (e.g., `::ffff:127.0.0.1`, `::ffff:169.254.169.254`) before checking them against the deny list. Due to an `ipaddr.js` kind mismatch (`ipv6` vs `ipv4`), all IPv4 CIDR deny rules are silently skipped for IPv4-mapped IPv6 addresses. An attacker who controls DNS resolution for a hostname can set a AAAA record to `::ffff:&amp;lt;target_ipv4&amp;gt;`, completely bypassing all SSRF protections and accessing internal services, cloud metadata endpoints, and localhost.
+
+## CWE
+
+- **CWE-918**: Server-Side Request Forgery (SSRF)
+- **CWE-1389**: Incorrect Parsing of Numbers with Different Radices (IPv4-mapped IPv6 not normalized to IPv4 before deny list check)
+
+## Affected Versions
+
+- All versions up to and …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-c6xh-wv4j-ppv5"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-c6xh-wv4j-ppv5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6431"&gt;https://github.com/FlowiseAI/Flowise/pull/6431&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/0fc769208395641c1411ccdb9c81416e54802155"&gt;https://github.com/FlowiseAI/Flowise/commit/0fc769208395641c1411ccdb9c81416e54802155&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c6xh-wv4j-ppv5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6vh2-wg4h-4vwj: Flowise: Unauthenticated Property Injection into Flow Execution Context via Ungated `overrideConfig` Spread in Prediction API</title>
+    <id>https://osv.dev/vulnerability/GHSA-6vh2-wg4h-4vwj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6vh2-wg4h-4vwj"/>
+    <published>2026-08-04T15:56:11Z</published>
+    <updated>2026-08-04T16:00:19Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69258"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Unauthenticated Property Injection into Flow Execution Context via Ungated `overrideConfig` Spread in Prediction API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69258&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
+
+The `POST /api/v1/prediction/:id` endpoint — which is unauthenticated (whitelisted in `WHITELIST_URLS`) — accepts an `overrideConfig` object in the request body. This object is unconditionally spread into the internal `flowConfig` and `flowData` objects at two locations in the codebase **without checking** `apiOverrideStatus`. This allows an unauthenticated attacker to inject arbitrary properties into the flow execution context of any public chatflow, enabling session hijacking, cross-session data pollution, chat history manipulation, and injection of attacker-controlled values into `$flow.*` template variables consumed by flow nodes.
+
+This is distinct from the previously reported `overrideConfig` vulnerability (GHSA-5cph-wvm9-45gj), which addressed overrideConfig&amp;#x27;s ability t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-6vh2-wg4h-4vwj"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-6vh2-wg4h-4vwj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6279"&gt;https://github.com/FlowiseAI/Flowise/pull/6279&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/23b997ee5ef9e269b628bad0f56f1ecb86bd2fca"&gt;https://github.com/FlowiseAI/Flowise/commit/23b997ee5ef9e269b628bad0f56f1ecb86bd2fca&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6vh2-wg4h-4vwj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4c8g-83qw-93j6: fast-uri vulnerable to host confusion via failed IDN canonicalization</title>
+    <id>https://osv.dev/vulnerability/GHSA-4c8g-83qw-93j6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4c8g-83qw-93j6"/>
+    <published>2026-07-21T19:03:11Z</published>
+    <updated>2026-08-04T15:46:35Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-13676"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;fast-uri vulnerable to host confusion via failed IDN canonicalization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-13676&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 4.0.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 2.4.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+`fast-uri` versions `&amp;gt;= 2.3.1, &amp;lt;= 4.0.0` fail to canonicalize Unicode/IDN hostnames for HTTP-family URLs. The IDN conversion path calls `URL.domainToASCII(...)` on the global WHATWG `URL` constructor, where that helper does not exist. The resulting `TypeError` is silently routed into `parsed.error`, but `parse()`, `normalize()`, and `equal()` all return with the host left in its original Unicode form.
+
+For example, `http://127。0。0。1/` is treated by `fast-uri` as host `127。0。0。1`, while Node&amp;#x27;s WHATWG URL parser and `fetch()` canonicalize the same input to `127.0.0.1`.
+
+Applications that use `fast-uri` to enforce host-based policy (denylists, loopback filtering, redirect validation, outbound proxy routing) before passing the same URL into Node&amp;#x27;s URL or `fetch()` consumers see a p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/security/advisories/GHSA-4c8g-83qw-93j6"&gt;https://github.com/fastify/fast-uri/security/advisories/GHSA-4c8g-83qw-93j6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-13676"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-13676&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/pull/188"&gt;https://github.com/fastify/fast-uri/pull/188&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/commit/2a6d357a18a68e6d812824379fd3388a1ae50d05"&gt;https://github.com/fastify/fast-uri/commit/2a6d357a18a68e6d812824379fd3388a1ae50d05&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/commit/21ea1f9d70495c931f55dff893a8fa38f4f2e6bd"&gt;https://github.com/fastify/fast-uri/commit/21ea1f9d70495c931f55dff893a8fa38f4f2e6bd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/commit/01db48010f594b98f7b323be18b393791c66ed1d"&gt;https://github.com/fastify/fast-uri/commit/01db48010f594b98f7b323be18b393791c66ed1d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-13676.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-13676.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/releases/tag/v4.0.1"&gt;https://github.com/fastify/fast-uri/releases/tag/v4.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4c8g-83qw-93j6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3769-jgqc-cxm7: Flowise: RCE via NodeVM Sandbox Escape in executeJavaScriptCode() nodeVMOptions Override</title>
+    <id>https://osv.dev/vulnerability/GHSA-3769-jgqc-cxm7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3769-jgqc-cxm7"/>
+    <published>2026-08-04T15:29:12Z</published>
+    <updated>2026-08-04T15:46:35Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69254"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: RCE via NodeVM Sandbox Escape in executeJavaScriptCode() nodeVMOptions Override&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69254&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A sandbox escape vulnerability in `executeJavaScriptCode()` allows any authenticated user to execute arbitrary system commands as root on the Flowise server. The function accepts caller-provided `nodeVMOptions` that override the
+  default sandbox security settings via JavaScript&amp;#x27;s spread operator, allowing an attacker to re-enable blocked modules like `child_process` and `fs`.
+
+### Details
+The vulnerability is in `packages/components/src/utils.ts` at line 1755:
+
+  ```typescript
+  const finalNodeVMOptions = { ...defaultNodeVMOptions, ...nodeVMOptions }
+
+  The executeJavaScriptCode() function (line 1569) creates a NodeVM sandbox with secure defaults that restrict which Node.js built-in modules can be required:
+
+  async (code, sandbox, options = {}) =&amp;gt; {
+      const { nodeVMOption…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-3769-jgqc-cxm7"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-3769-jgqc-cxm7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6306"&gt;https://github.com/FlowiseAI/Flowise/pull/6306&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/3086cb7e323bb96c5a581d3232ef975b0d92183d"&gt;https://github.com/FlowiseAI/Flowise/commit/3086cb7e323bb96c5a581d3232ef975b0d92183d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3769-jgqc-cxm7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vmv7-4m6c-3cg5: Flowise: CSV Agent Remote Code Execution via Pyodide Code Injection — Root Shell Verified</title>
+    <id>https://osv.dev/vulnerability/GHSA-vmv7-4m6c-3cg5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vmv7-4m6c-3cg5"/>
+    <published>2026-08-04T15:40:28Z</published>
+    <updated>2026-08-04T15:46:35Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69255"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: CSV Agent Remote Code Execution via Pyodide Code Injection — Root Shell Verified&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69255&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## UPDATE 2026-05-20: Full RCE as root VERIFIED
+
+**This is not theoretical — a Meterpreter reverse shell session as root has been established on Flowise 3.1.2.**
+
+### Verified Exploit Chain
+
+1. Python code injection via `base64_string = &amp;quot;${base64String}&amp;quot;` (CSVAgent.ts line 161)
+2. Pyodide `js` bridge provides access to the host Node.js process
+3. `process.mainModule.constructor._load(&amp;#x27;child_process&amp;#x27;)` loads child_process (bypasses ESM require restriction)
+4. `.execSync(&amp;#x27;CMD&amp;#x27;)` executes arbitrary OS commands as **root** (PID 1 in container)
+
+### Working RCE Payload
+
+```
+&amp;quot;;import js;e=js.globalThis.eval;e(&amp;quot;process.mainModule.constructor._load(&amp;#x27;child_process&amp;#x27;).execSync(&amp;#x27;id&amp;#x27;)&amp;quot;);#
+```
+
+**Constraint:** No commas allowed in payload — `csvFile.split(&amp;#x27;,&amp;#x27;)` splits on all commas.
+
+### Metasploit Sess…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-vmv7-4m6c-3cg5"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-vmv7-4m6c-3cg5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6499"&gt;https://github.com/FlowiseAI/Flowise/pull/6499&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/f4e2794f6a576b94578f2fdafbf49c2fb304626c"&gt;https://github.com/FlowiseAI/Flowise/commit/f4e2794f6a576b94578f2fdafbf49c2fb304626c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise%403.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise%403.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vmv7-4m6c-3cg5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wg86-r78f-74mp: Flowise Sandbox Escape to RCE</title>
+    <id>https://osv.dev/vulnerability/GHSA-wg86-r78f-74mp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wg86-r78f-74mp"/>
+    <published>2026-08-04T15:13:33Z</published>
+    <updated>2026-08-04T15:30:20Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69253"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise Sandbox Escape to RCE&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69253&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;=============================================================================
+                                                            Security Advisory
+                                                                       elttam
+
+Topic:          Flowise JavaScript Sandbox Escape
+
+Module:         FlowiseAI/Flowise, FlowiseAI/nodevm
+Disclosed:      11-Apr-2026
+Credits:        Luke Jahnke and Alex Brown
+Affects:        `FlowiseAI/Flowise 3.1.1`, `FlowiseAI/nodevm  3.9.25`
+
+# I.   Background
+
+Flowise AI is an open-source, low-code platform for building AI applications—such as chatbots, workflows, and autonomous agents—through an intuitive drag-and-drop interface, minimising the need for extensive coding.
+
+The platform also enables execution of custom JavaScript within a sandboxed environm…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-wg86-r78f-74mp"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-wg86-r78f-74mp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6417"&gt;https://github.com/FlowiseAI/Flowise/pull/6417&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/3f257bdc8196082a178da7134a075824401b13b9"&gt;https://github.com/FlowiseAI/Flowise/commit/3f257bdc8196082a178da7134a075824401b13b9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wg86-r78f-74mp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wp74-f5hh-5f3r: Flowise: Missing authorization on `/api/v1/files` allows low-privileged API keys to list and delete files across workspaces within the same organization</title>
+    <id>https://osv.dev/vulnerability/GHSA-wp74-f5hh-5f3r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wp74-f5hh-5f3r"/>
+    <published>2026-08-04T14:54:03Z</published>
+    <updated>2026-08-04T15:00:23Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69252"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Missing authorization on `/api/v1/files` allows low-privileged API keys to list and delete files across workspaces within the same organization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69252&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# summary:
+In Flowise, the `/api/v1/files` route is protected only by the `feat:files` feature gate and does not enforce `checkPermission(...)` on either `GET` or `DELETE`. As a result, any authenticated API key within the organization, even one with unrelated permissions, can list and delete files belonging to other workspaces in the same organization.
+
+# details:
+The `/files` route is mounted with `IdentityManager.checkFeatureByPlan(&amp;#x27;feat:files&amp;#x27;)` only and has no additional permission middleware. In the controller:
+
+- `getAllFiles` uses only `req.user.activeOrganizationId` and calls `getFilesListFromStorage(activeOrganizationId)`, which recursively lists files under the organization storage root
+- `deleteFile` reads `activeWorkspaceId`, but only uses it for storage quota bookkeeping; the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-wp74-f5hh-5f3r"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-wp74-f5hh-5f3r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6435"&gt;https://github.com/FlowiseAI/Flowise/pull/6435&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/bc22bf8baec95b6a3d6e1b3563b4f03491cd6fbb"&gt;https://github.com/FlowiseAI/Flowise/commit/bc22bf8baec95b6a3d6e1b3563b4f03491cd6fbb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wp74-f5hh-5f3r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g32j-mmxr-gfq5: Flowise RCE via TypeORM DataSource</title>
+    <id>https://osv.dev/vulnerability/GHSA-g32j-mmxr-gfq5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g32j-mmxr-gfq5"/>
+    <published>2026-08-04T14:28:04Z</published>
+    <updated>2026-08-04T14:45:17Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69251"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise RCE via TypeORM DataSource&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69251&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;flowise-components&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;=============================================================================
+                                                            Security Advisory
+                                                                       elttam
+
+Topic:          Flowise RCE via TypeORM DataSource
+
+Module:         FlowiseAI/Flowise
+Disclosed:      15-Apr-2026
+Credits:        Alex Brown
+Affects:        `FlowiseAI/Flowise 3.1.2`
+
+# I.   Background
+
+Flowise AI is an open-source, low-code platform for building AI applications—such as chatbots, workflows, and autonomous agents—through an intuitive drag-and-drop interface, minimising the need for extensive coding.
+
+Flowise allows users to connect to remote databases within a flow, which is performed using the [TypeORM `DataSource`](https://typeorm.io/docs/da…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-g32j-mmxr-gfq5"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-g32j-mmxr-gfq5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g32j-mmxr-gfq5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-85rg-p3fr-xc2f: QTINeon has unauthenticated relay-to-host amplification via unbounded RECONNECT_REQUEST forwarding</title>
+    <id>https://osv.dev/vulnerability/GHSA-85rg-p3fr-xc2f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-85rg-p3fr-xc2f"/>
+    <published>2026-07-28T16:36:47Z</published>
+    <updated>2026-08-04T14:40:38Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-54609"/>
+    <category term="PYSEC-2026-3615"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;QTINeon has unauthenticated relay-to-host amplification via unbounded RECONNECT_REQUEST forwarding&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54609, PYSEC-2026-3615&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;com.quietterminal:qti-neon&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;qti-neon&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;qti-neon&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+The relay&amp;#x27;s reconnect handler forwards every `RECONNECT_REQUEST` to the host without deduplication or a size cap on the `pendingReconnects` map, unlike the connect flow which guards against this with `maxPendingConnections`. An unauthenticated attacker who knows a valid session ID can send `RECONNECT_REQUEST` packets from many spoofed source addresses; each packet that passes the session lookup is forwarded to the host as a new reconnect attempt. Because the per-source rate limiter assigns a fresh token bucket to each spoofed IP, it provides no protection. The host receives one forwarded packet per spoofed source per cleanup cycle, making the relay an amplification vector for denial-of-service against the host. The host&amp;#x27;s real address is never exposed to clients by design, so th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Quiet-Terminal-Interactive/QTINeon/security/advisories/GHSA-85rg-p3fr-xc2f"&gt;https://github.com/Quiet-Terminal-Interactive/QTINeon/security/advisories/GHSA-85rg-p3fr-xc2f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Quiet-Terminal-Interactive/QTINeon"&gt;https://github.com/Quiet-Terminal-Interactive/QTINeon&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-85rg-p3fr-xc2f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-r745-8hwv-h473: Flowise: Unauthenticated OAuth2 Refresh Enables Non-Blind SSRF and Secret Exfiltration</title>
+    <id>https://osv.dev/vulnerability/GHSA-r745-8hwv-h473</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r745-8hwv-h473"/>
+    <published>2026-08-04T14:20:49Z</published>
+    <updated>2026-08-04T14:30:30Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-69250"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: Unauthenticated OAuth2 Refresh Enables Non-Blind SSRF and Secret Exfiltration&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69250&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The OAuth2 token refresh endpoint (`POST /api/v1/oauth2-credential/refresh/:credentialId`) is unauthenticated by design (it is in the public whitelist) and performs a server-side HTTP request to a credential-controlled URL (`accessTokenUrl`) without SSRF protections. In runtime validation, this endpoint was reachable without auth, triggered outbound POST requests to an attacker-controlled server, and reflected the full remote response body to the caller (`tokenInfo`), confirming non-blind SSRF and credential secret exfiltration.
+
+### Details
+
+The vulnerability is in `dist/routes/oauth2/index.js` (container runtime build), under path prefix `/api/v1/oauth2-credential`.
+
+Confirmed in runtime code:
+
+1. **Unauthenticated route via whitelist**
+   - `dist/utils/constants.js` include…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-r745-8hwv-h473"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-r745-8hwv-h473&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/da8b251a9a4c59484ceaf6f71df7406aede7bef2"&gt;https://github.com/FlowiseAI/Flowise/commit/da8b251a9a4c59484ceaf6f71df7406aede7bef2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise@3.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r745-8hwv-h473"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2364-jh4q-m9vm: Flowise: IDOR vulnerability exists at the GET /api/v1/organization/customer-default-source endpoint</title>
+    <id>https://osv.dev/vulnerability/GHSA-2364-jh4q-m9vm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2364-jh4q-m9vm"/>
+    <published>2026-08-04T14:16:46Z</published>
+    <updated>2026-08-04T14:30:30Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Flowise: IDOR vulnerability exists at the GET /api/v1/organization/customer-default-source endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flowise&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+An Insecure Direct Object Reference (IDOR) vulnerability exists at the **GET /api/v1/organization/customer-default-source** endpoint. This flaw allows an authenticated attacker to bypass authorization checks and retrieve sensitive payment and profile information of other customers by manipulating the customerId parameter. The exposed data includes email addresses, account balances, currency types, and internal billing configurations.
+
+### Details
+The application fails to implement proper object-level access control. While the endpoint requires a valid session/token, it does not verify if the requesting user has the authority to access the specific customerId provided in the query string.
+
+When a request is made to:
+GET /api/v1/organization/customer-default-source?customerId=cus…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-2364-jh4q-m9vm"&gt;https://github.com/FlowiseAI/Flowise/security/advisories/GHSA-2364-jh4q-m9vm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/pull/6321"&gt;https://github.com/FlowiseAI/Flowise/pull/6321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/commit/4d7899d02ca370a5510406be5c91483085a412f9"&gt;https://github.com/FlowiseAI/Flowise/commit/4d7899d02ca370a5510406be5c91483085a412f9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise"&gt;https://github.com/FlowiseAI/Flowise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/FlowiseAI/Flowise/releases/tag/flowise%403.1.3"&gt;https://github.com/FlowiseAI/Flowise/releases/tag/flowise%403.1.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2364-jh4q-m9vm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-11518: Malicious code in exnesss (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-11518</id>
@@ -854,7 +1328,7 @@ Some production setups *automatically* collapse multiple slashes. This includes:
 * Cloudflare - when normalize to urls origin is enabled (https://developers.cloudflare.com/rules/normalization/setti…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/better-auth/better-auth/security/advisories/GHSA-x732-6j76-qmhm"&gt;https://github.com/better-auth/better-auth/security/advisories/GHSA-x732-6j76-qmhm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/better-auth/better-auth"&gt;https://github.com/better-auth/better-auth&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x732-6j76-qmhm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-11484: Malicious code in simple-date-formatter-util-1 (npm)</title>
+    <title>[UPDATED] MAL-2026-11484: Malicious code in simple-date-formatter-util-1 (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-11484</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11484"/>
     <published>2026-08-02T16:35:47Z</published>
@@ -1053,7 +1527,7 @@ Any computer that has this package installed or running should be considered ful
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fxj3-2jph-p7mg"&gt;https://github.com/advisories/GHSA-fxj3-2jph-p7mg&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11488"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-11487: Malicious code in tailwindcss-anim (npm)</title>
+    <title>[UPDATED] MAL-2026-11487: Malicious code in tailwindcss-anim (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-11487</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11487"/>
     <published>2026-08-02T17:11:57Z</published>
@@ -1100,7 +1574,7 @@ Any computer that has this package installed or running should be considered ful
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-972c-x84x-rm4f"&gt;https://github.com/advisories/GHSA-972c-x84x-rm4f&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11486"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-11483: Malicious code in simple-date-formatter-util (npm)</title>
+    <title>[UPDATED] MAL-2026-11483: Malicious code in simple-date-formatter-util (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-11483</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11483"/>
     <published>2026-08-02T17:09:40Z</published>
@@ -1116,7 +1590,7 @@ Any computer that has this package installed or running should be considered ful
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-q32h-xc3m-rc77"&gt;https://github.com/advisories/GHSA-q32h-xc3m-rc77&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11483"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-11485: Malicious code in simple-date-formatter-util-2 (npm)</title>
+    <title>[UPDATED] MAL-2026-11485: Malicious code in simple-date-formatter-util-2 (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-11485</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11485"/>
     <published>2026-08-02T17:09:40Z</published>
@@ -2172,104 +2646,5 @@ _-= Per source details. Do not edit below this line.=-_
 ## Source: ghsa-malware (69f892cd190720c7c8f07109cfcbdd37f66caf5065ba5667b5be0800813dc0cf)
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-3x4g-gcc2-3jrc"&gt;https://github.com/advisories/GHSA-3x4g-gcc2-3jrc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11432"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-11449: Malicious code in @sof-assistant-fe-lib/vertical-faqs (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11449</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11449"/>
-    <published>2026-07-31T23:46:42Z</published>
-    <updated>2026-08-02T23:34:34Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-chhc-9q4w-p5vq"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @sof-assistant-fe-lib/vertical-faqs (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-chhc-9q4w-p5vq&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@sof-assistant-fe-lib/vertical-faqs&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (7d1ba538ee75936802bcb54b49dd258a1941bf7b9f07bc0b05db81fd656c47e7)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-chhc-9q4w-p5vq"&gt;https://github.com/advisories/GHSA-chhc-9q4w-p5vq&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11449"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-5385: Malicious code in @0xlr/clerk-auth (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-5385</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5385"/>
-    <published>2026-06-09T16:07:54Z</published>
-    <updated>2026-08-02T23:34:34Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-57r8-xw4c-5j59"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @0xlr/clerk-auth (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-57r8-xw4c-5j59&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@0xlr/clerk-auth&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (2ff421a5ccb412fd8455e89a1b9875b427ed34af12fa4b188ed4418cd8f52a74)
-On `npm install`, postinstall.js enumerates the entire process environment (Object.keys(process.env).sort().forEach) along with hostname, username, home directory, cwd, argv, and OS metadata, then POSTs the JSON payload over HTTPS to rytxau88zxh61dw6qz4yn19naeg54vsk.oastify.com (a Burp Collaborator subdomain controlled by the attacker). Any secrets present in the installer&amp;#x27;s environment at install time — CI tokens, NPM_TOKEN, AWS_*, GitHub tokens, etc. — are leaked to the operator of that Collaborator instance. The package itself is hollow: name `@0xlr/clerk-auth` with version `999.0.0` and a description reading &amp;#x27;Placeholder reservatio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@0xlr/clerk-auth/v/999.0.0"&gt;https://www.npmjs.com/package/@0xlr/clerk-auth/v/999.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-57r8-xw4c-5j59"&gt;https://github.com/advisories/GHSA-57r8-xw4c-5j59&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5385"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-11431: Malicious code in @0xlr/dep-confusion-poc (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11431</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11431"/>
-    <published>2026-07-31T15:37:14Z</published>
-    <updated>2026-08-02T23:34:34Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-r4wg-xfm2-45qv"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @0xlr/dep-confusion-poc (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-r4wg-xfm2-45qv&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@0xlr/dep-confusion-poc&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (8a8d7af3dbe17097e5afc32e3f155b7b7593dd51b5bf2e035550f1b952912d25)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-r4wg-xfm2-45qv"&gt;https://github.com/advisories/GHSA-r4wg-xfm2-45qv&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11431"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-5386: Malicious code in @0xlr/prisma-client-js (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-5386</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-5386"/>
-    <published>2026-06-09T16:07:48Z</published>
-    <updated>2026-08-02T23:34:33Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-mrxf-wq2g-xvxm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @0xlr/prisma-client-js (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-mrxf-wq2g-xvxm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@0xlr/prisma-client-js&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (b993c29d90c2ecfffaa9ed55b99c38e5351052e619b79ad2a385d6c72376f0f4)
-On `npm install`, postinstall.js enumerates all of process.env, collects hostname, username, homedir, cwd, argv, platform/arch/release, memory and CPU info, and POSTs the resulting JSON blob over HTTPS to the hardcoded attacker-controlled domain `rytxau88zxh61dw6qz4yn19naeg54vsk.oastify.com` (a Burp Collaborator out-of-band exfiltration host). The package name `@0xlr/prisma-client-js` impersonates the legitimate prisma-client-js / @prisma/client packages, and the 999.0.0 version is the canonical dependency-confusion override pattern; the package.json description self-identifies as a &amp;#x27;Placeholder reservation&amp;#x27; for that namespace. Any ins…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@0xlr/prisma-client-js/v/999.0.0"&gt;https://www.npmjs.com/package/@0xlr/prisma-client-js/v/999.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-mrxf-wq2g-xvxm"&gt;https://github.com/advisories/GHSA-mrxf-wq2g-xvxm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-5386"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-11467: Malicious code in iac-scanner (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11467</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11467"/>
-    <published>2026-07-31T21:51:11Z</published>
-    <updated>2026-08-02T23:34:33Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-69pc-2883-mff3"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in iac-scanner (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-69pc-2883-mff3&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;iac-scanner&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (64524c7a0044805e503f398bf4e7f890b40bc3225a8c7576cc71ec9c8a94e378)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-69pc-2883-mff3"&gt;https://github.com/advisories/GHSA-69pc-2883-mff3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11467"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-11430: Malicious code in list-issue-predecessor-dependencies-block (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11430</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11430"/>
-    <published>2026-08-02T19:04:25Z</published>
-    <updated>2026-08-02T19:49:31Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in list-issue-predecessor-dependencies-block (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;list-issue-predecessor-dependencies-block&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ossf-package-analysis (0f74d699bfc5fcf83c6f2864f93ecd41d3d9f8613f45f6bfb3b6dd5eeb7a880e)
-The OpenSSF Package Analysis project identified &amp;#x27;list-issue-predecessor-dependencies-block&amp;#x27; @ 99.0.0 (npm) as malicious.
-
-It is considered malicious because:
-
-- The package communicates with a domain associated with malicious activity.
-
-- The package executes one or more commands associated with malicious behavior.
-&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11430"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

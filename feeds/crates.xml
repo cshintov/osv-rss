@@ -3,12 +3,44 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-08-04T09:30:04Z</updated>
+  <updated>2026-08-06T09:15:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0236: A `BigInt` division panics, and two neighbouring operations answer wrongly in silence</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0236</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0236"/>
+    <published>2026-08-06T12:00:00Z</published>
+    <updated>2026-08-06T09:15:04Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-6976-qm5m-7mcj"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;A `BigInt` division panics, and two neighbouring operations answer wrongly in silence&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-6976-qm5m-7mcj&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;viperjs&lt;/code&gt; — fixed in 0.2.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`viperjs` is a JavaScript engine intended to run untrusted script inside a host application, so
+script text is data rather than a trusted caller and a panic reachable from script is a denial of
+service in the embedder&amp;#x27;s process.
+
+A divisor whose magnitude lands exactly on the engine&amp;#x27;s internal limb ceiling reaches an
+out-of-bounds index. On every released version up to and including 0.2.1:
+
+```js
+const d = (1n &amp;lt;&amp;lt; 33554399n) * 2n;
+1n / d;   // panic: index out of bounds
+```
+
+Two further operations on the same value returned wrong results without raising anything, which
+is the more dangerous half for an embedder that acts on the answer:
+
+```js
+d % 7n;      // 0n  — the true remainder is 1n
+String(d);   // &amp;quot;0&amp;quot;
+```
+
+## Cause
+
+The left-shift helper reserved one limb for the bits a shift may pus…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/viperjs"&gt;https://crates.io/crates/viperjs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0236.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0236.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MerlijnW70/viperjs/security/advisories/GHSA-6976-qm5m-7mcj"&gt;https://github.com/MerlijnW70/viperjs/security/advisories/GHSA-6976-qm5m-7mcj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MerlijnW70/viperjs/releases/tag/v0.2.2"&gt;https://github.com/MerlijnW70/viperjs/releases/tag/v0.2.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0236"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0233: Crafted archives can cause a use-after-free during deserialization</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0233</id>
@@ -281,26 +313,5 @@ therefore cause attacker-chosen encrypted content to be parsed as a response,
 notification, token, spending record, or quote from the configured wallet. This can
 corrupt wallet state or cause an application to act on forged wallet data. The issue
 does not expose the victim&amp;#x27;s p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/nostr"&gt;https://crates.io/crates/nostr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0226.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0226.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nostrdevkit/nostr/commit/2b6d6227cd884c1acb200bffa66a3f402b02a176"&gt;https://github.com/nostrdevkit/nostr/commit/2b6d6227cd884c1acb200bffa66a3f402b02a176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nostrdevkit/nostr/commit/0b78464e39604b0f052862035f47fdabc2a536dd"&gt;https://github.com/nostrdevkit/nostr/commit/0b78464e39604b0f052862035f47fdabc2a536dd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0226"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0224: Verification cache poisoning allows forged Nostr events to bypass signature validation</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0224</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0224"/>
-    <published>2026-08-01T12:00:00Z</published>
-    <updated>2026-08-01T15:15:03Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-f96q-5f6p-v7cj"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Verification cache poisoning allows forged Nostr events to bypass signature validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-f96q-5f6p-v7cj&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nostr-relay-pool&lt;/code&gt; — fixed in 0.44.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `nostr-relay-pool` crate cached the result of event signature verification
-before the check was actually performed. Because the entry was inserted
-unconditionally, a first delivery whose signature failed was still recorded
-in the cache. A subsequent delivery of the same event (identical ID,
-but with a forged signature) would then hit the cache, causing signature
-verification to be skipped entirely. The forged event was passed on to
-`NostrDatabase::save_event()` as if it had been validated.
-
-Applications that connect to untrusted or compromised Nostr relays and persist
-received events are vulnerable. An attacker can inject arbitrary events
-without a valid signature into the application&amp;#x27;s trusted database, enabling
-impersonation of any public key or corruption of application state derive…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/nostr-relay-pool"&gt;https://crates.io/crates/nostr-relay-pool&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0224.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0224.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nostrdevkit/nostr/commit/02a88bd5688de058bfba8aa9fb4612441a384eff"&gt;https://github.com/nostrdevkit/nostr/commit/02a88bd5688de058bfba8aa9fb4612441a384eff&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0224"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

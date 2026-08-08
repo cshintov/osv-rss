@@ -3,12 +3,78 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-08-07T21:30:17Z</updated>
+  <updated>2026-08-08T03:26:54Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-3f7w-8rr8-f37f: GitPython: Unguarded git option forwarding in IndexFile.checkout() and TagReference.create() enables arbitrary file overwrite and arbitrary file read</title>
+    <id>https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f"/>
+    <published>2026-08-03T20:09:56Z</published>
+    <updated>2026-08-08T03:26:54Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Unguarded git option forwarding in IndexFile.checkout() and TagReference.create() enables arbitrary file overwrite and arbitrary file read&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.57&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Target:** gitpython-developers/GitPython
+**Tested:** HEAD `07e80555` (2026-07-25), latest release 3.1.55, `git version 2.50.1`
+**Reported instances:** 2 exploitable, from a sweep of 14 unguarded call sites
+
+## Summary
+
+GitPython blocks dangerous git options through `Git.check_unsafe_options()`, gated per method by an `allow_unsafe_options` parameter. That guard is applied **per call site**, so any API that forwards `**kwargs` into a git command without calling it passes caller-controlled options straight to git.
+
+A mechanical sweep of every method that forwards `**kwargs` into a `.git.&amp;lt;command&amp;gt;(...)` call found **14 sites with no guard**. Two reach a git option that takes a filesystem path:
+
+| # | Call site | git option | Impact |
+|---|---|---|---|
+| 1 | `IndexFile.checkout()` → `git che…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3f7w-8rr8-f37f"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3f7w-8rr8-f37f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2193"&gt;https://github.com/gitpython-developers/GitPython/pull/2193&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/3af0c2516c5e18c829da30338614688f6b69b49c"&gt;https://github.com/gitpython-developers/GitPython/commit/3af0c2516c5e18c829da30338614688f6b69b49c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-539m-9xh6-q6rr: GitPython: Incomplete unsafe_git_archive_options denylist omits --add-file / --add-virtual-file, enabling arbitrary file read via Repo.archive()</title>
+    <id>https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr"/>
+    <published>2026-08-03T20:14:28Z</published>
+    <updated>2026-08-08T03:26:54Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Incomplete unsafe_git_archive_options denylist omits --add-file / --add-virtual-file, enabling arbitrary file read via Repo.archive()&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.57&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Target:** gitpython-developers/GitPython
+**Tested:** HEAD `07e80555` (2026-07-25), latest release 3.1.55, `git version 2.50.1`
+
+## Summary
+
+`Repo.archive()` does call the option guard, so this is not a missing-guard report. The guard is present and working; the **denylist it consults is incomplete**.
+
+```python
+# git/repo/base.py:169
+unsafe_git_archive_options = [
+    # Allows arbitrary command execution through the remote git-upload-archive command.
+    &amp;quot;--exec&amp;quot;,
+    # Writes output to a caller-controlled filesystem path.
+    &amp;quot;--output&amp;quot;,
+    &amp;quot;-o&amp;quot;,
+]
+```
+
+The comment on `--output` states the protected class in the project&amp;#x27;s own words: an option that lets the caller name **a filesystem path** is unsafe. `--output` is blocked because it *writes* to a caller-chosen path.
+
+`git archive` also…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-539m-9xh6-q6rr"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-539m-9xh6-q6rr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2193"&gt;https://github.com/gitpython-developers/GitPython/pull/2193&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/7a4f5dcb7bf3cbcbf6e438017efcdfe0bc0d36ca"&gt;https://github.com/gitpython-developers/GitPython/commit/7a4f5dcb7bf3cbcbf6e438017efcdfe0bc0d36ca&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-p538-c434-8v24: GitPython: Arbitrary file truncation via git rev-list --output argument injection in unguarded Commit.count</title>
+    <id>https://osv.dev/vulnerability/GHSA-p538-c434-8v24</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p538-c434-8v24"/>
+    <published>2026-08-03T20:23:17Z</published>
+    <updated>2026-08-08T03:26:54Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Arbitrary file truncation via git rev-list --output argument injection in unguarded Commit.count&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.56&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+`Commit.count()` forwards `**kwargs` into `rev_list` with **no** `check_unsafe_options` guard (the guard exists only in the sibling `iter_items`, commit.py:341). `git rev-list --output=&amp;lt;path&amp;gt;` opens and truncates the target file to 0 bytes before revision parsing, so `count(output=&amp;#x27;/victim&amp;#x27;)` destroys/blanks an arbitrary file.
+
+## Root Cause
+`commit.py:290-291` calls `self.repo.git.rev_list(self.hexsha, **kwargs)` with no `check_unsafe_options` and no `allow_unsafe_options` parameter. The sibling `iter_items` (commit.py:341) is guarded; `count` is not. This is a distinct, uncovered sink — GHSA-956x-8gvw-wg5v fixed `iter_commits`/`blame`, not `count`.
+
+## Impact
+Destroy/blank an arbitrary file at process privilege (integrity/availability). Reachability is key-control only (`count…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-p538-c434-8v24"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-p538-c434-8v24&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2184"&gt;https://github.com/gitpython-developers/GitPython/pull/2184&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/38553b6fddc7f6a667cdb45a6762343a08fc72b2"&gt;https://github.com/gitpython-developers/GitPython/commit/38553b6fddc7f6a667cdb45a6762343a08fc72b2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.56"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.56&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p538-c434-8v24"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-gv23-xrm3-8c62: PraisonAI has Cross-Workspace IDOR and Privilege Escalation via Platform API</title>
     <id>https://osv.dev/vulnerability/GHSA-gv23-xrm3-8c62</id>
@@ -1636,7 +1702,7 @@ _-= Per source details. Do not edit below this line.=-_
 On `import xAyOuB_XcTxTeaM`, __init__.py automatically starts a Flask HTTP server bound to 0.0.0.0:50019 exposing `/spam?uid=`, `/stop`, and `/status` endpoints. Any remote party able to reach the installer&amp;#x27;s host on that port can supply an arbitrary uid and cause the package to drive outbound abuse traffic from the installer&amp;#x27;s IP. In parallel, import-time background threads log in ~20 hardcoded Garena Free Fire guest accounts (shipped as accounts.json in the sdist) against loginbp.ggpolarbear.com and 100067.connect.garena.com using a hardcoded OAuth client_id=100067 and client_secret, open game rooms, and emit `openroom`/`spmroom`/`SE…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/xAyOuB-XcTxTeaM/0.1.0/"&gt;https://pypi.org/project/xAyOuB-XcTxTeaM/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/xAyOuB-XcTxTeaM/0.1.1/"&gt;https://pypi.org/project/xAyOuB-XcTxTeaM/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/xAyOuB-XcTxTeaM/0.1.2/"&gt;https://pypi.org/project/xAyOuB-XcTxTeaM/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13426"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13386: Malicious code in decapod-common (PyPI)</title>
+    <title>[UPDATED] MAL-2026-13386: Malicious code in decapod-common (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13386</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13386"/>
     <published>2026-08-06T07:14:52Z</published>

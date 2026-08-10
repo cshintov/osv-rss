@@ -3,12 +3,77 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-08-10T13:05:04Z</updated>
+  <updated>2026-08-10T15:39:09Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-55q2-fjhq-7xh7: DOMPurify: IN_PLACE hook removal leaves a detached subtree executable, causing XSS</title>
+    <id>https://osv.dev/vulnerability/GHSA-55q2-fjhq-7xh7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-55q2-fjhq-7xh7"/>
+    <published>2026-08-07T15:30:47Z</published>
+    <updated>2026-08-10T15:39:09Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;DOMPurify: IN_PLACE hook removal leaves a detached subtree executable, causing XSS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dompurify&lt;/code&gt; — fixed in 3.4.13&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+During `IN_PLACE` sanitization, a hook that removes an element can leave that element&amp;#x27;s detached descendants executable. A descendant image can retain its attacker-provided `onload` handler and fire after `sanitize()` returns, even though the returned root is clean and the image remains disconnected from the document.
+
+### Details
+
+In DOMPurify 3.4.12, `_sanitizeElements()` in `src/purify.ts:1862-1904` runs the `beforeSanitizeElements` or `uponSanitizeElement` hook and returns immediately when the hook detached the current node. The return does not call `_neutralizeSubtree(currentNode)`.
+
+The detached subtree is not added to `DOMPurify.removed`, so the post-walk `IN_PLACE` neutralization cannot reach it. If the browser queued a resource event while the application constructed …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/security/advisories/GHSA-55q2-fjhq-7xh7"&gt;https://github.com/cure53/DOMPurify/security/advisories/GHSA-55q2-fjhq-7xh7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/pull/1557"&gt;https://github.com/cure53/DOMPurify/pull/1557&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/commit/3067f7746769"&gt;https://github.com/cure53/DOMPurify/commit/3067f7746769&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify"&gt;https://github.com/cure53/DOMPurify&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/releases/tag/3.4.13"&gt;https://github.com/cure53/DOMPurify/releases/tag/3.4.13&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-55q2-fjhq-7xh7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-v39h-62p7-jpjc: fast-uri vulnerable to host confusion via percent-encoded authority delimiters</title>
+    <id>https://osv.dev/vulnerability/GHSA-v39h-62p7-jpjc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v39h-62p7-jpjc"/>
+    <published>2026-05-08T19:13:01Z</published>
+    <updated>2026-08-10T15:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-6322"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;fast-uri vulnerable to host confusion via percent-encoded authority delimiters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6322&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 3.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 2.4.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+`fast-uri` v3.1.1 and earlier decodes percent-encoded authority delimiters (`%40` as `@`, `%3A` as `:`) inside the host component and serializes them back as raw characters. This changes the URI structure, turning a hostname into userinfo plus a different host.
+
+For example, `http://trusted.com%40evil.com/` normalizes to `http://trusted.com@evil.com/`, which reparses as host `evil.com` with userinfo `trusted.com`.
+
+Applications that normalize untrusted URLs before host allowlist checks, redirect validation, or outbound request routing can be steered to a different authority than the original URL appeared to contain.
+
+### Patches
+
+Upgrade to `fast-uri` &amp;gt;= 3.1.2, or if you are in the v2.x release line, v2.4.1
+
+### Workarounds
+
+None. Upgrade to the patched version.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/security/advisories/GHSA-v39h-62p7-jpjc"&gt;https://github.com/fastify/fast-uri/security/advisories/GHSA-v39h-62p7-jpjc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6322"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6322&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:25271"&gt;https://access.redhat.com/errata/RHSA-2026:25271&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:37385"&gt;https://access.redhat.com/errata/RHSA-2026:37385&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:37628"&gt;https://access.redhat.com/errata/RHSA-2026:37628&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40118"&gt;https://access.redhat.com/errata/RHSA-2026:40118&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:40945"&gt;https://access.redhat.com/errata/RHSA-2026:40945&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41066"&gt;https://access.redhat.com/errata/RHSA-2026:41066&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v39h-62p7-jpjc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q3j6-qgpj-74h6: fast-uri vulnerable to path traversal via percent-encoded dot segments</title>
+    <id>https://osv.dev/vulnerability/GHSA-q3j6-qgpj-74h6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q3j6-qgpj-74h6"/>
+    <published>2026-05-08T17:15:09Z</published>
+    <updated>2026-08-10T15:00:18Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-6321"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;fast-uri vulnerable to path traversal via percent-encoded dot segments&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6321&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 3.1.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 2.4.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+`fast-uri` v3.1.0 and earlier decodes percent-encoded path separators (`%2F`) and dot segments (`%2E`) before applying dot-segment removal in `normalize()` and `equal()`. This makes encoded path data behave like real `/` and `..`, so distinct URIs collapse onto the same normalized path.
+
+For example, `http://example.com/public/%2e%2e/admin` normalizes to `http://example.com/admin`, and `equal()` considers them the same URI.
+
+Applications that normalize or compare attacker-controlled URLs to enforce path-based policy can be bypassed. A path that looks confined under an allowed prefix can normalize to a different location.
+
+### Patches
+
+Upgrade to `fast-uri` &amp;gt;= 3.1.1, or if you are in the v2.x release line, v2.4.1
+
+### Workarounds
+
+None. Upgrade to the patched version.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/security/advisories/GHSA-q3j6-qgpj-74h6"&gt;https://github.com/fastify/fast-uri/security/advisories/GHSA-q3j6-qgpj-74h6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6321"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-6321.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-6321.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/releases/tag/v3.1.1"&gt;https://github.com/fastify/fast-uri/releases/tag/v3.1.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/releases/tag/v2.4.1"&gt;https://github.com/fastify/fast-uri/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri"&gt;https://github.com/fastify/fast-uri&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.openjsf.org/security-advisories.html"&gt;https://cna.openjsf.org/security-advisories.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2466582"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2466582&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q3j6-qgpj-74h6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-13701: Malicious code in chai-as-format (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13701</id>
@@ -224,7 +289,7 @@ No static or traced-code signals of exfiltration, install-time remote code execu
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different comput…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-jm85-g3fj-922w"&gt;https://github.com/advisories/GHSA-jm85-g3fj-922w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@lambda-platform/lambda-vue/v/3.3.24"&gt;https://www.npmjs.com/package/@lambda-platform/lambda-vue/v/3.3.24&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13668"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13679: Malicious code in svelte-streak-kit (npm)</title>
+    <title>[UPDATED] MAL-2026-13679: Malicious code in svelte-streak-kit (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13679</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13679"/>
     <published>2026-08-08T17:19:59Z</published>
@@ -260,7 +325,7 @@ No malicious behavior was identified in this package version. No lifecycle scrip
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer m…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-5qqf-5c4c-p53q"&gt;https://github.com/advisories/GHSA-5qqf-5c4c-p53q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/svelte-map-visual/v/1.0.0"&gt;https://www.npmjs.com/package/svelte-map-visual/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13678"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13677: Malicious code in svelte-kit-cache (npm)</title>
+    <title>[UPDATED] MAL-2026-13677: Malicious code in svelte-kit-cache (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13677</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13677"/>
     <published>2026-08-08T17:20:38Z</published>
@@ -296,7 +361,7 @@ No a static rule matches and no traced install-time or import-time behavior of c
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-9qqc-qrf8-gp8j"&gt;https://github.com/advisories/GHSA-9qqc-qrf8-gp8j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/svelte-cache-kit/v/1.0.0"&gt;https://www.npmjs.com/package/svelte-cache-kit/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13676"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13674: Malicious code in statist-browser-typed-client-eventea.projects.tdeal (npm)</title>
+    <title>[UPDATED] MAL-2026-13674: Malicious code in statist-browser-typed-client-eventea.projects.tdeal (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13674</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13674"/>
     <published>2026-08-08T17:27:55Z</published>
@@ -314,7 +379,7 @@ Package contains 2 files with no static or behavioral indicators of supply-chain
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer m…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-966c-8786-6cx7"&gt;https://github.com/advisories/GHSA-966c-8786-6cx7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/statist-browser-typed-client-eventea.projects.tdeal/v/0.0.1"&gt;https://www.npmjs.com/package/statist-browser-typed-client-eventea.projects.tdeal/v/0.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13674"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13675: Malicious code in statist-browser-typed-client-eventea.projects.tdevice (npm)</title>
+    <title>[UPDATED] MAL-2026-13675: Malicious code in statist-browser-typed-client-eventea.projects.tdevice (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13675</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13675"/>
     <published>2026-08-08T17:27:55Z</published>
@@ -332,7 +397,7 @@ Package statist-browser-typed-client-eventea.projects.tdevice@0.0.1 contains onl
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should b…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-rrvf-xjx8-gmjh"&gt;https://github.com/advisories/GHSA-rrvf-xjx8-gmjh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/statist-browser-typed-client-eventea.projects.tdevice/v/0.0.1"&gt;https://www.npmjs.com/package/statist-browser-typed-client-eventea.projects.tdevice/v/0.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13675"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13673: Malicious code in statist-browser-typed-client-eventea.projects.pwakasko (npm)</title>
+    <title>[UPDATED] MAL-2026-13673: Malicious code in statist-browser-typed-client-eventea.projects.pwakasko (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13673</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13673"/>
     <published>2026-08-08T17:27:55Z</published>
@@ -350,7 +415,7 @@ Package contains only 2 files and no code patterns indicating credential access,
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outsid…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-4fvg-gp6j-v2qm"&gt;https://github.com/advisories/GHSA-4fvg-gp6j-v2qm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/statist-browser-typed-client-eventea.projects.pwakasko/v/0.0.1"&gt;https://www.npmjs.com/package/statist-browser-typed-client-eventea.projects.pwakasko/v/0.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13673"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13672: Malicious code in statist-browser-typed-client-eventea.projects.pwainsurance (npm)</title>
+    <title>[UPDATED] MAL-2026-13672: Malicious code in statist-browser-typed-client-eventea.projects.pwainsurance (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13672</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13672"/>
     <published>2026-08-08T17:27:55Z</published>
@@ -368,7 +433,7 @@ Package statist-browser-typed-client-eventea.projects.pwainsurance@0.0.1 contain
 Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-hm23-rg8r-xhmg"&gt;https://github.com/advisories/GHSA-hm23-rg8r-xhmg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/statist-browser-typed-client-eventea.projects.pwainsurance/v/0.0.1"&gt;https://www.npmjs.com/package/statist-browser-typed-client-eventea.projects.pwainsurance/v/0.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13672"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13671: Malicious code in statist-browser-typed-client-eventea.projects.pwahelp (npm)</title>
+    <title>[UPDATED] MAL-2026-13671: Malicious code in statist-browser-typed-client-eventea.projects.pwahelp (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13671</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13671"/>
     <published>2026-08-08T17:27:55Z</published>
@@ -401,7 +466,7 @@ package.json declares a postinstall script that opens an interactive bash revers
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/simple-date-formatter-new-9/v/1.0.0"&gt;https://www.npmjs.com/package/simple-date-formatter-new-9/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13698"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13670: Malicious code in statist-browser-typed-client-eventea.projects.pwafamily (npm)</title>
+    <title>[UPDATED] MAL-2026-13670: Malicious code in statist-browser-typed-client-eventea.projects.pwafamily (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13670</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13670"/>
     <published>2026-08-08T17:27:55Z</published>
@@ -547,7 +612,7 @@ _-= Per source details. Do not edit below this line.=-_
 scripts/install.js runs during npm preinstall and performs three attacker-beneficial actions against the installer host. First, it unconditionally beacons installer identifiers (pid, base64-encoded process.cwd(), base64-encoded process.env.INIT_CWD, and a marker) over plain HTTP to the hardcoded bare-IP endpoint http://49.232.169.67:43817/bsrc-r260. Second, when a parent build manifest matches an internal marker, it downloads a shell script from http://49.232.169.67:80/slt via curl (with a wget fallback) and pipes the response into /bin/sh through spawnSync, giving the remote host arbitrary code execution on the installer at install ti…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.7"&gt;https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.8"&gt;https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.11"&gt;https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.1"&gt;https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.4"&gt;https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.6"&gt;https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.0"&gt;https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.2"&gt;https://www.npmjs.com/package/@noobaihome/amis-uni-area-widget/v/1.0.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-13690"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13669: Malicious code in specials-resources-server (npm)</title>
+    <title>[UPDATED] MAL-2026-13669: Malicious code in specials-resources-server (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13669</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13669"/>
     <published>2026-08-08T17:27:55Z</published>
@@ -635,7 +700,7 @@ _-= Per source details. Do not edit below this line.=-_
 The package is published under a name suggesting a Vitest preview utility, but the shipped code is a rebranded copy of nodemailer with an added preinstall dropper. package.json declares `preinstall: node lib/utils/index.js`, which uses child_process.spawn(process.execPath, [lib/utils/smtp-connection/index.js], {detached:true, stdio:[&amp;#x27;ignore&amp;#x27;,&amp;#x27;ignore&amp;#x27;,&amp;#x27;ignore&amp;#x27;]}).unref() to launch a detached, fully silenced child that survives beyond `npm install`. The spawned file is obfuscated with a custom basE91 string-array decoder; the decoded top-level async IIFE calls globalThis.fetch against a URL on api.jsonbin.io/v3/, parses the JSON response…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-preview-pro/v/10.0.3"&gt;https://www.npmjs.com/package/vitest-preview-pro/v/10.0.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-preview-pro/v/10.0.7"&gt;https://www.npmjs.com/package/vitest-preview-pro/v/10.0.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-preview-pro/v/10.0.5"&gt;https://www.npmjs.com/package/vitest-preview-pro/v/10.0.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/vitest-preview-pro/v/10.0.6"&gt;https://www.npmjs.com/package/vitest-preview-pro/v/10.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-wx22-xm6j-mgqx"&gt;https://github.com/advisories/GHSA-wx22-xm6j-mgqx&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-12004"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-13680: Malicious code in test-noexist-xyz-99 (npm)</title>
+    <title>[UPDATED] MAL-2026-13680: Malicious code in test-noexist-xyz-99 (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-13680</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-13680"/>
     <published>2026-08-08T17:27:55Z</published>

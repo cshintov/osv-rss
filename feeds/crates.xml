@@ -3,12 +3,95 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-08-10T19:45:04Z</updated>
+  <updated>2026-08-11T11:15:06Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0253: Potential use-after-free due to lack of panic safety in `LruCache::pop()`</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0253</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0253"/>
+    <published>2026-05-12T12:00:00Z</published>
+    <updated>2026-08-11T11:15:06Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Potential use-after-free due to lack of panic safety in `LruCache::pop()`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;lru&lt;/code&gt; — fixed in 0.18.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`LruCache::pop()` in `lru` was not panic-safe. If the `Drop` implementation of a stored key panics during `pop()`, `self.detach()` is never called, leaving dangling pointers in the internal doubly-linked list.
+
+A subsequent cache operation that triggers eviction can then dereference these dangling pointers:
+- The node is freed from the map, but remains linked in the LRU list due to the skipped `detach()` call
+- When a new insertion causes eviction, the LRU traversal encounters the dangling pointer
+- This results in a write to already-freed memory during the eviction process
+
+## Impact
+
+- **CWE-416 (Use-After-Free):** memory corruption when subsequent cache operations access freed node pointers in the linked list
+- **CWE-415 (Double Free):** potential heap corruption when the same memory is…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/lru"&gt;https://crates.io/crates/lru&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0253.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0253.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jeromefroe/lru-rs/pull/238"&gt;https://github.com/jeromefroe/lru-rs/pull/238&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0253"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0252: Panic-safety unsoundness in `SplitVec::extend_from_slice` (uninitialized read)</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0252</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0252"/>
+    <published>2026-08-11T12:00:00Z</published>
+    <updated>2026-08-11T10:45:03Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Panic-safety unsoundness in `SplitVec::extend_from_slice` (uninitialized read)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;orx-split-vec&lt;/code&gt; — fixed in 4.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`SplitVec::extend_from_slice` increments the logical length `self.len` before cloning the incoming elements into the reserved slots. If an element&amp;#x27;s `Clone` panics mid-fill, unwinding leaves `self.len` counting slots that were never initialized. A later safe read (`get`, indexing, `iter`) then reads one of those uninitialized slots.
+
+This is reachable from safe Rust — a read of uninitialized memory (CWE-908). It is not a double-free: `SplitVec` has no manual `Drop` and its elements live in a standard `Vec`, so the defect is a read, not a free.
+
+## Impact
+
+A safe read after the panic returns a value built from uninitialized bytes. For a heap-owning element type such as `String`, the resulting value has garbage length/pointer fields.
+
+Confirmed under Miri. AddressSanitizer stays silent for t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/orx-split-vec"&gt;https://crates.io/crates/orx-split-vec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0252.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0252.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/orxfun/orx-split-vec/issues/95"&gt;https://github.com/orxfun/orx-split-vec/issues/95&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0252"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-94vh-gphv-8pm8: zip Incorrectly Canonicalizes Paths during Archive Extraction Leading to Arbitrary File Write</title>
+    <id>https://osv.dev/vulnerability/GHSA-94vh-gphv-8pm8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-94vh-gphv-8pm8"/>
+    <published>2025-03-17T21:26:32Z</published>
+    <updated>2026-08-11T10:40:35Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2025-29787"/>
+    <category term="RUSTSEC-2025-0168"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zip Incorrectly Canonicalizes Paths during Archive Extraction Leading to Arbitrary File Write&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-29787, RUSTSEC-2025-0168&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:L/VI:H/VA:N/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zip&lt;/code&gt; — fixed in 2.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+
+In the archive extraction routine of affected versions of the `zip` crate, symbolic links earlier in the archive are allowed to be used for later files in the archive without validation of the final canonicalized path, allowing maliciously crafted archives to overwrite arbitrary files in the file system when extracted.
+
+### Details
+
+This is a variant of the [zip-slip](https://github.com/snyk/zip-slip-vulnerability) vulnerability, we can make the extraction logic step outside of the target directory by creating a symlink to the parent directory and then extracting further files through that symlink.
+
+The documentation of the [`::zip::read::ZipArchive::extract`] method is in my opinion implying this should not happen:
+
+&amp;gt; &amp;quot;Paths are sanitized with ZipFile::enclosed_name.&amp;quot; ...
+&amp;gt; …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/security/advisories/GHSA-94vh-gphv-8pm8"&gt;https://github.com/zip-rs/zip2/security/advisories/GHSA-94vh-gphv-8pm8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-29787"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-29787&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/commit/a2e062f37066c3b12860a32eb1cb44856cfb7afe"&gt;https://github.com/zip-rs/zip2/commit/a2e062f37066c3b12860a32eb1cb44856cfb7afe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/eternal-flame-AD/bf71ef4f6828e741eb12ce7fd47b7b85"&gt;https://gist.github.com/eternal-flame-AD/bf71ef4f6828e741eb12ce7fd47b7b85&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2"&gt;https://github.com/zip-rs/zip2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/releases/tag/v2.3.0"&gt;https://github.com/zip-rs/zip2/releases/tag/v2.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-94vh-gphv-8pm8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2025-0168: Incorrect path canonicalization during Archive Extraction Leading to Arbitrary File Write</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0168</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0168"/>
+    <published>2025-03-16T12:00:00Z</published>
+    <updated>2026-08-11T10:30:03Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2025-29787"/>
+    <category term="GHSA-94vh-gphv-8pm8"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Incorrect path canonicalization during Archive Extraction Leading to Arbitrary File Write&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-29787, GHSA-94vh-gphv-8pm8&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:L/VI:H/VA:N/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zip&lt;/code&gt; — fixed in 2.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In the archive extraction routine of affected versions of the zip crate, symbolic links earlier in the archive are allowed to be used for later files in the archive without validation of the final canonicalized path, allowing maliciously crafted archives to overwrite arbitrary files in the file system when extracted.
+
+For more details, see the GitHub-hosted security advisory: &amp;lt;https://github.com/zip-rs/zip2/security/advisories/GHSA-94vh-gphv-8pm8&amp;gt;&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zip"&gt;https://crates.io/crates/zip&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0168.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0168.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/security/advisories/GHSA-94vh-gphv-8pm8"&gt;https://github.com/zip-rs/zip2/security/advisories/GHSA-94vh-gphv-8pm8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0168"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2025-0169: `FormatContext` stream accessors can cause undefined behavior from safe code</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0169</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0169"/>
+    <published>2025-04-24T12:00:00Z</published>
+    <updated>2026-08-11T10:30:03Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`FormatContext` stream accessors can cause undefined behavior from safe code&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stainless_ffmpeg&lt;/code&gt; — fixed in 0.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `stainless_ffmpeg` exposed several safe public methods on `FormatContext` that accepted a `stream_index` parameter and used it in unsafe pointer operations without checking whether the index was valid. These methods performed pointer arithmetic and dereferenced the resulting stream pointer. Safe callers could pass a negative or out-of-bounds `stream_index`, which could cause out-of-bounds pointer access and undefined behavior from safe Rust code.
+
+The issue was fixed in version `0.6.0` by marking the affected stream accessor methods as `unsafe` and documenting that callers must ensure `stream_index` is a valid stream index.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/stainless_ffmpeg"&gt;https://crates.io/crates/stainless_ffmpeg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0169.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0169.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nomalab/stainless-ffmpeg/issues/63"&gt;https://github.com/nomalab/stainless-ffmpeg/issues/63&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nomalab/stainless-ffmpeg/pull/64"&gt;https://github.com/nomalab/stainless-ffmpeg/pull/64&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nomalab/stainless-ffmpeg/commit/a649e8cb4e7c9859279d1dc85051df5e7a4932f7"&gt;https://github.com/nomalab/stainless-ffmpeg/commit/a649e8cb4e7c9859279d1dc85051df5e7a4932f7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0169"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0247: bitmaps is unmaintained</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0247</id>
@@ -156,126 +239,5 @@ seven.for_each_entries(|entry, reader| {
     <content type="html">&lt;p&gt;&lt;strong&gt;`setlocale` and `TextDomain::init` are unsound as they access environment with no synchronization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gettext-rs&lt;/code&gt; — fixed in 0.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`setlocale` and `TextDomain::init` are unsound and may allow safe code to exhibit undefined behavior when called in a multi-threaded program.
 
 The flaw is fixed in 0.8.0 by marking these functions `unsafe` and documenting the conditions under which they can be called safely.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/gettext-rs"&gt;https://crates.io/crates/gettext-rs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0244.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0244.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gettext-rs/gettext-rs/issues/64"&gt;https://github.com/gettext-rs/gettext-rs/issues/64&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0244"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0243: `nostr-relay-pool` is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0243</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0243"/>
-    <published>2026-08-03T12:00:00Z</published>
-    <updated>2026-08-09T12:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`nostr-relay-pool` is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nostr-relay-pool&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `nostr-relay-pool` crate is no longer actively maintained as a standalone crate.
-
-Its functionality has been incorporated into [`nostr-sdk`](https://crates.io/crates/nostr-sdk) starting with version `0.45.0`.
-
-Users should migrate to [`nostr-sdk`](https://crates.io/crates/nostr-sdk).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/nostr-relay-pool"&gt;https://crates.io/crates/nostr-relay-pool&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0243.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0243.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nostrdevkit/nostr/issues/1415"&gt;https://github.com/nostrdevkit/nostr/issues/1415&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0243"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0241: `nostr-keyring` is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0241</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0241"/>
-    <published>2026-08-03T12:00:00Z</published>
-    <updated>2026-08-09T12:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`nostr-keyring` is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nostr-keyring&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `nostr-keyring` crate is no longer actively maintained.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/nostr-keyring"&gt;https://crates.io/crates/nostr-keyring&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0241.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0241.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nostrdevkit/nostr/pull/1414"&gt;https://github.com/nostrdevkit/nostr/pull/1414&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nostrdevkit/nostr/issues/1415"&gt;https://github.com/nostrdevkit/nostr/issues/1415&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0241"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] RUSTSEC-2026-0239: Streaming AEAD does not authenticate stream structure</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0239</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0239"/>
-    <published>2026-08-09T12:00:00Z</published>
-    <updated>2026-08-09T12:45:04Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-8cwp-4826-jg9f"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Streaming AEAD does not authenticate stream structure&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-8cwp-4826-jg9f&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dcrypt-symmetric&lt;/code&gt; — fixed in 2.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In all published versions of `dcrypt-symmetric` before 2.0.0, version-1 GCM and
-ChaCha20-Poly1305 streams used unauthenticated terminator, counter, and length
-fields. Decryptors trusted transmitted counters, allocated from unbounded
-lengths, and discarded plaintext that did not fit a caller&amp;#x27;s single read
-buffer. An attacker could obtain successful truncated EOF, omit, replay, or
-reorder frames within a stream, or request an allocation approaching 4 GiB.
-
-Version 2.0.0 introduces the `DCRSTRM2` format, which authenticates its version,
-algorithm, random stream identifier, base nonce, strict sequence, bounded
-lengths, final flag, and caller AAD. It enforces authenticated finality and
-physical EOF, bounds frames to 16 KiB before allocation, retains partial-read
-plaintext, and rejects legacy ve…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/dcrypt-symmetric"&gt;https://crates.io/crates/dcrypt-symmetric&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0239.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0239.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/security/advisories/GHSA-8cwp-4826-jg9f"&gt;https://github.com/ioi-foundation/dcrypt/security/advisories/GHSA-8cwp-4826-jg9f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/commit/c99cc86f0ee353010cd202cbcd2c310371b0bbb8"&gt;https://github.com/ioi-foundation/dcrypt/commit/c99cc86f0ee353010cd202cbcd2c310371b0bbb8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/releases/tag/v2.0.0"&gt;https://github.com/ioi-foundation/dcrypt/releases/tag/v2.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0239"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] RUSTSEC-2026-0242: Safe ErrorRegistry APIs can cause undefined behavior</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0242</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0242"/>
-    <published>2026-08-09T12:00:00Z</published>
-    <updated>2026-08-09T12:45:04Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-7hc7-h3f2-r4j6"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Safe ErrorRegistry APIs can cause undefined behavior&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-7hc7-h3f2-r4j6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dcrypt-api&lt;/code&gt; — fixed in 2.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;All published versions of `dcrypt-api` before 2.0.0 exposed safe
-`ErrorRegistry` operations that could trigger undefined behavior when the
-default `std` feature was enabled.
-
-Stored `Box&amp;lt;E&amp;gt;` values were erased to raw pointers and later deallocated as
-`Box&amp;lt;()&amp;gt;`. The `get_error&amp;lt;E&amp;gt;` operation also performed an unchecked cast to a
-caller-selected type. Finally, concurrent replacement or clearing could free a
-value while another thread cloned it. Ordinary safe Rust could therefore cause
-mismatched deallocation, type confusion, and use-after-free. Crates that
-re-exported this API are affected transitively.
-
-Version 2.0.0 replaces the raw pointers with owned `Box&amp;lt;dyn Any + Send&amp;gt;` values
-behind a mutex, performs checked downcasts, and uses a mutation generation so
-concurrent stores and clears win …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/dcrypt-api"&gt;https://crates.io/crates/dcrypt-api&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0242.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0242.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/security/advisories/GHSA-7hc7-h3f2-r4j6"&gt;https://github.com/ioi-foundation/dcrypt/security/advisories/GHSA-7hc7-h3f2-r4j6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/commit/c99cc86f0ee353010cd202cbcd2c310371b0bbb8"&gt;https://github.com/ioi-foundation/dcrypt/commit/c99cc86f0ee353010cd202cbcd2c310371b0bbb8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/releases/tag/v2.0.0"&gt;https://github.com/ioi-foundation/dcrypt/releases/tag/v2.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0242"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] RUSTSEC-2026-0238: Low-level GCM ignores the operation nonce</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0238</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0238"/>
-    <published>2026-08-09T12:00:00Z</published>
-    <updated>2026-08-09T12:45:04Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-h9f2-fgp8-vc4h"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Low-level GCM ignores the operation nonce&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-h9f2-fgp8-vc4h&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dcrypt-algorithms&lt;/code&gt; — fixed in 2.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In all published versions of `dcrypt-algorithms` before 2.0.0, the low-level
-`Gcm` builder required an operation nonce but derived `J0` from the nonce
-captured by the original `Gcm` constructor. Multiple operations could therefore
-silently reuse a nonce even when callers supplied distinct values, compromising
-confidentiality and authenticity under an affected key.
-
-Version 2.0.0 makes `Gcm` key-only and passes the operation nonce through IV
-derivation, encryption, and decryption. It also corrects non-96-bit IV
-processing, rejects tags shorter than 96 bits, and enforces counter limits.
-Applications must upgrade, identify affected keys, rotate them, and re-encrypt
-affected data; updating the implementation cannot restore security after nonce
-reuse.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/dcrypt-algorithms"&gt;https://crates.io/crates/dcrypt-algorithms&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0238.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0238.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/security/advisories/GHSA-h9f2-fgp8-vc4h"&gt;https://github.com/ioi-foundation/dcrypt/security/advisories/GHSA-h9f2-fgp8-vc4h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/commit/c99cc86f0ee353010cd202cbcd2c310371b0bbb8"&gt;https://github.com/ioi-foundation/dcrypt/commit/c99cc86f0ee353010cd202cbcd2c310371b0bbb8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/releases/tag/v2.0.0"&gt;https://github.com/ioi-foundation/dcrypt/releases/tag/v2.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0238"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] RUSTSEC-2026-0240: Ed25519 identity public keys permit universal signature forgery</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0240</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0240"/>
-    <published>2026-08-09T12:00:00Z</published>
-    <updated>2026-08-09T12:45:04Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-7j32-2mpw-c784"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Ed25519 identity public keys permit universal signature forgery&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-7j32-2mpw-c784&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dcrypt-sign&lt;/code&gt; — fixed in 2.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;All published versions of `dcrypt-sign` before 2.0.0 accepted the Edwards
-identity as an Ed25519 public key. A signature with `R = B` and `S = 1` then
-verified for every message because the challenge term multiplied the identity.
-The implementation also admitted other noncanonical or small-order inputs.
-Consumers that accepted externally supplied dcrypt Ed25519 keys may therefore
-have accepted forged authorizations.
-
-Version 2.0.0 replaces the custom arithmetic with `ed25519-dalek`, uses strict
-verification, and rejects noncanonical, small-order, and non-torsion-free public
-keys and `R` values, as well as noncanonical `S &amp;gt;= L`. No wrapper around the
-affected verifier is recommended as a complete workaround. Upgrade to 2.0.0 or
-later, audit registered keys and trust stores, and review histo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/dcrypt-sign"&gt;https://crates.io/crates/dcrypt-sign&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0240.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0240.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/security/advisories/GHSA-7j32-2mpw-c784"&gt;https://github.com/ioi-foundation/dcrypt/security/advisories/GHSA-7j32-2mpw-c784&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/commit/c99cc86f0ee353010cd202cbcd2c310371b0bbb8"&gt;https://github.com/ioi-foundation/dcrypt/commit/c99cc86f0ee353010cd202cbcd2c310371b0bbb8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ioi-foundation/dcrypt/releases/tag/v2.0.0"&gt;https://github.com/ioi-foundation/dcrypt/releases/tag/v2.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0240"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0237: `nostr-relay-builder` is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0237</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0237"/>
-    <published>2026-08-03T12:00:00Z</published>
-    <updated>2026-08-09T12:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`nostr-relay-builder` is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nostr-relay-builder&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `nostr-relay-builder` crate is no longer actively maintained as a standalone crate.
-
-Its functionality has been incorporated into [`nostr-sdk`](https://crates.io/crates/nostr-sdk) starting with version `0.45.0`.
-
-Users should migrate to [`nostr-sdk`](https://crates.io/crates/nostr-sdk).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/nostr-relay-builder"&gt;https://crates.io/crates/nostr-relay-builder&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0237.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0237.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nostrdevkit/nostr/issues/1415"&gt;https://github.com/nostrdevkit/nostr/issues/1415&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0237"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

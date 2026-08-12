@@ -3,12 +3,441 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-08-11T18:45:13Z</updated>
+  <updated>2026-08-11T23:55:53Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-fm2x-c5qw-4h6f: LXD: VM lowlevel restriction bypass via raw.apparmor and raw.qemu.conf</title>
+    <id>https://osv.dev/vulnerability/GHSA-fm2x-c5qw-4h6f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fm2x-c5qw-4h6f"/>
+    <published>2026-04-10T19:21:00Z</published>
+    <updated>2026-08-11T23:55:53Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34177"/>
+    <category term="GO-2026-5368"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;LXD: VM lowlevel restriction bypass via raw.apparmor and raw.qemu.conf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34177, GO-2026-5368&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/canonical/lxd&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `isVMLowLevelOptionForbidden` function in `lxd/project/limits/permissions.go` is missing `raw.apparmor` and `raw.qemu.conf` from its hardcoded forbidden list. A user with `can_edit` permission on a VM instance in a restricted project can combine these two omissions to bridge the LXD unix socket into the guest VM and gain full cluster administrator access. This bypasses the `restricted.virtual-machines.lowlevel=block` project restriction, which is the security control specifically designed to prevent raw config injection.
+
+## Details
+
+### Affected code
+
+The enforcement point for VM lowlevel restrictions is `isVMLowLevelOptionForbidden` at `lxd/project/limits/permissions.go:924-926`:
+
+```go
+func isVMLowLevelOptionForbidden(key string) bool {
+    return slices.Contains([]strin…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/security/advisories/GHSA-fm2x-c5qw-4h6f"&gt;https://github.com/canonical/lxd/security/advisories/GHSA-fm2x-c5qw-4h6f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34177"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34177&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/pull/17909"&gt;https://github.com/canonical/lxd/pull/17909&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd"&gt;https://github.com/canonical/lxd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fm2x-c5qw-4h6f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q96j-3fmm-7fv4: LXD: Importing a crafted backup leads to project restriction bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-q96j-3fmm-7fv4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q96j-3fmm-7fv4"/>
+    <published>2026-04-10T19:20:55Z</published>
+    <updated>2026-08-11T23:55:51Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34178"/>
+    <category term="GO-2026-5576"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;LXD: Importing a crafted backup leads to project restriction bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34178, GO-2026-5576&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/canonical/lxd&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+LXD instance backup import validates project restrictions against `backup/index.yaml` embedded in the tar archive, but creates the actual instance from `backup/container/backup.yaml` extracted to the storage volume. Because these are separate, independently attacker-controlled files within the same tar archive, an attacker with instance-creation rights in a restricted project can craft a backup where `index.yaml` contains clean configuration (passing all restriction checks) while `backup.yaml` contains `security.privileged=true`, `raw.lxc` host filesystem mounts, and restricted device types. The instance is created from the unchecked `backup.yaml`, bypassing all project restriction enforcement.
+
+## Details
+
+LXD projects support a `restricted=true` mode that enforces security bo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/security/advisories/GHSA-q96j-3fmm-7fv4"&gt;https://github.com/canonical/lxd/security/advisories/GHSA-q96j-3fmm-7fv4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34178"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34178&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/pull/17921"&gt;https://github.com/canonical/lxd/pull/17921&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd"&gt;https://github.com/canonical/lxd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q96j-3fmm-7fv4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-c3h3-89qf-jqm5: LXD: Update of type field in restricted TLS certificate allows privilege escalation to cluster admin</title>
+    <id>https://osv.dev/vulnerability/GHSA-c3h3-89qf-jqm5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c3h3-89qf-jqm5"/>
+    <published>2026-04-10T19:20:50Z</published>
+    <updated>2026-08-11T23:55:35Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34179"/>
+    <category term="GO-2026-5306"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;LXD: Update of type field in restricted TLS certificate allows privilege escalation to cluster admin&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34179, GO-2026-5306&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/canonical/lxd&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A restricted TLS certificate user can escalate to cluster admin by changing their certificate type from `client` to `server` via PUT/PATCH to `/1.0/certificates/{fingerprint}`. The non-admin guard and reset block in `doCertificateUpdate` fail to validate or reset the `Type` field, allowing a caller-supplied value to persist to the database. The modified certificate is matched as a server certificate during TLS authentication, granting `ProtocolCluster` with full admin privileges.
+
+### Details
+
+`doCertificateUpdate` in `lxd/certificates.go` handles PUT/PATCH requests to `/1.0/certificates/{fingerprint}` for both privileged and unprivileged callers. The access handler is `allowAuthenticated`, so any trusted TLS user (including restricted) can reach this code.
+
+For unprivileged c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/security/advisories/GHSA-c3h3-89qf-jqm5"&gt;https://github.com/canonical/lxd/security/advisories/GHSA-c3h3-89qf-jqm5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34179"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/pull/17936"&gt;https://github.com/canonical/lxd/pull/17936&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd"&gt;https://github.com/canonical/lxd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c3h3-89qf-jqm5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-qw24-gh76-8rvv: Rclone: Unauthenticated command execution in `rclone rcd --rc-serve` via inline remote instantiation, bypassing CVE-2026-41179 fix</title>
+    <id>https://osv.dev/vulnerability/GHSA-qw24-gh76-8rvv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qw24-gh76-8rvv"/>
+    <published>2026-06-16T23:39:41Z</published>
+    <updated>2026-08-11T23:55:33Z</updated>
+    <category term="Go"/>
+    <category term="BIT-rclone-2026-49980"/>
+    <category term="CVE-2026-49980"/>
+    <category term="GO-2026-5596"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Rclone: Unauthenticated command execution in `rclone rcd --rc-serve` via inline remote instantiation, bypassing CVE-2026-41179 fix&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-49980, CVE-2026-49980, GO-2026-5596&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.74.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`rclone rcd --rc-serve` accepts unauthenticated `GET` and `HEAD` requests to paths of the form:
+
+```text
+/[remote:path]/object
+```
+
+The `remote` value is parsed from the URL and passed to normal backend initialization. Inline remote configuration can set backend options that execute local commands during initialization. As a result, a single unauthenticated `GET` or `HEAD` request can execute a command as the rclone process user.
+
+Versions from 1.55.0 onwards are vulnerable to command execution. Earlier versions (from 1.46.0) are vulnerable to the unauthenticated local file read described under &amp;quot;Additional impact&amp;quot; but not to command execution, because inline backend option overrides did not exist until 1.55.0.
+
+## Preconditions
+
+Preconditions for this vulnerability are:
+
+- The …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-qw24-gh76-8rvv"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-qw24-gh76-8rvv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-49980"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-49980&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-49980"&gt;https://access.redhat.com/security/cve/CVE-2026-49980&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2492478"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2492478&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone"&gt;https://github.com/rclone/rclone&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-49980.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-49980.json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qw24-gh76-8rvv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5596: Unauthenticated command execution in rclone rcd via inline remotes in github.com/rclone/rclone</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5596</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5596"/>
+    <published>2026-08-11T23:21:06Z</published>
+    <updated>2026-08-11T23:55:33Z</updated>
+    <category term="Go"/>
+    <category term="BIT-rclone-2026-49980"/>
+    <category term="CVE-2026-49980"/>
+    <category term="GHSA-qw24-gh76-8rvv"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unauthenticated command execution in rclone rcd via inline remotes in github.com/rclone/rclone&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-49980, CVE-2026-49980, GHSA-qw24-gh76-8rvv&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.74.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/ncw/rclone&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The --rc-serve path in rclone allows unauthenticated remote instantiation, enabling unauthenticated command execution. An attacker can use inline remote backend options such as sftp ssh to run arbitrary commands as the rclone user.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-qw24-gh76-8rvv"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-qw24-gh76-8rvv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/commit/48da1774f4999d1d46543308b9a7fe75585dbfc4"&gt;https://github.com/rclone/rclone/commit/48da1774f4999d1d46543308b9a7fe75585dbfc4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/commit/9222ed2c5a7678de7fa620214b0858311c707a29"&gt;https://github.com/rclone/rclone/commit/9222ed2c5a7678de7fa620214b0858311c707a29&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-49980"&gt;https://access.redhat.com/security/cve/CVE-2026-49980&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2492478"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2492478&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-49980.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-49980.json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5596"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5668: Race condition in 'docker cp' in github.com/docker/docker allows creation of arbitrary files</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5668</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5668"/>
+    <published>2026-06-25T22:34:38Z</published>
+    <updated>2026-08-11T23:45:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41568"/>
+    <category term="GHSA-vp62-88p7-qqf5"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Race condition in &amp;#x27;docker cp&amp;#x27; in github.com/docker/docker allows creation of arbitrary files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41568, GHSA-vp62-88p7-qqf5&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/docker/docker&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/moby/moby&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/moby/moby/v2&lt;/code&gt; — fixed in 2.0.0-beta.14&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A race condition in the Docker daemon allows an attacker to create arbitrary empty files on the host system during a &amp;quot;docker cp&amp;quot; operation by swapping a destination path with a symbolic link.
+
+The affected code is in the daemon package, specifically the openContainerFS and createIfNotExists methods. This is daemon-owned, Linux-specific code and is not intended for external use as a Go library.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/moby/moby/security/advisories/GHSA-vp62-88p7-qqf5"&gt;https://github.com/moby/moby/security/advisories/GHSA-vp62-88p7-qqf5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5668"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5306: Type field in restricted TLS certificate allows privilege escalation in github.com/canonical/lxd</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5306</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5306"/>
+    <published>2026-08-11T23:21:27Z</published>
+    <updated>2026-08-11T23:45:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34179"/>
+    <category term="GHSA-c3h3-89qf-jqm5"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Type field in restricted TLS certificate allows privilege escalation in github.com/canonical/lxd&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34179, GHSA-c3h3-89qf-jqm5&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/canonical/lxd&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Type field in restricted TLS certificate allows privilege escalation in github.com/canonical/lxd&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/security/advisories/GHSA-c3h3-89qf-jqm5"&gt;https://github.com/canonical/lxd/security/advisories/GHSA-c3h3-89qf-jqm5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/pull/17936"&gt;https://github.com/canonical/lxd/pull/17936&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5306"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5368: VM lowlevel restriction bypass via raw.apparmor and raw.qemu.conf in github.com/canonical/lxd</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5368</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5368"/>
+    <published>2026-08-11T23:21:27Z</published>
+    <updated>2026-08-11T23:45:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34177"/>
+    <category term="GHSA-fm2x-c5qw-4h6f"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;VM lowlevel restriction bypass via raw.apparmor and raw.qemu.conf in github.com/canonical/lxd&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34177, GHSA-fm2x-c5qw-4h6f&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/canonical/lxd&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;VM lowlevel restriction bypass via raw.apparmor and raw.qemu.conf in github.com/canonical/lxd&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/security/advisories/GHSA-fm2x-c5qw-4h6f"&gt;https://github.com/canonical/lxd/security/advisories/GHSA-fm2x-c5qw-4h6f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/pull/17909"&gt;https://github.com/canonical/lxd/pull/17909&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5368"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5576: LXD: Importing a crafted backup leads to project restriction bypass in github.com/canonical/lxd</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5576</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5576"/>
+    <published>2026-08-11T23:21:27Z</published>
+    <updated>2026-08-11T23:45:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34178"/>
+    <category term="GHSA-q96j-3fmm-7fv4"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;LXD: Importing a crafted backup leads to project restriction bypass in github.com/canonical/lxd&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34178, GHSA-q96j-3fmm-7fv4&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/canonical/lxd&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;LXD: Importing a crafted backup leads to project restriction bypass in github.com/canonical/lxd&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/security/advisories/GHSA-q96j-3fmm-7fv4"&gt;https://github.com/canonical/lxd/security/advisories/GHSA-q96j-3fmm-7fv4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/canonical/lxd/pull/17921"&gt;https://github.com/canonical/lxd/pull/17921&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5576"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5006: Invoking agent constraints dropped when forwarding keys in golang.org/x/crypto/ssh/agent</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5006</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5006"/>
+    <published>2026-05-22T02:08:34Z</published>
+    <updated>2026-08-11T21:30:12Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39832"/>
+    <category term="GHSA-f5wc-c3c7-36mc"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking agent constraints dropped when forwarding keys in golang.org/x/crypto/ssh/agent&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39832, GHSA-f5wc-c3c7-36mc&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When adding a key to a remote agent constraint extensions such as restrict-destination-v00@openssh.com were not serialized in the request. Destination restrictions were silently stripped when forwarding keys, allowing unrestricted use of the key on the remote host. The client now serializes all constraint extensions. Additionally, the in-memory keyring returned by NewKeyring() now rejects keys with unsupported constraint extensions instead of silently ignoring them.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79435"&gt;https://go.dev/issue/79435&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/778640"&gt;https://go.dev/cl/778640&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/778641"&gt;https://go.dev/cl/778641&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5006"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-5005: Invoking key constraints not enforced in golang.org/x/crypto/ssh/agent</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5005</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5005"/>
+    <published>2026-05-22T02:08:34Z</published>
+    <updated>2026-08-11T21:30:12Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-39833"/>
+    <category term="GHSA-jppx-rxg9-jmrx"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking key constraints not enforced in golang.org/x/crypto/ssh/agent&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39833, GHSA-jppx-rxg9-jmrx&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/crypto&lt;/code&gt; — fixed in 0.52.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The in-memory keyring returned by NewKeyring() silently accepted keys with the ConfirmBeforeUse constraint but never enforced it. The key would sign without any confirmation prompt, with no indication to the caller that the constraint was not in effect. NewKeyring() now returns an error when unsupported constraints are requested.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/79436"&gt;https://go.dev/issue/79436&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/778642"&gt;https://go.dev/cl/778642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/a082jnz-LvI"&gt;https://groups.google.com/g/golang-announce/c/a082jnz-LvI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5005"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-9cr8-q42q-g8m7: Traefik: HTTP/3 mTLS bypass via exact SNI TLSOptions lookup for wildcard and mixed-case hosts</title>
+    <id>https://osv.dev/vulnerability/GHSA-9cr8-q42q-g8m7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9cr8-q42q-g8m7"/>
+    <published>2026-06-16T21:04:29Z</published>
+    <updated>2026-08-11T20:51:18Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53622"/>
+    <category term="GO-2026-5287"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik: HTTP/3 mTLS bypass via exact SNI TLSOptions lookup for wildcard and mixed-case hosts&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53622, GO-2026-5287&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;Traefik&lt;/code&gt; — fixed in 3.7.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+There is a critical vulnerability in Traefik&amp;#x27;s HTTP/3 (QUIC) TLS configuration selection that allows unauthenticated clients to bypass router-specific mTLS enforcement. When HTTP/3 is enabled on an entrypoint, the TLS handshake selects the applicable TLS configuration through an exact, case-sensitive lookup on the SNI value, which fails to match wildcard host patterns (e.g., `*.example.com`) or case variants of the configured hostname. Because the handshake falls back to the default TLS configuration — which may not require client certificates — a client can complete the QUIC handshake without presenting a certificate, while the subsequent HTTP routing layer still dispatches the request to a backend protected by a router-specific mTLS policy. The issue affects deployments where…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-9cr8-q42q-g8m7"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-9cr8-q42q-g8m7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.3"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9cr8-q42q-g8m7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4g6j-g789-rghm: Nezha's authenticated agents can forge service-monitor results for other users' services</title>
+    <id>https://osv.dev/vulnerability/GHSA-4g6j-g789-rghm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4g6j-g789-rghm"/>
+    <published>2026-06-01T14:05:06Z</published>
+    <updated>2026-08-11T20:51:14Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48119"/>
+    <category term="GO-2026-5119"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha&amp;#x27;s authenticated agents can forge service-monitor results for other users&amp;#x27; services&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48119, GO-2026-5119&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 1.14.15-0.20260521020202-02129f16fb15&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 2.0.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;#### Summary
+
+Nezha accepts service-monitor `TaskResult` messages from an authenticated agent based only on whether the reported service ID exists. The dashboard authenticates the agent and derives the reporter server ID from the gRPC stream, but the service-monitor result worker does not verify that the reporter server was selected for that service, belongs to the service owner, or was actually assigned that monitoring task.
+
+A low-privilege user with a valid agent secret and one registered agent can therefore submit forged monitoring results for another user&amp;#x27;s service ID. This allows cross-tenant corruption of service-monitor history/current state, and can influence victim-owned service notifications with attacker-controlled result text.
+
+#### Details
+
+The agent task stream accepts inbou…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-4g6j-g789-rghm"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-4g6j-g789-rghm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-48119"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-48119&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/commit/02129f16fb1572ef57c7e8dd7d03f84d39b8b586"&gt;https://github.com/nezhahq/nezha/commit/02129f16fb1572ef57c7e8dd7d03f84d39b8b586&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4g6j-g789-rghm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-p6hg-qh38-555r: Traefik's errors middleware forwards Authorization and Cookie headers to separate error page service</title>
+    <id>https://osv.dev/vulnerability/GHSA-p6hg-qh38-555r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p6hg-qh38-555r"/>
+    <published>2026-05-04T19:26:33Z</published>
+    <updated>2026-08-11T20:51:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41181"/>
+    <category term="GO-2026-5532"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik&amp;#x27;s errors middleware forwards Authorization and Cookie headers to separate error page service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41181, GO-2026-5532&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:L/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt; — fixed in 2.11.44&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.6.15&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.7.0-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+There is a medium severity information disclosure vulnerability in Traefik&amp;#x27;s `errors` (custom error pages) middleware. When the backend returns a response matching the configured status range, the middleware forwards the original request&amp;#x27;s complete header set, including `Authorization`, `Cookie`, and other authentication material, to the separate error page service rather than only the minimal context needed to render the error page. This behavior is undocumented: the documentation states only that `Host` is forwarded by default, so operators are not warned that sensitive credentials are shared across service boundaries. Deployments using the `errors` middleware with a distinct error page service may inadvertently expose end-user credentials to infrastructure that was not inten…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-p6hg-qh38-555r"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-p6hg-qh38-555r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41181"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41181&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v2.11.44"&gt;https://github.com/traefik/traefik/releases/tag/v2.11.44&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.6.15"&gt;https://github.com/traefik/traefik/releases/tag/v3.6.15&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.0-rc.3"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.0-rc.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p6hg-qh38-555r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mrxx-39g5-ph77: Dgraph: Pre-Auth Full Database Exfiltration via DQL Injection in Upsert Condition Field</title>
+    <id>https://osv.dev/vulnerability/GHSA-mrxx-39g5-ph77</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mrxx-39g5-ph77"/>
+    <published>2026-04-24T15:41:21Z</published>
+    <updated>2026-08-11T20:51:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41327"/>
+    <category term="GO-2026-5516"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dgraph: Pre-Auth Full Database Exfiltration via DQL Injection in Upsert Condition Field&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41327, GO-2026-5516&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v25&lt;/code&gt; — fixed in 25.3.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v24&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## 1. Executive Summary
+
+A vulnerability has been found in Dgraph that gives an unauthenticated attacker full read access to every piece of data in the database. This affects Dgraph&amp;#x27;s default configuration where ACL is not enabled.
+
+The attack is a single HTTP POST to `/mutate?commitNow=true` containing a crafted `cond` field in an upsert mutation. The `cond` value is concatenated directly into a DQL query string via `strings.Builder.WriteString` after only a cosmetic `strings.Replace` transformation. No escaping, parameterization, or structural validation is applied. An attacker injects an additional DQL query block into the `cond` string, which the DQL parser accepts as a syntactically valid named query block. The injected query executes server-side and its results are returned in the HT…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/security/advisories/GHSA-mrxx-39g5-ph77"&gt;https://github.com/dgraph-io/dgraph/security/advisories/GHSA-mrxx-39g5-ph77&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41327"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41327&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph"&gt;https://github.com/dgraph-io/dgraph&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/releases/tag/v25.3.3"&gt;https://github.com/dgraph-io/dgraph/releases/tag/v25.3.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mrxx-39g5-ph77"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-38x9-25wx-7fg2: Heimdall: IP Spoofing via Unvalidated Forwarding Headers</title>
+    <id>https://osv.dev/vulnerability/GHSA-38x9-25wx-7fg2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-38x9-25wx-7fg2"/>
+    <published>2026-06-18T14:24:37Z</published>
+    <updated>2026-08-11T20:51:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-57210"/>
+    <category term="GO-2026-5075"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Heimdall: IP Spoofing via Unvalidated Forwarding Headers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-57210, GO-2026-5075&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;https://github.com/dadrus/heimdall&lt;/code&gt; — fixed in 0.17.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When the `trusted_proxies` option is configured, heimdall extracts client IP addresses from the `Forwarded` (`for=` parameter) and `X-Forwarded-For` headers and exposes them as `Request.ClientIPAddresses` to the rule pipeline. However, extracted values are not validated to be syntactically valid IP addresses. Arbitrary strings, malformed IP literals, and RFC 7239 `unknown` values and obfuscated identifiers are accepted without further checks.
+In addition, the `Forwarded` header parser splits on `,` and `;` without accounting for RFC 7239 quoted strings, which can cause a single quoted value to be parsed as multiple entries, with fragments — including trailing quote characters — treated as independent addresses.
+
+### Impact
+
+`Request.ClientIPAddresses` is available to all pipel…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dadrus/heimdall/security/advisories/GHSA-38x9-25wx-7fg2"&gt;https://github.com/dadrus/heimdall/security/advisories/GHSA-38x9-25wx-7fg2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dadrus/heimdall"&gt;https://github.com/dadrus/heimdall&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-38x9-25wx-7fg2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-95mq-xwj4-r47p: Dgraph: Unauthenticated /debug/pprof/cmdline discloses admin auth token, enabling unauthorized access to protected Alpha admin endpoints</title>
+    <id>https://osv.dev/vulnerability/GHSA-95mq-xwj4-r47p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-95mq-xwj4-r47p"/>
+    <published>2026-04-16T21:08:07Z</published>
+    <updated>2026-08-11T20:51:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-40173"/>
+    <category term="GO-2026-5274"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dgraph: Unauthenticated /debug/pprof/cmdline discloses admin auth token, enabling unauthorized access to protected Alpha admin endpoints&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40173, GO-2026-5274&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v25&lt;/code&gt; — fixed in 25.3.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v24&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+An unauthenticated debug endpoint in Dgraph Alpha exposes the full process command line, including the configured admin token from `--security &amp;quot;token=...&amp;quot;`.
+
+This does not break token validation logic directly; instead, it discloses the credential and enables unauthorized admin-level access by reusing the leaked token in `X-Dgraph-AuthToken`.
+
+### Details
+The behavior occurs entirely within core Alpha HTTP routing and does not require any external proxy, plugin, or non-core integration.
+
+The core issue is not that admin token protection is absent, but that the protected secret is exposed in cleartext through an unauthenticated core debug endpoint.
+
+Relevant code paths:
+- `dgraph/cmd/alpha/run.go:17` imports `net/http/pprof`, which registers `/debug/pprof/*` handlers on the defa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/security/advisories/GHSA-95mq-xwj4-r47p"&gt;https://github.com/dgraph-io/dgraph/security/advisories/GHSA-95mq-xwj4-r47p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40173"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40173&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph"&gt;https://github.com/dgraph-io/dgraph&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/releases/tag/v25.3.2"&gt;https://github.com/dgraph-io/dgraph/releases/tag/v25.3.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-95mq-xwj4-r47p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-5r4w-85f3-pw66: Traefik: SNICheck ignores wildcard TLSOptions mappings, allowing domain-fronted mTLS bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-5r4w-85f3-pw66</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5r4w-85f3-pw66"/>
+    <published>2026-06-16T19:02:20Z</published>
+    <updated>2026-08-11T20:51:01Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48491"/>
+    <category term="GO-2026-5152"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik: SNICheck ignores wildcard TLSOptions mappings, allowing domain-fronted mTLS bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48491, GO-2026-5152&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;Traefik&lt;/code&gt; — fixed in 3.7.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+There is a high severity vulnerability in Traefik&amp;#x27;s domain-fronting protection (`SNICheck`) that allows an unauthenticated client to bypass mutual TLS enforced through wildcard router `TLSOptions`. When a router uses a wildcard host rule such as `Host(`*.example.com`)` with stricter TLS options (for example `RequireAndVerifyClientCert`), `SNICheck` resolves the TLS options for the HTTP `Host` header using exact map lookups only and never applies wildcard matching. If another permissive SNI is served on the same entrypoint, an attacker can complete the TLS handshake under the permissive options and then send an HTTP `Host` header targeting the wildcard-protected backend, reaching it without presenting a client certificate. This affects the regular HTTPS / HTTP-2 path and does no…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-5r4w-85f3-pw66"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-5r4w-85f3-pw66&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.3"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5r4w-85f3-pw66"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jfwf-28xr-xw6q: RClone: Unauthenticated operations/fsinfo allows attacker-controlled backend instantiation and local command execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q"/>
+    <published>2026-04-22T14:45:10Z</published>
+    <updated>2026-08-11T20:50:58Z</updated>
+    <category term="Go"/>
+    <category term="BIT-rclone-2026-41179"/>
+    <category term="CVE-2026-41179"/>
+    <category term="GO-2026-5466"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;RClone: Unauthenticated operations/fsinfo allows attacker-controlled backend instantiation and local command execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-41179, CVE-2026-41179, GO-2026-5466&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.73.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The RC endpoint `operations/fsinfo` is exposed without `AuthRequired: true` and accepts attacker-controlled `fs` input. Because `rc.GetFs(...)` supports inline backend definitions, an unauthenticated attacker can instantiate an attacker-controlled backend on demand. For the WebDAV backend, `bearer_token_command` is executed during backend initialization, making single-request unauthenticated local command execution possible on reachable RC deployments without global HTTP authentication.
+
+### Preconditions
+
+Preconditions for this vulnerability are:
+
+- The rclone remote control API **must** be enabled, either by the `--rc` flag or by running the `rclone rcd` server
+- The remote control API **must** be reachable by the attacker - by default rclone only serves the rc to localhost u…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-jfwf-28xr-xw6q"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-jfwf-28xr-xw6q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41179"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/commit/2a9e952b38e03a96bf40c9eb6e8e22199865ee3b"&gt;https://github.com/rclone/rclone/commit/2a9e952b38e03a96bf40c9eb6e8e22199865ee3b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone"&gt;https://github.com/rclone/rclone&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/backend/webdav/webdav.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/backend/webdav/webdav.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/operations/rc.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/operations/rc.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/cache.go"&gt;https://github.com/rclone/rclone/blob/bf55d5e6d37fd86164a87782191f9e1ffcaafa82/fs/rc/cache.go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/releases/tag/v1.73.5"&gt;https://github.com/rclone/rclone/releases/tag/v1.73.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jfwf-28xr-xw6q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5466: Unauthenticated backend instantiation in github.com/rclone/rclone</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5466</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5466"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:50:58Z</updated>
+    <category term="Go"/>
+    <category term="BIT-rclone-2026-41179"/>
+    <category term="CVE-2026-41179"/>
+    <category term="GHSA-jfwf-28xr-xw6q"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unauthenticated backend instantiation in github.com/rclone/rclone&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-41179, CVE-2026-41179, GHSA-jfwf-28xr-xw6q&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/ncw/rclone&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.73.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The operations/fsinfo remote control (RC) endpoint in rclone was registered without requiring authentication. This allowed unauthenticated callers to instantiate arbitrary backends via inline backend definitions, which could lead to local command execution if the backend configuration allows it (e.g., via bearer_token_command in webdav or ssh in sftp).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-jfwf-28xr-xw6q"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-jfwf-28xr-xw6q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/commit/9e3e68d00c3ecf475a1432fc206400cfb4df7e3f"&gt;https://github.com/rclone/rclone/commit/9e3e68d00c3ecf475a1432fc206400cfb4df7e3f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/releases/tag/v1.73.5"&gt;https://github.com/rclone/rclone/releases/tag/v1.73.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5466"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-p5rh-vmhp-gvcw: Dgraph: Pre-Auth Database Overwrite + SSRF + File Read via restoreTenant Missing Authorization</title>
+    <id>https://osv.dev/vulnerability/GHSA-p5rh-vmhp-gvcw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p5rh-vmhp-gvcw"/>
+    <published>2026-04-02T20:44:36Z</published>
+    <updated>2026-08-11T20:50:53Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34976"/>
+    <category term="GO-2026-5529"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dgraph: Pre-Auth Database Overwrite + SSRF + File Read via restoreTenant Missing Authorization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34976, GO-2026-5529&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v25&lt;/code&gt; — fixed in 25.3.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v24&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `restoreTenant` admin mutation is missing from the authorization middleware config (`admin.go:499-522`), making it completely unauthenticated. Unlike the similar `restore` mutation which requires Guardian-of-Galaxy authentication, `restoreTenant` executes with zero middleware.
+
+This mutation accepts attacker-controlled backup source URLs (including `file://` for local filesystem access), S3/MinIO credentials, encryption key file paths, and Vault credential file paths. An unauthenticated attacker can overwrite the entire database, read server-side files, and perform SSRF.
+
+## Authentication Bypass
+
+Every admin mutation has middleware configured in `adminMutationMWConfig` (`admin.go:499-522`) EXCEPT `restoreTenant`. The `restore` mutation has `gogMutMWs` (Guardian of Galaxy auth + IP whi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/security/advisories/GHSA-p5rh-vmhp-gvcw"&gt;https://github.com/dgraph-io/dgraph/security/advisories/GHSA-p5rh-vmhp-gvcw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34976"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34976&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/commit/b15c87e9353e36618bf8e0df3bd945c0ce7105ef"&gt;https://github.com/dgraph-io/dgraph/commit/b15c87e9353e36618bf8e0df3bd945c0ce7105ef&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph"&gt;https://github.com/dgraph-io/dgraph&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/releases/tag/v25.3.1"&gt;https://github.com/dgraph-io/dgraph/releases/tag/v25.3.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p5rh-vmhp-gvcw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5532: Authorization and Cookie headers forwarded to error page service in github.com/traefik/traefik</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5532</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5532"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:45:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41181"/>
+    <category term="GHSA-p6hg-qh38-555r"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Authorization and Cookie headers forwarded to error page service in github.com/traefik/traefik&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41181, GHSA-p6hg-qh38-555r&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt; — fixed in 2.11.44&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.6.15, 3.7.0-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Traefik&amp;#x27;s errors middleware by default forwards all original request headers to the error page service. If the error page service is in a separate trust domain, this can lead to the disclosure of sensitive information such as Authorization or Cookie headers.
+
+The fix adds an errorRequestHeaders option to the Errors middleware, allowing users to explicitly list which headers should be forwarded.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-p6hg-qh38-555r"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-p6hg-qh38-555r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v2.11.44"&gt;https://github.com/traefik/traefik/releases/tag/v2.11.44&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.6.15"&gt;https://github.com/traefik/traefik/releases/tag/v3.6.15&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.0-rc.3"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.0-rc.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5532"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5529: Unauthenticated restoreTenant mutation allows database overwrite and SSRF in github.com/dgraph-io/dgraph</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5529</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5529"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:45:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34976"/>
+    <category term="GHSA-p5rh-vmhp-gvcw"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unauthenticated restoreTenant mutation allows database overwrite and SSRF in github.com/dgraph-io/dgraph&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34976, GHSA-p5rh-vmhp-gvcw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v25&lt;/code&gt; — fixed in 25.3.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/hypermodeinc/dgraph/v24&lt;/code&gt; — fixed in 24.1.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The restoreTenant GraphQL mutation in Dgraph was missing from the admin mutation middleware configuration. This omission bypassed all authentication, IP whitelisting, and audit logging for this mutation.
+
+An unauthenticated remote attacker could use this mutation to trigger a database restore from an arbitrary URL, potentially leading to a complete database overwrite, Server-Side Request Forgery (SSRF), or arbitrary file read on the host system.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/security/advisories/GHSA-p5rh-vmhp-gvcw"&gt;https://github.com/dgraph-io/dgraph/security/advisories/GHSA-p5rh-vmhp-gvcw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/commit/b15c87e9353e36618bf8e0df3bd945c0ce7105ef"&gt;https://github.com/dgraph-io/dgraph/commit/b15c87e9353e36618bf8e0df3bd945c0ce7105ef&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/releases/tag/v25.3.1"&gt;https://github.com/dgraph-io/dgraph/releases/tag/v25.3.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5529"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5516: Pre-Auth DQL injection in upsert condition field in github.com/dgraph-io/dgraph</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5516</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5516"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:45:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41327"/>
+    <category term="GHSA-mrxx-39g5-ph77"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pre-Auth DQL injection in upsert condition field in github.com/dgraph-io/dgraph&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41327, GHSA-mrxx-39g5-ph77&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v25&lt;/code&gt; — fixed in 25.3.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/hypermodeinc/dgraph/v24&lt;/code&gt; — fixed in 24.1.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A DQL injection vulnerability in Dgraph allows an unauthenticated remote attacker to exfiltrate data from the database.
+
+The injection occurs via the &amp;quot;cond&amp;quot; field in upsert mutations. The buildUpsertQuery function fails to properly validate the condition string, allowing an attacker to craft a payload that closes the intended @if clause and appends arbitrary DQL query blocks. These injected blocks execute with the privileges of the Dgraph process, potentially leading to full database exfiltration.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/security/advisories/GHSA-mrxx-39g5-ph77"&gt;https://github.com/dgraph-io/dgraph/security/advisories/GHSA-mrxx-39g5-ph77&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/releases/tag/v25.3.3"&gt;https://github.com/dgraph-io/dgraph/releases/tag/v25.3.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5516"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5119: Nezha's authenticated agents can forge service-monitor results for other users' services in github.com/nezhahq/nezha</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5119</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5119"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:45:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48119"/>
+    <category term="GHSA-4g6j-g789-rghm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha&amp;#x27;s authenticated agents can forge service-monitor results for other users&amp;#x27; services in github.com/nezhahq/nezha&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48119, GHSA-4g6j-g789-rghm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/naiba/nezha&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 1.14.15-0.20260521020202-02129f16fb15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Nezha accepts service-monitor TaskResult messages from an authenticated agent based only on whether the reported service ID exists. The dashboard authenticates the agent and derives the reporter server ID from the gRPC stream, but the service-monitor result worker does not verify that the reporter server was selected for that service, belongs to the service owner, or was actually assigned that monitoring task.
+
+A low-privilege user with a valid agent secret and one registered agent can submit forged monitoring results for another user&amp;#x27;s service ID. This allows cross-tenant corruption of service-monitor history and state, and can influence victim-owned service notifications.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-4g6j-g789-rghm"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-4g6j-g789-rghm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/commit/02129f16fb1572ef57c7e8dd7d03f84d39b8b586"&gt;https://github.com/nezhahq/nezha/commit/02129f16fb1572ef57c7e8dd7d03f84d39b8b586&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5119"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5287: Traefik: HTTP/3 mTLS bypass via exact SNI TLSOptions lookup for wildcard and mixed-case hosts in github.com/traefik/traefik</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5287</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5287"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:34:23Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53622"/>
+    <category term="GHSA-9cr8-q42q-g8m7"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik: HTTP/3 mTLS bypass via exact SNI TLSOptions lookup for wildcard and mixed-case hosts in github.com/traefik/traefik&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53622, GHSA-9cr8-q42q-g8m7&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt; — fixed in 2.11.51&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.7.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Traefik&amp;#x27;s HTTP/3 TLS configuration selection is vulnerable to a bypass when using wildcard or mixed-case hosts in the SNI.
+
+The HTTP/3 (QUIC) path performed a direct, case-sensitive lookup on the SNI value to select the applicable TLS configuration. This lookup failed to match wildcard host patterns (e.g., &amp;quot;*.example.com&amp;quot;) or case variants of configured hostnames. In these cases, Traefik would fall back to the default TLS configuration, which might not enforce mutual TLS (mTLS), allowing unauthenticated clients to access protected backends.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-9cr8-q42q-g8m7"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-9cr8-q42q-g8m7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.3"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5287"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5274: Dgraph: Unauthenticated admin token disclosure via /debug/pprof/cmdline in github.com/dgraph-io/dgraph</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5274</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5274"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:33:01Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-40173"/>
+    <category term="GHSA-95mq-xwj4-r47p"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dgraph: Unauthenticated admin token disclosure via /debug/pprof/cmdline in github.com/dgraph-io/dgraph&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40173, GHSA-95mq-xwj4-r47p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v25&lt;/code&gt; — fixed in 25.3.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/hypermodeinc/dgraph/v24&lt;/code&gt; — fixed in 24.1.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The /debug/pprof/cmdline endpoint in Dgraph Alpha discloses the command-line arguments used to start the process, which may include the administrator&amp;#x27;s authentication token if provided via the --auth_token flag. This allows an unauthenticated remote attacker to obtain the token and gain full administrative access to the Dgraph cluster.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/security/advisories/GHSA-95mq-xwj4-r47p"&gt;https://github.com/dgraph-io/dgraph/security/advisories/GHSA-95mq-xwj4-r47p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/releases/tag/v25.3.2"&gt;https://github.com/dgraph-io/dgraph/releases/tag/v25.3.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5274"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5152: Traefik: SNICheck ignores wildcard TLSOptions mappings in github.com/traefik/traefik</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5152</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5152"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:33:01Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-48491"/>
+    <category term="GHSA-5r4w-85f3-pw66"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik: SNICheck ignores wildcard TLSOptions mappings in github.com/traefik/traefik&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48491, GHSA-5r4w-85f3-pw66&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v2&lt;/code&gt; — fixed in 2.11.48&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik/v3&lt;/code&gt; — fixed in 3.7.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The SNICheck middleware in Traefik ignores wildcard TLSOptions mappings, allowing an unauthenticated attacker to bypass mTLS requirements by using a domain-fronted request. This occurs because the middleware compares the TLS options name used during the handshake with a pre-computed value that may not account for wildcard matches correctly when certain configuration models are applied.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-5r4w-85f3-pw66"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-5r4w-85f3-pw66&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.7.3"&gt;https://github.com/traefik/traefik/releases/tag/v3.7.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v3.6.19"&gt;https://github.com/traefik/traefik/releases/tag/v3.6.19&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/releases/tag/v2.11.48"&gt;https://github.com/traefik/traefik/releases/tag/v2.11.48&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5152"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-5075: Heimdall: IP Spoofing via Unvalidated Forwarding Headers in github.com/dadrus/heimdall</title>
+    <id>https://osv.dev/vulnerability/GO-2026-5075</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5075"/>
+    <published>2026-08-11T20:19:48Z</published>
+    <updated>2026-08-11T20:33:01Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-57210"/>
+    <category term="GHSA-38x9-25wx-7fg2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Heimdall: IP Spoofing via Unvalidated Forwarding Headers in github.com/dadrus/heimdall&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-57210, GHSA-38x9-25wx-7fg2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dadrus/heimdall&lt;/code&gt; — fixed in 0.17.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When the trusted_proxies option is configured, heimdall extracts client IP addresses from the Forwarded and X-Forwarded-For headers and exposes them as Request.ClientIPAddresses to the rule pipeline. However, extracted values are not validated to be syntactically valid IP addresses. Arbitrary strings, malformed IP literals, and RFC 7239 unknown values and obfuscated identifiers are accepted without further checks. In addition, the Forwarded header parser splits on commas and semicolons without accounting for RFC 7239 quoted strings, which can cause a single quoted value to be parsed as multiple entries, with fragments treated as independent addresses.
+
+Request.ClientIPAddresses is available to all pipeline mechanisms. Its contents can therefore influence rule evaluation in deployments wher…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dadrus/heimdall/security/advisories/GHSA-38x9-25wx-7fg2"&gt;https://github.com/dadrus/heimdall/security/advisories/GHSA-38x9-25wx-7fg2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5075"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-qqv8-ph7f-h3f7: OpenShift Builder has a path traversal, allows command injection in privileged BuildContainer</title>
     <id>https://osv.dev/vulnerability/GHSA-qqv8-ph7f-h3f7</id>
@@ -132,33 +561,6 @@ cmd/serve/s3/list.go
 In cmd/serve/s3/backend.go, the S3 backend builds backend paths by joining the bucket name and object key with path.Join:
 
 fp := path.Join(bucketName, object…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-8v25-v8p6-qf7v"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-8v25-v8p6-qf7v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/commit/83d1e62aa9e0dbd10a5d7eb34c117ae997268cdf"&gt;https://github.com/rclone/rclone/commit/83d1e62aa9e0dbd10a5d7eb34c117ae997268cdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/commit/c89b766cf417fddbe7eace40d31262ecb85bfa93"&gt;https://github.com/rclone/rclone/commit/c89b766cf417fddbe7eace40d31262ecb85bfa93&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone"&gt;https://github.com/rclone/rclone&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/releases/tag/v1.74.4"&gt;https://github.com/rclone/rclone/releases/tag/v1.74.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8v25-v8p6-qf7v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-qw24-gh76-8rvv: Rclone: Unauthenticated command execution in `rclone rcd --rc-serve` via inline remote instantiation, bypassing CVE-2026-41179 fix</title>
-    <id>https://osv.dev/vulnerability/GHSA-qw24-gh76-8rvv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qw24-gh76-8rvv"/>
-    <published>2026-06-16T23:39:41Z</published>
-    <updated>2026-08-10T21:42:03Z</updated>
-    <category term="Go"/>
-    <category term="BIT-rclone-2026-49980"/>
-    <category term="CVE-2026-49980"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rclone: Unauthenticated command execution in `rclone rcd --rc-serve` via inline remote instantiation, bypassing CVE-2026-41179 fix&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-rclone-2026-49980, CVE-2026-49980&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rclone/rclone&lt;/code&gt; — fixed in 1.74.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`rclone rcd --rc-serve` accepts unauthenticated `GET` and `HEAD` requests to paths of the form:
-
-```text
-/[remote:path]/object
-```
-
-The `remote` value is parsed from the URL and passed to normal backend initialization. Inline remote configuration can set backend options that execute local commands during initialization. As a result, a single unauthenticated `GET` or `HEAD` request can execute a command as the rclone process user.
-
-Versions from 1.55.0 onwards are vulnerable to command execution. Earlier versions (from 1.46.0) are vulnerable to the unauthenticated local file read described under &amp;quot;Additional impact&amp;quot; but not to command execution, because inline backend option overrides did not exist until 1.55.0.
-
-## Preconditions
-
-Preconditions for this vulnerability are:
-
-- The …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone/security/advisories/GHSA-qw24-gh76-8rvv"&gt;https://github.com/rclone/rclone/security/advisories/GHSA-qw24-gh76-8rvv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-49980"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-49980&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-49980"&gt;https://access.redhat.com/security/cve/CVE-2026-49980&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2492478"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2492478&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rclone/rclone"&gt;https://github.com/rclone/rclone&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-49980.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-49980.json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qw24-gh76-8rvv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-8c48-q9wj-3w37: rclone: FTP Command Arguments Permit CRLF Injection When Custom Encoding Preserves Newlines</title>

@@ -3,12 +3,104 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-08-12T15:30:08Z</updated>
+  <updated>2026-08-12T21:26:55Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-cqjc-rmpq-xprq: Russh: Post-auth remote panic via pty-req with more than 130 terminal-mode records</title>
+    <id>https://osv.dev/vulnerability/GHSA-cqjc-rmpq-xprq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cqjc-rmpq-xprq"/>
+    <published>2026-07-24T16:46:13Z</published>
+    <updated>2026-08-12T21:26:55Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-73489"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Post-auth remote panic via pty-req with more than 130 terminal-mode records&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73489&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A post-authentication denial-of-service panic in `russh` 0.62.2 (commit
+`c4be19f1915c8682f4615c3fd50008512b474491`, current default branch `main` as
+of 2026-07-22). An authenticated client sends a `pty-req` channel request
+carrying more than 130 terminal-mode records. The parser uses a fixed
+`[(Pty::TTY_OP_END, 0); 130]` array but increments its counter `i` for every
+valid record (logging &amp;quot;too many pty codes&amp;quot; without returning), then slices
+`&amp;amp;modes[0..i]` — an out-of-bounds slice that **panics** (`range end index 131
+out of range for slice of length 130`) before the application `pty_request`
+handler runs.
+
+This is reachable with the **default** server configuration and the **default**
+crypto config (curve25519-sha256 + chacha20-poly1305), requiring only an
+authenticated session…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-cqjc-rmpq-xprq"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-cqjc-rmpq-xprq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/8912512371820167a12a0a638bd666856ce458ad"&gt;https://github.com/Eugeny/russh/commit/8912512371820167a12a0a638bd666856ce458ad&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.4"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cqjc-rmpq-xprq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-m65r-rprj-r5rg: Russh: Channel-scoped server callbacks can be reached without an open channel</title>
+    <id>https://osv.dev/vulnerability/GHSA-m65r-rprj-r5rg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m65r-rprj-r5rg"/>
+    <published>2026-08-03T15:35:00Z</published>
+    <updated>2026-08-12T21:26:54Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-68930"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Channel-scoped server callbacks can be reached without an open channel&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-68930&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;There is a server-side channel state issue in `russh`.
+
+After a client is authenticated, `russh` can dispatch channel-scoped handler callbacks for recipient channel IDs that were never opened or confirmed. In the strongest reproduced case, the client does not send `SSH_MSG_CHANNEL_OPEN` at all. It authenticates normally, then sends `SSH_MSG_CHANNEL_REQUEST` packets with request type `exec` for a range of recipient channel IDs. `russh` still calls the server application&amp;#x27;s `exec_request` handler.
+
+This is not an authentication bypass. A valid login is required. The issue is that the SSH channel lifecycle is not enforced before channel-scoped callbacks are delivered to the application.
+
+## Impact
+
+An authenticated client can bypass the server application&amp;#x27;s channel-open policy.
+
+A server may d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-m65r-rprj-r5rg"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-m65r-rprj-r5rg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/7c5659f8cf6f6f2f9989d12dba0ebf49dc50a171"&gt;https://github.com/Eugeny/russh/commit/7c5659f8cf6f6f2f9989d12dba0ebf49dc50a171&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.5"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m65r-rprj-r5rg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g9hv-x236-4qp3: Russh: client wrong-length X25519 `clone_from_slice` panic (pre-auth DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-g9hv-x236-4qp3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g9hv-x236-4qp3"/>
+    <published>2026-07-24T16:47:16Z</published>
+    <updated>2026-08-12T21:26:54Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-73429"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: client wrong-length X25519 `clone_from_slice` panic (pre-auth DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73429&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A malicious SSH server can crash a `russh` client session with a single
+malformed key-exchange reply, causing a pre-authentication Denial-of-Service
+before the server host key is verified. The embedding process itself stays
+up, but the connection is killed deterministically.
+
+### Details
+Every *other* kex path in `russh` validates the peer ephemeral length before
+cloning:
+
+- `Curve25519Kex::server_dh` (`russh/src/kex/curve25519.rs:61-65`) checks
+  `if pubkey_len != 32 { return Err(crate::Error::Kex); }` before
+  `clone_from_slice`.
+- The hybrid ML-KEM, ECDH-NIST, and DH/GEX paths all validate lengths.
+
+Only the client-side curve25519 `compute_shared_secret` is missing the check.
+This asymmetric validation gap makes the bug easy to miss in code review: a
+malicious *client* canno…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-g9hv-x236-4qp3"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-g9hv-x236-4qp3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/a7fc1eb5717264e31c3c5f7dd849b73989a08f3d"&gt;https://github.com/Eugeny/russh/commit/a7fc1eb5717264e31c3c5f7dd849b73989a08f3d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.4"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g9hv-x236-4qp3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-5xvq-cp9x-6p6r: Russh: Pre-auth remote panic via all-zero Curve25519 peer public value (encode_mpint OOB)</title>
+    <id>https://osv.dev/vulnerability/GHSA-5xvq-cp9x-6p6r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5xvq-cp9x-6p6r"/>
+    <published>2026-07-24T16:45:26Z</published>
+    <updated>2026-08-12T21:26:54Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-73430"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Pre-auth remote panic via all-zero Curve25519 peer public value (encode_mpint OOB)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73430&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A pre-authentication denial-of-service panic in `russh` 0.62.2 (commit
+`c4be19f1915c8682f4615c3fd50008512b474491`, current default branch `main` as
+of 2026-07-22). An unauthenticated client sends a single `SSH_MSG_KEX_ECDH_INIT`
+whose `Q_C` is 32 zero bytes. russh&amp;#x27;s Curve25519 KEX does not reject the
+all-zero peer public value, so `server_dh()` computes the all-zero shared
+secret and `compute_exchange_hash()` then calls `encode_mpint(&amp;amp;shared.0, ...)`,
+which indexes `s[i]` at `i == s.len()` and **panics** (`index out of bounds:
+the len is 32 but the index is 32`) **before host-key signature verification**.
+The server KEX task dies on the first KEX message, before authentication.
+
+This is reachable with the **default** server configuration
+(`Config::default()` → `Preferred::DEFAULT`, whose k…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-5xvq-cp9x-6p6r"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-5xvq-cp9x-6p6r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/a7fc1eb5717264e31c3c5f7dd849b73989a08f3d"&gt;https://github.com/Eugeny/russh/commit/a7fc1eb5717264e31c3c5f7dd849b73989a08f3d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.4"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5xvq-cp9x-6p6r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-3763-qp59-59vf: nimiq-blockchain: Validity store off by one error</title>
     <id>https://osv.dev/vulnerability/GHSA-3763-qp59-59vf</id>
@@ -193,111 +285,5 @@ For more details, see the GitHub-hosted security advisory: &amp;lt;https://githu
     <content type="html">&lt;p&gt;&lt;strong&gt;`FormatContext` stream accessors can cause undefined behavior from safe code&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stainless_ffmpeg&lt;/code&gt; — fixed in 0.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `stainless_ffmpeg` exposed several safe public methods on `FormatContext` that accepted a `stream_index` parameter and used it in unsafe pointer operations without checking whether the index was valid. These methods performed pointer arithmetic and dereferenced the resulting stream pointer. Safe callers could pass a negative or out-of-bounds `stream_index`, which could cause out-of-bounds pointer access and undefined behavior from safe Rust code.
 
 The issue was fixed in version `0.6.0` by marking the affected stream accessor methods as `unsafe` and documenting that callers must ensure `stream_index` is a valid stream index.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/stainless_ffmpeg"&gt;https://crates.io/crates/stainless_ffmpeg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0169.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0169.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nomalab/stainless-ffmpeg/issues/63"&gt;https://github.com/nomalab/stainless-ffmpeg/issues/63&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nomalab/stainless-ffmpeg/pull/64"&gt;https://github.com/nomalab/stainless-ffmpeg/pull/64&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nomalab/stainless-ffmpeg/commit/a649e8cb4e7c9859279d1dc85051df5e7a4932f7"&gt;https://github.com/nomalab/stainless-ffmpeg/commit/a649e8cb4e7c9859279d1dc85051df5e7a4932f7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0169"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0247: bitmaps is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0247</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0247"/>
-    <published>2026-05-03T12:00:00Z</published>
-    <updated>2026-08-10T19:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;bitmaps is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;bitmaps&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The bitmaps crate is unmaintained; all versions are affected. The GitHub
-repository was archived by the owner on 2026-05-03.
-
-Recommended alternatives:
-
-* [fixedbitset](https://crates.io/crates/fixedbitset)
-* [bitvec](https://crates.io/crates/bitvec)&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/bitmaps"&gt;https://crates.io/crates/bitmaps&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0247.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0247.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bodil/bitmaps"&gt;https://github.com/bodil/bitmaps&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0247"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0248: im is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0248</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0248"/>
-    <published>2026-05-03T12:00:00Z</published>
-    <updated>2026-08-10T19:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;im is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;im&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The im crate is unmaintained; all versions are affected. The GitHub
-repository was archived by the owner on 2026-05-03.
-
-Recommended alternative:
-
-* [imbl](https://crates.io/crates/imbl) is a maintained fork of this crate&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/im"&gt;https://crates.io/crates/im&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0248.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0248.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bodil/im-rs"&gt;https://github.com/bodil/im-rs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0248"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2025-0167: `Bitmap::try_from(&amp;[u8])` can create invalid values</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0167</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0167"/>
-    <published>2025-12-25T12:00:00Z</published>
-    <updated>2026-08-10T19:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`Bitmap::try_from(&amp;amp;[u8])` can create invalid values&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;bitmaps&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `TryFrom&amp;lt;&amp;amp;[u8]&amp;gt;` implementation for `Bitmap&amp;lt;SIZE&amp;gt;` copies the input bytes
-into an uninitialized backing store and calls `assume_init()` without
-validating that the bytes form a valid value of the backing store type. For
-`SIZE = 1` the backing store is a `bool`, so any input byte other than `0x00`
-or `0x01` produces an invalid value, which is immediate undefined behavior.
-
-The `AsMut&amp;lt;[u8]&amp;gt;` implementation has the same problem, as it allows safe code
-to write invalid bit patterns into the backing store through the returned slice.
-
-No fixed version is available, as the crate is unmaintained; its GitHub
-repository was archived by the owner on 2026-05-03.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/bitmaps"&gt;https://crates.io/crates/bitmaps&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0167.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0167.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bodil/bitmaps/issues/35"&gt;https://github.com/bodil/bitmaps/issues/35&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0167"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2023-0126: Aliasing violation in `OrdSet` insertion</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2023-0126</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2023-0126"/>
-    <published>2023-02-04T12:00:00Z</published>
-    <updated>2026-08-10T19:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Aliasing violation in `OrdSet` insertion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;im&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Inserting into an `im::OrdSet` (for example by collecting an iterator into one) can violate
-Rust&amp;#x27;s aliasing rules: Miri reports a stacked borrows violation in
-`sized_chunks::Chunk::force_copy()`, which is called during insertion, where a shared borrow
-is invalidated by a unique borrow before the read through it completes.
-This is undefined behavior, reachable from safe code.
-
-No fixed version is available, as the crate is unmaintained; its GitHub
-repository was archived by the owner on 2026-05-03.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/im"&gt;https://crates.io/crates/im&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2023-0126.html"&gt;https://rustsec.org/advisories/RUSTSEC-2023-0126.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bodil/im-rs/issues/207"&gt;https://github.com/bodil/im-rs/issues/207&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2023-0126"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0249: smartstring is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0249</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0249"/>
-    <published>2026-05-03T12:00:00Z</published>
-    <updated>2026-08-10T19:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;smartstring is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;smartstring&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The smartstring crate is unmaintained; all versions are affected. The
-GitHub repository was archived by the owner on 2026-05-03.
-
-Recommended alternatives:
-
-* [compact_str](https://crates.io/crates/compact_str)
-* [smol_str](https://crates.io/crates/smol_str)&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/smartstring"&gt;https://crates.io/crates/smartstring&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0249.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0249.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bodil/smartstring"&gt;https://github.com/bodil/smartstring&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0249"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0250: im-rc is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0250</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0250"/>
-    <published>2026-05-03T12:00:00Z</published>
-    <updated>2026-08-10T19:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;im-rc is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;im-rc&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The im-rc crate is unmaintained; all versions are affected. The GitHub
-repository was archived by the owner on 2026-05-03.
-
-[imbl](https://crates.io/crates/imbl) is a maintained fork of the im crate,
-but we&amp;#x27;re not aware of maintained alternative to im-rc at this time.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/im-rc"&gt;https://crates.io/crates/im-rc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0250.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0250.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bodil/im-rs"&gt;https://github.com/bodil/im-rs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0250"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0251: sized-chunks is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0251</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0251"/>
-    <published>2026-05-03T12:00:00Z</published>
-    <updated>2026-08-10T19:45:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;sized-chunks is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;sized-chunks&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The sized-chunks crate is unmaintained; all versions are affected. The
-GitHub repository was archived by the owner on 2026-05-03.
-
-Recommended alternative:
-
-* [imbl-sized-chunks](https://crates.io/crates/imbl-sized-chunks), a popular fork of this crate&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/sized-chunks"&gt;https://crates.io/crates/sized-chunks&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0251.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0251.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bodil/sized-chunks"&gt;https://github.com/bodil/sized-chunks&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0251"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

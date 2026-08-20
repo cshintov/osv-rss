@@ -3,22 +3,357 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-08-19T23:15:09Z</updated>
+  <updated>2026-08-20T04:05:00Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
   <entry>
+    <title>[NEW] GHSA-f3qq-49m6-rw8f: Lemur: SSRF protection in certificate revocation checking bypassable via HTTP redirects and DNS rebinding (incomplete fix for GHSA-54vg-pfh7-jq95)</title>
+    <id>https://osv.dev/vulnerability/GHSA-f3qq-49m6-rw8f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f3qq-49m6-rw8f"/>
+    <published>2026-08-18T20:51:12Z</published>
+    <updated>2026-08-20T04:05:00Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-70667"/>
+    <category term="PYSEC-2026-3676"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Lemur: SSRF protection in certificate revocation checking bypassable via HTTP redirects and DNS rebinding (incomplete fix for GHSA-54vg-pfh7-jq95)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-70667, PYSEC-2026-3676&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;lemur&lt;/code&gt; — fixed in 1.9.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+The SSRF mitigation added for GHSA-54vg-pfh7-jq95 (`_validate_revocation_url()` in `lemur
+/certificates/verify.py`) can be bypassed. An operator-role user who uploads a certificate with attacker-controlled CRL/OCSP extensions can still make Lemur reach internal destinations (RFC1918, loopback, link-local 169.254.169.254) during verification.
+
+## Affected version
+Tested against `main` (the commit that introduced `_validate_revocation_url`). The 1.9.2 release predates that guard and is vulnerable to the original SSRF (GHSA-54vg-pfh7-jq95) directly; this bypass applies to the unreleased mitigation in `main`. Please map the affected range to whichever release will first contain `_validate_revocation_url`.
+
+## Bypass 1 — HTTP redirect (deterministic)
+The guard validates only the URL …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur/security/advisories/GHSA-f3qq-49m6-rw8f"&gt;https://github.com/Netflix/lemur/security/advisories/GHSA-f3qq-49m6-rw8f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur/commit/ed504a830f38a83825b1570302e9f38d6553938a"&gt;https://github.com/Netflix/lemur/commit/ed504a830f38a83825b1570302e9f38d6553938a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur"&gt;https://github.com/Netflix/lemur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur/releases/tag/v1.9.3"&gt;https://github.com/Netflix/lemur/releases/tag/v1.9.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f3qq-49m6-rw8f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-54vg-pfh7-jq95: Lemur: Crafted CRL/OCSP URLs in uploaded certificates lead to post-authentication SSRF</title>
+    <id>https://osv.dev/vulnerability/GHSA-54vg-pfh7-jq95</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-54vg-pfh7-jq95"/>
+    <published>2026-06-25T21:58:51Z</published>
+    <updated>2026-08-20T04:05:00Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55162"/>
+    <category term="PYSEC-2026-2586"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Lemur: Crafted CRL/OCSP URLs in uploaded certificates lead to post-authentication SSRF&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55162, PYSEC-2026-2586&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;lemur&lt;/code&gt; — fixed in 1.9.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+ 
+When verifying an uploaded certificate, `lemur/certificates/verify.py` extracts the CRL Distribution Point URL and the OCSP responder URL directly from the certificate&amp;#x27;s extensions and issues outbound requests to those URLs without scheme restriction or destination allow-listing. An authenticated user holding the operator role (required by `StrictRolePermission` on `POST /certificates/upload`) can craft a certificate whose extensions point at internal services - instance metadata endpoints, internal Kubernetes API servers, RFC1918 hosts, link-local addresses - and cause the Lemur host to issue requests against those destinations during verification.
+ 
+## Root Cause
+ 
+`lemur/certificates/verify.py`, `crl_verify`:
+ 
+```python
+point = p.full_name[0].value                         …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur/security/advisories/GHSA-54vg-pfh7-jq95"&gt;https://github.com/Netflix/lemur/security/advisories/GHSA-54vg-pfh7-jq95&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur"&gt;https://github.com/Netflix/lemur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur/releases/tag/v1.9.2"&gt;https://github.com/Netflix/lemur/releases/tag/v1.9.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-54vg-pfh7-jq95"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jmfc-hfjq-pxcp: stigmem-node's federation insecure transport settings may allow non-loopback cleartext federation</title>
+    <id>https://osv.dev/vulnerability/GHSA-jmfc-hfjq-pxcp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jmfc-hfjq-pxcp"/>
+    <published>2026-05-29T22:16:27Z</published>
+    <updated>2026-08-20T04:04:16Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76244"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stigmem-node&amp;#x27;s federation insecure transport settings may allow non-loopback cleartext federation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76244&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+Stigmem nodes with federation enabled could be configured to run without mTLS outside loopback-only local development. In affected deployments, federation traffic may traverse the network without the intended transport protection. Impacted users are operators who enabled federation and explicitly disabled mTLS while binding the node to a non-loopback URL.
+
+### Patches
+Patched in 0.9.0a2. The node now refuses this configuration unless insecure federation is limited to loopback-only local development.
+
+### Workarounds
+Before upgrading, operators should enable mTLS for federation or ensure federation endpoints are bound only to loopback/private test environments and are not reachable by untrusted networks.
+
+### Upgrade
+Upgrade to the patched release:
+
+```bash
+pip install --upgrade …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-jmfc-hfjq-pxcp"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-jmfc-hfjq-pxcp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jmfc-hfjq-pxcp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-9vp8-3hmv-8fgh: stigmem-node's federation peer registration lacked explicit out-of-band approval</title>
+    <id>https://osv.dev/vulnerability/GHSA-9vp8-3hmv-8fgh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9vp8-3hmv-8fgh"/>
+    <published>2026-05-29T22:18:19Z</published>
+    <updated>2026-08-20T04:04:15Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76242"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stigmem-node&amp;#x27;s federation peer registration lacked explicit out-of-band approval&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76242&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+Federation peer registration accepted peer key material during registration without a separate administrator approval step based on an out-of-band fingerprint check. Impacted deployments are nodes that accept federation peer registration across a network where initial registration could be intercepted or misdirected.
+
+### Patches
+Patched in 0.9.0a2. Peer registration now uses a pending approval flow, and peer tokens are not accepted until an administrator approves the peer using the expected fingerprint.
+
+### Workarounds
+Before upgrading, restrict peer registration endpoints to trusted administrative networks and verify peer public-key fingerprints out of band before allowing federation traffic.
+
+### Upgrade
+Upgrade to the patched release:
+
+```bash
+pip install --upgrade --pre st…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-9vp8-3hmv-8fgh"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-9vp8-3hmv-8fgh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2"&gt;https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9vp8-3hmv-8fgh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6gqw-jqv7-v88m: stigmem-node: decay sweep expires and counts facts across all tenants (cross-tenant BOLA)</title>
+    <id>https://osv.dev/vulnerability/GHSA-6gqw-jqv7-v88m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6gqw-jqv7-v88m"/>
+    <published>2026-06-19T21:43:02Z</published>
+    <updated>2026-08-20T04:04:15Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76238"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stigmem-node: decay sweep expires and counts facts across all tenants (cross-tenant BOLA)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76238&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+On a multi-tenant stigmem node, a caller holding a `write` credential for **one** tenant can run a decay sweep that acts on **every** tenant&amp;#x27;s facts. The candidate-selection queries in `lifecycle/decay.py` (`_select_ttl_candidates`, `_select_confidence_candidates`) carried no `tenant_id` predicate, and the caller&amp;#x27;s tenant was not threaded into the sweep or its async worker (`run_decay_sweep` / `_decay_job_worker`), reached via `POST /v1/decay/sweep`.
+
+### Impact
+A sweep with `ttl_seconds=0` expires **all tenants&amp;#x27;** facts — cross-tenant data destruction (integrity and availability). A `dry_run` sweep returns a global candidate count, acting as a cross-tenant existence/volume **oracle** (information disclosure).
+
+### Affected configurations
+This is a cross-**tenant** break. It is…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-6gqw-jqv7-v88m"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-6gqw-jqv7-v88m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/pull/728"&gt;https://github.com/eidetic-labs/stigmem/pull/728&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6gqw-jqv7-v88m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fp6w-8wpg-74g5: stigmem-node: Auth-disabled deployments may grant broad anonymous access outside loopback</title>
+    <id>https://osv.dev/vulnerability/GHSA-fp6w-8wpg-74g5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fp6w-8wpg-74g5"/>
+    <published>2026-05-29T22:13:47Z</published>
+    <updated>2026-08-20T04:04:15Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76243"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stigmem-node: Auth-disabled deployments may grant broad anonymous access outside loopback&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76243&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+Stigmem nodes configured with authentication disabled could grant the anonymous identity broad read/write/federation capabilities if exposed outside a loopback-only local development environment. Impacted users are operators who intentionally disabled authentication while binding the node to a non-loopback URL.
+
+### Patches
+Patched in 0.9.0a2. The node now refuses unauthenticated operation outside loopback-only local development.
+
+### Workarounds
+Before upgrading, keep authentication enabled for all non-local deployments and do not expose nodes with authentication disabled to untrusted networks.
+
+### Upgrade
+Upgrade to the patched release:
+
+```bash
+pip install --upgrade --pre stigmem-node
+```
+
+If developers install through the Stigmem meta-package instead, they should use the ma…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-fp6w-8wpg-74g5"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-fp6w-8wpg-74g5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2"&gt;https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fp6w-8wpg-74g5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-w7pm-9g55-mxfm: stigmem-node's unsigned plugin override could be enabled without a second explicit acknowledgment</title>
+    <id>https://osv.dev/vulnerability/GHSA-w7pm-9g55-mxfm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w7pm-9g55-mxfm"/>
+    <published>2026-05-29T22:17:21Z</published>
+    <updated>2026-08-20T04:04:14Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76241"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stigmem-node&amp;#x27;s unsigned plugin override could be enabled without a second explicit acknowledgment&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76241&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+A single configuration flag could disable plugin signature enforcement. If an operator unintentionally carried that setting into an environment where plugin paths are writable by less-trusted users, unsigned plugin code could be loaded.
+
+### Patches
+Patched in 0.9.0a2. Disabling plugin signature enforcement now requires a second explicit acknowledgment value.
+
+### Workarounds
+Before upgrading, keep plugin signing required in all shared or production environments and ensure plugin directories are not writable by untrusted users.
+
+### Upgrade
+Upgrade to the patched release:
+
+```bash
+pip install --upgrade --pre stigmem-node
+```
+
+If developers install through the Stigmem meta-package instead, they should use the matching extra for deployments, for example:
+
+```bash
+pip install --upg…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-w7pm-9g55-mxfm"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-w7pm-9g55-mxfm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2"&gt;https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w7pm-9g55-mxfm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-hmq2-w58f-27jc: GitPython: Arbitrary Git Repository Creation Outside the Working Tree via Unvalidated .gitmodules Submodule Name in GitPython</title>
+    <id>https://osv.dev/vulnerability/GHSA-hmq2-w58f-27jc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hmq2-w58f-27jc"/>
+    <published>2026-08-07T15:45:39Z</published>
+    <updated>2026-08-20T04:04:13Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76222"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Arbitrary Git Repository Creation Outside the Working Tree via Unvalidated .gitmodules Submodule Name in GitPython&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76222&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.58&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+GitPython computes the on-disk location of a submodule&amp;#x27;s separate Git directory (`.git/modules/&amp;lt;name&amp;gt;`) from the submodule&amp;#x27;s `.gitmodules` section name with no validation. Because that name is fully attacker-controlled content of a cloned repository, a malicious repository can set a submodule name to a traversal string (e.g. `../../../../home/victim/.something`) and cause GitPython to create and initialize a full Git repository at an attacker-chosen filesystem path outside the intended clone directory. The only precondition is that a victim clones the malicious repository with GitPython and runs submodule initialization (`submodule_update(init=True)` / `sm.update(init=True)`), a very common and often automatic step. Core Git itself already blocks this exact attack class (CVE-20…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-hmq2-w58f-27jc"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-hmq2-w58f-27jc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2202"&gt;https://github.com/gitpython-developers/GitPython/pull/2202&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/4299c990e1ca21896f9485277caf7bb0ae5b404c"&gt;https://github.com/gitpython-developers/GitPython/commit/4299c990e1ca21896f9485277caf7bb0ae5b404c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/e4b8e7d026ca6abb4cf604f8e77093432ce23c06"&gt;https://github.com/gitpython-developers/GitPython/commit/e4b8e7d026ca6abb4cf604f8e77093432ce23c06&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hmq2-w58f-27jc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-wvpp-8hx9-p66j: GitPython: Unsafe git option guard bypass via split_single_char_options=False short-option token smuggling enables command execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-wvpp-8hx9-p66j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wvpp-8hx9-p66j"/>
+    <published>2026-08-07T15:49:07Z</published>
+    <updated>2026-08-20T04:04:13Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76220"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Unsafe git option guard bypass via split_single_char_options=False short-option token smuggling enables command execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76220&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.58&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+The `check_unsafe_options` guard can be bypassed on every guarded method (clone/clone_from, fetch/pull/push, ls_remote, iter_commits, blame, archive) by combining a single-character kwarg with `split_single_char_options=False`. The guard&amp;#x27;s candidate list omits the smuggled option, but `transform_kwarg` emits a JOINED `-n&amp;lt;value&amp;gt;` argv token that git parses as `--upload-pack=&amp;lt;cmd&amp;gt;`, yielding arbitrary command execution at the default `allow_unsafe_options=False`. This is an incomplete-fix bypass of commit `e8d0fbf7` (the fix for GHSA-r9mr-m37c-5fr3), which only emits value-derived candidates when `split_single_char_options` is True.
+
+## Root Cause
+`_option_candidates` derives value-token candidates only under `if len(key)==1 and split_single_char_options:` (cmd.py:1048, added by `…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-wvpp-8hx9-p66j"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-wvpp-8hx9-p66j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2204"&gt;https://github.com/gitpython-developers/GitPython/pull/2204&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/96a888f4d782cb2f80452148e48e60ce4af6d541"&gt;https://github.com/gitpython-developers/GitPython/commit/96a888f4d782cb2f80452148e48e60ce4af6d541&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wvpp-8hx9-p66j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xh5j-xjfq-qvvx: stigmem-node's federation peer token timestamp validation may reject valid peer tokens</title>
+    <id>https://osv.dev/vulnerability/GHSA-xh5j-xjfq-qvvx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xh5j-xjfq-qvvx"/>
+    <published>2026-05-29T22:14:34Z</published>
+    <updated>2026-08-20T04:04:13Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76245"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stigmem-node&amp;#x27;s federation peer token timestamp validation may reject valid peer tokens&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76245&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+A mismatch in federation peer-token timestamp handling could cause valid peer tokens to be treated as expired. Impacted deployments are Stigmem nodes using federation peer authentication paths from affected versions. The primary impact is availability and reliability of authenticated federation flows.
+
+### Patches
+Patched in 0.9.0a2. Federation peer-token timestamp handling now uses the canonical millisecond-based validation path and is covered by regression tests.
+
+### Workarounds
+Before upgrading, avoid mixed peer-token minting paths and restrict federation use to tightly controlled peers.
+
+### Upgrade
+Upgrade to the patched release:
+
+```bash
+pip install --upgrade --pre stigmem-node
+```
+
+If developers install through the Stigmem meta-package instead, they should use the matchi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-xh5j-xjfq-qvvx"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-xh5j-xjfq-qvvx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2"&gt;https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xh5j-xjfq-qvvx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-9pc9-4crj-mhpj: stigmem-node's Postgres schema identifier handling required defensive quoting</title>
+    <id>https://osv.dev/vulnerability/GHSA-9pc9-4crj-mhpj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9pc9-4crj-mhpj"/>
+    <published>2026-05-29T22:15:40Z</published>
+    <updated>2026-08-20T04:04:12Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76240"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stigmem-node&amp;#x27;s Postgres schema identifier handling required defensive quoting&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76240&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+Postgres backend schema identifiers were interpolated into SQL strings. In the reviewed code path the schema value is operator-controlled, but the pattern was unsafe if future call sites allowed tenant or request-controlled schema names. Impacted users are operators using the Postgres backend in affected versions.
+
+### Patches
+Patched in 0.9.0a2. Schema identifier handling now uses defensive identifier quoting and validation-oriented regression coverage.
+
+### Workarounds
+Before upgrading, only configure Postgres schema names from trusted deployment configuration and do not derive schema names from request, tenant, header, or user input.
+
+### Upgrade
+Upgrade to the patched release:
+
+```bash
+pip install --upgrade --pre stigmem-node
+```
+
+If developers install through the Stigmem me…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-9pc9-4crj-mhpj"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-9pc9-4crj-mhpj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/CHANGELOG.md#L14-L35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md"&gt;https://github.com/eidetic-labs/stigmem/blob/v0.9.0a2/SECURITY.md&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2"&gt;https://github.com/eidetic-labs/stigmem/releases/tag/v0.9.0a2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9pc9-4crj-mhpj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xhv3-q4xx-349r: stistigmem-node: quarantine review surface exposes and mutates other tenants' quarantined facts (cross-tenant BOLA)</title>
+    <id>https://osv.dev/vulnerability/GHSA-xhv3-q4xx-349r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xhv3-q4xx-349r"/>
+    <published>2026-06-19T21:43:00Z</published>
+    <updated>2026-08-20T04:04:12Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76237"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stistigmem-node: quarantine review surface exposes and mutates other tenants&amp;#x27; quarantined facts (cross-tenant BOLA)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76237&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+On a multi-tenant stigmem node, a tenant administrator could list, read, and **admit or reject** quarantined facts belonging to **other** tenants. The list/count queries and `_get_quarantined_fact` in `routes/quarantine.py` lacked an `f.tenant_id = identity.tenant_id` predicate, and the garden lookup was not tenant-scoped — reached via the `/v1/quarantine` list and admit/reject endpoints.
+
+### Impact
+Cross-tenant confidentiality (reading another tenant&amp;#x27;s quarantined content) and cross-tenant integrity (moderating — admitting or rejecting — another tenant&amp;#x27;s facts), gated only by a plain tenant `write` capability rather than a node-level admin authority.
+
+### Affected configurations
+This is a cross-**tenant** break. It is exploitable **only** on deployments running the opt-in `st…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-xhv3-q4xx-349r"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-xhv3-q4xx-349r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/pull/728"&gt;https://github.com/eidetic-labs/stigmem/pull/728&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xhv3-q4xx-349r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-x26h-xmv8-gxf7: stigmem-node: RTBF tombstones are mis-attributed and suppress reads tenant-blind (cross-tenant BOLA)</title>
+    <id>https://osv.dev/vulnerability/GHSA-x26h-xmv8-gxf7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x26h-xmv8-gxf7"/>
+    <published>2026-06-19T21:42:57Z</published>
+    <updated>2026-08-20T04:04:12Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76236"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stigmem-node: RTBF tombstones are mis-attributed and suppress reads tenant-blind (cross-tenant BOLA)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76236&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stigmem-node&lt;/code&gt; — fixed in 0.9.0a12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+On a multi-tenant stigmem node, RTBF (right-to-be-forgotten) tombstones were mis-scoped two ways. (1) `issue_tombstone` defaulted the tenant to `&amp;quot;default&amp;quot;` instead of the caller&amp;#x27;s tenant, so tombstones could be written to the wrong tenant. (2) The read-suppression path — `_get_tombstone_filter` (`routes/facts/common.py`) and the `_tombstone_scope_cache` (`lifecycle/tombstones.py`) — had no `tenant_id` predicate, so tombstone suppression was applied tenant-blind across fact queries and provenance. Reached via `/v1/tombstones` and the fact query/provenance read paths.
+
+### Impact
+Cross-tenant integrity of the RTBF mechanism: a tenant&amp;#x27;s deletion request could be recorded against the wrong tenant, and tombstone suppression could hide — or fail to hide — facts across tenant boundari…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-x26h-xmv8-gxf7"&gt;https://github.com/eidetic-labs/stigmem/security/advisories/GHSA-x26h-xmv8-gxf7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem/pull/728"&gt;https://github.com/eidetic-labs/stigmem/pull/728&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/eidetic-labs/stigmem"&gt;https://github.com/eidetic-labs/stigmem&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x26h-xmv8-gxf7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4gmw-gg2m-w46p: GitPython: Unguarded git read-tree option forwarding in IndexFile.from_tree/reset/merge_tree enables arbitrary file overwrite</title>
+    <id>https://osv.dev/vulnerability/GHSA-4gmw-gg2m-w46p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4gmw-gg2m-w46p"/>
+    <published>2026-08-07T15:33:57Z</published>
+    <updated>2026-08-20T04:04:11Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76219"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Unguarded git read-tree option forwarding in IndexFile.from_tree/reset/merge_tree enables arbitrary file overwrite&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76219&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.58&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+`IndexFile.from_tree`, `IndexFile.reset` (→ from_tree) and `IndexFile.merge_tree` append caller-influenced treeish strings positionally to `git read-tree` with no unsafe-option guard, no `allow_unsafe_options` parameter, and no `--` separator. `git read-tree --index-output=&amp;lt;file&amp;gt;` writes the resulting index to an arbitrary path, and last-occurrence-wins lets an injected `--index-output` override the method&amp;#x27;s internal temp path — clobbering an arbitrary file with a valid git-index blob. This is a distinct, never-guarded sink: commit `3af0c251` (GHSA-3f7w-8rr8-f37f) guarded only `checkout_index` and `tag`; `read_tree` was left unprotected (it is among the acknowledged unguarded call sites in that advisory&amp;#x27;s sweep but was never reported or fixed).
+
+## Root Cause
+`from_tree` (index/…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-4gmw-gg2m-w46p"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-4gmw-gg2m-w46p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2204"&gt;https://github.com/gitpython-developers/GitPython/pull/2204&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/9b5dcaf85da5946dbf69dcd53f9edba08f760b32"&gt;https://github.com/gitpython-developers/GitPython/commit/9b5dcaf85da5946dbf69dcd53f9edba08f760b32&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4gmw-gg2m-w46p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-hh9p-6wh2-4mfc: GitPython: Arbitrary file read via --pathspec-from-file in IndexFile.remove() and Head.checkout()</title>
+    <id>https://osv.dev/vulnerability/GHSA-hh9p-6wh2-4mfc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hh9p-6wh2-4mfc"/>
+    <published>2026-08-07T15:43:56Z</published>
+    <updated>2026-08-20T04:04:11Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76217"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Arbitrary file read via --pathspec-from-file in IndexFile.remove() and Head.checkout()&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76217&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.58&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`IndexFile.remove()` and `Head.checkout()` forward `**kwargs` into `git rm` and `git checkout`
+with no guard. Passing `--pathspec-from-file=&amp;lt;file&amp;gt;` **together with `--pathspec-file-nul`**
+makes Git treat the whole file as a single NUL-delimited pathspec, and the unmatched-pathspec
+error quotes it verbatim. GitPython surfaces that through `GitCommandError.stderr`, so the
+entire contents of a caller-chosen file are returned to the caller in band.
+
+This is the same primitive as Instance 2 of
+[GHSA-3f7w-8rr8-f37f](https://github.com/advisories/GHSA-3f7w-8rr8-f37f) - `TagReference.create()`
+with `-F`, arbitrary file read returned in band - at two sites that advisory assessed and
+cleared.
+
+## Prior art, and why I am filing rather than commenting
+
+GHSA-3f7w-8rr8-f37f&amp;#x27;s sweep table lis…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-hh9p-6wh2-4mfc"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-hh9p-6wh2-4mfc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2204"&gt;https://github.com/gitpython-developers/GitPython/pull/2204&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/f2550b65bf60ca087190981e2c7b6865e201f40c"&gt;https://github.com/gitpython-developers/GitPython/commit/f2550b65bf60ca087190981e2c7b6865e201f40c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hh9p-6wh2-4mfc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jm78-9fvv-mhgr: GitPython: git-config OPTION-name injection via =/#/whitespace bypasses name validator, enabling forged core.sshCommand/hooksPath (RCE)</title>
+    <id>https://osv.dev/vulnerability/GHSA-jm78-9fvv-mhgr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jm78-9fvv-mhgr"/>
+    <published>2026-08-07T15:46:35Z</published>
+    <updated>2026-08-20T04:04:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76221"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: git-config OPTION-name injection via =/#/whitespace bypasses name validator, enabling forged core.sshCommand/hooksPath (RCE)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76221&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.58&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+GitPython&amp;#x27;s config-name validator only neutralizes CR/LF/NUL for the `&amp;quot;option&amp;quot;` label; it does not reject `=`, `#`, `;`, `[`, `]`, or whitespace in an **option name**. `write_section` writes the option name verbatim into the config file, so an option name such as `sshCommand = touch &amp;lt;cmd&amp;gt; #` is written as `\tsshCommand = touch &amp;lt;cmd&amp;gt; # = &amp;lt;value&amp;gt;`, which git parses as `core.sshCommand = touch &amp;lt;cmd&amp;gt;` (the trailing `#` comments out the intended value). This forges arbitrary config directives (`core.sshCommand`, `core.hooksPath`, `alias.*`) → RCE on the next git operation. This is a distinct field (option name, not section name) and distinct character class (`=`/`#`/space, not newline/bracket) from GHSA-3rp5-jjmw-4wv2 (section-name bracket injection) and GHSA-mv93-w799-cj2w / GHSA-v8…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-jm78-9fvv-mhgr"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-jm78-9fvv-mhgr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2204"&gt;https://github.com/gitpython-developers/GitPython/pull/2204&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/a495ccd3b547ccd60b2187215823b72a9c0188bf"&gt;https://github.com/gitpython-developers/GitPython/commit/a495ccd3b547ccd60b2187215823b72a9c0188bf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jm78-9fvv-mhgr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-9rj7-rf2p-w77r: GitPython: Unguarded git option forwarding in Repo.init enables arbitrary command execution via --template clone hooks</title>
+    <id>https://osv.dev/vulnerability/GHSA-9rj7-rf2p-w77r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9rj7-rf2p-w77r"/>
+    <published>2026-08-07T15:36:43Z</published>
+    <updated>2026-08-20T04:04:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-76218"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Unguarded git option forwarding in Repo.init enables arbitrary command execution via --template clone hooks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76218&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.58&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+`Repo.init()` forwards `**kwargs` verbatim to `git init` with no unsafe-option guard and no `allow_unsafe_options` parameter. `git init --template=&amp;lt;dir&amp;gt;` copies `&amp;lt;dir&amp;gt;/hooks/*` into the new repo&amp;#x27;s `.git/hooks`, so an attacker-controlled `template` kwarg plants a hook that executes on the next git operation → arbitrary code execution. `--template` is already recognized as unsafe for clone (it is on `unsafe_git_clone_options`, and GHSA-6p8h-3wgx-97gf covers the clone path), but `Repo.init` is a distinct method that never received a guard and needs an independent fix.
+
+## Root Cause
+`Repo.init(path, mkdir, odbt, expand_vars, **kwargs)` is a bare `git.init(**kwargs)` (git/repo/base.py:1435) with no `check_unsafe_options` and no `allow_unsafe_options`.
+
+## Impact
+Arbitrary code execu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-9rj7-rf2p-w77r"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-9rj7-rf2p-w77r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2204"&gt;https://github.com/gitpython-developers/GitPython/pull/2204&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/d9ddb55bdc66"&gt;https://github.com/gitpython-developers/GitPython/commit/d9ddb55bdc66&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.58&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9rj7-rf2p-w77r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
     <title>[NEW] MAL-2026-14308: Malicious code in libasync (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-14308</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14308"/>
     <published>2026-08-19T22:38:13Z</published>
-    <updated>2026-08-19T23:15:09Z</updated>
+    <updated>2026-08-20T04:00:12Z</updated>
     <category term="PyPI"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in libasync (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;libasync&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
 ---
 _-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (3563869a8df47e05e731eafb6ea62b3d8c60672c038444139d0ff5f8941bebcf)
+The package was found to contain malicious code or consuming dependency that contains malicious code
 
 ## Source: kam193 (a46929f4ba4ca97beaf5511f0be0af36c4d1e9deff65bea3821137c2c258eb9c)
 During import, the code obfuscated in native extension downloads malicious remote executable and establishes persistence via registry keys. Downloaded binary seems to be used for cryptomining.
@@ -37,23 +372,7 @@ Campaign: 2026-08-libasync
 Reasons (based on the campaign):
 
 
- - Downloads and executes a remote executable.
-
-
- - obfuscation
-
-
- - The package contains code to detect if it is running in a sandbox environment.
-
-
- - native-extension
-
-
- - persistence
-
-
- - cryptominer
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/b7e770b71209bbc615ae928de01b04aef48295bf6548fd5f6d6cfffce531c0d0/detection"&gt;https://www.virustotal.com/gui/file/b7e770b71209bbc615ae928de01b04aef48295bf6548fd5f6d6cfffce531c0d0/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260819-145amavbkc/behavioral1"&gt;https://tria.ge/260819-145amavbkc/behavioral1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/11d7c6bd095b62206bc5b49b6749dfc73ea21e9b5b0b268c84ef4cadd1cba278/detection"&gt;https://www.virustotal.com/gui/file/11d7c6bd095b62206bc5b49b6749dfc73ea21e9b5b0b268c84ef4cadd1cba278/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/libasync"&gt;https://bad-packages.kam193.eu/pypi/package/libasync&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14308"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+ - Downloads and executes …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/b7e770b71209bbc615ae928de01b04aef48295bf6548fd5f6d6cfffce531c0d0/detection"&gt;https://www.virustotal.com/gui/file/b7e770b71209bbc615ae928de01b04aef48295bf6548fd5f6d6cfffce531c0d0/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260819-145amavbkc/behavioral1"&gt;https://tria.ge/260819-145amavbkc/behavioral1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/11d7c6bd095b62206bc5b49b6749dfc73ea21e9b5b0b268c84ef4cadd1cba278/detection"&gt;https://www.virustotal.com/gui/file/11d7c6bd095b62206bc5b49b6749dfc73ea21e9b5b0b268c84ef4cadd1cba278/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/libasync"&gt;https://bad-packages.kam193.eu/pypi/package/libasync&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/libasync/1.0.0/"&gt;https://pypi.org/project/libasync/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14308"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] MAL-2026-14306: Malicious code in rc4-secure (PyPI)</title>
@@ -436,25 +755,6 @@ if plugin.requires_key:
 This issue only affected volumes which simultaneously enable both filekeys and dirkeys, with volflag `dk` or `dks` combined with `fk` or `fka`.
 
 Both required features are default-disabled, and must be explicitly enabled in the volflags (the &amp;quot;flags&amp;quot; section of a volume).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/9001/copyparty/security/advisories/GHSA-x5pq-m9p8-f4vx"&gt;https://github.com/9001/copyparty/security/advisories/GHSA-x5pq-m9p8-f4vx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/9001/copyparty/commit/e40755331ba9449993ff482456e6bdd2c6deb950"&gt;https://github.com/9001/copyparty/commit/e40755331ba9449993ff482456e6bdd2c6deb950&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/9001/copyparty"&gt;https://github.com/9001/copyparty&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/9001/copyparty/releases/tag/v1.20.17"&gt;https://github.com/9001/copyparty/releases/tag/v1.20.17&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x5pq-m9p8-f4vx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-f3qq-49m6-rw8f: Lemur: SSRF protection in certificate revocation checking bypassable via HTTP redirects and DNS rebinding (incomplete fix for GHSA-54vg-pfh7-jq95)</title>
-    <id>https://osv.dev/vulnerability/GHSA-f3qq-49m6-rw8f</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f3qq-49m6-rw8f"/>
-    <published>2026-08-18T20:51:12Z</published>
-    <updated>2026-08-19T12:55:59Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-70667"/>
-    <category term="PYSEC-2026-3676"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Lemur: SSRF protection in certificate revocation checking bypassable via HTTP redirects and DNS rebinding (incomplete fix for GHSA-54vg-pfh7-jq95)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-70667, PYSEC-2026-3676&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;lemur&lt;/code&gt; — fixed in 1.9.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-The SSRF mitigation added for GHSA-54vg-pfh7-jq95 (`_validate_revocation_url()` in `lemur
-/certificates/verify.py`) can be bypassed. An operator-role user who uploads a certificate with attacker-controlled CRL/OCSP extensions can still make Lemur reach internal destinations (RFC1918, loopback, link-local 169.254.169.254) during verification.
-
-## Affected version
-Tested against `main` (the commit that introduced `_validate_revocation_url`). The 1.9.2 release predates that guard and is vulnerable to the original SSRF (GHSA-54vg-pfh7-jq95) directly; this bypass applies to the unreleased mitigation in `main`. Please map the affected range to whichever release will first contain `_validate_revocation_url`.
-
-## Bypass 1 — HTTP redirect (deterministic)
-The guard validates only the URL …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur/security/advisories/GHSA-f3qq-49m6-rw8f"&gt;https://github.com/Netflix/lemur/security/advisories/GHSA-f3qq-49m6-rw8f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur/commit/ed504a830f38a83825b1570302e9f38d6553938a"&gt;https://github.com/Netflix/lemur/commit/ed504a830f38a83825b1570302e9f38d6553938a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur"&gt;https://github.com/Netflix/lemur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Netflix/lemur/releases/tag/v1.9.3"&gt;https://github.com/Netflix/lemur/releases/tag/v1.9.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f3qq-49m6-rw8f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-47w6-gwp4-w6vc: vantage6: Algorithm developer can edit another developer's algorithm that is pending / under review</title>
@@ -2364,369 +2664,5 @@ The AWS Cloud Development Kit (AWS CDK) is an open-source software development f
 ## Impact
 
 The `S3LoggingOptions.encrypted` property in the `aws-codebuild` module uses positive polarity (`true` = encryption ON), but is mapped directly to the CloudFormation `S3LogsConfig.EncryptionDisabled` field, which uses negative polarity (`true` = encryption OFF). Because the value is not negated before being passed to CloudFormation, any explicit …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aws/aws-cdk/security/advisories/GHSA-464c-974j-9xm6"&gt;https://github.com/aws/aws-cdk/security/advisories/GHSA-464c-974j-9xm6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aws/aws-cdk/pull/37761"&gt;https://github.com/aws/aws-cdk/pull/37761&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aws/aws-cdk/commit/40319185dc645d2afc6acf1d25547a86250e97af"&gt;https://github.com/aws/aws-cdk/commit/40319185dc645d2afc6acf1d25547a86250e97af&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aws/aws-cdk"&gt;https://github.com/aws/aws-cdk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aws/aws-cdk/releases/tag/v2.253.0"&gt;https://github.com/aws/aws-cdk/releases/tag/v2.253.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-464c-974j-9xm6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-539m-9xh6-q6rr: GitPython: Incomplete unsafe_git_archive_options denylist omits --add-file / --add-virtual-file, enabling arbitrary file read via Repo.archive()</title>
-    <id>https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr"/>
-    <published>2026-08-03T20:14:28Z</published>
-    <updated>2026-08-18T05:15:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-73619"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Incomplete unsafe_git_archive_options denylist omits --add-file / --add-virtual-file, enabling arbitrary file read via Repo.archive()&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73619&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.57&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Target:** gitpython-developers/GitPython
-**Tested:** HEAD `07e80555` (2026-07-25), latest release 3.1.55, `git version 2.50.1`
-
-## Summary
-
-`Repo.archive()` does call the option guard, so this is not a missing-guard report. The guard is present and working; the **denylist it consults is incomplete**.
-
-```python
-# git/repo/base.py:169
-unsafe_git_archive_options = [
-    # Allows arbitrary command execution through the remote git-upload-archive command.
-    &amp;quot;--exec&amp;quot;,
-    # Writes output to a caller-controlled filesystem path.
-    &amp;quot;--output&amp;quot;,
-    &amp;quot;-o&amp;quot;,
-]
-```
-
-The comment on `--output` states the protected class in the project&amp;#x27;s own words: an option that lets the caller name **a filesystem path** is unsafe. `--output` is blocked because it *writes* to a caller-chosen path.
-
-`git archive` also…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-539m-9xh6-q6rr"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-539m-9xh6-q6rr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2193"&gt;https://github.com/gitpython-developers/GitPython/pull/2193&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/7a4f5dcb7bf3cbcbf6e438017efcdfe0bc0d36ca"&gt;https://github.com/gitpython-developers/GitPython/commit/7a4f5dcb7bf3cbcbf6e438017efcdfe0bc0d36ca&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-539m-9xh6-q6rr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-3f7w-8rr8-f37f: GitPython: Unguarded git option forwarding in IndexFile.checkout() and TagReference.create() enables arbitrary file overwrite and arbitrary file read</title>
-    <id>https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f"/>
-    <published>2026-08-03T20:09:56Z</published>
-    <updated>2026-08-18T05:15:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-73620"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: Unguarded git option forwarding in IndexFile.checkout() and TagReference.create() enables arbitrary file overwrite and arbitrary file read&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73620&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.57&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Target:** gitpython-developers/GitPython
-**Tested:** HEAD `07e80555` (2026-07-25), latest release 3.1.55, `git version 2.50.1`
-**Reported instances:** 2 exploitable, from a sweep of 14 unguarded call sites
-
-## Summary
-
-GitPython blocks dangerous git options through `Git.check_unsafe_options()`, gated per method by an `allow_unsafe_options` parameter. That guard is applied **per call site**, so any API that forwards `**kwargs` into a git command without calling it passes caller-controlled options straight to git.
-
-A mechanical sweep of every method that forwards `**kwargs` into a `.git.&amp;lt;command&amp;gt;(...)` call found **14 sites with no guard**. Two reach a git option that takes a filesystem path:
-
-| # | Call site | git option | Impact |
-|---|---|---|---|
-| 1 | `IndexFile.checkout()` → `git che…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3f7w-8rr8-f37f"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3f7w-8rr8-f37f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2193"&gt;https://github.com/gitpython-developers/GitPython/pull/2193&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/3af0c2516c5e18c829da30338614688f6b69b49c"&gt;https://github.com/gitpython-developers/GitPython/commit/3af0c2516c5e18c829da30338614688f6b69b49c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.57&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3f7w-8rr8-f37f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-vfgx-5q85-58q3: openssl-encrypt has non-cryptographic PRNG used for steganography pixel selection</title>
-    <id>https://osv.dev/vulnerability/GHSA-vfgx-5q85-58q3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vfgx-5q85-58q3"/>
-    <published>2026-03-31T23:43:06Z</published>
-    <updated>2026-08-18T04:06:14Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74874"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt has non-cryptographic PRNG used for steganography pixel selection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74874&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The `generate_pseudorandom_sequence()` function in `openssl_encrypt/plugins/steganography/core/utils.py` at **lines 89-91** uses Python&amp;#x27;s `random` module (Mersenne Twister) for steganographic pixel/sample selection.
-
-### Affected Code
-
-```python
-random.seed(seed)
-sequence = random.sample(range(max_value), min(length, max_value))
-return sequence
-```
-
-Additionally, the steganography password is stored as a plain Python string (not `SecureBytes`) and only 8 bytes (64 bits) of the SHA-256 hash are used for the seed, reducing effective security to 64 bits.
-
-### Impact
-
-The Mersenne Twister&amp;#x27;s state can be recovered from approximately 624 outputs. An attacker who knows or guesses the password can predict the PRNG sequence and determine exactly which pixels contain hidden data, potent…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-vfgx-5q85-58q3"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-vfgx-5q85-58q3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/09e96e090417d34d2f533f6810d3cd4f77810101"&gt;https://github.com/jahlives/openssl_encrypt/commit/09e96e090417d34d2f533f6810d3cd4f77810101&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vfgx-5q85-58q3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4rh7-jwg9-m28m: openssl-encrypt accepts refresh tokens as URL query parameters causing token leakage</title>
-    <id>https://osv.dev/vulnerability/GHSA-4rh7-jwg9-m28m</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4rh7-jwg9-m28m"/>
-    <published>2026-04-01T21:12:19Z</published>
-    <updated>2026-08-18T04:06:13Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74880"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt accepts refresh tokens as URL query parameters causing token leakage&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74880&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Refresh tokens are accepted as URL query parameters in the keyserver and telemetry server routes.
-
-### Affected Code
-
-```python
-# openssl_encrypt_server/modules/keyserver/routes.py:214-215
-# openssl_encrypt_server/modules/telemetry/routes.py:90-91
-async def refresh_token(
-    request: Request,
-    refresh_token: str = Query(..., description=&amp;quot;Refresh token&amp;quot;)
-):
-```
-
-### Impact
-
-Tokens in URL query parameters are exposed in:
-- Server access logs
-- Proxy/CDN logs
-- Browser history
-- HTTP Referer headers
-- Network monitoring tools
-
-This creates significant token leakage risk.
-
-### Recommended Fix
-
-- Accept refresh tokens in the request body (POST) instead of query parameters
-- Use `Body(...)` instead of `Query(...)`
-
-### Fix
-
-Fixed in commit `4b2adb0` on branch `releases/1.4.x` — …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-4rh7-jwg9-m28m"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-4rh7-jwg9-m28m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/4b2adb05cde8a7ee03cdd271755da3b377c68011"&gt;https://github.com/jahlives/openssl_encrypt/commit/4b2adb05cde8a7ee03cdd271755da3b377c68011&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4rh7-jwg9-m28m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-c65f-x25w-62jv: openssl-encrypt has CORS wildcard with allow_credentials=True in standalone servers</title>
-    <id>https://osv.dev/vulnerability/GHSA-c65f-x25w-62jv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c65f-x25w-62jv"/>
-    <published>2026-04-01T21:12:37Z</published>
-    <updated>2026-08-18T04:06:13Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74881"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt has CORS wildcard with allow_credentials=True in standalone servers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74881&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Both standalone servers configure CORS with `allow_origins=[&amp;quot;*&amp;quot;]`, `allow_credentials=True`, `allow_methods=[&amp;quot;*&amp;quot;]`, and `allow_headers=[&amp;quot;*&amp;quot;]`.
-
-### Affected Code
-
-```python
-# server/key-server/app/main.py:86-92
-# server/telemetry-server/app/main.py:23-29
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins,  # defaults to [&amp;quot;*&amp;quot;]
-    allow_credentials=True,
-    allow_methods=[&amp;quot;*&amp;quot;],
-    allow_headers=[&amp;quot;*&amp;quot;],
-)
-```
-
-The docker-compose file (`openssl_encrypt_server/docker-compose.yml:75`) also defaults `CORS_ORIGINS` to `*`, and `.env.example` ships with `CORS_ORIGINS=*`.
-
-### Impact
-
-This is the most permissive CORS configuration possible, allowing any website to make fully credentialed cross-origin requests to the API. An attacker&amp;#x27;s website could make au…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-c65f-x25w-62jv"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-c65f-x25w-62jv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/809416b74d2749cdcffb484cd65b057e1685cc13"&gt;https://github.com/jahlives/openssl_encrypt/commit/809416b74d2749cdcffb484cd65b057e1685cc13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c65f-x25w-62jv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2vhw-q7vh-7xv2: openssl-encrypt's readiness endpoint leaks database error details to unauthenticated callers</title>
-    <id>https://osv.dev/vulnerability/GHSA-2vhw-q7vh-7xv2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2vhw-q7vh-7xv2"/>
-    <published>2026-04-01T21:11:59Z</published>
-    <updated>2026-08-18T04:06:12Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74879"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt&amp;#x27;s readiness endpoint leaks database error details to unauthenticated callers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74879&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The `/ready` endpoint in `openssl_encrypt_server/server.py` at **lines 159-175** catches database errors and returns the full exception string in the response.
-
-### Affected Code
-
-```python
-except Exception as e:
-    return {&amp;quot;status&amp;quot;: &amp;quot;not_ready&amp;quot;, &amp;quot;reason&amp;quot;: str(e)}
-```
-
-### Impact
-
-Database exception messages can leak:
-- Database hostnames and IP addresses
-- Connection parameters and port numbers
-- Driver version information
-- Potentially database credentials if included in connection string errors
-
-This information is available to unauthenticated callers.
-
-### Recommended Fix
-
-- Return a generic error message: `{&amp;quot;status&amp;quot;: &amp;quot;not_ready&amp;quot;, &amp;quot;reason&amp;quot;: &amp;quot;database unavailable&amp;quot;}`
-- Log the full exception server-side for debugging
-
-### Fix
-
-Fixed in commit `7aa8787` on branch `releases/1…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-2vhw-q7vh-7xv2"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-2vhw-q7vh-7xv2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/7aa8787f4de2e9a23f58fca067bb16c4c69d28bb"&gt;https://github.com/jahlives/openssl_encrypt/commit/7aa8787f4de2e9a23f58fca067bb16c4c69d28bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2vhw-q7vh-7xv2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-hvc7-763r-4f3h: openssl-encrypt has no owner verification on key revocation — any client can revoke any key</title>
-    <id>https://osv.dev/vulnerability/GHSA-hvc7-763r-4f3h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hvc7-763r-4f3h"/>
-    <published>2026-04-01T21:11:32Z</published>
-    <updated>2026-08-18T04:06:12Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74877"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt has no owner verification on key revocation — any client can revoke any key&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74877&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The `revoke_key` method in `openssl_encrypt_server/modules/keyserver/service.py` at **lines 195-270** accepts a `client_id` parameter but never verifies that the requesting client is the same as `key.owner_client_id`.
-
-### Impact
-
-Any authenticated client can revoke any other client&amp;#x27;s key, as long as they provide a valid revocation signature. While the signature requirement mitigates this somewhat (you need the private key to sign), the lack of ownership check is a defense-in-depth gap.
-
-### Recommended Fix
-
-- Add an ownership check: verify `client_id == key.owner_client_id` before allowing revocation
-- Return 403 Forbidden if the requesting client does not own the key
-
-### Fix
-
-Fixed in commit `05e45f3` on branch `releases/1.4.x` — added documentation that ML-DSA signature ve…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-hvc7-763r-4f3h"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-hvc7-763r-4f3h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/05e45f393886b5bf7e924d2dd42099a9dd37f91d"&gt;https://github.com/jahlives/openssl_encrypt/commit/05e45f393886b5bf7e924d2dd42099a9dd37f91d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hvc7-763r-4f3h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8h88-gxp3-j7pg: openssl-encrypt's unverified key bundle from_dict() + to_identity() path allows encryption to attacker keys</title>
-    <id>https://osv.dev/vulnerability/GHSA-8h88-gxp3-j7pg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8h88-gxp3-j7pg"/>
-    <published>2026-04-01T21:11:14Z</published>
-    <updated>2026-08-18T04:06:12Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74876"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt&amp;#x27;s unverified key bundle from_dict() + to_identity() path allows encryption to attacker keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74876&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The `PublicKeyBundle.from_dict()` method in `openssl_encrypt/modules/key_bundle.py` at **lines 329-361** creates bundles from untrusted data without verifying the signature. The docstring warns to call `verify_signature()` after creation, but the `to_identity()` method (line 363-391) can convert an unverified bundle directly to an `Identity` object.
-
-### Affected Code
-
-```python
-@classmethod
-def from_dict(cls, data: Dict) -&amp;gt; &amp;quot;PublicKeyBundle&amp;quot;:
-    &amp;quot;&amp;quot;&amp;quot;
-    SECURITY: Does NOT verify signature. Call verify_signature() after creation.
-    &amp;quot;&amp;quot;&amp;quot;
-    # Creates bundle without verification
-```
-
-### Impact
-
-If `from_dict()` followed by `to_identity()` is called without an intervening `verify_signature()` call, encryption could be performed against an attacker&amp;#x27;s public key, leaking secret…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8h88-gxp3-j7pg"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8h88-gxp3-j7pg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/f4a1ba660063cd9e17883829e5272a248525a16b"&gt;https://github.com/jahlives/openssl_encrypt/commit/f4a1ba660063cd9e17883829e5272a248525a16b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8h88-gxp3-j7pg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-425g-fjhq-5h92: openssl-encrypt silently skips schema validation when jsonschema library is not installed</title>
-    <id>https://osv.dev/vulnerability/GHSA-425g-fjhq-5h92</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-425g-fjhq-5h92"/>
-    <published>2026-03-31T23:43:33Z</published>
-    <updated>2026-08-18T04:06:12Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74875"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt silently skips schema validation when jsonschema library is not installed&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74875&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-In `openssl_encrypt/modules/json_validator.py` at **lines 234-238**, when the `jsonschema` library is not installed, all schema validation is silently skipped with only a print warning.
-
-### Affected Code
-
-```python
-if not JSONSCHEMA_AVAILABLE:
-    print(f&amp;quot;Warning: Cannot validate against schema &amp;#x27;{schema_name}&amp;#x27; - jsonschema library not available&amp;quot;)
-    return
-```
-
-Additionally, unknown metadata format versions (line 288-293) bypass schema validation entirely, and all schemas use `additionalProperties: true` allowing arbitrary extra fields.
-
-### Impact
-
-An attacker who can influence the Python environment (remove the jsonschema package) or craft metadata with an unknown version number can bypass all schema checks. Malformed or malicious metadata will be accepted without validati…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-425g-fjhq-5h92"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-425g-fjhq-5h92&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/6e7f938dcb7928faf5fd12bb5559f6dae2944124"&gt;https://github.com/jahlives/openssl_encrypt/commit/6e7f938dcb7928faf5fd12bb5559f6dae2944124&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-425g-fjhq-5h92"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-h3m5-p59h-x88p: openssl-encrypt has visible password in process list via --password CLI argument</title>
-    <id>https://osv.dev/vulnerability/GHSA-h3m5-p59h-x88p</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h3m5-p59h-x88p"/>
-    <published>2026-03-31T23:42:17Z</published>
-    <updated>2026-08-18T04:06:12Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74873"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt has visible password in process list via --password CLI argument&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74873&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Passwords passed via the `--password` / `-p` CLI argument in `openssl_encrypt/modules/crypt_cli_subparser.py` at **lines 150-154** are visible to any user on the system via `ps aux` or `/proc/[pid]/cmdline`.
-
-### Affected Code
-
-```python
-subparser.add_argument(
-    &amp;quot;--password&amp;quot;, &amp;quot;-p&amp;quot;,
-    help=&amp;quot;Password (will prompt if not provided, or use CRYPT_PASSWORD environment variable)&amp;quot;,
-)
-```
-
-Similarly, `--keystore-password` exposes the keystore password.
-
-### Impact
-
-On multi-user systems, any user can observe the encryption password by listing processes. The `CRYPT_PASSWORD` environment variable alternative is also visible via `/proc/[pid]/environ` (though with slightly restricted access).
-
-### Recommended Fix
-
-- Document the security implications prominently
-- Recommend interactive…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h3m5-p59h-x88p"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h3m5-p59h-x88p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/e78a3666e4592f3538adaaa6be8f5f04356174db"&gt;https://github.com/jahlives/openssl_encrypt/commit/e78a3666e4592f3538adaaa6be8f5f04356174db&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h3m5-p59h-x88p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-j48q-4c78-rhf9: openssl-encrypt: Dynamic .so loading for Whirlpool uses broad glob pattern without integrity verification</title>
-    <id>https://osv.dev/vulnerability/GHSA-j48q-4c78-rhf9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j48q-4c78-rhf9"/>
-    <published>2026-03-31T23:31:29Z</published>
-    <updated>2026-08-18T04:06:12Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74872"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt: Dynamic .so loading for Whirlpool uses broad glob pattern without integrity verification&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74872&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Severity: HIGH
-
-### Summary
-
-The Whirlpool hash implementation in `openssl_encrypt/modules/registry/hash_registry.py` at **lines 570-589** uses glob patterns to find `.so` modules in site-packages and loads the first match via `importlib` without verifying module integrity.
-
-### Affected Code
-
-```python
-for site_pkg in site.getsitepackages():
-    pattern = os.path.join(site_pkg, &amp;quot;whirlpool*py313*.so&amp;quot;)
-    py313_modules = glob.glob(pattern)
-    if py313_modules:
-        module_path = py313_modules[0]  # Takes first match
-        loader = ExtensionFileLoader(&amp;quot;whirlpool&amp;quot;, module_path)
-        spec = importlib.util.spec_from_file_location(&amp;quot;whirlpool&amp;quot;, module_path, loader=loader)
-        whirlpool_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(whirlpool_module…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-j48q-4c78-rhf9"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-j48q-4c78-rhf9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/963d0d1278b722ea134272f9df65fddcd3e6ab47"&gt;https://github.com/jahlives/openssl_encrypt/commit/963d0d1278b722ea134272f9df65fddcd3e6ab47&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j48q-4c78-rhf9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-h45m-mgcp-q388: openssl-encrypt: TOTP rate limiter is in-memory only — not shared across workers, lost on restart</title>
-    <id>https://osv.dev/vulnerability/GHSA-h45m-mgcp-q388</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h45m-mgcp-q388"/>
-    <published>2026-03-31T23:41:26Z</published>
-    <updated>2026-08-18T04:06:12Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-74878"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt: TOTP rate limiter is in-memory only — not shared across workers, lost on restart&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74878&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Severity: HIGH
-
-### Summary
-
-The TOTP brute-force rate limiter in `openssl_encrypt_server/modules/pepper/totp.py` at **lines 47-98** uses an in-memory `defaultdict(list)` as a class variable.
-
-### Affected Code
-
-```python
-class TOTPRateLimiter:
-    def __init__(self, ...):
-        self.attempts: Dict[str, List[datetime]] = defaultdict(list)
-        self.lockouts: Dict[str, datetime] = {}
-
-class TOTPService:
-    _rate_limiter = TOTPRateLimiter()  # Class variable, in-memory only
-```
-
-### Impact
-
-1. Rate limit state is **not shared** across multiple server instances/workers — an attacker can distribute attempts
-2. All rate limit state is **lost on server restart** — allows immediate retry
-3. In multi-worker deployments, each worker has independent rate limit state
-
-### Recommended Fix
-
-- …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h45m-mgcp-q388"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h45m-mgcp-q388&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/2749bc0949b34a5921a35fb4a3f1856fc51916de"&gt;https://github.com/jahlives/openssl_encrypt/commit/2749bc0949b34a5921a35fb4a3f1856fc51916de&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h45m-mgcp-q388"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

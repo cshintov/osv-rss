@@ -3,12 +3,196 @@
   <title>OSV — new &amp; updated vulnerabilities: Maven (Java)</title>
   <subtitle>Open-source vulns affecting Maven (Java) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:maven</id>
-  <updated>2026-08-20T15:47:55Z</updated>
+  <updated>2026-08-20T19:00:08Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/maven.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-pgrf-4654-3gq8: netty-incubator-codec-ohttp: Binary HTTP parser unchecked varint length overflow causes decoder crash</title>
+    <id>https://osv.dev/vulnerability/GHSA-pgrf-4654-3gq8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pgrf-4654-3gq8"/>
+    <published>2026-08-20T18:43:21Z</published>
+    <updated>2026-08-20T19:00:08Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-61799"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;netty-incubator-codec-ohttp: Binary HTTP parser unchecked varint length overflow causes decoder crash&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61799&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.netty.incubator:netty-incubator-codec-bhttp&lt;/code&gt; — fixed in 0.0.23.Final&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`io.netty.incubator:netty-incubator-codec-bhttp` uses attacker-controlled Binary HTTP variable-length integers as `long` values but accumulates them into `int` offsets. Large valid varint lengths wrap the internal offset negative, leading to unchecked `ArrayIndexOutOfBoundsException` / `IndexOutOfBoundsException` from a tiny malformed BHTTP payload. A remote peer can trigger connection-level denial of service in applications that expose `BinaryHttpParser` / `BinaryHttpDecoder` to untrusted input.
+
+## Details
+
+In `codec-bhttp/src/main/java/io/netty/incubator/codec/bhttp/BinaryHttpParser.java`, several parser paths store cumulative byte offsets in `int sumBytes` and then add attacker-controlled `long` lengths using compound assignment. In Java, `int += long` narrows the result ba…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-pgrf-4654-3gq8"&gt;https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-pgrf-4654-3gq8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp"&gt;https://github.com/netty/netty-incubator-codec-ohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final"&gt;https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pgrf-4654-3gq8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8cfx-wx3q-mh5q: netty-incubator-codec-ohttp: Binary HTTP parser infinite loop on known-length field section boundary</title>
+    <id>https://osv.dev/vulnerability/GHSA-8cfx-wx3q-mh5q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8cfx-wx3q-mh5q"/>
+    <published>2026-08-20T18:43:25Z</published>
+    <updated>2026-08-20T19:00:08Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-63124"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;netty-incubator-codec-ohttp: Binary HTTP parser infinite loop on known-length field section boundary&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63124&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.netty.incubator:netty-incubator-codec-bhttp&lt;/code&gt; — fixed in 0.0.23.Final&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`io.netty.incubator:netty-incubator-codec-bhttp` can enter a non-terminating parse loop when a known-length Binary HTTP field section ends exactly after a complete field line. A remote peer that can send Binary HTTP input to a Netty pipeline using `BinaryHttpParser` / `BinaryHttpDecoder` can use a tiny malformed request or response to keep the parsing thread busy indefinitely, causing denial of service.
+
+## Details
+
+In `codec-bhttp/src/main/java/io/netty/incubator/codec/bhttp/BinaryHttpParser.java`, `readFieldSection(...)` tracks the remaining field-section length in `fieldSectionLength`, then repeatedly calls `readFieldLine(...)` until the length reaches zero:
+
+- `readFieldSection(...)` parses the known-length field section and enters `while (fieldSectionLength != 0)` at `Bina…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-8cfx-wx3q-mh5q"&gt;https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-8cfx-wx3q-mh5q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp"&gt;https://github.com/netty/netty-incubator-codec-ohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final"&gt;https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8cfx-wx3q-mh5q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4899-mpch-38p3: netty-incubator-codec-ohttp BinaryHttpParser: Unauthenticated CPU-exhaustion DoS via infinite loop in field-section decoding</title>
+    <id>https://osv.dev/vulnerability/GHSA-4899-mpch-38p3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4899-mpch-38p3"/>
+    <published>2026-08-20T18:43:38Z</published>
+    <updated>2026-08-20T19:00:08Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-63202"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;netty-incubator-codec-ohttp BinaryHttpParser: Unauthenticated CPU-exhaustion DoS via infinite loop in field-section decoding&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63202&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.netty.incubator:netty-incubator-codec-bhttp&lt;/code&gt; — fixed in 0.0.23.Final&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# BinaryHttpParser: Unauthenticated CPU-exhaustion DoS via infinite loop in field-section decoding
+
+- **ID:** BHTTP-LOOP-001
+- **Severity:** High
+- **CVSS v3.1:** 7.5 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H`
+- **CWE:** CWE-835 (Loop with Unreachable Exit Condition) — secondary CWE-400 (Uncontrolled Resource Consumption)
+- **Affected component:** `codec-bhttp` → `io.netty.incubator.codec.bhttp.BinaryHttpParser#readFieldSection`, file `codec-bhttp/src/main/java/io/netty/incubator/codec/bhttp/BinaryHttpParser.java:619-626`
+- **Affected version:** netty-incubator-codec-ohttp HEAD `d3f2b49` (release `0.0.22.Final` + 3 commits). The loop has existed since the parser was introduced and is present in the latest code; all published advisory fixes are already applied.
+- **Reachable from:** `…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-4899-mpch-38p3"&gt;https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-4899-mpch-38p3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp"&gt;https://github.com/netty/netty-incubator-codec-ohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final"&gt;https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4899-mpch-38p3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2mc4-j865-9q4r: netty-incubator-codec-ohttp: BoringSSL HPKE private key bytes exposed through toString() and exception messages</title>
+    <id>https://osv.dev/vulnerability/GHSA-2mc4-j865-9q4r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2mc4-j865-9q4r"/>
+    <published>2026-08-20T18:43:17Z</published>
+    <updated>2026-08-20T19:00:07Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-61798"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;netty-incubator-codec-ohttp: BoringSSL HPKE private key bytes exposed through toString() and exception messages&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61798&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.netty.incubator:netty-incubator-codec-ohttp-hpke-classes-boringssl&lt;/code&gt; — fixed in 0.0.23.Final&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`io.netty.incubator:netty-incubator-codec-ohttp-hpke-classes-boringssl` exposes raw HPKE private key bytes in string representations and error messages. `BoringSSLAsymmetricCipherKeyPair.toString()` includes the private-key parameter object, and `BoringSSLAsymmetricKeyParameter.toString()` renders the full byte array with `Arrays.toString(bytes)`. Separately, failed native key initialization includes `Arrays.toString(privateKeyBytes)` in the thrown `IllegalArgumentException` message. Applications that log key-pair objects or exceptions can persist private key material in logs.
+
+## Details
+
+`codec-ohttp-hpke-classes-boringssl/src/main/java/io/netty/incubator/codec/hpke/boringssl/BoringSSLAsymmetricCipherKeyPair.java` renders private key material through `toString()`:
+
+- `BoringS…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-2mc4-j865-9q4r"&gt;https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-2mc4-j865-9q4r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp"&gt;https://github.com/netty/netty-incubator-codec-ohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final"&gt;https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2mc4-j865-9q4r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hmq9-67w8-j5pw: netty-incubator-codec-ohttp: BinaryHttpParser should enforce limits for variable lengths fields</title>
+    <id>https://osv.dev/vulnerability/GHSA-hmq9-67w8-j5pw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hmq9-67w8-j5pw"/>
+    <published>2026-08-20T18:43:28Z</published>
+    <updated>2026-08-20T19:00:07Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-61827"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;netty-incubator-codec-ohttp: BinaryHttpParser should enforce limits for variable lengths fields&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61827&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.netty.incubator:netty-incubator-codec-bhttp&lt;/code&gt; — fixed in 0.0.23.Final&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;We don&amp;#x27;t enforce any limits for the encoded variable lengths that are used for fields. As the remote peer controls these it&amp;#x27;s easy for the remote peer to have us buffer data forever and so ultimately OOM.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-hmq9-67w8-j5pw"&gt;https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-hmq9-67w8-j5pw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp"&gt;https://github.com/netty/netty-incubator-codec-ohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final"&gt;https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hmq9-67w8-j5pw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-93g8-qqv3-mrx8: Apache CXF has JNDI Injection Vulnerability in JMSConfigFactory</title>
+    <id>https://osv.dev/vulnerability/GHSA-93g8-qqv3-mrx8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-93g8-qqv3-mrx8"/>
+    <published>2026-06-12T12:31:34Z</published>
+    <updated>2026-08-20T18:45:17Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50632"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF has JNDI Injection Vulnerability in JMSConfigFactory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50632&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-transports-jms&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-transports-jms&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A further incomplete fix for a previous advisory CVE-2026-44417 (Untrusted JMS configuration can lead to RCE) for Apache CXF has been identified, which can allow code execution capabilities, if untrusted users are allowed to configure JMS for Apache CXF. Users are recommended to upgrade to versions 4.2.2 or 4.1.7, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50632"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50632&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:37390"&gt;https://access.redhat.com/errata/RHSA-2026:37390&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-50632"&gt;https://access.redhat.com/security/cve/CVE-2026-50632&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2488304"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2488304&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/740ghch5z5y675cn2kzgtyo5k37n6qcw"&gt;https://lists.apache.org/thread/740ghch5z5y675cn2kzgtyo5k37n6qcw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-50632.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-50632.json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-93g8-qqv3-mrx8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-9mrv-8pvf-hf4m: Apache CXF OAuth2 Missing JWT Audience and Issuer Validation in Access Token Validator</title>
+    <id>https://osv.dev/vulnerability/GHSA-9mrv-8pvf-hf4m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9mrv-8pvf-hf4m"/>
+    <published>2026-06-12T12:31:33Z</published>
+    <updated>2026-08-20T18:45:17Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50627"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF OAuth2 Missing JWT Audience and Issuer Validation in Access Token Validator&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50627&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The JwtAccessTokenValidator class in Apache CXF fails to validate the &amp;#x27;aud&amp;#x27; (Audience) claims of incoming JWT access tokens. This allows a JWT issued for one Resource Server to be successfully replayed against a completely different Resource Server, leading to Token Confusion/Routing attacks. Users are recommended to upgrade to versions 4.2.2 or 4.1.7, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50627"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50627&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:37390"&gt;https://access.redhat.com/errata/RHSA-2026:37390&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-50627"&gt;https://access.redhat.com/security/cve/CVE-2026-50627&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2488298"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2488298&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/0jfzz9q992957b99tw7hodcqjfyxwb1m"&gt;https://lists.apache.org/thread/0jfzz9q992957b99tw7hodcqjfyxwb1m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-50627.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-50627.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/11/4"&gt;http://www.openwall.com/lists/oss-security/2026/06/11/4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9mrv-8pvf-hf4m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-f8p7-h97q-7vx7: Apache CXF OAuth2 Log Injection via Unsanitized Client Identifier</title>
+    <id>https://osv.dev/vulnerability/GHSA-f8p7-h97q-7vx7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f8p7-h97q-7vx7"/>
+    <published>2026-06-12T12:31:33Z</published>
+    <updated>2026-08-20T18:45:17Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50629"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF OAuth2 Log Injection via Unsanitized Client Identifier&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50629&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The &amp;#x27;clientId&amp;#x27; parameter from incoming HTTP requests is directly concatenated into OAuth2 server log warning messages without sanitizing control characters. This allows an attacker to inject arbitrary content, including fake log entries, into the server&amp;#x27;s log files. Users are recommended to upgrade to versions 4.2.2 or 4.1.7, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50629"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50629&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/xw95po30p8th58ms1no6b0f2375cql00"&gt;https://lists.apache.org/thread/xw95po30p8th58ms1no6b0f2375cql00&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/11/6"&gt;http://www.openwall.com/lists/oss-security/2026/06/11/6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f8p7-h97q-7vx7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-33j8-j763-4fv5: Apache CXF: WS JSON request filter trusts metadata from an unvalidated first signature entry</title>
+    <id>https://osv.dev/vulnerability/GHSA-33j8-j763-4fv5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-33j8-j763-4fv5"/>
+    <published>2026-06-12T12:31:34Z</published>
+    <updated>2026-08-20T18:45:16Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50634"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF: WS JSON request filter trusts metadata from an unvalidated first signature entry&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50634&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-jose-jaxrs&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-jose-jaxrs&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability in Apache CXF&amp;#x27;s JwsJsonContainerRequestFilter can be exploited to cause CXF to process metadata that was not authenticated by the accepted signature. This can bypass the application&amp;#x27;s assumption
+
+that accepted `Content-Type` or protected HTTP-header metadata came from a verified signature entry, and may steer downstream JAX-RS entity parsing or signed-header consistency checks. Users are recommended to upgrade to versions 4.2.2 or 4.1.7, which fix this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50634"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50634&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/9nfwh9d3m4kznxrk1mz98hl0jml18k0p"&gt;https://lists.apache.org/thread/9nfwh9d3m4kznxrk1mz98hl0jml18k0p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/11/11"&gt;http://www.openwall.com/lists/oss-security/2026/06/11/11&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-33j8-j763-4fv5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g5v7-jchf-7jrr: Apache CXF OAuth2 has Inverted IP Binding Check that Defeats Security Control</title>
+    <id>https://osv.dev/vulnerability/GHSA-g5v7-jchf-7jrr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g5v7-jchf-7jrr"/>
+    <published>2026-06-12T12:31:33Z</published>
+    <updated>2026-08-20T18:45:16Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50628"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF OAuth2 has Inverted IP Binding Check that Defeats Security Control&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50628&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A logic error in OAuthRequestFilter rejects legitimate requests originating from the bound IP address, while blindly allowing requests from any other IP address. Enabling this
+
+security feature inadvertently creates an inverse security check. Users are recommended to upgrade to versions 4.2.2 or 4.1.7, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50628"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50628&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:37390"&gt;https://access.redhat.com/errata/RHSA-2026:37390&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-50628"&gt;https://access.redhat.com/security/cve/CVE-2026-50628&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2488302"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2488302&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/vb3ho8lf228gh90m1fpnohf2008xrdxk"&gt;https://lists.apache.org/thread/vb3ho8lf228gh90m1fpnohf2008xrdxk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-50628.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-50628.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/11/5"&gt;http://www.openwall.com/lists/oss-security/2026/06/11/5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g5v7-jchf-7jrr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-542g-m3fx-q86f: Apache CXF has Authentication Bypass in OAuth2 TokenIntrospectionService</title>
+    <id>https://osv.dev/vulnerability/GHSA-542g-m3fx-q86f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-542g-m3fx-q86f"/>
+    <published>2026-06-12T12:31:33Z</published>
+    <updated>2026-08-20T18:45:16Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50623"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF has Authentication Bypass in OAuth2 TokenIntrospectionService&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50623&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An authentication bypass vulnerability exists in the OAuth2 TokenIntrospectionService in Apache CXF. Due to a missing &amp;#x27;throw&amp;#x27; keyword in the security context check, the introspection endpoint (/services/oauth2/introspect) can be accessed by any unauthenticated network attacker. However note that this is a safeguard only in the case that someone forgot to enable authentication on the service. Users are recommended to upgrade to version 4.2.2 or 4.1.7, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50623"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50623&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/ydzj8m5mqmjy13xgyj9mkk9hfff63qq7"&gt;https://lists.apache.org/thread/ydzj8m5mqmjy13xgyj9mkk9hfff63qq7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/11/3"&gt;http://www.openwall.com/lists/oss-security/2026/06/11/3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-542g-m3fx-q86f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xf62-wr5p-5p95: Apache CXF OAuth2 HTTP Response Splitting via WWW-Authenticate Realm Injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-xf62-wr5p-5p95</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xf62-wr5p-5p95"/>
+    <published>2026-06-12T12:31:33Z</published>
+    <updated>2026-08-20T18:45:16Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50630"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF OAuth2 HTTP Response Splitting via WWW-Authenticate Realm Injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50630&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A CRLF injection vulnerability exists in the OAuth2 AuthorizationUtils class. When constructing the WWW-Authenticate response header, the &amp;#x27;realm&amp;#x27; parameter is concatenated without sanitizing Carriage Return (CR) and Line Feed (LF) characters. If an attacker can control the realm value, they can inject arbitrary HTTP headers or split the HTTP response entirely. Users are recommended to upgrade to versions 4.2.2 or 4.1.7, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50630"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50630&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/bt7vnjzzkpd6vdhkxv103poor1jy5trm"&gt;https://lists.apache.org/thread/bt7vnjzzkpd6vdhkxv103poor1jy5trm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/11/7"&gt;http://www.openwall.com/lists/oss-security/2026/06/11/7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xf62-wr5p-5p95"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vmr9-j6wf-pmh2: netty-incubator-codec-ohttp: [OHttpServerCodec] Native Direct-Memory Leak on AEAD Decryption Failure Leads to Gateway Denial of Service</title>
+    <id>https://osv.dev/vulnerability/GHSA-vmr9-j6wf-pmh2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vmr9-j6wf-pmh2"/>
+    <published>2026-08-20T18:39:50Z</published>
+    <updated>2026-08-20T18:45:15Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-54251"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;netty-incubator-codec-ohttp: [OHttpServerCodec] Native Direct-Memory Leak on AEAD Decryption Failure Leads to Gateway Denial of Service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54251&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.netty.incubator:netty-incubator-codec-ohttp&lt;/code&gt; — fixed in 0.0.23.Final&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The **netty-incubator-codec-ohttp** library implements Oblivious HTTP (OHTTP) gateway and client functionality using Netty&amp;#x27;s `ByteBuf` memory management. When an OHTTP gateway processes encrypted client requests, it allocates a pooled direct (native off-heap) `ByteBuf` to hold the decrypted plaintext before the AEAD tag is verified. If the AEAD tag check fails — meaning the ciphertext is invalid — the decryption method throws a `CryptoException`, but the allocated buffer is never released because no `try/finally` block guards the allocation.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-vmr9-j6wf-pmh2"&gt;https://github.com/netty/netty-incubator-codec-ohttp/security/advisories/GHSA-vmr9-j6wf-pmh2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp"&gt;https://github.com/netty/netty-incubator-codec-ohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final"&gt;https://github.com/netty/netty-incubator-codec-ohttp/releases/tag/netty-incubator-codec-parent-ohttp-0.0.23.Final&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vmr9-j6wf-pmh2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-qp3f-rvj8-46c8: Apache CXF JNDI Injection vulnerability in DispatchMDBMessageListenerImpl</title>
+    <id>https://osv.dev/vulnerability/GHSA-qp3f-rvj8-46c8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qp3f-rvj8-46c8"/>
+    <published>2026-06-12T12:31:34Z</published>
+    <updated>2026-08-20T18:45:14Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50633"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF JNDI Injection vulnerability in DispatchMDBMessageListenerImpl&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50633&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-integration-jca&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-integration-jca&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A JNDI Injection vulnerability has been discovered in Apache CXF&amp;#x27;s JCA integration module, which can allow for code execution, if an attacker is able to manipulate the JCA deployment descriptor (ra.xml) or runtime activation parameters. Users are recommended to upgrade to versions 4.2.2 or 4.1.7, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50633"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50633&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:37390"&gt;https://access.redhat.com/errata/RHSA-2026:37390&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-50633"&gt;https://access.redhat.com/security/cve/CVE-2026-50633&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2488307"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2488307&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/1czhgovkgzdkyp3t61wthn0foogh2grf"&gt;https://lists.apache.org/thread/1czhgovkgzdkyp3t61wthn0foogh2grf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-50633.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-50633.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/11/10"&gt;http://www.openwall.com/lists/oss-security/2026/06/11/10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qp3f-rvj8-46c8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-83r6-96m8-r52p: Apache CXF OAuth2 TOCTOU Race Condition in Refresh Token Processing</title>
+    <id>https://osv.dev/vulnerability/GHSA-83r6-96m8-r52p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-83r6-96m8-r52p"/>
+    <published>2026-06-12T12:31:33Z</published>
+    <updated>2026-08-20T18:45:13Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-50631"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Apache CXF OAuth2 TOCTOU Race Condition in Refresh Token Processing&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-50631&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.2.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.apache.cxf:cxf-rt-rs-security-oauth2&lt;/code&gt; — fixed in 4.1.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A race condition in AbstractOAuthDataProvider allows concurrent requests using the same Refresh Token to bypass single-use semantics and generate multiple valid Access Tokens, when &amp;#x27;recycleRefreshTokens&amp;#x27; is set to false. A leaked refresh token can be replayed concurrently by multiple attackers or threads. Users are recommended to upgrade to versions 4.2.2 or 4.1.7, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-50631"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-50631&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/cxf"&gt;https://github.com/apache/cxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/s83t3x4r626o9h8rt0ryr1w7w53l1vv8"&gt;https://lists.apache.org/thread/s83t3x4r626o9h8rt0ryr1w7w53l1vv8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/06/11/8"&gt;http://www.openwall.com/lists/oss-security/2026/06/11/8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-83r6-96m8-r52p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-5pvg-856g-cp85: Netty has Insufficient Bailiwick Validation for NS Records</title>
     <id>https://osv.dev/vulnerability/GHSA-5pvg-856g-cp85</id>
@@ -241,94 +425,5 @@ This was discovered based on an existing vulnerability CVE-2017-15699.
 
 ### Details
 Inbound frames enter the client through `SocketFrameHandler.readFrame`, which returns frames parsed from the peer-controlled input stream (`src/main/java/com/rabbitmq/client/impl/SocketFrameHandler.java:197`). `AMQConnection.MainLoop` reads each frame (`src/main/java/com/ra…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/rabbitmq-java-client/security/advisories/GHSA-qx7j-jv8m-fppr"&gt;https://github.com/rabbitmq/rabbitmq-java-client/security/advisories/GHSA-qx7j-jv8m-fppr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/rabbitmq-java-client/pull/1959"&gt;https://github.com/rabbitmq/rabbitmq-java-client/pull/1959&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/rabbitmq-java-client/pull/1960"&gt;https://github.com/rabbitmq/rabbitmq-java-client/pull/1960&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/rabbitmq-java-client/commit/31735344d9f9dfc53740b67f06e560e8846b9322"&gt;https://github.com/rabbitmq/rabbitmq-java-client/commit/31735344d9f9dfc53740b67f06e560e8846b9322&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/rabbitmq-java-client/commit/abd6d60d4e2bfc1a327dc90ab246b2e8aca1f33b"&gt;https://github.com/rabbitmq/rabbitmq-java-client/commit/abd6d60d4e2bfc1a327dc90ab246b2e8aca1f33b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/rabbitmq-java-client"&gt;https://github.com/rabbitmq/rabbitmq-java-client&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/rabbitmq-java-client/releases/tag/v5.31.0"&gt;https://github.com/rabbitmq/rabbitmq-java-client/releases/tag/v5.31.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qx7j-jv8m-fppr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-pq65-77rc-7r8c: Keycloak has a Time-of-check Time-of-use (TOCTOU) Race Condition</title>
-    <id>https://osv.dev/vulnerability/GHSA-pq65-77rc-7r8c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pq65-77rc-7r8c"/>
-    <published>2026-05-28T06:31:09Z</published>
-    <updated>2026-08-19T00:45:06Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-9796"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Keycloak has a Time-of-check Time-of-use (TOCTOU) Race Condition&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-9796&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.keycloak:keycloak-server&lt;/code&gt; — fixed in 26.6.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A flaw was found in Keycloak. An authenticated administrator with the `manage-clients` role can exploit a Time-of-check to time-of-use (TOCTOU) vulnerability in the name-based admin role checks. This allows the attacker to escalate their privileges to `realm-admin` for all users within the realm, granting them extensive control over the system. The composite role relationship persists even after the attacker&amp;#x27;s own permissions are revoked and across system reboots.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-9796"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-9796&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/keycloak/keycloak/issues/49427"&gt;https://github.com/keycloak/keycloak/issues/49427&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/keycloak/keycloak/pull/49624"&gt;https://github.com/keycloak/keycloak/pull/49624&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/keycloak/keycloak/commit/39cb8de54c8517efeda4baa8bc314fd40e9c6934"&gt;https://github.com/keycloak/keycloak/commit/39cb8de54c8517efeda4baa8bc314fd40e9c6934&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:56523"&gt;https://access.redhat.com/errata/RHSA-2026:56523&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:56524"&gt;https://access.redhat.com/errata/RHSA-2026:56524&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-9796"&gt;https://access.redhat.com/security/cve/CVE-2026-9796&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2482464"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2482464&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pq65-77rc-7r8c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2qj4-mmr9-4v2f: Netty: Memory Exhaustion in SctpMessageCompletionHandler</title>
-    <id>https://osv.dev/vulnerability/GHSA-2qj4-mmr9-4v2f</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2qj4-mmr9-4v2f"/>
-    <published>2026-08-17T17:50:49Z</published>
-    <updated>2026-08-18T22:26:59Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-59902"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Netty: Memory Exhaustion in SctpMessageCompletionHandler&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59902&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.netty:netty-transport-sctp&lt;/code&gt; — fixed in 4.2.17.Final&lt;/li&gt;&lt;li&gt;&lt;code&gt;io.netty:netty-transport-sctp&lt;/code&gt; — fixed in 4.1.137.Final&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-SctpMessageCompletionHandler does not limit the total size of buffered fragments, allowing an unauthenticated attacker to cause an OutOfMemoryError by sending large SCTP fragments.
-
-### Details
-`io.netty.handler.codec.sctp.SctpMessageCompletionHandler` buffers fragments for incomplete SCTP messages. The fix for CVE-2026-46340 fixed unbounded memory growth by introducing limits on the number of concurrent incomplete messages (maxIncompleteSctpMessages) and the number of fragments per message (maxFragments).
-
-While the count of fragments is now bounded, the handler still does not enforce a maximum size in bytes.
-
-With the default limits of 128 messages and 128 fragments, and a typical max SCTP chunk size of 64KB, an attacker can consume up to ~1GB per connection. By opening a sma…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/security/advisories/GHSA-2qj4-mmr9-4v2f"&gt;https://github.com/netty/netty/security/advisories/GHSA-2qj4-mmr9-4v2f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/pull/17213"&gt;https://github.com/netty/netty/pull/17213&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/pull/17217"&gt;https://github.com/netty/netty/pull/17217&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/commit/1b5abc6443b63726c72cdd285af2feb7ddbb8ff7"&gt;https://github.com/netty/netty/commit/1b5abc6443b63726c72cdd285af2feb7ddbb8ff7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty"&gt;https://github.com/netty/netty&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/releases/tag/netty-4.1.137.Final"&gt;https://github.com/netty/netty/releases/tag/netty-4.1.137.Final&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/releases/tag/netty-4.2.17.Final"&gt;https://github.com/netty/netty/releases/tag/netty-4.2.17.Final&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2qj4-mmr9-4v2f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-8c42-7qj2-3j46: Netty Vulnerable to Cache Poisoning and Information Disclosure via CORS Vary Header Overwrite</title>
-    <id>https://osv.dev/vulnerability/GHSA-8c42-7qj2-3j46</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8c42-7qj2-3j46"/>
-    <published>2026-08-17T18:24:26Z</published>
-    <updated>2026-08-18T22:26:59Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-59903"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Netty Vulnerable to Cache Poisoning and Information Disclosure via CORS Vary Header Overwrite&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59903&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.netty:netty-codec-http&lt;/code&gt; — fixed in 4.2.17.Final&lt;/li&gt;&lt;li&gt;&lt;code&gt;io.netty:netty-codec-http&lt;/code&gt; — fixed in 4.1.137.Final&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-Netty&amp;#x27;s `CorsHandler` silently overwrites existing `Vary` headers, enabling cache poisoning and sensitive information disclosure.
-
-### Details
-`io.netty.handler.codec.http.cors.CorsHandler#setVaryHeader` overwrites any existing Vary headers set by backend applications. 
-
-```java
-    private static void setVaryHeader(final HttpResponse response) {
-        response.headers().set(HttpHeaderNames.VARY, HttpHeaderNames.ORIGIN);
-    }
-```
-
-Because `set()` replaces all existing values for the header, if a backend application sets a `Vary` header (such as `Vary: Authorization` or `Vary: Cookie`) to ensure that intermediate caches (like CDNs) cache responses separately per user, the `CorsHandler` will overwrite it with `Vary: origin`. This causes the caching proxy to ignore the authoriz…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/security/advisories/GHSA-8c42-7qj2-3j46"&gt;https://github.com/netty/netty/security/advisories/GHSA-8c42-7qj2-3j46&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/pull/17213"&gt;https://github.com/netty/netty/pull/17213&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/pull/17217"&gt;https://github.com/netty/netty/pull/17217&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty"&gt;https://github.com/netty/netty&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/releases/tag/netty-4.1.137.Final"&gt;https://github.com/netty/netty/releases/tag/netty-4.1.137.Final&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/netty/netty/releases/tag/netty-4.2.17.Final"&gt;https://github.com/netty/netty/releases/tag/netty-4.2.17.Final&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8c42-7qj2-3j46"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9wxp-w4px-32vh: Spring Boot's Mail Auto-Configuration Does Not Enable SSL Hostname Verification</title>
-    <id>https://osv.dev/vulnerability/GHSA-9wxp-w4px-32vh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9wxp-w4px-32vh"/>
-    <published>2026-06-11T09:31:55Z</published>
-    <updated>2026-08-18T20:30:07Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-40992"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Spring Boot&amp;#x27;s Mail Auto-Configuration Does Not Enable SSL Hostname Verification&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40992&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.springframework.boot:spring-boot-starter-mail&lt;/code&gt; — fixed in 4.0.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.springframework.boot:spring-boot-starter-mail&lt;/code&gt; — fixed in 3.5.15&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.springframework.boot:spring-boot-starter-mail&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Spring Boot&amp;#x27;s Mail auto-configuration does not enable hostname verification. Applications that set the relevant JavaMail property, such as spring.mail.properties.mail.smtp.ssl.checkserveridentity=true, are not affected.
-
-Affected versions:
-Spring Boot 4.0.0 through 4.0.6; 3.5.0 through 3.5.14; 3.4.0 through 3.4.16.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40992"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40992&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/spring-projects/spring-boot"&gt;https://github.com/spring-projects/spring-boot&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://spring.io/security/cve-2026-40992"&gt;https://spring.io/security/cve-2026-40992&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9wxp-w4px-32vh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-hw5c-xm3c-v96w: Spring Web Flow JS RemotingHandler renders non-HTML Response as HTML</title>
-    <id>https://osv.dev/vulnerability/GHSA-hw5c-xm3c-v96w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hw5c-xm3c-v96w"/>
-    <published>2026-06-11T09:31:55Z</published>
-    <updated>2026-08-18T20:30:07Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-40986"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Spring Web Flow JS RemotingHandler renders non-HTML Response as HTML&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40986&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.springframework.webflow:spring-webflow&lt;/code&gt; — fixed in 4.0.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.springframework.webflow:spring-webflow&lt;/code&gt; — fixed in 3.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.springframework.webflow:spring-webflow&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Spring Web Flow&amp;#x27;s JavaScript RemotingHandler renders the body of an error response as HTML even when the response is not &amp;quot;text/html&amp;quot;, which can result in a scripting attack in the user&amp;#x27;s browser if the error response from the server contains error details with input reflected from an attacker.
-
-Affected versions:
-Spring Web Flow 4.0.0; 3.0.0 through 3.0.1; 2.5.0 through 2.5.1.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40986"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40986&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/spring-projects/spring-webflow"&gt;https://github.com/spring-projects/spring-webflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://spring.io/security/cve-2026-40986"&gt;https://spring.io/security/cve-2026-40986&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hw5c-xm3c-v96w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9ggw-87m9-9gfc: Spring Web Flow has Data Binding Vulnerability with Unified EL Parser</title>
-    <id>https://osv.dev/vulnerability/GHSA-9ggw-87m9-9gfc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9ggw-87m9-9gfc"/>
-    <published>2026-06-11T06:30:28Z</published>
-    <updated>2026-08-18T20:15:10Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-40985"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Spring Web Flow has Data Binding Vulnerability with Unified EL Parser&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-40985&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.springframework.webflow:spring-webflow&lt;/code&gt; — fixed in 4.0.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.springframework.webflow:spring-webflow&lt;/code&gt; — fixed in 3.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.springframework.webflow:spring-webflow&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Applications that configure the WebFlowELExpressionParser are vulnerable to the use of malicious Unified EL expressions.
-
-Affected versions:
-Spring Web Flow 4.0.0; 3.0.0 through 3.0.1; 2.5.0 through 2.5.1.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40985"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40985&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/spring-projects/spring-webflow"&gt;https://github.com/spring-projects/spring-webflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://spring.io/security/cve-2026-40985"&gt;https://spring.io/security/cve-2026-40985&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9ggw-87m9-9gfc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

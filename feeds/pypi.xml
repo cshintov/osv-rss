@@ -3,43 +3,81 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-08-22T10:15:09Z</updated>
+  <updated>2026-08-23T03:56:01Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
   <entry>
+    <title>[UPDATED] GHSA-rf74-v2fm-23pw: Natural Language Toolkit (NLTK) has unbounded recursion in JSONTaggedDecoder.decode_obj() may cause DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-rf74-v2fm-23pw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rf74-v2fm-23pw"/>
+    <published>2026-03-18T20:17:43Z</published>
+    <updated>2026-08-23T03:56:01Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-66393"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Natural Language Toolkit (NLTK) has unbounded recursion in JSONTaggedDecoder.decode_obj() may cause DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-66393&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`JSONTaggedDecoder.decode_obj()` in `nltk/jsontags.py` calls itself 
+recursively without any depth limit. A deeply nested JSON structure 
+exceeding `sys.getrecursionlimit()` (default: 1000) will raise an 
+unhandled `RecursionError`, crashing the Python process.
+
+### Affected code
+File: `nltk/jsontags.py`, lines 47–52
+```python
+@classmethod
+def decode_obj(cls, obj):
+    if isinstance(obj, dict):
+        obj = {key: cls.decode_obj(val) for (key, val) in obj.items()}
+    elif isinstance(obj, list):
+        obj = list(cls.decode_obj(val) for val in obj)
+```
+
+### Proof of Concept
+```python
+import sys, json
+from nltk.jsontags import JSONTaggedDecoder
+
+depth = sys.getrecursionlimit() + 50  # e.g. 1050
+payload = &amp;#x27;{&amp;quot;x&amp;quot;:&amp;#x27; * depth + &amp;quot;null&amp;quot; + &amp;quot;}&amp;quot; * depth
+
+# Raises RecursionError, crashing …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-rf74-v2fm-23pw"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-rf74-v2fm-23pw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk"&gt;https://github.com/nltk/nltk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rf74-v2fm-23pw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-14350: Malicious code in scrambleeer (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-14350</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14350"/>
+    <published>2026-08-21T09:31:52Z</published>
+    <updated>2026-08-23T03:30:22Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in scrambleeer (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;scrambleeer&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (7eb0e96b324df04d5ecaf0739dec60dcb2367a26def0e713519c51e24ee790df)
+The package advertises a numeric shuffle utility but its sole public function scrambleeer() opens a TCP socket to bax.h4x.tv on port 6363, dup2&amp;#x27;s the socket over stdin/stdout/stderr, and spawns /bin/bash via pty. Invoking the documented API therefore hands an interactive shell on the caller&amp;#x27;s host to the operator of bax.h4x.tv. The payload is compressed onto a single semicolon-separated line inside an otherwise innocuous shuffle routine, concealing the backdoor from casual review.
+
+## Source: kam193 (52d5b1e99e57b038247cf3b7f86a7514e75275a095ca3f3cf044d80cbe999472)
+When using the provided library, the code starts a reverse shell to a h…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/scrambleeer"&gt;https://bad-packages.kam193.eu/pypi/package/scrambleeer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/scrambleeer/0.1.1/"&gt;https://pypi.org/project/scrambleeer/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/scrambleeer/0.1.0/"&gt;https://pypi.org/project/scrambleeer/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14350"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
     <title>[NEW] MAL-2026-14358: Malicious code in scrambleeeer (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-14358</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14358"/>
     <published>2026-08-22T09:47:41Z</published>
-    <updated>2026-08-22T10:15:09Z</updated>
+    <updated>2026-08-23T03:30:22Z</updated>
     <category term="PyPI"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in scrambleeeer (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;scrambleeeer&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
 ---
 _-= Per source details. Do not edit below this line.=-_
 
+## Source: amazon-inspector (2a65599e4b6ca9e8349fbde07e578e53844af217c6eca15dcd6bb99c8a1fa63f)
+Package advertises a trivial string-shuffle utility, but its exported function scrambleeeer() opens a TCP socket to bax.h4x.tv:6363, duplicates stdin/stdout/stderr onto that socket, and spawns /bin/bash via pty.spawn. Any caller who invokes the documented API hands an interactive bash shell on the installer&amp;#x27;s host to whoever controls bax.h4x.tv:6363. The destination is hardcoded, not user-configurable, undocumented, and unrelated to the package&amp;#x27;s stated purpose.
+
 ## Source: kam193 (52bcde495e195edfc164c36aa7f704643c3171eaffc477c28de4b60c7dd2d414)
 When using the provided library, the code starts a reverse shell to a hardcoded location.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-08-scrambleeer
-
-
-Reasons (based on the campaign):
-
-
- - The package contains code to create a reverse shell, allowing an attacker to execute any commands on the victim&amp;#x27;s machine.
-
-
- - action-hidden-in-lib-usage
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/scrambleeeer"&gt;https://bad-packages.kam193.eu/pypi/package/scrambleeeer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14358"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/scrambleeeer"&gt;https://bad-packages.kam193.eu/pypi/package/scrambleeeer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/scrambleeeer/0.1.0/"&gt;https://pypi.org/project/scrambleeeer/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14358"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-q56x-g2fj-4rj6: ONNX: TOCTOU arbitrary file read/write in save_external_dat </title>
@@ -282,23 +320,6 @@ def load_base64(self, media_type: str, data: str) -&amp;gt; tuple[npt.NDArray, d
     <content type="html">&lt;p&gt;Aliases: CVE-2025-51481, GHSA-h7x8-jv97-fvvm, PYSEC-2026-1286&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dagster-ge&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Local File Inclusion in dagster._grpc.impl.get_notebook_data in Dagster 1.10.14 allows attackers with access to the gRPC server to read arbitrary files by supplying path traversal sequences in the notebook_path field of ExternalNotebookData requests, bypassing the intended extension-based check.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dagster-io/dagster/pull/30002"&gt;https://github.com/dagster-io/dagster/pull/30002&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dagster-io/dagster"&gt;https://github.com/dagster-io/dagster&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.gecko.security/blog/cve-2025-51481"&gt;https://www.gecko.security/blog/cve-2025-51481&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2025-102"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-14350: Malicious code in scrambleeer (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-14350</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14350"/>
-    <published>2026-08-21T09:31:52Z</published>
-    <updated>2026-08-21T15:00:17Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in scrambleeer (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;scrambleeer&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (7eb0e96b324df04d5ecaf0739dec60dcb2367a26def0e713519c51e24ee790df)
-The package advertises a numeric shuffle utility but its sole public function scrambleeer() opens a TCP socket to bax.h4x.tv on port 6363, dup2&amp;#x27;s the socket over stdin/stdout/stderr, and spawns /bin/bash via pty. Invoking the documented API therefore hands an interactive shell on the caller&amp;#x27;s host to the operator of bax.h4x.tv. The payload is compressed onto a single semicolon-separated line inside an otherwise innocuous shuffle routine, concealing the backdoor from casual review.
-
-## Source: kam193 (52d5b1e99e57b038247cf3b7f86a7514e75275a095ca3f3cf044d80cbe999472)
-When using the provided library, the code starts a reverse shell to a h…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/scrambleeer"&gt;https://bad-packages.kam193.eu/pypi/package/scrambleeer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/scrambleeer/0.1.1/"&gt;https://pypi.org/project/scrambleeer/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14350"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] MAL-2026-14349: Malicious code in boto4 (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-14349</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14349"/>
@@ -366,55 +387,5 @@ The default MLflow Tracking Server (`mlflow server`, no authentication, default 
     <category term="GHSA-7gwp-5pfp-969j"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;MLflow: Unauthenticated full-read SSRF in webhook delivery: _validate_webhook_url bypassed via unvalidated HTTP redirects (and DNS rebinding)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-mlflow-2026-64849, CVE-2026-64849, GHSA-7gwp-5pfp-969j&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mlflow&lt;/code&gt; — fixed in 3.15.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
 The default MLflow Tracking Server (`mlflow server`, no authentication, default SQLite backend) exposes the model-registry webhooks API unauthenticated, including a synchronous `POST /api/2.0/mlflow/webhooks/{id}/test` endpoint that returns the upstream response status and body to the caller. The SSRF guard added in PR #20747 (`_validate_webhook_url`, shipped in 3.10.0) resolves the webhook hostname and rejects non-public IPs, but it is bypassable: delivery follows HTTP redirects (no `allow_redirects=False`) and never pins the validated IP. An attacker hosts a public HTTPS endpoint that passes the guard and returns `302 Location: http://169.254.169.254/...` (or `http://127.0.0.1:...`); MLflow follows it and never re-validates the redirect target. Because `/test` reflects the re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/security/advisories/GHSA-7gwp-5pfp-969j"&gt;https://github.com/mlflow/mlflow/security/advisories/GHSA-7gwp-5pfp-969j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/issues/24179"&gt;https://github.com/mlflow/mlflow/issues/24179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/pull/24258"&gt;https://github.com/mlflow/mlflow/pull/24258&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/commit/ba949522477cbd5915aa55d29b0cfad7d5ddf939"&gt;https://github.com/mlflow/mlflow/commit/ba949522477cbd5915aa55d29b0cfad7d5ddf939&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow"&gt;https://github.com/mlflow/mlflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/releases/tag/v3.15.0"&gt;https://github.com/mlflow/mlflow/releases/tag/v3.15.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/mlflow"&gt;https://pypi.org/project/mlflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-7gwp-5pfp-969j"&gt;https://github.com/advisories/GHSA-7gwp-5pfp-969j&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3687"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2026-2946: PraisonAI: Coarse-Grained Tool Approval Cache Bypasses Per-Invocation Consent for Shell Commands</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-2946</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-2946"/>
-    <published>2026-07-13T14:36:52Z</published>
-    <updated>2026-08-21T05:32:09Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-56074"/>
-    <category term="GHSA-ffp3-3562-8cv3"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;PraisonAI: Coarse-Grained Tool Approval Cache Bypasses Per-Invocation Consent for Shell Commands&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56074, GHSA-ffp3-3562-8cv3&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;praisonaiagents&lt;/code&gt; — fixed in 4.5.128&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The approval system in PraisonAI Agents caches tool approval decisions by tool name only, not by invocation arguments. Once a user approves `execute_command` for any command (e.g., `ls -la`), all subsequent `execute_command` calls in that execution context bypass the approval prompt entirely. Combined with `os.environ.copy()` passing all process environment variables to subprocesses, this allows an LLM agent (potentially via prompt injection) to silently exfiltrate API keys and credentials without further user consent.
-
-## Details
-
-The `require_approval` decorator in `src/praisonai-agents/praisonaiagents/approval/__init__.py:176-178` checks approval status by tool name only:
-
-```python
-@wraps(func)
-def wrapper(*args, **kwargs):
-    if is_already_approved(tool_name):   # line 17…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-ffp3-3562-8cv3"&gt;https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-ffp3-3562-8cv3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-56074"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-56074&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI"&gt;https://github.com/MervinPraison/PraisonAI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/releases/tag/v4.5.128"&gt;https://github.com/MervinPraison/PraisonAI/releases/tag/v4.5.128&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/praisonai-tool-approval-cache-bypass-via-coarse-grained-caching"&gt;https://www.vulncheck.com/advisories/praisonai-tool-approval-cache-bypass-via-coarse-grained-caching&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/praisonaiagents"&gt;https://pypi.org/project/praisonaiagents&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-ffp3-3562-8cv3"&gt;https://github.com/advisories/GHSA-ffp3-3562-8cv3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-2946"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-14274: Malicious code in reqcrypt-dev (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-14274</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14274"/>
-    <published>2026-08-19T06:49:21Z</published>
-    <updated>2026-08-21T05:01:07Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in reqcrypt-dev (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;reqcrypt-dev&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (dcb6f64adb9e9635c1060d7c40db6006cad5446b87dcd7b20ceeb8ee7c6980f8)
-The package presents itself as a requests-style HTTP client but its response processor inspects every JSON response for the magic keys `payloaddd`, `payload_gz`, and `payload_zlib`. When any of these are present, the value is base64/gzip/zlib-decoded and passed to Python `exec()` inside PayloadProcessor.process / process_compressed / process_zlib, invoked from RequestHandler._process_response on every JSON response. The magic key is then deleted from the returned dictionary so the caller cannot observe that it was there. Three parallel encoding wrappers (raw base64, base64+gzip, base64+zlib) all funnel into `exec()` inside broad try/ex…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/reqcrypt-dev"&gt;https://bad-packages.kam193.eu/pypi/package/reqcrypt-dev&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/reqcrypt_dev/0.1.0/"&gt;https://pypi.org/project/reqcrypt_dev/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14274"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-14341: Malicious code in reqcrypts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-14341</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14341"/>
-    <published>2026-08-21T02:17:41Z</published>
-    <updated>2026-08-21T04:30:13Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in reqcrypts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;reqcrypts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (7fb4e239b6344dfe684483344d4d1a2da013a4d506b78d81e9096c6b31a690ae)
-reqcrypts is published as a drop-in HTTP client (`import reqcrypts; reqcrypts.get(url)`) but its RequestHandler wraps every JSON response through a PayloadManager that base64-decodes a `_payload` field from the response body and passes it to `exec()` on the caller&amp;#x27;s Python interpreter, then deletes the field to hide the execution. Payload execution and silent mode are on by default. Any HTTP server the caller reaches (including MITM or redirect targets) can therefore run arbitrary Python code on the installer&amp;#x27;s host by returning a JSON body containing a `_payload` key. The package additionally exports top-level `add_payload(trigger, co…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/reqcrypts"&gt;https://bad-packages.kam193.eu/pypi/package/reqcrypts&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/reqcrypts/0.1.2/"&gt;https://pypi.org/project/reqcrypts/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/reqcrypts/0.1.3/"&gt;https://pypi.org/project/reqcrypts/0.1.3/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14341"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

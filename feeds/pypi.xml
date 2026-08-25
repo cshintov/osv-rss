@@ -3,12 +3,212 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-08-24T17:00:11Z</updated>
+  <updated>2026-08-24T20:30:11Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-8jj7-4v57-frf5: django CMS: Plugin move endpoint allows cyclic reparenting (DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-8jj7-4v57-frf5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8jj7-4v57-frf5"/>
+    <published>2026-08-24T20:09:43Z</published>
+    <updated>2026-08-24T20:30:11Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54623"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;django CMS: Plugin move endpoint allows cyclic reparenting (DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54623&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;django-cms&lt;/code&gt; — fixed in 5.0.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The `move_plugin` admin endpoint does not prevent a plugin from being   reparented under itself or one of its own descendants. Doing so creates a  cycle in the plugin tree, after which the recursive descendant/ancestor SQL  queries loop without terminating, stalling the request worker.
+
+### Details
+`move_plugin` (in `cms/admin/placeholderadmin.py`) accepts a  `plugin_parent` POST parameter and, for an in-placeholder move, sets the  plugin&amp;#x27;s parent to the target without any cycle/ancestor check. If the target  parent is a descendant of the moved plugin, the resulting `parent_id` graph  contains a cycle.
+
+Descendant and ancestor traversal is implemented with `WITH RECURSIVE` CTEs  (`_get_descendants_cte` / `_get_ancestors_cte` in `cms/models/pluginmodel.py`)  that have no cycle c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/security/advisories/GHSA-8jj7-4v57-frf5"&gt;https://github.com/django-cms/django-cms/security/advisories/GHSA-8jj7-4v57-frf5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54623"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54623&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/pull/8645"&gt;https://github.com/django-cms/django-cms/pull/8645&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/commit/7642a98ab3170793c0b27b4125dd1f3d318b8a1c"&gt;https://github.com/django-cms/django-cms/commit/7642a98ab3170793c0b27b4125dd1f3d318b8a1c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms"&gt;https://github.com/django-cms/django-cms&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/releases/tag/5.0.8"&gt;https://github.com/django-cms/django-cms/releases/tag/5.0.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8jj7-4v57-frf5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fwjf-m4qw-9f2x: django CMS: Page cache ignores plugin-declared Vary headers (disclosure &amp; poisoning)</title>
+    <id>https://osv.dev/vulnerability/GHSA-fwjf-m4qw-9f2x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fwjf-m4qw-9f2x"/>
+    <published>2026-08-24T20:09:51Z</published>
+    <updated>2026-08-24T20:30:11Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54625"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;django CMS: Page cache ignores plugin-declared Vary headers (disclosure &amp;amp; poisoning)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54625&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;django-cms&lt;/code&gt; — fixed in 5.0.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The CMS page cache key ignores the request headers that plugins declare via `get_vary_cache_on()`. The header is added to the response `Vary` header, but the CMS&amp;#x27;s own cache key does not incorporate the header values, so the first visitor&amp;#x27;s variant is served to all subsequent visitors regardless of their header values.
+
+### Details
+`_page_cache_key` (in `cms/cache/page.py`) keys only on cache prefix, site, language, path and timezone. `set_page_cache` collects the plugin-declared vary headers and calls `patch_vary_headers(response, ...)` (affecting only the emitted `Vary` header), but stores and retrieves the cached page under the header-agnostic key. `get_page_cache` therefore returns whichever variant was cached first.
+
+### Impact
+- **Information disclosure:** when a plugin v…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/security/advisories/GHSA-fwjf-m4qw-9f2x"&gt;https://github.com/django-cms/django-cms/security/advisories/GHSA-fwjf-m4qw-9f2x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54625"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54625&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/pull/8646"&gt;https://github.com/django-cms/django-cms/pull/8646&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/pull/8647"&gt;https://github.com/django-cms/django-cms/pull/8647&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/commit/8758714b865ffa79c6bcd0e5c503958ea48885aa"&gt;https://github.com/django-cms/django-cms/commit/8758714b865ffa79c6bcd0e5c503958ea48885aa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/commit/d5dc1efa18d157445491c4b12c2dd1efd56f439f"&gt;https://github.com/django-cms/django-cms/commit/d5dc1efa18d157445491c4b12c2dd1efd56f439f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms"&gt;https://github.com/django-cms/django-cms&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/django-cms/django-cms/releases/tag/5.0.8"&gt;https://github.com/django-cms/django-cms/releases/tag/5.0.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fwjf-m4qw-9f2x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xph7-9rjv-w5fr: ChromaDB's SimpleRBACAuthorizationProvider doesn't check which tenant, database, or collection a permission applies to</title>
+    <id>https://osv.dev/vulnerability/GHSA-xph7-9rjv-w5fr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xph7-9rjv-w5fr"/>
+    <published>2026-06-12T18:31:56Z</published>
+    <updated>2026-08-24T20:15:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-45831"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ChromaDB&amp;#x27;s SimpleRBACAuthorizationProvider doesn&amp;#x27;t check which tenant, database, or collection a permission applies to&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45831&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;chromadb&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The SimpleRBACAuthorizationProvider authorization provider in versions 0.5.0 or later of the ChromaDB Python project evaluates whether a user holds a given permission but never checks which tenant, database, or collection that permission applies to allowing users to perform cross tenant actions.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45831"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45831&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma/issues/7588"&gt;https://github.com/chroma-core/chroma/issues/7588&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma/pull/7602"&gt;https://github.com/chroma-core/chroma/pull/7602&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma"&gt;https://github.com/chroma-core/chroma&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.hiddenlayer.com/sai-security-advisory/2026-06-chromadb-3"&gt;https://www.hiddenlayer.com/sai-security-advisory/2026-06-chromadb-3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xph7-9rjv-w5fr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-36p7-vc44-83pf: ChromaDB has a code injection vulnerability</title>
+    <id>https://osv.dev/vulnerability/GHSA-36p7-vc44-83pf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-36p7-vc44-83pf"/>
+    <published>2026-06-12T18:31:56Z</published>
+    <updated>2026-08-24T20:15:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-45833"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ChromaDB has a code injection vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45833&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;chromadb&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A code injection vulnerability in version 0.4.17 or later of the ChromaDB Python project allows an authenticated attacker to run arbitrary code on the server by sending a malicious model repository and trust_remote_code set to true in the /api/v2/tenants/default_tenant/databases/default_database/collections/{collection_id} if they have the UPDATE_COLLECTION permission.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45833"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45833&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-45833"&gt;https://access.redhat.com/security/cve/CVE-2026-45833&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2488430"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2488430&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma"&gt;https://github.com/chroma-core/chroma&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-45833.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-45833.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.hiddenlayer.com/sai-security-advisory/2026-06-chromadb-5"&gt;https://www.hiddenlayer.com/sai-security-advisory/2026-06-chromadb-5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-36p7-vc44-83pf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-2wm9-hf6c-p5cr: ChromaDB allows any authenticated users to arbitrarily read, write, update, or delete data in any tenant's collection</title>
+    <id>https://osv.dev/vulnerability/GHSA-2wm9-hf6c-p5cr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2wm9-hf6c-p5cr"/>
+    <published>2026-06-12T18:31:56Z</published>
+    <updated>2026-08-24T20:00:10Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-45830"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ChromaDB allows any authenticated users to arbitrarily read, write, update, or delete data in any tenant&amp;#x27;s collection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-45830&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;chromadb&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A lack of authorization validation in version 0.4.17 or later of the ChromaDB Python project allows any authenticated users to arbitrarily read, write, update, or delete data in any tenant&amp;#x27;s collection regardless of which tenant they belong to.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45830"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45830&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma/issues/7588"&gt;https://github.com/chroma-core/chroma/issues/7588&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma/pull/7602"&gt;https://github.com/chroma-core/chroma/pull/7602&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2026-45830"&gt;https://access.redhat.com/security/cve/CVE-2026-45830&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2488408"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2488408&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/chroma-core/chroma"&gt;https://github.com/chroma-core/chroma&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-45830.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-45830.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.hiddenlayer.com/sai-security-advisory/2026-06-chromadb"&gt;https://www.hiddenlayer.com/sai-security-advisory/2026-06-chromadb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2wm9-hf6c-p5cr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xm98-3vcf-fph7: mcp-contextforge-gateway has RestrictedPython sandbox bypass via getattr builtin in python_sandbox_server</title>
+    <id>https://osv.dev/vulnerability/GHSA-xm98-3vcf-fph7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xm98-3vcf-fph7"/>
+    <published>2026-08-24T19:20:58Z</published>
+    <updated>2026-08-24T19:30:08Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-53710"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;mcp-contextforge-gateway has RestrictedPython sandbox bypass via getattr builtin in python_sandbox_server&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53710&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mcp-contextforge-gateway&lt;/code&gt; — fixed in 1.0.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Commit:** `f855e54d5b7bc1c91b977574a03b91eff6b86bb6`
+**Component:** `mcp-servers/python/python_sandbox_server/src/python_sandbox_server/server_fastmcp.py`
+
+## Vulnerability
+
+RestrictedPython&amp;#x27;s sandbox in ContextForge&amp;#x27;s `python_sandbox_server` sub-project allows arbitrary Python execution via three compounding weaknesses:
+
+1. Raw `getattr` is exposed in `safe_builtins`, bypassing `_getattr_` mediation.
+2. `validate_code` checks for literal dangerous dunder strings, but the payload constructs those names at runtime.
+3. The `execute_code` MCP tool can be exposed over HTTP/SSE transport with no authentication layer.
+
+## Proof of Concept
+
+The local PoC was executed against the real pinned sandbox code path. It constructs dunder names at runtime, walks Python&amp;#x27;s class hierarchy through the expo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/IBM/mcp-context-forge/security/advisories/GHSA-xm98-3vcf-fph7"&gt;https://github.com/IBM/mcp-context-forge/security/advisories/GHSA-xm98-3vcf-fph7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/IBM/mcp-context-forge/commit/63a2900e6301b9c8a483a38d3737a1beb3a7ce89"&gt;https://github.com/IBM/mcp-context-forge/commit/63a2900e6301b9c8a483a38d3737a1beb3a7ce89&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/IBM/mcp-context-forge"&gt;https://github.com/IBM/mcp-context-forge&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/IBM/mcp-context-forge/releases#release-v1.0.2"&gt;https://github.com/IBM/mcp-context-forge/releases#release-v1.0.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xm98-3vcf-fph7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q8gq-377p-jq3r: vLLM: Security Check Bypass via assert Statement in Activation Function Loading Allows Arbitrary Code Execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-q8gq-377p-jq3r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q8gq-377p-jq3r"/>
+    <published>2026-06-16T17:34:49Z</published>
+    <updated>2026-08-24T18:49:07Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-41523"/>
+    <category term="PYSEC-2026-2300"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: Security Check Bypass via assert Statement in Activation Function Loading Allows Arbitrary Code Execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41523, PYSEC-2026-2300&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.22.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+An `assert`-based security check in vLLM&amp;#x27;s activation function loading allows any unauthenticated attacker to achieve arbitrary code execution on the server by publishing a malicious HuggingFace model, when vLLM runs in Python optimized mode (`python -O` or `PYTHONOPTIMIZE=1`).
+
+### Details
+
+vLLM uses an `assert` statement at [`vllm/model_executor/layers/pooler/activations.py:48`](https://github.com/vllm-project/vllm/blob/main/vllm/model_executor/layers/pooler/activations.py#L48) as its sole security control to restrict which activation functions can be loaded from a HuggingFace model&amp;#x27;s `config.json`:
+
+```python
+# vllm/model_executor/layers/pooler/activations.py:35-53
+function_name: str | None = None
+if (
+    hasattr(config, &amp;quot;sentence_transformers&amp;quot;)
+    and &amp;quot;activation_fn&amp;quot; in …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-q8gq-377p-jq3r"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-q8gq-377p-jq3r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-41523"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-41523&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/b3c7ffcab82c2439726f8cb213800f6f38c023d3"&gt;https://github.com/vllm-project/vllm/commit/b3c7ffcab82c2439726f8cb213800f6f38c023d3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36005"&gt;https://access.redhat.com/errata/RHSA-2026:36005&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:36006"&gt;https://access.redhat.com/errata/RHSA-2026:36006&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:57380"&gt;https://access.redhat.com/errata/RHSA-2026:57380&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:57387"&gt;https://access.redhat.com/errata/RHSA-2026:57387&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:57389"&gt;https://access.redhat.com/errata/RHSA-2026:57389&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q8gq-377p-jq3r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-rwxx-mrjm-wc2m: vLLM: ReDoS via structured_outputs.regex compiled without timeout in xgrammar and outlines backends</title>
+    <id>https://osv.dev/vulnerability/GHSA-rwxx-mrjm-wc2m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rwxx-mrjm-wc2m"/>
+    <published>2026-07-17T17:10:37Z</published>
+    <updated>2026-08-24T18:49:07Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55574"/>
+    <category term="PYSEC-2026-2304"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: ReDoS via structured_outputs.regex compiled without timeout in xgrammar and outlines backends&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55574, PYSEC-2026-2304&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.24.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `structured_outputs.regex` API parameter passes a user-supplied regex string directly to grammar compiler backends with no compilation timeout. In the xgrammar backend, the string reaches `compile_regex()` with no guard. In the outlines backend, `validate_regex_is_buildable()` blocks structural issues (lookarounds, backreferences) but provides zero protection against exponential DFA state-space explosion. Patterns like `(a+)+b` pass all checks and hang the inference worker.
+
+## Root Cause
+
+`backend_xgrammar.py:91` — no timeout:
+```python
+ctx = self.compiler.compile_regex(grammar_spec)
+```
+
+`backend_outlines.py:299–330` — structural checks only, no complexity analysis:
+```python
+def validate_regex_is_buildable(regex: str) -&amp;gt; None:
+    sre_parse.parse(regex)   # AST parse onl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-rwxx-mrjm-wc2m"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-rwxx-mrjm-wc2m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55574"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55574&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/45118"&gt;https://github.com/vllm-project/vllm/pull/45118&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/2b3006076c5e9bc4cda9e03e3641388de3c5c286"&gt;https://github.com/vllm-project/vllm/commit/2b3006076c5e9bc4cda9e03e3641388de3c5c286&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/vllm/PYSEC-2026-2304.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/vllm/PYSEC-2026-2304.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rwxx-mrjm-wc2m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-8wr5-jm2h-8r4f: vLLM has Remote DoS via Invalid Recovered Token Reinjection</title>
+    <id>https://osv.dev/vulnerability/GHSA-8wr5-jm2h-8r4f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8wr5-jm2h-8r4f"/>
+    <published>2026-07-17T17:08:03Z</published>
+    <updated>2026-08-24T18:49:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54234"/>
+    <category term="PYSEC-2026-3542"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM has Remote DoS via Invalid Recovered Token Reinjection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54234, PYSEC-2026-3542&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.24.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A frontend-legal multi-request speculative workload can make vLLM produce an out-of-vocabulary recovered token equal to `vocab_size`, convert that value to `-1` when choosing the next live token for a request, and then feed that `-1` back into the next drafter input ids. On Qwen3 GPTQ this reaches the worker-side drafting / attention path and crashes the engine with a GPU `device-side assert`.
+
+The same issue is reachable through the public gRPC request surface by sending a specific overlapping `Generate` / `Abort` sequence.
+
+## Impact
+
+- A remote client that can send public gRPC generation requests can crash the
+  shared vLLM engine worker
+- The triggering request sequence aborts concurrent requests and prevents later
+  requests from completing until the worker is restarted
+- …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-8wr5-jm2h-8r4f"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-8wr5-jm2h-8r4f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54234"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54234&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/44744"&gt;https://github.com/vllm-project/vllm/pull/44744&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/8a5cf1ccd65e8ac7635c402c1ec0b08988bc26ca"&gt;https://github.com/vllm-project/vllm/commit/8a5cf1ccd65e8ac7635c402c1ec0b08988bc26ca&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8wr5-jm2h-8r4f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3ww4-5jv9-j5gm: vLLM's Artifact Pin Decay allows pinned deployments to load unpinned code, weights, and processors</title>
+    <id>https://osv.dev/vulnerability/GHSA-3ww4-5jv9-j5gm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3ww4-5jv9-j5gm"/>
+    <published>2026-06-10T17:11:38Z</published>
+    <updated>2026-08-24T18:49:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-47155"/>
+    <category term="PYSEC-2026-2301"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM&amp;#x27;s Artifact Pin Decay allows pinned deployments to load unpinned code, weights, and processors&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47155, PYSEC-2026-2301&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.22.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+vLLM&amp;#x27;s revision pinning controls do not consistently apply to all artifacts loaded for a model. A deployment that supplies `--revision` or `--code-revision` can still load dynamic code, GGUF files, image processors, retrieval side weights, or same-repository subfolder weights/config from an unpinned/default revision.
+
+This is a supply-chain integrity issue for pinned vLLM deployments. Operators can believe they are serving a reviewed model revision while vLLM resolves behavior-affecting nested or sibling artifacts outside that reviewed revision.
+
+### Details
+
+The expected invariant is:
+
+&amp;gt; When a vLLM operator supplies a model or code revision pin, every code, config, processor, weight file, side weight, and same-repository subfolder artifact loaded as part of that model should…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-3ww4-5jv9-j5gm"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-3ww4-5jv9-j5gm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-47155"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-47155&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/42616"&gt;https://github.com/vllm-project/vllm/pull/42616&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/d26a28ab033697f55a1414b5b0435de7cd6045b6"&gt;https://github.com/vllm-project/vllm/commit/d26a28ab033697f55a1414b5b0435de7cd6045b6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/vllm/PYSEC-2026-2301.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/vllm/PYSEC-2026-2301.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://huntr.com/bounties/3f1e24c0-87d2-4f6c-a705-820f380879ac"&gt;https://huntr.com/bounties/3f1e24c0-87d2-4f6c-a705-820f380879ac&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3ww4-5jv9-j5gm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-33cg-gxv8-3p8g: vLLM denial of service via prompt embeds on M-RoPE models</title>
+    <id>https://osv.dev/vulnerability/GHSA-33cg-gxv8-3p8g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-33cg-gxv8-3p8g"/>
+    <published>2026-07-20T19:13:07Z</published>
+    <updated>2026-08-24T18:49:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55514"/>
+    <category term="PYSEC-2026-2303"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM denial of service via prompt embeds on M-RoPE models&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55514, PYSEC-2026-2303&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.24.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+_Short summary of the problem. Make the impact and severity as clear as possible. For example: An unsafe deserialization vulnerability allows any unauthenticated user to execute arbitrary code on the server._
+
+Sending a pure prompt embeds payload in a `/v1/completions` request with a model using M-RoPE causes the EngineCore to fail an assertion and fatally crash, shutting down the entire server application.
+
+Any remote user who is authorized to make a `/v1/completions` endpoint can trivially make such a request and induce a crash.
+
+### Details
+_Give all details on the vulnerability. Pointing to the incriminated source code is very helpful for the maintainer._
+
+In commit [56669c1](https://github.com/vllm-project/vllm/commit/56669c1f293d5c53b6a19ddf2f78802fa9fff2c2), a simple ass…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-33cg-gxv8-3p8g"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-33cg-gxv8-3p8g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55514"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55514&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/45252"&gt;https://github.com/vllm-project/vllm/pull/45252&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/470229c37efaf69c86e8bc97482b0b1ff7551c65"&gt;https://github.com/vllm-project/vllm/commit/470229c37efaf69c86e8bc97482b0b1ff7551c65&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/vllm/PYSEC-2026-2303.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/vllm/PYSEC-2026-2303.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/releases/tag/v0.24.0"&gt;https://github.com/vllm-project/vllm/releases/tag/v0.24.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-33cg-gxv8-3p8g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-14401: Malicious code in multyproccess (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-14401</id>

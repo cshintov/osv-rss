@@ -3,12 +3,73 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-08-28T20:30:02Z</updated>
+  <updated>2026-08-29T04:10:51Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-6hx8-3wjj-gr8g: WebOb: Open redirect in Location header normalization via leading C0 control / space characters</title>
+    <id>https://osv.dev/vulnerability/GHSA-6hx8-3wjj-gr8g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6hx8-3wjj-gr8g"/>
+    <published>2026-08-27T22:10:07Z</published>
+    <updated>2026-08-29T04:10:51Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-54770"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;WebOb: Open redirect in Location header normalization via leading C0 control / space characters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54770&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;webob&lt;/code&gt; — fixed in 1.8.11&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+This is a third follow-up to **CVE-2024-42353 / GHSA-mg3v-6m49-jhp3**
+and **CVE-2026-44889 / GHSA-fh3h-vg37-cc95**.
+
+WebOb makes the `Location` header absolute when it serves a redirect. To stop a
+relative or protocol-relative target from redirecting users off-host, it checks
+the value for a URI scheme and for a leading `//`, then joins it against the
+request URI with `urllib.parse.urljoin()`. The previous fix additionally stripped
+ASCII tab/CR/LF from the value before those checks.
+
+However, on Python 3.10+ `urllib.parse.urljoin()` (via `urlsplit()`) does more
+than remove tab/CR/LF: **it also strips leading and trailing C0 control
+characters (`U+0000`–`U+001F`) and spaces from the URL before parsing it.**
+Because WebOb&amp;#x27;s guard checks (`SCHEME_RE` and `startswith(&amp;quot;//&amp;quot;)`) run ag…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Pylons/webob/security/advisories/GHSA-6hx8-3wjj-gr8g"&gt;https://github.com/Pylons/webob/security/advisories/GHSA-6hx8-3wjj-gr8g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54770"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54770&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Pylons/webob/commit/ff89560643fb252751b4db8806a283b5377f1f07"&gt;https://github.com/Pylons/webob/commit/ff89560643fb252751b4db8806a283b5377f1f07&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Pylons/webob"&gt;https://github.com/Pylons/webob&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Pylons/webob/tree/1.8.11"&gt;https://github.com/Pylons/webob/tree/1.8.11&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6hx8-3wjj-gr8g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vxj7-4xrp-5vr4: aiosmtplib: STARTTLS response injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-vxj7-4xrp-5vr4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vxj7-4xrp-5vr4"/>
+    <published>2026-08-27T23:32:22Z</published>
+    <updated>2026-08-29T04:10:51Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55558"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;aiosmtplib: STARTTLS response injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55558&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiosmtplib&lt;/code&gt; — fixed in 5.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
+
+When a connection is upgraded with STARTTLS, aiosmtplib reads the server&amp;#x27;s 220 go-ahead reply and immediately performs the TLS handshake without discarding any data still sitting in the receive buffer. Bytes the protocol read off the plaintext socket before the handshake survive across the plaintext→TLS boundary (the asyncio transport is swapped in place, so the protocol object and its buffer are reused), and are then parsed as though they had arrived inside the TLS session.
+
+Who is affected: Any caller that uses STARTTLS by passing `start_tls=True` or `start_tls=None` when the server advertises STARTTLS, and whose traffic can be intercepted by an active network attacker on the plaintext leg of the connection.
+
+A man in the middle can send, in a single segment immediately after …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cole/aiosmtplib/security/advisories/GHSA-vxj7-4xrp-5vr4"&gt;https://github.com/cole/aiosmtplib/security/advisories/GHSA-vxj7-4xrp-5vr4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55558"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55558&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cole/aiosmtplib/commit/9fab7ba1361dbf7622ede1315a24be805cff09c9"&gt;https://github.com/cole/aiosmtplib/commit/9fab7ba1361dbf7622ede1315a24be805cff09c9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cole/aiosmtplib"&gt;https://github.com/cole/aiosmtplib&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cole/aiosmtplib/releases/tag/v5.1.2"&gt;https://github.com/cole/aiosmtplib/releases/tag/v5.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vxj7-4xrp-5vr4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-ffg3-p8fm-mjx2: RestrictedPython guard hooks can be shadowed via positional-only arguments</title>
+    <id>https://osv.dev/vulnerability/GHSA-ffg3-p8fm-mjx2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ffg3-p8fm-mjx2"/>
+    <published>2026-08-28T22:51:35Z</published>
+    <updated>2026-08-28T23:00:08Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-55830"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;RestrictedPython guard hooks can be shadowed via positional-only arguments&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55830&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;restrictedpython&lt;/code&gt; — fixed in 8.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+RestrictedPython rewrites sensitive operations to go through guard hooks. Attribute access becomes `_getattr_(obj, name)`, item access becomes `_getitem_(obj, key)`, writes go through `_write_`, and print goes through `_print_`. The embedding application supplies these hooks to enforce its policy.
+
+Argument-name validation rejects these protected names for regular arguments, `*args`, `**kwargs`, and keyword-only arguments, but it misses positional-only arguments (the ones before `/`). So a function like:
+
+```python
+def f(_getattr_=evil, /):
+    return o.x
+```
+
+makes `_getattr_` a local that shadows the policy hook, and the rewritten access calls `evil` instead. The same works for `_getitem_`, `_write_`, and `_print_`. Shadowing `_print_` can also be used to capture the internal…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zopefoundation/RestrictedPython/security/advisories/GHSA-ffg3-p8fm-mjx2"&gt;https://github.com/zopefoundation/RestrictedPython/security/advisories/GHSA-ffg3-p8fm-mjx2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55830"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55830&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zopefoundation/RestrictedPython/commit/3737596ec9f28c34a073cc845bd2f4c0a80cb671"&gt;https://github.com/zopefoundation/RestrictedPython/commit/3737596ec9f28c34a073cc845bd2f4c0a80cb671&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zopefoundation/RestrictedPython"&gt;https://github.com/zopefoundation/RestrictedPython&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ffg3-p8fm-mjx2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] PYSEC-2026-3726: nltk versions before 3.10.2 contain a symlink-based arbitrary file read vulnerability in IPIPANCorpusReader methods that</title>
     <id>https://osv.dev/vulnerability/PYSEC-2026-3726</id>
@@ -739,46 +800,6 @@ Reasons (based on the campaign):
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/flyteplugins-redis"&gt;https://bad-packages.kam193.eu/pypi/package/flyteplugins-redis&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14584"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-vxj7-4xrp-5vr4: aiosmtplib: STARTTLS response injection</title>
-    <id>https://osv.dev/vulnerability/GHSA-vxj7-4xrp-5vr4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vxj7-4xrp-5vr4"/>
-    <published>2026-08-27T23:32:22Z</published>
-    <updated>2026-08-27T23:45:06Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-55558"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;aiosmtplib: STARTTLS response injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55558&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiosmtplib&lt;/code&gt; — fixed in 5.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-When a connection is upgraded with STARTTLS, aiosmtplib reads the server&amp;#x27;s 220 go-ahead reply and immediately performs the TLS handshake without discarding any data still sitting in the receive buffer. Bytes the protocol read off the plaintext socket before the handshake survive across the plaintext→TLS boundary (the asyncio transport is swapped in place, so the protocol object and its buffer are reused), and are then parsed as though they had arrived inside the TLS session.
-
-Who is affected: Any caller that uses STARTTLS by passing `start_tls=True` or `start_tls=None` when the server advertises STARTTLS, and whose traffic can be intercepted by an active network attacker on the plaintext leg of the connection.
-
-A man in the middle can send, in a single segment immediately after …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cole/aiosmtplib/security/advisories/GHSA-vxj7-4xrp-5vr4"&gt;https://github.com/cole/aiosmtplib/security/advisories/GHSA-vxj7-4xrp-5vr4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55558"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55558&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cole/aiosmtplib/commit/9fab7ba1361dbf7622ede1315a24be805cff09c9"&gt;https://github.com/cole/aiosmtplib/commit/9fab7ba1361dbf7622ede1315a24be805cff09c9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cole/aiosmtplib"&gt;https://github.com/cole/aiosmtplib&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cole/aiosmtplib/releases/tag/v5.1.2"&gt;https://github.com/cole/aiosmtplib/releases/tag/v5.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vxj7-4xrp-5vr4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-6hx8-3wjj-gr8g: WebOb: Open redirect in Location header normalization via leading C0 control / space characters</title>
-    <id>https://osv.dev/vulnerability/GHSA-6hx8-3wjj-gr8g</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6hx8-3wjj-gr8g"/>
-    <published>2026-08-27T22:10:07Z</published>
-    <updated>2026-08-27T22:15:07Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-54770"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;WebOb: Open redirect in Location header normalization via leading C0 control / space characters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54770&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;webob&lt;/code&gt; — fixed in 1.8.11&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-This is a third follow-up to **CVE-2024-42353 / GHSA-mg3v-6m49-jhp3**
-and **CVE-2026-44889 / GHSA-fh3h-vg37-cc95**.
-
-WebOb makes the `Location` header absolute when it serves a redirect. To stop a
-relative or protocol-relative target from redirecting users off-host, it checks
-the value for a URI scheme and for a leading `//`, then joins it against the
-request URI with `urllib.parse.urljoin()`. The previous fix additionally stripped
-ASCII tab/CR/LF from the value before those checks.
-
-However, on Python 3.10+ `urllib.parse.urljoin()` (via `urlsplit()`) does more
-than remove tab/CR/LF: **it also strips leading and trailing C0 control
-characters (`U+0000`–`U+001F`) and spaces from the URL before parsing it.**
-Because WebOb&amp;#x27;s guard checks (`SCHEME_RE` and `startswith(&amp;quot;//&amp;quot;)`) run ag…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Pylons/webob/security/advisories/GHSA-6hx8-3wjj-gr8g"&gt;https://github.com/Pylons/webob/security/advisories/GHSA-6hx8-3wjj-gr8g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54770"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54770&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Pylons/webob/commit/ff89560643fb252751b4db8806a283b5377f1f07"&gt;https://github.com/Pylons/webob/commit/ff89560643fb252751b4db8806a283b5377f1f07&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Pylons/webob"&gt;https://github.com/Pylons/webob&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Pylons/webob/tree/1.8.11"&gt;https://github.com/Pylons/webob/tree/1.8.11&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6hx8-3wjj-gr8g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[UPDATED] PYSEC-2025-102: Local File Inclusion in dagster._grpc.impl.get_notebook_data in Dagster 1.10.14 allows attackers with access to the gRPC</title>
     <id>https://osv.dev/vulnerability/PYSEC-2025-102</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2025-102"/>
@@ -1028,158 +1049,5 @@ Reasons (based on the campaign):
 
  - The package overrides the install command in setup.py to execute malicious code during installation.
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/mathkitlite"&gt;https://bad-packages.kam193.eu/pypi/package/mathkitlite&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14552"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-pppj-hq3g-57pj: JupyterLab: Cross-site scripting (XSS) via crafted settings file (`overrides.json`)</title>
-    <id>https://osv.dev/vulnerability/GHSA-pppj-hq3g-57pj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pppj-hq3g-57pj"/>
-    <published>2026-07-22T23:16:18Z</published>
-    <updated>2026-08-27T05:15:08Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-jupyterlab-2026-73417"/>
-    <category term="CVE-2026-73417"/>
-    <category term="PYSEC-2026-3672"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;JupyterLab: Cross-site scripting (XSS) via crafted settings file (`overrides.json`)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-jupyterlab-2026-73417, CVE-2026-73417, PYSEC-2026-3672&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:H/VA:L/SC:N/SI:N/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;jupyterlab&lt;/code&gt; — fixed in 4.6.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;jupyterlab&lt;/code&gt; — fixed in 4.5.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;JupyterLab 4.5+ allows notebook settings to be shared and applied through an `overrides.json` file using the `Import` button in the Settings Editor.
-
-Certain notebook display settings were not properly validated before being applied. As a result, a crafted settings file could contain hidden instructions that run as code inside JupyterLab when imported, instead of only changing a display preference.
-
-Because importing a settings file appears harmless, a user could import a file shared by another party without realizing it could do more. On multi-tenant file systems without proper permission control, another user could plant a malicious `overrides.json`.
-
-&amp;gt; CVE assignment pending, GitHub CNA is experiencing severe backlog
-
-### Impact
-
-When a malicious settings file is applied, the embedded c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/security/advisories/GHSA-pppj-hq3g-57pj"&gt;https://github.com/jupyterlab/jupyterlab/security/advisories/GHSA-pppj-hq3g-57pj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/pull/19184"&gt;https://github.com/jupyterlab/jupyterlab/pull/19184&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/pull/19185"&gt;https://github.com/jupyterlab/jupyterlab/pull/19185&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/pull/19186"&gt;https://github.com/jupyterlab/jupyterlab/pull/19186&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/commit/be9303f5bcd5308eaeae953c5a3c903046682c2c"&gt;https://github.com/jupyterlab/jupyterlab/commit/be9303f5bcd5308eaeae953c5a3c903046682c2c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/commit/f1beab4a2027af4719d6edc07d52d6cf5a39a432"&gt;https://github.com/jupyterlab/jupyterlab/commit/f1beab4a2027af4719d6edc07d52d6cf5a39a432&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab"&gt;https://github.com/jupyterlab/jupyterlab&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab/releases/tag/v4.5.10"&gt;https://github.com/jupyterlab/jupyterlab/releases/tag/v4.5.10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pppj-hq3g-57pj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4q5v-7g7x-j79w: compliance-trestle - jinja has an Arbitrary File Write via Path Traversal</title>
-    <id>https://osv.dev/vulnerability/GHSA-4q5v-7g7x-j79w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4q5v-7g7x-j79w"/>
-    <published>2026-05-28T17:44:03Z</published>
-    <updated>2026-08-27T04:10:58Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-46345"/>
-    <category term="PYSEC-2026-2423"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;compliance-trestle - jinja has an Arbitrary File Write via Path Traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-46345, PYSEC-2026-2423&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;compliance-trestle&lt;/code&gt; — fixed in 4.0.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;compliance-trestle&lt;/code&gt; — fixed in 3.12.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Relevant Products/Components:**
-
-* `trestle/core/commands/author/jinja.py`
-* `trestle author jinja`
-
----
-
-## Detailed Description:
-
-The `-o/--output` argument in `trestle author jinja` allows writing files outside the intended workspace.
-
-The application does not properly validate:
-
-* `../`
-* `..\`
-* absolute paths
-
-This allows arbitrary file write to attacker-controlled locations.
-
-Vulnerable code:
-
-```python
-output_file = trestle_root / r_output_file
-```
-
-An attacker can overwrite files such as:
-
-* `.github/workflows/*.yml`
-* `.git/hooks/*`
-* user writable config files
-
-This can lead to CI/CD compromise or local code execution.
-
----
-
-## Steps To Reproduce:
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/oscal-compass/compliance-trestle.git
-cd compliance-trestle
-```
-
-2. …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oscal-compass/compliance-trestle/security/advisories/GHSA-4q5v-7g7x-j79w"&gt;https://github.com/oscal-compass/compliance-trestle/security/advisories/GHSA-4q5v-7g7x-j79w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46345"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46345&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oscal-compass/compliance-trestle/commit/247fcce289f60103f3d8e28d8ec51a6986b94fb6"&gt;https://github.com/oscal-compass/compliance-trestle/commit/247fcce289f60103f3d8e28d8ec51a6986b94fb6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oscal-compass/compliance-trestle/commit/7d107b3ac53caca7bde97a6278b23cd739d94525"&gt;https://github.com/oscal-compass/compliance-trestle/commit/7d107b3ac53caca7bde97a6278b23cd739d94525&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oscal-compass/compliance-trestle"&gt;https://github.com/oscal-compass/compliance-trestle&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/compliance-trestle/PYSEC-2026-2423.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/compliance-trestle/PYSEC-2026-2423.yaml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4q5v-7g7x-j79w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-14545: Malicious code in pybitjs (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-14545</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14545"/>
-    <published>2026-08-26T19:21:41Z</published>
-    <updated>2026-08-27T04:00:13Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in pybitjs (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pybitjs&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (611713d33cb9efee440b0a416812cbb2ceda3d43c0cdc73c1f8b353400209df5)
-The package&amp;#x27;s setuptools cmdclasses (BuildPy, Develop) invoke `node pybitjs/js/main.js` during `pip install`, and write a `pybitjs.pth` file containing `import pybitjs._autorun; pybitjs._autorun.run_main_js_once()` so the same Node.js payload is re-executed on every subsequent Python interpreter startup. The bundled `pybitjs/js/main.js` is heavily string-array obfuscated (obfuscator.io style `_0x240a` / `_0x4963`) and implements an EtherHiding-style C2: it queries Ethereum JSON-RPC endpoints (drpc.org, publicnode.com, blockscout, etherscan-like API) for transactions involving the hardcoded address `0xa322E5f3...`, extracts an IPv4 from…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/stamparm/maltrail/blob/12360952bc81865dc973e33e5033cea6e1fcc342/trails/static/malware/apt_lazarus.txt#L7414"&gt;https://github.com/stamparm/maltrail/blob/12360952bc81865dc973e33e5033cea6e1fcc342/trails/static/malware/apt_lazarus.txt#L7414&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://etherscan.io/address/0xa322E5f3D311D3080e6f0121063e9aDC2490Ef1a"&gt;https://etherscan.io/address/0xa322E5f3D311D3080e6f0121063e9aDC2490Ef1a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/pybitjs"&gt;https://bad-packages.kam193.eu/pypi/package/pybitjs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pybitjs/0.1.0/"&gt;https://pypi.org/project/pybitjs/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14545"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-3gw4-m5w7-v89c: Uncontrolled Resource Consumption in Indy Node</title>
-    <id>https://osv.dev/vulnerability/GHSA-3gw4-m5w7-v89c</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3gw4-m5w7-v89c"/>
-    <published>2020-06-11T00:04:15Z</published>
-    <updated>2026-08-27T03:56:00Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2020-11090"/>
-    <category term="PYSEC-2020-47"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Uncontrolled Resource Consumption in Indy Node&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2020-11090, PYSEC-2020-47&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;indy-node&lt;/code&gt; — fixed in 1.12.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Summary
-Indy Node has a bug in TAA handling code. The current primary can be crashed with a malformed transaction from a client, which leads to a view change. Repeated rapid view changes have the potential of bringing down the network.
-
-# Discovery
-On May 18, Evernym&amp;#x27;s monitoring of Sovrin StagingNet showed a report of StagingNet losing sufficient consensus to validate write transactions. The problem resolved itself within a few minutes. On May 20th we saw the alert multiple times, and we began analyzing the logs of our steward node. On May 21st we continued to see the alerts with increasing frequency.
-
-It appears that someone is unknowingly sending a malformed transaction, and retrying when the transaction fails. The cause of the errors appear to be the TAA acceptance.
-
-# Proposed actio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/indy-node/security/advisories/GHSA-3gw4-m5w7-v89c"&gt;https://github.com/hyperledger/indy-node/security/advisories/GHSA-3gw4-m5w7-v89c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2020-11090"&gt;https://nvd.nist.gov/vuln/detail/CVE-2020-11090&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/indy-node"&gt;https://github.com/hyperledger/indy-node&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/indy-node/blob/master/CHANGELOG.md#1123"&gt;https://github.com/hyperledger/indy-node/blob/master/CHANGELOG.md#1123&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/indy-node/PYSEC-2020-47.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/indy-node/PYSEC-2020-47.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/indy-node/1.12.3"&gt;https://pypi.org/project/indy-node/1.12.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3gw4-m5w7-v89c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-87x5-vmc3-756j: vLLM: Completion prompt lists fan out into unbounded engine requests</title>
-    <id>https://osv.dev/vulnerability/GHSA-87x5-vmc3-756j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-87x5-vmc3-756j"/>
-    <published>2026-08-13T18:40:06Z</published>
-    <updated>2026-08-26T22:27:17Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-73559"/>
-    <category term="PYSEC-2026-3704"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: Completion prompt lists fan out into unbounded engine requests&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73559, PYSEC-2026-3704&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The `/v1/completions` request model accepts `prompt` as a list of text prompts or a list of token-id prompts without any outer prompt-count bound. The serving path turns each element into a separate engine input, creates one engine generator per element, merges all generators, and allocates a response slot per prompt. An authenticated API client can therefore turn one request into an attacker-chosen number of backend subrequests before any aggregate request-count budget is enforced.
-
-## Technical Details
-
-`CompletionRequest.prompt` allows both list-shaped prompt inputs and scalar prompts:
-
-```python
-# vllm/entrypoints/openai/completion/protocol.py
-prompt: (
-    list[Annotated[int, Field(ge=0)]]
-    | list[list[Annotated[int, Field(ge=0)]]]
-    | str
-    | list[str]
-    | None
-)…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-87x5-vmc3-756j"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-87x5-vmc3-756j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-73559"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-73559&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/47845"&gt;https://github.com/vllm-project/vllm/pull/47845&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/675f4295cdfe0d870471c2b51bfeca3a68a9569e"&gt;https://github.com/vllm-project/vllm/commit/675f4295cdfe0d870471c2b51bfeca3a68a9569e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/releases/tag/v0.26.0"&gt;https://github.com/vllm-project/vllm/releases/tag/v0.26.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-87x5-vmc3-756j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f66q-9rf6-8795: Flask-Security-Too: WebAuthn reauthentication freshness bypass via cross-user assertion</title>
-    <id>https://osv.dev/vulnerability/GHSA-f66q-9rf6-8795</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f66q-9rf6-8795"/>
-    <published>2026-07-07T23:43:12Z</published>
-    <updated>2026-08-26T22:27:17Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Flask-Security-Too: WebAuthn reauthentication freshness bypass via cross-user assertion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;flask-security-too&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Flask-Security-Too 5.8.0 and 5.8.1 mark a session as reauthentication-fresh after processing a WebAuthn assertion whose proven credential belongs to a different user than the currently authenticated session user. The check that `GHSA-97r5-pg8x-p63p` added on the OAuth reauthentication path (`user.email == current_user.email`) is missing on the WebAuthn reauthentication path. An attacker who owns any WebAuthn credential registered to any account on the deployment can satisfy a victim session&amp;#x27;s freshness gate by submitting their own WebAuthn proof into the victim session.
-
-### Affected versions
-
-`Flask-Security-Too` `&amp;gt;= 5.8.0, &amp;lt;= 5.8.1` (current `main` commit `5c44c76e33a20b67d02115e26d2da4bab18c094e`).
-`GHSA-97r5-pg8x-p63p` (published 2026-05-22) shipped its fix in 5.8.1 only o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pallets-eco/flask-security/security/advisories/GHSA-f66q-9rf6-8795"&gt;https://github.com/pallets-eco/flask-security/security/advisories/GHSA-f66q-9rf6-8795&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pallets-eco/flask-security"&gt;https://github.com/pallets-eco/flask-security&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f66q-9rf6-8795"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

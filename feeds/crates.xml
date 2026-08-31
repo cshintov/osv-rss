@@ -3,12 +3,109 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-08-29T22:10:55Z</updated>
+  <updated>2026-08-31T09:45:02Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0272: Panic-safety unsoundness in `Stack::pop`, `Fifo::pop_front` and `Value::replace_stable` (use-after-free / double-free)</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0272</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0272"/>
+    <published>2026-08-27T12:00:00Z</published>
+    <updated>2026-08-31T09:45:02Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Panic-safety unsoundness in `Stack::pop`, `Fifo::pop_front` and `Value::replace_stable` (use-after-free / double-free)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stack_dst&lt;/code&gt; — fixed in 0.8.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Three removal and replacement paths destroy an initialized value before
+committing the metadata change that removes it. Destruction runs `T::drop()`,
+which is user code and may panic. If it does, the commit is skipped and the
+container still claims ownership of the already-destroyed value, so its own
+destructor drops that value a second time.
+
+`Stack::pop` drops the top value before reducing `next_ofs`. `Stack`&amp;#x27;s
+destructor pops in a loop, so an unchanged `next_ofs` re-drops the same value.
+
+`Fifo::pop_front` (via `pop_front_inner`) drops the front value before advancing
+`read_pos`. An unchanged `read_pos` still points at the destroyed value.
+
+`Value::replace_stable` drops the existing value before writing the replacement.
+If the destructor panics the replacement is never written, but the …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/stack_dst"&gt;https://crates.io/crates/stack_dst&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0272.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0272.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/thepowersgang/stack_dst-rs/issues/16"&gt;https://github.com/thepowersgang/stack_dst-rs/issues/16&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0272"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2025-0172: `zip-extract` is unmaintained; use the `zip &gt;= 2.4.0` crate instead</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0172</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0172"/>
+    <published>2025-07-16T12:00:00Z</published>
+    <updated>2026-08-31T09:30:02Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`zip-extract` is unmaintained; use the `zip &amp;gt;= 2.4.0` crate instead&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zip-extract&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The [`zip-extract`](https://crates.io/crates/zip-extract) crate has been
+explicitly deprecated by its author on [Jul 16, 2025](https://github.com/MCOfficer/zip-extract/commit/2950ec98d33b6e752b4f0976d67d89feb6f4acde), and the repository
+was archived on [Sep 8, 2025](https://github.com/MCOfficer/zip-extract).
+
+The author added deprecation notices [README](https://github.com/MCOfficer/zip-extract/commit/2950ec98d33b6e752b4f0976d67d89feb6f4acde#diff-b335630551682c19a781afebcf4d07bf978fb1f8ac04c6bf87428ed5106870f5R1-R8)
+stating that the functionality is now available directly in the [`zip`](https://crates.io/crates/zip) crate
+via [`ZipArchive::extract`](https://docs.rs/zip/8.6.0/zip/read/struct.ZipArchive.html#method.extract)
+(available since zip 0.6.0) and
+[`ZipArchive::extract_unwrapped_root…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zip-extract"&gt;https://crates.io/crates/zip-extract&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0172.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0172.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MCOfficer/zip-extract/commit/2950ec98d33b6e752b4f0976d67d89feb6f4acde"&gt;https://github.com/MCOfficer/zip-extract/commit/2950ec98d33b6e752b4f0976d67d89feb6f4acde&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0172"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0271: FTP command injection via CRLF in control channel arguments</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0271</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0271"/>
+    <published>2026-08-18T12:00:00Z</published>
+    <updated>2026-08-31T09:30:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-8mhj-xm4h-m5m6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;FTP command injection via CRLF in control channel arguments&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-8mhj-xm4h-m5m6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;suppaftp&lt;/code&gt; — fixed in 10.0.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `suppaftp` wrote command arguments (user name, password, paths, `SITE` arguments and custom commands) to the FTP control channel without validation. An argument containing a carriage return (`\r`) or a line feed (`\n`) terminated the intended command line and let a second, attacker-chosen command be sent to the server within the same authenticated session.
+
+An application that passes untrusted input as credentials, paths or command strings to methods such as `login`, `cwd`, `mkdir`, `rmdir`, `rm`, `rename`, `retr`, `put_file`, `site` or `custom_command` can therefore be made to execute arbitrary FTP commands with the application&amp;#x27;s privileges, for example deleting files or redirecting a data connection with an injected `PORT`.
+
+All three clients are affected: sync, toki…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/suppaftp"&gt;https://crates.io/crates/suppaftp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0271.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0271.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/veeso/suppaftp/pull/172"&gt;https://github.com/veeso/suppaftp/pull/172&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0271"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2025-0171: soundness issue</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0171</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0171"/>
+    <published>2025-05-06T12:00:00Z</published>
+    <updated>2026-08-31T09:00:02Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;soundness issue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mod3d-base&lt;/code&gt; — fixed in 0.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`mod3d_base::BufferData::as_ptr` lack of sufficient checks to its public self field `byte_offset` and used unsafely to do the pointer calculation.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/mod3d-base"&gt;https://crates.io/crates/mod3d-base&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0171.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0171.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/atthecodeface/model3d"&gt;https://github.com/atthecodeface/model3d&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0171"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0270: `sp-sized-chunks` is unmaintained</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0270</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0270"/>
+    <published>2026-08-11T12:00:00Z</published>
+    <updated>2026-08-31T08:45:02Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`sp-sized-chunks` is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;sp-sized-chunks&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `sp-sized-chunks` crate is a fork of `sized-chunks`. Its repository is archived and the crate is no longer maintained. Users should migrate to [`imbl-sized-chunks`](https://crates.io/crates/imbl-sized-chunks), a maintained fork.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/sp-sized-chunks"&gt;https://crates.io/crates/sp-sized-chunks&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0270.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0270.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0270"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0268: Guest controlled-size host heap allocation through WASIp3 streams</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0268</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0268"/>
+    <published>2026-08-20T12:00:00Z</published>
+    <updated>2026-08-31T08:30:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-x84v-gj2h-g759"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Guest controlled-size host heap allocation through WASIp3 streams&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-x84v-gj2h-g759&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 46.0.3, 47.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
+located at
+https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-x84v-gj2h-g759
+For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0268.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0268.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-x84v-gj2h-g759"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-x84v-gj2h-g759&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0268"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0269: Filesystem sandbox escape when paths or symlinks contain trailing slashes</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0269</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0269"/>
+    <published>2026-08-20T12:00:00Z</published>
+    <updated>2026-08-31T08:30:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-vqjp-4c8c-hfgg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Filesystem sandbox escape when paths or symlinks contain trailing slashes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-vqjp-4c8c-hfgg&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:H/SI:H/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 24.0.13, 36.0.14, 46.0.3, 47.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
+located at
+https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-vqjp-4c8c-hfgg
+For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0269.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0269.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-vqjp-4c8c-hfgg"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-vqjp-4c8c-hfgg&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0269"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-2vh6-hw4j-32ww: gix-packetline: reachable panic on empty side-band packet (pre-auth network DoS)</title>
     <id>https://osv.dev/vulnerability/GHSA-2vh6-hw4j-32ww</id>
@@ -139,111 +236,5 @@ pub fn name(name: &amp;amp;BStr) -&amp;gt; Result&amp;lt;&amp;amp;BStr, name::Er
     match name.find(b&amp;quot;..&amp;quot;) {
         Some(pos) =&amp;gt; {
             let &amp;amp;b = name.get(po…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-p3hw-mv63-rf9w"&gt;https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-p3hw-mv63-rf9w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide"&gt;https://github.com/GitoxideLabs/gitoxide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p3hw-mv63-rf9w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-fr8x-3vfx-f45h: gix and gitoxide: unvalidated submodule name traverses out of .git/modules and redirects state() / open() to another repository</title>
-    <id>https://osv.dev/vulnerability/GHSA-fr8x-3vfx-f45h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fr8x-3vfx-f45h"/>
-    <published>2026-05-05T19:27:51Z</published>
-    <updated>2026-08-29T03:55:36Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-82251"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;gix and gitoxide: unvalidated submodule name traverses out of .git/modules and redirects state() / open() to another repository&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82251&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitoxide&lt;/code&gt; — fixed in 0.52.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;gix&lt;/code&gt; — fixed in 0.83.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## **Summary**
-attachments:
-[pocs.zip](https://github.com/user-attachments/files/26431422/pocs.zip)
-
-Submodule names coming from `.gitmodules` are exposed as unvalidated names and are later reused to derive the submodule git directory as:
-
-```
-&amp;lt;superproject common_dir&amp;gt;/modules/&amp;lt;submodule name&amp;gt;
-```
-
-Because the submodule name is joined directly as a filesystem path component, a name such as `../../../escaped-target.git` escapes `.git/modules` after normalization. The current implementation then uses that escaped path in both `state()` and `open()`.
-
-The updated PoC demonstrates the real sink, not just string construction:
-
-- `state()` reports `repository_exists=true` for the traversed path;
-- `open()` returns a repository whose normalized `common_dir()` matches the attacker-chosen repositor…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-fr8x-3vfx-f45h"&gt;https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-fr8x-3vfx-f45h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide"&gt;https://github.com/GitoxideLabs/gitoxide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fr8x-3vfx-f45h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9pwq-gcrx-wghh: Buffa has a Use-After-Free in OwnedView via Unsound 'static Lifetime Promotion in Deref</title>
-    <id>https://osv.dev/vulnerability/GHSA-9pwq-gcrx-wghh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9pwq-gcrx-wghh"/>
-    <published>2026-08-28T18:33:58Z</published>
-    <updated>2026-08-28T18:45:07Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-55406"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Buffa has a Use-After-Free in OwnedView via Unsound &amp;#x27;static Lifetime Promotion in Deref&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55406&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:N/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;buffa&lt;/code&gt; — fixed in 0.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A soundness bug in `buffa`&amp;#x27;s `OwnedView&amp;lt;V&amp;gt;` allowed safe Rust code to trigger a use-after-free. The `OwnedView::decode` constructor transmuted a borrowed slice to `&amp;amp;&amp;#x27;static [u8]`, and the `Deref` implementation exposed the promoted `&amp;#x27;static` lifetime on borrowed view fields (such as `&amp;amp;&amp;#x27;static str` and `&amp;amp;&amp;#x27;static [u8]`) to callers. Because these references appeared to be `&amp;#x27;static`, the borrow checker permitted them to outlive the `OwnedView`; once the `OwnedView` was dropped and its backing buffer freed, those references became dangling, enabling memory corruption, information disclosure of freed heap contents, and cross-thread misuse — all without any `unsafe` code in the calling application. Users are advised to update to the latest patched version of buffa.
-
-Thank you to hackerone.com/suu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa/security/advisories/GHSA-9pwq-gcrx-wghh"&gt;https://github.com/anthropics/buffa/security/advisories/GHSA-9pwq-gcrx-wghh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55406"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa/pull/154"&gt;https://github.com/anthropics/buffa/pull/154&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa/commit/7dcf50a1a40eca6ed8d6c6dd59f4310aa0d68b0e"&gt;https://github.com/anthropics/buffa/commit/7dcf50a1a40eca6ed8d6c6dd59f4310aa0d68b0e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa"&gt;https://github.com/anthropics/buffa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa/releases/tag/v0.7.0"&gt;https://github.com/anthropics/buffa/releases/tag/v0.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9pwq-gcrx-wghh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f9qc-qg88-7pq5: Buffa Vulnerable to Memory Exhaustion Denial of Service in decode_unknown_field via Unbounded Allocation</title>
-    <id>https://osv.dev/vulnerability/GHSA-f9qc-qg88-7pq5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f9qc-qg88-7pq5"/>
-    <published>2026-08-28T18:34:22Z</published>
-    <updated>2026-08-28T18:45:06Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-55407"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Buffa Vulnerable to Memory Exhaustion Denial of Service in decode_unknown_field via Unbounded Allocation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55407&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;buffa&lt;/code&gt; — fixed in 0.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `decode_unknown_field` function in buffa&amp;#x27;s protobuf decoder allocated heap memory in proportion to untrusted input (unknown fields in the serialized protobuf) without enforcing an allocation budget. Any message decoded from untrusted input using code generated with `preserve_unknown_fields=true` (the default) was affected. A small, well-formed payload of nested unknown fields inside a StartGroup could trigger roughly 22× memory amplification (e.g., a 64 MiB input forcing ~1.4 GB of heap allocation), and length-delimited unknown fields could be sized arbitrarily, enabling an unauthenticated attacker to crash a process via memory exhaustion. This was reachable from the default decode APIs, since the top-level message size cap did not account for in-decode amplification. 
-
-For users of co…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa/security/advisories/GHSA-f9qc-qg88-7pq5"&gt;https://github.com/anthropics/buffa/security/advisories/GHSA-f9qc-qg88-7pq5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55407"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55407&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa/pull/184"&gt;https://github.com/anthropics/buffa/pull/184&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa/commit/278fa43fcff661d4ee6bd83b75955a153d4281fc"&gt;https://github.com/anthropics/buffa/commit/278fa43fcff661d4ee6bd83b75955a153d4281fc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa"&gt;https://github.com/anthropics/buffa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/anthropics/buffa/releases/tag/v0.8.0"&gt;https://github.com/anthropics/buffa/releases/tag/v0.8.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f9qc-qg88-7pq5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-gpwf-4h98-v82q: datadog-opentelemetry has unbounded W3C tracestate parsing that may lead to DoS</title>
-    <id>https://osv.dev/vulnerability/GHSA-gpwf-4h98-v82q</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gpwf-4h98-v82q"/>
-    <published>2026-08-28T16:35:03Z</published>
-    <updated>2026-08-28T16:45:06Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-54788"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;datadog-opentelemetry has unbounded W3C tracestate parsing that may lead to DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54788&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;datadog-opentelemetry&lt;/code&gt; — fixed in 0.3.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-Datadog tracing libraries that implement W3C Trace Context (`tracecontext`) propagation parse the incoming `tracestate` header without enforcing a size cap on the Datadog vendor entry (`dd=...`). The `dd=` value contains semicolon-separated `key:value` pairs, and the parser allocates a hash-map entry for each pair. A remote, unauthenticated attacker can send a `tracestate` header whose `dd=` member is arbitrarily large (or contains an arbitrarily large number of pairs), forcing unbounded CPU and memory consumption per request and enabling a remote Denial of Service. `tracecontext` extraction is enabled by default in affected tracers, so any internet-facing service instrumented with an affected version is exposed unless `tracecontext` has been explicitly removed from the propagat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-rs/security/advisories/GHSA-gpwf-4h98-v82q"&gt;https://github.com/DataDog/dd-trace-rs/security/advisories/GHSA-gpwf-4h98-v82q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-rs/pull/218"&gt;https://github.com/DataDog/dd-trace-rs/pull/218&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-rs/commit/77c5d185c71d0ea8103da0e6cf4cd50677ffacd2"&gt;https://github.com/DataDog/dd-trace-rs/commit/77c5d185c71d0ea8103da0e6cf4cd50677ffacd2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-rs"&gt;https://github.com/DataDog/dd-trace-rs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-rs/releases/tag/datadog-opentelemetry-v0.3.3"&gt;https://github.com/DataDog/dd-trace-rs/releases/tag/datadog-opentelemetry-v0.3.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gpwf-4h98-v82q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0182: Leak in WASIp1 `fd_renumber` implementation</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0182</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0182"/>
-    <published>2026-06-15T12:00:00Z</published>
-    <updated>2026-08-27T12:01:44Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-54786"/>
-    <category term="GHSA-3p27-qvp9-27qf"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Leak in WASIp1 `fd_renumber` implementation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54786, GHSA-3p27-qvp9-27qf&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 24.0.10, 36.0.11, 44.0.3, 45.0.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-3p27-qvp9-27qf
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime-wasi"&gt;https://crates.io/crates/wasmtime-wasi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0182.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0182.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-3p27-qvp9-27qf"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-3p27-qvp9-27qf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0182"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-3p27-qvp9-27qf: Wasmtime has a leak in WASIp1 `fd_renumber` implementation</title>
-    <id>https://osv.dev/vulnerability/GHSA-3p27-qvp9-27qf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3p27-qvp9-27qf"/>
-    <published>2026-08-26T14:30:10Z</published>
-    <updated>2026-08-26T14:45:10Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-54786"/>
-    <category term="RUSTSEC-2026-0182"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Wasmtime has a leak in WASIp1 `fd_renumber` implementation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54786, RUSTSEC-2026-0182&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:N/I:N/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 24.0.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 45.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 36.0.11&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 44.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-Wasmtime&amp;#x27;s native implementation of WASIp1 suffers from a leak in the `fd_renumber` function where the file descriptor being renumbered to is not properly closed. Wasmtime&amp;#x27;s implementation erroneously only updated the table of descriptors for WASIp1 and didn&amp;#x27;t update the underlying table of descriptors used by the host. This behavior means that while `fd_renumber` works correctly from a guest&amp;#x27;s perspective it ends up leaking resources in the host that aren&amp;#x27;t cleaned up until the corresponding `Store` is destroyed. This means that guests can, in a loop, use `fd_renumber` to cause hosts to exhaust resources or exhaust file descriptors.
-
-This bug only affects the native implementation of WASIp1. This means that only runtimes which load core wasm modules and expose `fd_renumber` ar…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-3p27-qvp9-27qf"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-3p27-qvp9-27qf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54786"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54786&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/13650"&gt;https://github.com/bytecodealliance/wasmtime/pull/13650&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/100bfe27253d2ce5154ddddf66d06e30f3fa6824"&gt;https://github.com/bytecodealliance/wasmtime/commit/100bfe27253d2ce5154ddddf66d06e30f3fa6824&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/36b305d827149ac0336ddcbc0a378c303339d195"&gt;https://github.com/bytecodealliance/wasmtime/commit/36b305d827149ac0336ddcbc0a378c303339d195&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/72493b11ed5df382c92a9dfb8b6bc064e471f1cd"&gt;https://github.com/bytecodealliance/wasmtime/commit/72493b11ed5df382c92a9dfb8b6bc064e471f1cd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/e9fbe974c9698edef117323d981e13caf2097c13"&gt;https://github.com/bytecodealliance/wasmtime/commit/e9fbe974c9698edef117323d981e13caf2097c13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/f069f125cb77a4a3dced19a77d73790610678622"&gt;https://github.com/bytecodealliance/wasmtime/commit/f069f125cb77a4a3dced19a77d73790610678622&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3p27-qvp9-27qf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5x78-73v4-xg6w: postgres-protocol: Unbounded SCRAM iteration count allows a malicious server to cause CPU-exhaustion denial of service</title>
-    <id>https://osv.dev/vulnerability/GHSA-5x78-73v4-xg6w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5x78-73v4-xg6w"/>
-    <published>2026-08-24T19:43:31Z</published>
-    <updated>2026-08-26T03:27:11Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0179"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;postgres-protocol: Unbounded SCRAM iteration count allows a malicious server to cause CPU-exhaustion denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0179&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;postgres-protocol&lt;/code&gt; — fixed in 0.6.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A malicious, compromised, or man-in-the-middle server can supply an arbitrarily
-large SCRAM-SHA-256 PBKDF2 iteration count during authentication. The client
-runs it inline with no upper bound, pinning a `tokio` worker thread for minutes
-per connection, possibly stalling the whole async runtime.
-
-Applications that connect only to a trusted database are not exposed; the risk
-applies to clients that may connect to untrusted or user-supplied servers, or
-whose connection can be intercepted by a man-in-the-middle.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres/commit/d40097a36a85068ea50a3afbf0ce154ba439e7f0"&gt;https://github.com/rust-postgres/rust-postgres/commit/d40097a36a85068ea50a3afbf0ce154ba439e7f0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres"&gt;https://github.com/rust-postgres/rust-postgres&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres/releases/tag/postgres-protocol-v0.6.12"&gt;https://github.com/rust-postgres/rust-postgres/releases/tag/postgres-protocol-v0.6.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0179.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0179.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5x78-73v4-xg6w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

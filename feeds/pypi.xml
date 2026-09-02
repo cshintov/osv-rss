@@ -3,12 +3,662 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-09-02T03:00:07Z</updated>
+  <updated>2026-09-02T09:10:38Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-4rh7-jwg9-m28m: openssl-encrypt accepts refresh tokens as URL query parameters causing token leakage</title>
+    <id>https://osv.dev/vulnerability/GHSA-4rh7-jwg9-m28m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4rh7-jwg9-m28m"/>
+    <published>2026-04-01T21:12:19Z</published>
+    <updated>2026-09-02T09:10:38Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74880"/>
+    <category term="PYSEC-2026-3759"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt accepts refresh tokens as URL query parameters causing token leakage&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74880, PYSEC-2026-3759&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Refresh tokens are accepted as URL query parameters in the keyserver and telemetry server routes.
+
+### Affected Code
+
+```python
+# openssl_encrypt_server/modules/keyserver/routes.py:214-215
+# openssl_encrypt_server/modules/telemetry/routes.py:90-91
+async def refresh_token(
+    request: Request,
+    refresh_token: str = Query(..., description=&amp;quot;Refresh token&amp;quot;)
+):
+```
+
+### Impact
+
+Tokens in URL query parameters are exposed in:
+- Server access logs
+- Proxy/CDN logs
+- Browser history
+- HTTP Referer headers
+- Network monitoring tools
+
+This creates significant token leakage risk.
+
+### Recommended Fix
+
+- Accept refresh tokens in the request body (POST) instead of query parameters
+- Use `Body(...)` instead of `Query(...)`
+
+### Fix
+
+Fixed in commit `4b2adb0` on branch `releases/1.4.x` — …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-4rh7-jwg9-m28m"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-4rh7-jwg9-m28m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/4b2adb05cde8a7ee03cdd271755da3b377c68011"&gt;https://github.com/jahlives/openssl_encrypt/commit/4b2adb05cde8a7ee03cdd271755da3b377c68011&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4rh7-jwg9-m28m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h3m5-p59h-x88p: openssl-encrypt has visible password in process list via --password CLI argument</title>
+    <id>https://osv.dev/vulnerability/GHSA-h3m5-p59h-x88p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h3m5-p59h-x88p"/>
+    <published>2026-03-31T23:42:17Z</published>
+    <updated>2026-09-02T09:10:38Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74873"/>
+    <category term="PYSEC-2026-3753"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt has visible password in process list via --password CLI argument&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74873, PYSEC-2026-3753&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Passwords passed via the `--password` / `-p` CLI argument in `openssl_encrypt/modules/crypt_cli_subparser.py` at **lines 150-154** are visible to any user on the system via `ps aux` or `/proc/[pid]/cmdline`.
+
+### Affected Code
+
+```python
+subparser.add_argument(
+    &amp;quot;--password&amp;quot;, &amp;quot;-p&amp;quot;,
+    help=&amp;quot;Password (will prompt if not provided, or use CRYPT_PASSWORD environment variable)&amp;quot;,
+)
+```
+
+Similarly, `--keystore-password` exposes the keystore password.
+
+### Impact
+
+On multi-user systems, any user can observe the encryption password by listing processes. The `CRYPT_PASSWORD` environment variable alternative is also visible via `/proc/[pid]/environ` (though with slightly restricted access).
+
+### Recommended Fix
+
+- Document the security implications prominently
+- Recommend interactive…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h3m5-p59h-x88p"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h3m5-p59h-x88p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/e78a3666e4592f3538adaaa6be8f5f04356174db"&gt;https://github.com/jahlives/openssl_encrypt/commit/e78a3666e4592f3538adaaa6be8f5f04356174db&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h3m5-p59h-x88p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h45m-mgcp-q388: openssl-encrypt: TOTP rate limiter is in-memory only — not shared across workers, lost on restart</title>
+    <id>https://osv.dev/vulnerability/GHSA-h45m-mgcp-q388</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h45m-mgcp-q388"/>
+    <published>2026-03-31T23:41:26Z</published>
+    <updated>2026-09-02T09:10:36Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74878"/>
+    <category term="PYSEC-2026-3757"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt: TOTP rate limiter is in-memory only — not shared across workers, lost on restart&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74878, PYSEC-2026-3757&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Severity: HIGH
+
+### Summary
+
+The TOTP brute-force rate limiter in `openssl_encrypt_server/modules/pepper/totp.py` at **lines 47-98** uses an in-memory `defaultdict(list)` as a class variable.
+
+### Affected Code
+
+```python
+class TOTPRateLimiter:
+    def __init__(self, ...):
+        self.attempts: Dict[str, List[datetime]] = defaultdict(list)
+        self.lockouts: Dict[str, datetime] = {}
+
+class TOTPService:
+    _rate_limiter = TOTPRateLimiter()  # Class variable, in-memory only
+```
+
+### Impact
+
+1. Rate limit state is **not shared** across multiple server instances/workers — an attacker can distribute attempts
+2. All rate limit state is **lost on server restart** — allows immediate retry
+3. In multi-worker deployments, each worker has independent rate limit state
+
+### Recommended Fix
+
+- …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h45m-mgcp-q388"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h45m-mgcp-q388&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/2749bc0949b34a5921a35fb4a3f1856fc51916de"&gt;https://github.com/jahlives/openssl_encrypt/commit/2749bc0949b34a5921a35fb4a3f1856fc51916de&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h45m-mgcp-q388"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-2vhw-q7vh-7xv2: openssl-encrypt's readiness endpoint leaks database error details to unauthenticated callers</title>
+    <id>https://osv.dev/vulnerability/GHSA-2vhw-q7vh-7xv2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2vhw-q7vh-7xv2"/>
+    <published>2026-04-01T21:11:59Z</published>
+    <updated>2026-09-02T09:10:34Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74879"/>
+    <category term="PYSEC-2026-3758"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt&amp;#x27;s readiness endpoint leaks database error details to unauthenticated callers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74879, PYSEC-2026-3758&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `/ready` endpoint in `openssl_encrypt_server/server.py` at **lines 159-175** catches database errors and returns the full exception string in the response.
+
+### Affected Code
+
+```python
+except Exception as e:
+    return {&amp;quot;status&amp;quot;: &amp;quot;not_ready&amp;quot;, &amp;quot;reason&amp;quot;: str(e)}
+```
+
+### Impact
+
+Database exception messages can leak:
+- Database hostnames and IP addresses
+- Connection parameters and port numbers
+- Driver version information
+- Potentially database credentials if included in connection string errors
+
+This information is available to unauthenticated callers.
+
+### Recommended Fix
+
+- Return a generic error message: `{&amp;quot;status&amp;quot;: &amp;quot;not_ready&amp;quot;, &amp;quot;reason&amp;quot;: &amp;quot;database unavailable&amp;quot;}`
+- Log the full exception server-side for debugging
+
+### Fix
+
+Fixed in commit `7aa8787` on branch `releases/1…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-2vhw-q7vh-7xv2"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-2vhw-q7vh-7xv2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/7aa8787f4de2e9a23f58fca067bb16c4c69d28bb"&gt;https://github.com/jahlives/openssl_encrypt/commit/7aa8787f4de2e9a23f58fca067bb16c4c69d28bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2vhw-q7vh-7xv2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vfgx-5q85-58q3: openssl-encrypt has non-cryptographic PRNG used for steganography pixel selection</title>
+    <id>https://osv.dev/vulnerability/GHSA-vfgx-5q85-58q3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vfgx-5q85-58q3"/>
+    <published>2026-03-31T23:43:06Z</published>
+    <updated>2026-09-02T09:10:33Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74874"/>
+    <category term="PYSEC-2026-3754"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt has non-cryptographic PRNG used for steganography pixel selection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74874, PYSEC-2026-3754&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `generate_pseudorandom_sequence()` function in `openssl_encrypt/plugins/steganography/core/utils.py` at **lines 89-91** uses Python&amp;#x27;s `random` module (Mersenne Twister) for steganographic pixel/sample selection.
+
+### Affected Code
+
+```python
+random.seed(seed)
+sequence = random.sample(range(max_value), min(length, max_value))
+return sequence
+```
+
+Additionally, the steganography password is stored as a plain Python string (not `SecureBytes`) and only 8 bytes (64 bits) of the SHA-256 hash are used for the seed, reducing effective security to 64 bits.
+
+### Impact
+
+The Mersenne Twister&amp;#x27;s state can be recovered from approximately 624 outputs. An attacker who knows or guesses the password can predict the PRNG sequence and determine exactly which pixels contain hidden data, potent…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-vfgx-5q85-58q3"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-vfgx-5q85-58q3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/09e96e090417d34d2f533f6810d3cd4f77810101"&gt;https://github.com/jahlives/openssl_encrypt/commit/09e96e090417d34d2f533f6810d3cd4f77810101&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vfgx-5q85-58q3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-m4rf-3fr8-xwx3: NLTK: JVM argument injection bypass via per-call options in the NLTK Stanford wrappers (incomplete fix of CVE-2026-12841)</title>
+    <id>https://osv.dev/vulnerability/GHSA-m4rf-3fr8-xwx3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m4rf-3fr8-xwx3"/>
+    <published>2026-09-01T20:38:22Z</published>
+    <updated>2026-09-02T09:10:30Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-79675"/>
+    <category term="PYSEC-2026-3749"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;NLTK: JVM argument injection bypass via per-call options in the NLTK Stanford wrappers (incomplete fix of CVE-2026-12841)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-79675, PYSEC-2026-3749&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt; — fixed in 3.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability
+
+The fix for CVE-2026-12841 (CWE-88, JVM argument injection) added `_validate_java_options()` to block dangerous JVM flags such as `-agentlib`, `-agentpath`, `-javaagent`, `-Xrunjdwp`, and `@argfile` references. However, the validation is only applied when setting global options via `config_java()`. The `java()` function&amp;#x27;s per-call `options` parameter -- added by PR #3683 (CVE-2026-12615 fix) -- passes options directly to `subprocess.Popen` without calling `_validate_java_options()`.
+
+All four Stanford Java wrapper classes accept user-supplied `java_options` and route them through the unvalidated per-call path, bypassing the CVE-2026-12841 fix entirely.
+
+## Root Cause
+
+In `nltk/internals.py`, the `java()` function (line 128) accepts an `options` keyword argument. When `opt…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-m4rf-3fr8-xwx3"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-m4rf-3fr8-xwx3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-79675"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-79675&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/commit/8fa9650b6009aacfdebbc33d2a08d32c0858ea6c"&gt;https://github.com/nltk/nltk/commit/8fa9650b6009aacfdebbc33d2a08d32c0858ea6c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk"&gt;https://github.com/nltk/nltk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/releases/tag/v3.10.3"&gt;https://github.com/nltk/nltk/releases/tag/v3.10.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/nltk-before-jvm-argument-injection-via-per-call-options"&gt;https://www.vulncheck.com/advisories/nltk-before-jvm-argument-injection-via-per-call-options&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m4rf-3fr8-xwx3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-425g-fjhq-5h92: openssl-encrypt silently skips schema validation when jsonschema library is not installed</title>
+    <id>https://osv.dev/vulnerability/GHSA-425g-fjhq-5h92</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-425g-fjhq-5h92"/>
+    <published>2026-03-31T23:43:33Z</published>
+    <updated>2026-09-02T09:10:24Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74875"/>
+    <category term="PYSEC-2026-3755"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt silently skips schema validation when jsonschema library is not installed&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74875, PYSEC-2026-3755&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+In `openssl_encrypt/modules/json_validator.py` at **lines 234-238**, when the `jsonschema` library is not installed, all schema validation is silently skipped with only a print warning.
+
+### Affected Code
+
+```python
+if not JSONSCHEMA_AVAILABLE:
+    print(f&amp;quot;Warning: Cannot validate against schema &amp;#x27;{schema_name}&amp;#x27; - jsonschema library not available&amp;quot;)
+    return
+```
+
+Additionally, unknown metadata format versions (line 288-293) bypass schema validation entirely, and all schemas use `additionalProperties: true` allowing arbitrary extra fields.
+
+### Impact
+
+An attacker who can influence the Python environment (remove the jsonschema package) or craft metadata with an unknown version number can bypass all schema checks. Malformed or malicious metadata will be accepted without validati…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-425g-fjhq-5h92"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-425g-fjhq-5h92&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/6e7f938dcb7928faf5fd12bb5559f6dae2944124"&gt;https://github.com/jahlives/openssl_encrypt/commit/6e7f938dcb7928faf5fd12bb5559f6dae2944124&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-425g-fjhq-5h92"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-8h88-gxp3-j7pg: openssl-encrypt's unverified key bundle from_dict() + to_identity() path allows encryption to attacker keys</title>
+    <id>https://osv.dev/vulnerability/GHSA-8h88-gxp3-j7pg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8h88-gxp3-j7pg"/>
+    <published>2026-04-01T21:11:14Z</published>
+    <updated>2026-09-02T09:10:23Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74876"/>
+    <category term="PYSEC-2026-3756"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;openssl-encrypt&amp;#x27;s unverified key bundle from_dict() + to_identity() path allows encryption to attacker keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-74876, PYSEC-2026-3756&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `PublicKeyBundle.from_dict()` method in `openssl_encrypt/modules/key_bundle.py` at **lines 329-361** creates bundles from untrusted data without verifying the signature. The docstring warns to call `verify_signature()` after creation, but the `to_identity()` method (line 363-391) can convert an unverified bundle directly to an `Identity` object.
+
+### Affected Code
+
+```python
+@classmethod
+def from_dict(cls, data: Dict) -&amp;gt; &amp;quot;PublicKeyBundle&amp;quot;:
+    &amp;quot;&amp;quot;&amp;quot;
+    SECURITY: Does NOT verify signature. Call verify_signature() after creation.
+    &amp;quot;&amp;quot;&amp;quot;
+    # Creates bundle without verification
+```
+
+### Impact
+
+If `from_dict()` followed by `to_identity()` is called without an intervening `verify_signature()` call, encryption could be performed against an attacker&amp;#x27;s public key, leaking secret…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8h88-gxp3-j7pg"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8h88-gxp3-j7pg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/commit/f4a1ba660063cd9e17883829e5272a248525a16b"&gt;https://github.com/jahlives/openssl_encrypt/commit/f4a1ba660063cd9e17883829e5272a248525a16b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt"&gt;https://github.com/jahlives/openssl_encrypt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8h88-gxp3-j7pg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3756: openssl_encrypt versions before 1.4.0 contain a vulnerability in PublicKeyBundle.from_dict() that creates key bundles fr</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3756</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3756"/>
+    <published>2026-08-17T11:16:42Z</published>
+    <updated>2026-09-02T09:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74876"/>
+    <category term="GHSA-8h88-gxp3-j7pg"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74876, GHSA-8h88-gxp3-j7pg&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain a vulnerability in PublicKeyBundle.from_dict() that creates key bundles from untrusted data without verifying signatures. Attackers can call from_dict() followed by to_identity() without signature verification to encrypt data using attacker-controlled public keys, leaking secrets.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8h88-gxp3-j7pg"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8h88-gxp3-j7pg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-unverified-key-bundle-encryption"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-unverified-key-bundle-encryption&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3756"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3752: NLTK before 3.10.3 contains a regular expression denial of service vulnerability in Pl196xCorpusReader that allows attac</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3752</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3752"/>
+    <published>2026-08-27T17:21:03Z</published>
+    <updated>2026-09-02T09:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81725"/>
+    <category term="GHSA-8mpw-7fpc-4gqj"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81725, GHSA-8mpw-7fpc-4gqj&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt; — fixed in 3.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;NLTK before 3.10.3 contains a regular expression denial of service vulnerability in Pl196xCorpusReader that allows attackers to cause quadratic CPU consumption by supplying malformed TEI blocks with many unmatched opening tags. Attackers can exploit lazy regex patterns in the read_block method through public APIs like words() and tagged_words() to force repeated rescans and achieve near-quadratic runtime growth.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/nltk-before-3.10.3-regular-expression-denial-of-service-via-pl196xcorpusreader"&gt;https://www.vulncheck.com/advisories/nltk-before-3.10.3-regular-expression-denial-of-service-via-pl196xcorpusreader&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-8mpw-7fpc-4gqj"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-8mpw-7fpc-4gqj&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3752"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3749: NLTK before 3.10.3 fails to validate JVM options passed through the per-call options parameter in the java() function, a</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3749</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3749"/>
+    <published>2026-08-25T16:17:28Z</published>
+    <updated>2026-09-02T09:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-79675"/>
+    <category term="GHSA-m4rf-3fr8-xwx3"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-79675, GHSA-m4rf-3fr8-xwx3&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt; — fixed in 3.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;NLTK before 3.10.3 fails to validate JVM options passed through the per-call options parameter in the java() function, allowing attackers to inject dangerous JVM flags. Attackers can supply malicious options like -agentpath, -javaagent, or @argfile to Stanford wrapper classes to achieve arbitrary code execution.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/nltk-before-jvm-argument-injection-via-per-call-options"&gt;https://www.vulncheck.com/advisories/nltk-before-jvm-argument-injection-via-per-call-options&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-m4rf-3fr8-xwx3"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-m4rf-3fr8-xwx3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3749"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3767: openssl_encrypt versions before 1.4.0 contain hardcoded database credentials in standalone server configuration files. A</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3767</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3767"/>
+    <published>2026-08-17T11:16:44Z</published>
+    <updated>2026-09-02T09:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74891"/>
+    <category term="GHSA-v4vm-4xf2-fhqj"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74891, GHSA-v4vm-4xf2-fhqj&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain hardcoded database credentials in standalone server configuration files. Attackers on the same network can access PostgreSQL databases using well-known default credentials to retrieve sensitive data.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-v4vm-4xf2-fhqj"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-v4vm-4xf2-fhqj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-hardcoded-database-credentials"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-hardcoded-database-credentials&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3767"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3762: openssl_encrypt versions before 1.4.0 contain a logging bug in restore_hidden_modules() that logs module counts after cl</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3762</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3762"/>
+    <published>2026-08-17T11:16:43Z</published>
+    <updated>2026-09-02T09:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74885"/>
+    <category term="GHSA-43r4-3hf9-m84q"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74885, GHSA-43r4-3hf9-m84q&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain a logging bug in restore_hidden_modules() that logs module counts after clearing, always showing zero restored modules and corrupting audit trails. Additionally, a race condition exists between module hiding and import hook installation where another thread could re-import blocked modules in multi-threaded environments.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-43r4-3hf9-m84q"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-43r4-3hf9-m84q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-logging-bug-and-race-condition"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-logging-bug-and-race-condition&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3762"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3774: openssl_encrypt versions before 1.4.9 fail to escape attacker-controlled key_id values printed to stderr during decrypt </title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3774</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3774"/>
+    <published>2026-08-27T17:20:59Z</published>
+    <updated>2026-09-02T09:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81695"/>
+    <category term="GHSA-jwfm-99h7-2w5x"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81695, GHSA-jwfm-99h7-2w5x&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.9 fail to escape attacker-controlled key_id values printed to stderr during decrypt auto-detection. Attackers can craft encrypted files with malicious key_id containing escape sequences to repaint terminal output and forge authenticity verification blocks.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-jwfm-99h7-2w5x"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-jwfm-99h7-2w5x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-terminal-injection-via-key-id"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-terminal-injection-via-key-id&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3774"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3763: openssl_encrypt versions before 1.4.0 contain a plugin sandbox bypass vulnerability where the PluginImportGuard blocks a</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3763</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3763"/>
+    <published>2026-08-17T11:16:43Z</published>
+    <updated>2026-09-02T09:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74886"/>
+    <category term="GHSA-9pgj-v69p-q586"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74886, GHSA-9pgj-v69p-q586&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain a plugin sandbox bypass vulnerability where the PluginImportGuard blocks a different set of modules than the AST analyzer&amp;#x27;s DANGEROUS_MODULES set. Attackers can bypass AST analysis through string obfuscation or encoding to import unblocked dangerous modules like sys, shutil, multiprocessing, importlib, and pickle for arbitrary code execution.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-9pgj-v69p-q586"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-9pgj-v69p-q586&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-plugin-import-guard-bypass"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-plugin-import-guard-bypass&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3763"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3778: openssl_encrypt versions before 1.4.9 use a denylist to identify trusted built-in plugins, allowing unsigned plugins in </title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3778</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3778"/>
+    <published>2026-08-27T17:21:00Z</published>
+    <updated>2026-09-02T09:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81701"/>
+    <category term="GHSA-wxx9-p55f-wm34"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81701, GHSA-wxx9-p55f-wm34&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.9 use a denylist to identify trusted built-in plugins, allowing unsigned plugins in top-level plugins/ directories and unknown subdirectories to bypass signature verification. Attackers can place malicious unsigned plugins following documented installation paths to achieve arbitrary code execution in the CLI process with access to passwords and cryptographic keys.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-wxx9-p55f-wm34"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-wxx9-p55f-wm34&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-arbitrary-code-execution-via-unsigned-plugin"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-arbitrary-code-execution-via-unsigned-plugin&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3778"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3768: openssl_encrypt versions before 1.4.0 contain hardcoded default JWT signing secrets in config.py that pass validation ch</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3768</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3768"/>
+    <published>2026-08-17T11:16:44Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74893"/>
+    <category term="GHSA-qc6h-gfjh-7qqg"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74893, GHSA-qc6h-gfjh-7qqg&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain hardcoded default JWT signing secrets in config.py that pass validation checks. Attackers with access to source code can forge valid JWT tokens for any client_id to gain authenticated access to keyserver and telemetry APIs.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-qc6h-gfjh-7qqg"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-qc6h-gfjh-7qqg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-jwt-token-forgery-via-hardcoded-secrets"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-jwt-token-forgery-via-hardcoded-secrets&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3768"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3782: NVIDIA NemoClaw contains a vulnerability where an attacker could cause
+insufficiently protected credentials . A successf</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3782</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3782"/>
+    <published>2026-08-25T21:17:28Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-65087"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-65087&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;uff&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;NVIDIA NemoClaw contains a vulnerability where an attacker could cause
+insufficiently protected credentials . A successful exploit of this vulnerability might lead to information disclosure and data tampering.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-65087"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-65087&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.cve.org/CVERecord?id=CVE-2026-65087"&gt;https://www.cve.org/CVERecord?id=CVE-2026-65087&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NVIDIA/product-security/tree/main/2026/5872"&gt;https://github.com/NVIDIA/product-security/tree/main/2026/5872&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3782"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3780: openssl-encrypt before 1.4.9 fails to redact the file password in its --debug argv dump when the password is supplied vi</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3780</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3780"/>
+    <published>2026-08-27T17:21:01Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81705"/>
+    <category term="GHSA-jgvm-7jxv-cgcc"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81705, GHSA-jgvm-7jxv-cgcc&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl-encrypt before 1.4.9 fails to redact the file password in its --debug argv dump when the password is supplied via bundled short-option spellings (e.g. -apHunter2) or abbreviated long-option spellings (e.g. --passw). The sanitizer only recognized exact option names, --option=value forms, and tokens starting with -p, so these spellings bypass the redaction chokepoint and the cleartext password is written to stderr. Anyone with access to that output (terminal scrollback, merged 2&amp;gt;&amp;amp;1 output, CI job logs, or the GUI&amp;#x27;s persistent debug log) can recover the password.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-jgvm-7jxv-cgcc"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-jgvm-7jxv-cgcc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-password-cleartext-leak-via-debug"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-password-cleartext-leak-via-debug&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3780"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3758: openssl_encrypt versions before 1.4.0 contain an information disclosure vulnerability in the /ready endpoint that return</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3758</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3758"/>
+    <published>2026-08-17T11:16:42Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74879"/>
+    <category term="GHSA-2vhw-q7vh-7xv2"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74879, GHSA-2vhw-q7vh-7xv2&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain an information disclosure vulnerability in the /ready endpoint that returns full database exception strings to unauthenticated callers. Attackers can trigger database errors to extract sensitive information including hostnames, IP addresses, connection parameters, and potentially credentials from exception messages.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-2vhw-q7vh-7xv2"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-2vhw-q7vh-7xv2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-information-disclosure-via-ready-endpoint"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-information-disclosure-via-ready-endpoint&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3758"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3779: openssl_encrypt versions before 1.4.9 fail to validate encryption status of embedded post-quantum private keys in file m</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3779</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3779"/>
+    <published>2026-08-27T17:21:00Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81703"/>
+    <category term="GHSA-qqfq-g2cv-j7v3"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81703, GHSA-qqfq-g2cv-j7v3&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.9 fail to validate encryption status of embedded post-quantum private keys in file metadata. Attackers can craft files with unencrypted embedded PQC keys that decrypt under any password, bypassing authentication and producing attacker-chosen plaintext with false integrity verification.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-qqfq-g2cv-j7v3"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-qqfq-g2cv-j7v3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-authentication-bypass-via-unencrypted-pqc-key"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-authentication-bypass-via-unencrypted-pqc-key&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3779"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3764: openssl_encrypt versions before 1.4.0 use a non-standard PBKDF2 key derivation construction with iterations=1 per call i</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3764</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3764"/>
+    <published>2026-08-17T11:16:43Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74888"/>
+    <category term="GHSA-743f-89fg-x288"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74888, GHSA-743f-89fg-x288&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 use a non-standard PBKDF2 key derivation construction with iterations=1 per call in an outer loop, creating a KDF whose security properties have not been formally analyzed. Attackers can exploit this weakened key derivation to more efficiently crack passwords protecting legacy encrypted files compared to standard PBKDF2 implementations.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-743f-89fg-x288"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-743f-89fg-x288&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-non-standard-pbkdf2-key-derivation"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-non-standard-pbkdf2-key-derivation&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3764"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3766: openssl_encrypt versions before 1.4.0 contain an authentication bypass vulnerability in CamelliaCipher that disables HMA</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3766</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3766"/>
+    <published>2026-08-17T11:16:43Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74890"/>
+    <category term="GHSA-rvc2-5jxq-gpcj"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74890, GHSA-rvc2-5jxq-gpcj&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain an authentication bypass vulnerability in CamelliaCipher that disables HMAC tag generation and verification when the PYTEST_CURRENT_TEST environment variable is set. Attackers with code execution can set this environment variable to produce unauthenticated ciphertext and bypass integrity protection on encrypted data.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-rvc2-5jxq-gpcj"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-rvc2-5jxq-gpcj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-hmac-authentication-bypass-via-environment-variable"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-hmac-authentication-bypass-via-environment-variable&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3766"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3760: openssl_encrypt versions before 1.4.0 contain a sandbox bypass vulnerability where the plugin sandbox fails to restrict </title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3760</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3760"/>
+    <published>2026-08-17T11:16:42Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74883"/>
+    <category term="GHSA-mcjj-qw7m-j3cp"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74883, GHSA-mcjj-qw7m-j3cp&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain a sandbox bypass vulnerability where the plugin sandbox fails to restrict alternative file access methods like pathlib.Path and io.open. Attackers can import pathlib or io modules to read and write arbitrary files, completely bypassing the restricted_open file access controls.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-sandbox-bypass-via-pathlib-and-io"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-sandbox-bypass-via-pathlib-and-io&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-mcjj-qw7m-j3cp"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-mcjj-qw7m-j3cp&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3760"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3772: openssl_encrypt versions before 1.4.0 contain a critical vulnerability in pqc.py where KEM decapsulation failures silent</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3772</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3772"/>
+    <published>2026-08-17T11:16:45Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74900"/>
+    <category term="GHSA-p3gq-pcg9-qvfv"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74900, GHSA-p3gq-pcg9-qvfv&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain a critical vulnerability in pqc.py where KEM decapsulation failures silently fall back to simulation mode, generating a deterministic shared secret from only 16 bytes of the private key and publicly available encapsulated key data. Attackers who obtain 16 bytes of the private key can compute the shared secret and decrypt all ciphertext, as the fallback triggers on any KEM failure without raising an error.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-p3gq-pcg9-qvfv"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-p3gq-pcg9-qvfv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-weak-shared-secret-via-pqc-simulation-mode"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-weak-shared-secret-via-pqc-simulation-mode&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3772"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3751: NLTK before 3.10.3 contains a regular expression denial of service (ReDoS) vulnerability in the tgrep module. The _tgrep</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3751</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3751"/>
+    <published>2026-08-26T11:16:40Z</published>
+    <updated>2026-09-02T09:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-80206"/>
+    <category term="GHSA-w3v8-gmh9-3wv7"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-80206, GHSA-w3v8-gmh9-3wv7&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt; — fixed in 3.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;NLTK before 3.10.3 contains a regular expression denial of service (ReDoS) vulnerability in the tgrep module. The _tgrep_node_action function compiles user-supplied regular expressions embedded in /regex/ pattern nodes and executes them via re.search against tree node labels without any validation or timeout. An attacker who controls the tgrep pattern (e.g., via tgrep_positions() or tgrep_compile() exposed to external input) can supply a pattern that triggers catastrophic backtracking, causing indefinite CPU saturation that blocks the Python process.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/nltk-3.10.2-regular-expression-denial-of-service-via-tgrep"&gt;https://www.vulncheck.com/advisories/nltk-3.10.2-regular-expression-denial-of-service-via-tgrep&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-w3v8-gmh9-3wv7"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-w3v8-gmh9-3wv7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3751"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3748: NLTK versions before 3.10.3 use xml.etree.ElementTree to parse XML in multiple modules, which honors entity declarations</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3748</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3748"/>
+    <published>2026-08-25T02:16:52Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-78681"/>
+    <category term="GHSA-97qj-x29f-37w7"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-78681, GHSA-97qj-x29f-37w7&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt; — fixed in 3.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;NLTK versions before 3.10.3 use xml.etree.ElementTree to parse XML in multiple modules, which honors entity declarations in document DTDs. Attackers can craft XML payloads with nested entity declarations that expand from hundreds of bytes to megabytes in memory, causing denial of service.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/nltk-before-entity-expansion-dos-via-elementtree"&gt;https://www.vulncheck.com/advisories/nltk-before-entity-expansion-dos-via-elementtree&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-97qj-x29f-37w7"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-97qj-x29f-37w7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3748"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3777: openssl_encrypt versions before 1.4.9 contain a signature verification vulnerability in gpg_runner.verify_detached that </title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3777</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3777"/>
+    <published>2026-08-27T17:21:00Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81700"/>
+    <category term="GHSA-x38r-8wf3-q9hq"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81700, GHSA-x38r-8wf3-q9hq&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.9 contain a signature verification vulnerability in gpg_runner.verify_detached that accepts revoked and expired keys by only checking VALIDSIG status without inspecting REVKEYSIG, EXPKEYSIG, or gpg exit codes. Attackers holding compromised-then-revoked signing keys or expired project keys can bypass signature verification to execute malicious plugins in the host process.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-x38r-8wf3-q9hq"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-x38r-8wf3-q9hq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-gpg-signature-verification-bypass"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-gpg-signature-verification-bypass&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3777"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3781: openssl_encrypt before 1.4.9 fails to prevent namespace collisions between own identities and contacts in IdentityStore,</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3781</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3781"/>
+    <published>2026-08-27T17:21:01Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81706"/>
+    <category term="GHSA-8gmx-w9m8-vx7q"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81706, GHSA-8gmx-w9m8-vx7q&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt before 1.4.9 fails to prevent namespace collisions between own identities and contacts in IdentityStore, allowing attackers to create shadowed contact entries invisible until the corresponding own identity is deleted. When the own identity is deleted, the shadowed contact becomes visible and resolves to the attacker&amp;#x27;s keys, enabling silent key substitution for encrypted files.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8gmx-w9m8-vx7q"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8gmx-w9m8-vx7q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-key-substitution-via-identity-shadowing"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-key-substitution-via-identity-shadowing&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3781"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3750: NLTK versions before 3.10.0 contain a regular expression denial of service vulnerability in Text.findall() and TokenSear</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3750</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3750"/>
+    <published>2026-08-26T11:16:39Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-80205"/>
+    <category term="GHSA-rrv8-h7p8-rx55"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-80205, GHSA-rrv8-h7p8-rx55&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt; — fixed in 3.10.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;NLTK versions before 3.10.0 contain a regular expression denial of service vulnerability in Text.findall() and TokenSearcher.findall() methods that accept user-supplied regular expressions without validation or timeout. Attackers can supply crafted regex patterns that cause catastrophic backtracking, resulting in indefinite CPU saturation and denial of service to all users of the Python process.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/09/01/3"&gt;http://www.openwall.com/lists/oss-security/2026/09/01/3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/nltk-before-3.10.0-redos-via-text-findall-unvalidated-regex"&gt;https://www.vulncheck.com/advisories/nltk-before-3.10.0-redos-via-text-findall-unvalidated-regex&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-rrv8-h7p8-rx55"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-rrv8-h7p8-rx55&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3750"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3754: openssl_encrypt versions before 1.4.0 use Python's non-cryptographic random module for steganographic pixel selection in</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3754</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3754"/>
+    <published>2026-08-17T11:16:41Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74874"/>
+    <category term="GHSA-vfgx-5q85-58q3"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74874, GHSA-vfgx-5q85-58q3&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 use Python&amp;#x27;s non-cryptographic random module for steganographic pixel selection in the generate_pseudorandom_sequence function. Attackers who know the password can recover the Mersenne Twister state from approximately 624 outputs and predict pixel locations containing hidden data for extraction.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-vfgx-5q85-58q3"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-vfgx-5q85-58q3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-weak-prng-steganography-pixel-selection"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-weak-prng-steganography-pixel-selection&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3754"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3773: openssl_encrypt versions before 1.4.0 contain an authentication bypass vulnerability in pqc.py where AES-GCM decryption </title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3773</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3773"/>
+    <published>2026-08-17T11:16:45Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74901"/>
+    <category term="GHSA-w4j7-wfgw-r52w"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74901, GHSA-w4j7-wfgw-r52w&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain an authentication bypass vulnerability in pqc.py where AES-GCM decryption failures trigger fallback to unauthenticated AES-CTR mode. Attackers can modify ciphertext in transit to bypass integrity verification and perform bit-flipping attacks without detection.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-w4j7-wfgw-r52w"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-w4j7-wfgw-r52w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-authentication-bypass-via-aes-ctr-fallback"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-authentication-bypass-via-aes-ctr-fallback&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3773"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3757: openssl_encrypt versions before 1.4.0 use an in-memory rate limiter for TOTP brute-force protection that is not shared a</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3757</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3757"/>
+    <published>2026-08-17T11:16:42Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74878"/>
+    <category term="GHSA-h45m-mgcp-q388"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74878, GHSA-h45m-mgcp-q388&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 use an in-memory rate limiter for TOTP brute-force protection that is not shared across workers and is lost on server restart. Attackers can distribute authentication attempts across multiple server instances or retry immediately after a restart to bypass rate limiting protections.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h45m-mgcp-q388"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h45m-mgcp-q388&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-totp-rate-limiter-bypass"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-totp-rate-limiter-bypass&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3757"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3775: openssl_encrypt versions before 1.4.9 fail to sanitize terminal control characters in file metadata printed by the info </title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3775</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3775"/>
+    <published>2026-08-27T17:20:59Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81696"/>
+    <category term="GHSA-539p-fxf4-7fv8"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81696, GHSA-539p-fxf4-7fv8&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.9 fail to sanitize terminal control characters in file metadata printed by the info command. Attackers can craft malicious files containing escape sequences to repaint terminal output and forge verification information displayed to users.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-539p-fxf4-7fv8"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-539p-fxf4-7fv8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-terminal-injection-via-info-command"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-terminal-injection-via-info-command&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3775"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3769: openssl_encrypt before 1.4.0 contains an authentication bypass vulnerability in the verify_api_token function that accep</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3769</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3769"/>
+    <published>2026-08-17T11:16:44Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74894"/>
+    <category term="GHSA-4g2c-wpgj-49w8"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74894, GHSA-4g2c-wpgj-49w8&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt before 1.4.0 contains an authentication bypass vulnerability in the verify_api_token function that accepts any non-empty Bearer token string without validation. Attackers can upload arbitrary public keys, enumerate all keys, and revoke keys belonging to any user by providing any Bearer token in the Authorization header.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-4g2c-wpgj-49w8"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-4g2c-wpgj-49w8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-authentication-bypass-via-bearer-token"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-authentication-bypass-via-bearer-token&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3769"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3759: openssl_encrypt versions before 1.4.0 accept refresh tokens as URL query parameters in keyserver and telemetry server ro</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3759</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3759"/>
+    <published>2026-08-17T11:16:42Z</published>
+    <updated>2026-09-02T09:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74880"/>
+    <category term="GHSA-4rh7-jwg9-m28m"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74880, GHSA-4rh7-jwg9-m28m&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 accept refresh tokens as URL query parameters in keyserver and telemetry server routes. Attackers can extract tokens from server logs, proxy logs, browser history, and HTTP Referer headers to gain unauthorized access.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-4rh7-jwg9-m28m"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-4rh7-jwg9-m28m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-token-leakage-via-query-parameters"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-token-leakage-via-query-parameters&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3759"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3755: openssl_encrypt versions before 1.4.0 silently skip JSON schema validation when the jsonschema library is not installed,</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3755</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3755"/>
+    <published>2026-08-17T11:16:41Z</published>
+    <updated>2026-09-02T09:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74875"/>
+    <category term="GHSA-425g-fjhq-5h92"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74875, GHSA-425g-fjhq-5h92&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 silently skip JSON schema validation when the jsonschema library is not installed, allowing malformed metadata to be accepted. Attackers can remove the jsonschema package or supply unknown metadata format versions to bypass all schema checks and process malicious data.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-425g-fjhq-5h92"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-425g-fjhq-5h92&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-schema-validation-bypass"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-schema-validation-bypass&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3755"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3753: openssl_encrypt versions before 1.4.0 expose passwords passed via the --password CLI argument in process listings access</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3753</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3753"/>
+    <published>2026-08-17T11:16:41Z</published>
+    <updated>2026-09-02T09:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74873"/>
+    <category term="GHSA-h3m5-p59h-x88p"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74873, GHSA-h3m5-p59h-x88p&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 expose passwords passed via the --password CLI argument in process listings accessible to all system users. Attackers can read process arguments through ps aux or /proc/[pid]/cmdline to retrieve plaintext passwords and keystore passwords.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h3m5-p59h-x88p"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-h3m5-p59h-x88p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-password-exposure-via-cli-argument"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-password-exposure-via-cli-argument&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3753"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3765: openssl_encrypt versions before 1.4.0 use HKDF with no salt and static info parameter in key normalization functions, re</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3765</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3765"/>
+    <published>2026-08-17T11:16:43Z</published>
+    <updated>2026-09-02T09:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74889"/>
+    <category term="GHSA-j9mh-57cc-665x"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74889, GHSA-j9mh-57cc-665x&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 use HKDF with no salt and static info parameter in key normalization functions, reducing entropy extraction and determinism. Attackers can exploit predictable key derivation with identical inputs to weaken cryptographic security against multi-target attacks.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-j9mh-57cc-665x"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-j9mh-57cc-665x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-weak-key-derivation-via-hkdf"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-weak-key-derivation-via-hkdf&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3765"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3776: openssl_encrypt versions before 1.4.9 contain a shell injection vulnerability in the info command's reconstructed CLI bl</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3776</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3776"/>
+    <published>2026-08-27T17:21:00Z</published>
+    <updated>2026-09-02T09:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-81698"/>
+    <category term="GHSA-gw2m-mj6q-59hc"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-81698, GHSA-gw2m-mj6q-59hc&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.9 contain a shell injection vulnerability in the info command&amp;#x27;s reconstructed CLI block that interpolates untrusted metadata fields without quoting. Attackers can craft metadata values like pepper_name containing shell commands that execute when users copy the printed CLI block into a shell.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-gw2m-mj6q-59hc"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-gw2m-mj6q-59hc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-shell-injection-via-info-command"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-1.4.9-shell-injection-via-info-command&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3776"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3770: openssl_encrypt versions before 1.4.0 fail to apply sandbox restrictions in the default process isolation mode for plugi</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3770</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3770"/>
+    <published>2026-08-17T11:16:44Z</published>
+    <updated>2026-09-02T09:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74895"/>
+    <category term="GHSA-623h-chj7-hfx8"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74895, GHSA-623h-chj7-hfx8&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 fail to apply sandbox restrictions in the default process isolation mode for plugin execution. Attackers can execute malicious plugins with unrestricted access to the filesystem, network, subprocess execution, and all Python modules.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-623h-chj7-hfx8"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-623h-chj7-hfx8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-plugin-sandbox-bypass-via-process-isolation"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-plugin-sandbox-bypass-via-process-isolation&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3770"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3771: openssl_encrypt versions before 1.4.0 contain a sandbox escape vulnerability in the DangerousPatternVisitor AST analyzer</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3771</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3771"/>
+    <published>2026-08-17T11:16:44Z</published>
+    <updated>2026-09-02T09:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74896"/>
+    <category term="GHSA-w7gr-9g4g-33mx"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74896, GHSA-w7gr-9g4g-33mx&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain a sandbox escape vulnerability in the DangerousPatternVisitor AST analyzer that fails to detect dunder attribute traversal techniques. Attackers can use __class__, __bases__, __subclasses__(), and __globals__ chains to access restricted functions and execute arbitrary system commands from plugin code.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-w7gr-9g4g-33mx"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-w7gr-9g4g-33mx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-sandbox-escape-via-dunder-attribute-traversal"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-sandbox-escape-via-dunder-attribute-traversal&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3771"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3761: openssl_encrypt versions before 1.4.0 contain a path traversal vulnerability in the _is_safe_path method where the plugi</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3761</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3761"/>
+    <published>2026-08-17T11:16:43Z</published>
+    <updated>2026-09-02T09:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-74884"/>
+    <category term="GHSA-8jpj-w975-rwv5"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-74884, GHSA-8jpj-w975-rwv5&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openssl-encrypt&lt;/code&gt; — fixed in 1.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;openssl_encrypt versions before 1.4.0 contain a path traversal vulnerability in the _is_safe_path method where the plugin_id parameter is not sanitized before constructing the plugin config directory path. Attackers can declare a malicious plugin_id containing path traversal sequences like &amp;#x27;../&amp;#x27; to access arbitrary directories outside the intended plugin directory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8jpj-w975-rwv5"&gt;https://github.com/jahlives/openssl_encrypt/security/advisories/GHSA-8jpj-w975-rwv5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/openssl-encrypt-before-path-traversal-via-plugin-id"&gt;https://www.vulncheck.com/advisories/openssl-encrypt-before-path-traversal-via-plugin-id&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3761"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-3747: Reflected XSS in Netron versions &lt;=9.1.2 on desktop application through unsanitized node names allows an attacker to hid</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-3747</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-3747"/>
+    <published>2026-08-27T17:20:49Z</published>
+    <updated>2026-09-02T09:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-79720"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-79720&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;netron&lt;/code&gt; — fixed in 9.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Reflected XSS in Netron versions &amp;lt;=9.1.2 on desktop application through unsanitized node names allows an attacker to hide certain nodes, perform port scanning or abuse a Chrome n-day to achieve Remote Code Execution.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/lutzroeder/netron/commit/cd14bad8c9132b1aaf1d197fe61925575f194f00"&gt;https://github.com/lutzroeder/netron/commit/cd14bad8c9132b1aaf1d197fe61925575f194f00&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.hiddenlayer.com/sai-security-advisory/2026-08-netron"&gt;https://www.hiddenlayer.com/sai-security-advisory/2026-08-netron&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-3747"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-15810: Malicious code in gcphelpit (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-15810</id>
@@ -163,24 +813,6 @@ If you cannot upgrade yet, consider applying the changes from PR [#3966](https:/
     <category term="CVE-2026-45360"/>
     <category term="PYSEC-2026-186"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Apache Airflow Vulnerable to Deserialization of Untrusted Data&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-airflow-2026-45360, CVE-2026-45360, PYSEC-2026-186&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow&lt;/code&gt; — fixed in 3.2.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Apache Airflow&amp;#x27;s scheduler-side deadline-reference decoder (`SerializedCustomReference.deserialize_reference`) imported and dispatched arbitrary class paths drawn from DAG-author-controlled serialized state without an allowlist or plugin-registry gate. A DAG author whose code reaches the scheduler — the default on single-host deployments where the DAG bundle is importable from the scheduler process — could embed a custom `DeadlineReference` whose serialized form named an attacker-controlled module path, causing the scheduler to `import_string(...)` and instantiate that class with a live SQLAlchemy session attached. Affects deployments where DAG-author code is less trusted than the scheduler process. Users are advised to upgrade to `apache-airflow` 3.2.2 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-45360"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-45360&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/61461"&gt;https://github.com/apache/airflow/pull/61461&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/66737"&gt;https://github.com/apache/airflow/pull/66737&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2026-186.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2026-186.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/q227dghjwgfz8xsxrf2pwpz4wk43zm83"&gt;https://lists.apache.org/thread/q227dghjwgfz8xsxrf2pwpz4wk43zm83&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/05/31/12"&gt;http://www.openwall.com/lists/oss-security/2026/05/31/12&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2r5m-76wx-56gx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-m4rf-3fr8-xwx3: NLTK: JVM argument injection bypass via per-call options in the NLTK Stanford wrappers (incomplete fix of CVE-2026-12841)</title>
-    <id>https://osv.dev/vulnerability/GHSA-m4rf-3fr8-xwx3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m4rf-3fr8-xwx3"/>
-    <published>2026-09-01T20:38:22Z</published>
-    <updated>2026-09-01T20:45:05Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-79675"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;NLTK: JVM argument injection bypass via per-call options in the NLTK Stanford wrappers (incomplete fix of CVE-2026-12841)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-79675&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt; — fixed in 3.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability
-
-The fix for CVE-2026-12841 (CWE-88, JVM argument injection) added `_validate_java_options()` to block dangerous JVM flags such as `-agentlib`, `-agentpath`, `-javaagent`, `-Xrunjdwp`, and `@argfile` references. However, the validation is only applied when setting global options via `config_java()`. The `java()` function&amp;#x27;s per-call `options` parameter -- added by PR #3683 (CVE-2026-12615 fix) -- passes options directly to `subprocess.Popen` without calling `_validate_java_options()`.
-
-All four Stanford Java wrapper classes accept user-supplied `java_options` and route them through the unvalidated per-call path, bypassing the CVE-2026-12841 fix entirely.
-
-## Root Cause
-
-In `nltk/internals.py`, the `java()` function (line 128) accepts an `options` keyword argument. When `opt…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-m4rf-3fr8-xwx3"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-m4rf-3fr8-xwx3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-79675"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-79675&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/commit/8fa9650b6009aacfdebbc33d2a08d32c0858ea6c"&gt;https://github.com/nltk/nltk/commit/8fa9650b6009aacfdebbc33d2a08d32c0858ea6c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk"&gt;https://github.com/nltk/nltk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/releases/tag/v3.10.3"&gt;https://github.com/nltk/nltk/releases/tag/v3.10.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/nltk-before-jvm-argument-injection-via-per-call-options"&gt;https://www.vulncheck.com/advisories/nltk-before-jvm-argument-injection-via-per-call-options&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m4rf-3fr8-xwx3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GHSA-8423-8fgw-73vq: tornado: multipart split() creates huge temp list before max_parts check -&gt; memory amplification DoS (httputil.py:34)</title>
@@ -872,7 +1504,7 @@ When the chosen target is a Pyt…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul
     <content type="html">&lt;p&gt;&lt;strong&gt; MLflow AI Gateway permits SSRF through an unvalidated api_base&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-71211&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mlflow&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;MLflow&amp;#x27;s AI Gateway accepts an auth_config.api_base value when creating a gateway secret (mlflow/server/handlers.py, _create_gateway_secret) with no validation of scheme, host, or IP range; the value is stored verbatim. The gateway proxy endpoint (mlflow/server/gateway_api.py, raw_proxy) subsequently issues an HTTP request to that stored api_base plus a caller-supplied path and returns the full response body. MLflow&amp;#x27;s existing SSRF guard, _validate_webhook_url (which blocks non-global and metadata IPs), is never invoked anywhere in this gateway secret/proxy code path. The CreateGatewaySecret action additionally has no entry in the permission-validator map, so it requires only basic authentication rather than any specific scope, meaning any authenticated user — including read-only accounts …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-71211"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-71211&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/commit/96b7d900e14227e0821981409d86f5fb6c59b386"&gt;https://github.com/mlflow/mlflow/commit/96b7d900e14227e0821981409d86f5fb6c59b386&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow"&gt;https://github.com/mlflow/mlflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/tree/v3.14.0/mlflow"&gt;https://github.com/mlflow/mlflow/tree/v3.14.0/mlflow&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h7x2-h6g9-p789"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-15603: Malicious code in pyservercheck (PyPI)</title>
+    <title>[UPDATED] MAL-2026-15603: Malicious code in pyservercheck (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-15603</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15603"/>
     <published>2026-08-31T05:02:04Z</published>
@@ -926,26 +1558,5 @@ The package&amp;#x27;s module polls a hardcoded Telegram bot (api.telegram.org, 
 &amp;gt; * Other inference frameworks (vLLM, TGI, Hugging Face transformers
 &amp;gt;   itself) all expose `--trust-remote-code` as **opt-in** so that
 &amp;gt;   users who consciously load kn…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/InternLM/lmdeploy/security/advisories/GHSA-9xq9-36w5-q796"&gt;https://github.com/InternLM/lmdeploy/security/advisories/GHSA-9xq9-36w5-q796&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-46517"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-46517&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/github/advisory-database/pull/4511"&gt;https://github.com/github/advisory-database/pull/4511&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/InternLM/lmdeploy/commit/81be52961aa324fd5cd3cacebffba1ba051bc107"&gt;https://github.com/InternLM/lmdeploy/commit/81be52961aa324fd5cd3cacebffba1ba051bc107&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/InternLM/lmdeploy"&gt;https://github.com/InternLM/lmdeploy&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/InternLM/lmdeploy/blob/v0.13.0/lmdeploy/version.py"&gt;https://github.com/InternLM/lmdeploy/blob/v0.13.0/lmdeploy/version.py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/InternLM/lmdeploy/releases/tag/v0.13.0"&gt;https://github.com/InternLM/lmdeploy/releases/tag/v0.13.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/lmdeploy/PYSEC-2026-2608.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/lmdeploy/PYSEC-2026-2608.yaml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9xq9-36w5-q796"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-ffg3-p8fm-mjx2: RestrictedPython guard hooks can be shadowed via positional-only arguments</title>
-    <id>https://osv.dev/vulnerability/GHSA-ffg3-p8fm-mjx2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ffg3-p8fm-mjx2"/>
-    <published>2026-08-28T22:51:35Z</published>
-    <updated>2026-08-31T04:40:57Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-55830"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;RestrictedPython guard hooks can be shadowed via positional-only arguments&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55830&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;restrictedpython&lt;/code&gt; — fixed in 8.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-RestrictedPython rewrites sensitive operations to go through guard hooks. Attribute access becomes `_getattr_(obj, name)`, item access becomes `_getitem_(obj, key)`, writes go through `_write_`, and print goes through `_print_`. The embedding application supplies these hooks to enforce its policy.
-
-Argument-name validation rejects these protected names for regular arguments, `*args`, `**kwargs`, and keyword-only arguments, but it misses positional-only arguments (the ones before `/`). So a function like:
-
-```python
-def f(_getattr_=evil, /):
-    return o.x
-```
-
-makes `_getattr_` a local that shadows the policy hook, and the rewritten access calls `evil` instead. The same works for `_getitem_`, `_write_`, and `_print_`. Shadowing `_print_` can also be used to capture the internal…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zopefoundation/RestrictedPython/security/advisories/GHSA-ffg3-p8fm-mjx2"&gt;https://github.com/zopefoundation/RestrictedPython/security/advisories/GHSA-ffg3-p8fm-mjx2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55830"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55830&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zopefoundation/RestrictedPython/commit/3737596ec9f28c34a073cc845bd2f4c0a80cb671"&gt;https://github.com/zopefoundation/RestrictedPython/commit/3737596ec9f28c34a073cc845bd2f4c0a80cb671&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zopefoundation/RestrictedPython"&gt;https://github.com/zopefoundation/RestrictedPython&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ffg3-p8fm-mjx2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

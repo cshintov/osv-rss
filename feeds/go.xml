@@ -3,12 +3,52 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-09-03T10:40:54Z</updated>
+  <updated>2026-09-03T15:15:05Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-gw25-m53r-qh88: SiYuan: path traversal via /export/temp/ short-circuit branch (incomplete fix for the export-disclosure hardening, GHSA-6865-qjcf-286f)</title>
+    <id>https://osv.dev/vulnerability/GHSA-gw25-m53r-qh88</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gw25-m53r-qh88"/>
+    <published>2026-09-03T14:56:31Z</published>
+    <updated>2026-09-03T15:15:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-65607"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: path traversal via /export/temp/ short-circuit branch (incomplete fix for the export-disclosure hardening, GHSA-6865-qjcf-286f)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-65607&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260510110132-b763d787d1f2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+SiYuan&amp;#x27;s `/export/` file handler was hardened against export disclosure (issue #12213) by adding an
+`IsSubPath(exportBaseDir, fullPath)` check and an `IsSensitivePath()` check in commit `bb481e1`. These guards
+were added only to the main branch of the handler. The handler begins with a short-circuit branch:
+```go
+if strings.HasPrefix(c.Request.URL.Path, &amp;quot;/export/temp/&amp;quot;) {
+    c.File(filepath.Join(util.TempDir, c.Request.URL.Path))
+    return
+}
+```
+This branch joins the **broader** `util.TempDir` with the raw, percent-decoded request path and serves it with
+**neither** `IsSubPath` **nor** `IsSensitivePath`. An authenticated request to
+`/export/temp/%2e%2e/.../etc/passwd` traverses out of `TempDir` and reads arbitrary files - exactly the
+sensitive-file disclosure the patch intende…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-gw25-m53r-qh88"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-gw25-m53r-qh88&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/b763d787d1f2b862c577049e4ee147c5857fe413"&gt;https://github.com/siyuan-note/siyuan/commit/b763d787d1f2b862c577049e4ee147c5857fe413&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gw25-m53r-qh88"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-99rq-75j6-5j9f: SiYuan: Stored and reflected XSS in SiYuan through an SVG sanitizer bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-99rq-75j6-5j9f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-99rq-75j6-5j9f"/>
+    <published>2026-09-03T14:53:17Z</published>
+    <updated>2026-09-03T15:00:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-66394"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Stored and reflected XSS in SiYuan through an SVG sanitizer bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-66394&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260714095344-f08dee71ba8e&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+SiYuan cleans user supplied SVG with `util.SanitizeSVG` before it serves the file inline as `image/svg+xml`. This cleaner is the guard behind the `Editor.AllowSVGScript` setting, which is off by default, so a `&amp;lt;script&amp;gt;` inside an SVG is meant to be removed.
+
+The cleaner reads the input as HTML, but the browser reads the served file as XML (SVG). Because the two parsers treat some tags differently, a `&amp;lt;script&amp;gt;` can be hidden so the cleaner never removes it. The cleaned file still holds a working script. When a browser opens that file as an SVG document, the script runs in the app origin. There is no Content Security Policy in the product to stop it.
+
+The same bug can be reached in two ways. Both share one root cause (the cleaner), so one fix in the cleaner closes both:
+
+* Reflec…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-99rq-75j6-5j9f"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-99rq-75j6-5j9f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/f08dee71ba8e087a395d74f121de11e6a997ef14"&gt;https://github.com/siyuan-note/siyuan/commit/f08dee71ba8e087a395d74f121de11e6a997ef14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/releases/tag/v3.7.3"&gt;https://github.com/siyuan-note/siyuan/releases/tag/v3.7.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-99rq-75j6-5j9f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-5972: Enforce maximum recursion depth in encoding/asn1</title>
     <id>https://osv.dev/vulnerability/GO-2026-5972</id>
@@ -2108,29 +2148,5 @@ The Golang crypto/tls package also had this vulnerability (&amp;quot;verifying c
     <category term="Go"/>
     <category term="CVE-2026-26292"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Gitea LFS mirror operations bypass migration HTTP transport protections&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-26292&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.gitea.io/gitea&lt;/code&gt; — fixed in 1.25.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Gitea versions before 1.25.5 do not use the migration HTTP transport for LFS push and sync mirror operations, bypassing the configured migration transport protections for those LFS requests.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-26292"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-26292&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/36665"&gt;https://github.com/go-gitea/gitea/pull/36665&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/36691"&gt;https://github.com/go-gitea/gitea/pull/36691&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/996cc12bf7d54ae2326f20b4211fff70eb31e74a"&gt;https://github.com/go-gitea/gitea/commit/996cc12bf7d54ae2326f20b4211fff70eb31e74a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/bcd253a310115045d3ec5e8168a953fbee34dd28"&gt;https://github.com/go-gitea/gitea/commit/bcd253a310115045d3ec5e8168a953fbee34dd28&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.25.5"&gt;https://blog.gitea.com/release-of-1.25.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea"&gt;https://github.com/go-gitea/gitea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/releases/tag/v1.25.5"&gt;https://github.com/go-gitea/gitea/releases/tag/v1.25.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rc56-rj3f-xggf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-wg65-39gg-5wfj: Prometheus Azure AD remote write OAuth client secret exposed via config API</title>
-    <id>https://osv.dev/vulnerability/GHSA-wg65-39gg-5wfj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wg65-39gg-5wfj"/>
-    <published>2026-05-05T19:33:47Z</published>
-    <updated>2026-09-01T15:47:45Z</updated>
-    <category term="Go"/>
-    <category term="BIT-prometheus-2026-42151"/>
-    <category term="CVE-2026-42151"/>
-    <category term="GO-2026-5710"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Prometheus Azure AD remote write OAuth client secret exposed via config API&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-prometheus-2026-42151, CVE-2026-42151, GO-2026-5710&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 0.311.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-Users who use Azure AD remote write with OAuth authentication are impacted.
-
-The `client_secret` field in the Azure AD remote write OAuth configuration (`storage/remote/azuread`) was typed as `string` instead of `Secret`. Prometheus redacts fields of type `Secret` when serving the configuration via the `/-/config` HTTP API endpoint. Because the field was a plain string, the Azure OAuth client secret was exposed in plaintext to any user or process with access to that endpoint.
-
-### Patches
-
-The problem has been patched by changing `ClientSecret` in `OAuthConfig` to `Secret`. Users should upgrade to 3.11.3 or 3.5.3 LTS.
-
-### Workarounds
-
-Users  who can not upgrade can switch to Managed Identity or Workload Identity authentication for Azure AD remote write, which do not involve a …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/security/advisories/GHSA-wg65-39gg-5wfj"&gt;https://github.com/prometheus/prometheus/security/advisories/GHSA-wg65-39gg-5wfj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42151"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18590"&gt;https://github.com/prometheus/prometheus/pull/18590&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18587"&gt;https://github.com/prometheus/prometheus/pull/18587&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:60387"&gt;https://access.redhat.com/errata/RHSA-2026:60387&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:60386"&gt;https://access.redhat.com/errata/RHSA-2026:60386&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:57191"&gt;https://access.redhat.com/errata/RHSA-2026:57191&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:56340"&gt;https://access.redhat.com/errata/RHSA-2026:56340&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wg65-39gg-5wfj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

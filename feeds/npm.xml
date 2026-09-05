@@ -3,12 +3,85 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-09-04T19:00:05Z</updated>
+  <updated>2026-09-05T04:10:52Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-528h-pc64-c93x: stream-json: pick/ignore/filter/replace filters are O(depth²) on nested input — small crafted JSON blocks the event loop for seconds→minutes (DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-528h-pc64-c93x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-528h-pc64-c93x"/>
+    <published>2026-09-03T20:27:53Z</published>
+    <updated>2026-09-05T04:10:52Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-71429"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;stream-json: pick/ignore/filter/replace filters are O(depth²) on nested input — small crafted JSON blocks the event loop for seconds→minutes (DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-71429&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stream-json&lt;/code&gt; — fixed in 3.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
+
+The path filters `pick`, `ignore`, `filter`, and `replace` — the library&amp;#x27;s headline &amp;quot;surgical extraction&amp;quot; feature — recompute the full path string from the nesting stack on **every checkable token**. Because the stack length equals the current nesting depth, and a checkable token is emitted at every level, processing a document of depth *D* costs **O(D²)**, not O(D).
+
+This is triggered by document **structure (nesting depth), not byte volume**, so a tiny payload achieves outsized CPU cost, and it is the ordinary &amp;quot;traverse until the filter matches&amp;quot; path — including the exact README flagship example `pick({filter: &amp;#x27;data&amp;#x27;})`. Any service that uses these filters to extract a field from an untrusted (or larger-than-memory) JSON body — the primary documented use case — can be mad…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uhop/stream-json/security/advisories/GHSA-528h-pc64-c93x"&gt;https://github.com/uhop/stream-json/security/advisories/GHSA-528h-pc64-c93x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uhop/stream-json/commit/a869fb98aaef9225556f49901a8f55954ff856e6"&gt;https://github.com/uhop/stream-json/commit/a869fb98aaef9225556f49901a8f55954ff856e6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uhop/stream-json"&gt;https://github.com/uhop/stream-json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-528h-pc64-c93x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7q9c-hpx7-9cwm: TypeSpec: Unauthenticated Remote Shutdown of Spector Mock Server via POST /.admin/stop</title>
+    <id>https://osv.dev/vulnerability/GHSA-7q9c-hpx7-9cwm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7q9c-hpx7-9cwm"/>
+    <published>2026-09-04T21:43:13Z</published>
+    <updated>2026-09-04T22:00:09Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;TypeSpec: Unauthenticated Remote Shutdown of Spector Mock Server via POST /.admin/stop&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@typespec/spector&lt;/code&gt; — fixed in 0.1.0-alpha.27&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`@typespec/spector` registers a `POST /.admin/stop` HTTP route with no authentication, authorization token, Origin check, or IP-source restriction. Any network-reachable client can send a single unauthenticated POST request to terminate the mock server process. Because the server binds to `0.0.0.0` by default (all interfaces), this endpoint is exposed to any host that can reach the server&amp;#x27;s port—not just localhost—making a complete denial-of-service trivially achievable with one HTTP request. Severity is **High (CVSS 7.5)**.
+
+### Details
+
+The vulnerability originates in `packages/spector/src/routes/admin.ts` at line 7, where an Express router registers the shutdown endpoint with no authentication middleware whatsoever:
+
+```ts
+// packages/spector/src/routes/admin.ts:7-12
+router…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/microsoft/typespec/security/advisories/GHSA-7q9c-hpx7-9cwm"&gt;https://github.com/microsoft/typespec/security/advisories/GHSA-7q9c-hpx7-9cwm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/microsoft/typespec/pull/11274"&gt;https://github.com/microsoft/typespec/pull/11274&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/microsoft/typespec/commit/30d6f6598dd796e2d6aea038139d29b91e6a2da7"&gt;https://github.com/microsoft/typespec/commit/30d6f6598dd796e2d6aea038139d29b91e6a2da7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/microsoft/typespec/commit/39f8f0230bb59b17464d8173b6bff4ddee8082a1"&gt;https://github.com/microsoft/typespec/commit/39f8f0230bb59b17464d8173b6bff4ddee8082a1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/microsoft/typespec"&gt;https://github.com/microsoft/typespec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/microsoft/typespec/releases/tag/@typespec/spector@0.1.0-alpha.27"&gt;https://github.com/microsoft/typespec/releases/tag/@typespec/spector@0.1.0-alpha.27&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7q9c-hpx7-9cwm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-15866: Malicious code in @bx-ui-framework/authentication (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-15866</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15866"/>
+    <published>2026-09-04T01:12:20Z</published>
+    <updated>2026-09-04T21:30:08Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @bx-ui-framework/authentication (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@bx-ui-framework/authentication&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (a80fea2ddf5689952ca33aee5f32efb088024bd1a243621b558d3cdc41ed7d57)
+package.json at line 14 declares a runtime dependency `microfrontend` whose source is a bare HTTPS URL (`https://repo.artifactorymanager.com/bx-ui-framework/authentication`) rather than an npm registry version range. On `npm install`, npm fetches whatever bytes that host returns and installs them as a dependency, running any lifecycle scripts contained in the fetched artifact. There is no version pin, no integrity hash, and no signature check, so the delivered content is fully controlled by whoever operates `repo.artifactorymanager.com`, and can change between installs. The shipped package itself is a minimal stub, so this manifest ent…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bx-ui-framework/authentication/v/1.2.0"&gt;https://www.npmjs.com/package/@bx-ui-framework/authentication/v/1.2.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bx-ui-framework/authentication/v/15.0.0"&gt;https://www.npmjs.com/package/@bx-ui-framework/authentication/v/15.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bx-ui-framework/authentication/v/16.0.0"&gt;https://www.npmjs.com/package/@bx-ui-framework/authentication/v/16.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-f962-v9hr-pfg5: jupyterlab-git extension: Stored XSS leading to RCE</title>
+    <id>https://osv.dev/vulnerability/GHSA-f962-v9hr-pfg5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f962-v9hr-pfg5"/>
+    <published>2026-06-19T19:36:04Z</published>
+    <updated>2026-09-04T21:30:06Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-54527"/>
+    <category term="PYSEC-2026-2540"/>
+    <category term="PYSEC-2026-2541"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;jupyterlab-git extension: Stored XSS leading to RCE&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-54527, PYSEC-2026-2540, PYSEC-2026-2541&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;jupyterlab-git&lt;/code&gt; — fixed in 0.54.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;jupyterlab-git-core&lt;/code&gt; — fixed in 0.54.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@jupyterlab/git&lt;/code&gt; — fixed in 0.54.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Overview
+
+Amazon Web Services (AWS) Security has identified a stored cross-site scripting (XSS) issue in the jupyterlab-git JupyterLab extension that can lead to remote code execution (RCE). The issue exists in the PlainTextDiff.ts component, where the createHeader() method passes Git filenames directly to innerHTML without sanitization when rendering diffs for renamed files in commit history. This allows an adversary to craft a filename containing arbitrary HTML/JavaScript that executes when another user views the rename diff in the Git History tab.
+
+The issue can be leveraged through the rename history view in the JupyterLab Git panel. An adversary creates a file with a crafted filename containing a JavaScript payload (e.g., &amp;lt;img src=x onerror=eval(atob(&amp;quot;base64_payload&amp;quot;))&amp;gt;.py), renames t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab-git/security/advisories/GHSA-f962-v9hr-pfg5"&gt;https://github.com/jupyterlab/jupyterlab-git/security/advisories/GHSA-f962-v9hr-pfg5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54527"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54527&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab-git/commit/c6d37b88f36aa59aee317930b95e427fb9d6b09b"&gt;https://github.com/jupyterlab/jupyterlab-git/commit/c6d37b88f36aa59aee317930b95e427fb9d6b09b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-f962-v9hr-pfg5"&gt;https://github.com/advisories/GHSA-f962-v9hr-pfg5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab-git"&gt;https://github.com/jupyterlab/jupyterlab-git&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyterlab/jupyterlab-git/releases/tag/v0.54.0"&gt;https://github.com/jupyterlab/jupyterlab-git/releases/tag/v0.54.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/jupyterlab-git-core/PYSEC-2026-2541.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/jupyterlab-git-core/PYSEC-2026-2541.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/jupyterlab-git/PYSEC-2026-2540.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/jupyterlab-git/PYSEC-2026-2540.yaml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f962-v9hr-pfg5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3x93-p86w-5jvh: danger allows local OS command injection through crafted file paths</title>
+    <id>https://osv.dev/vulnerability/GHSA-3x93-p86w-5jvh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3x93-p86w-5jvh"/>
+    <published>2026-07-23T00:31:28Z</published>
+    <updated>2026-09-04T21:00:06Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-16629"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;danger allows local OS command injection through crafted file paths&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-16629&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;danger&lt;/code&gt; — fixed in 13.0.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability was identified in danger danger-js up to 13.0.7. Impacted is the function danger.git.diffForFile of the file source/platforms/git/localGetFileAtSHA.ts of the component CLI. Such manipulation of the argument File leads to os command injection. The attack needs to be performed locally. Upgrading to version 13.0.8 is recommended to address this issue. The name of the patch is 087a7290264cc6fb7154ea8c2552a7b2cb8b33a3. It is advisable to upgrade the affected component.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-16629"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-16629&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/danger/danger-js/pull/1513"&gt;https://github.com/danger/danger-js/pull/1513&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/danger/danger-js/commit/087a7290264cc6fb7154ea8c2552a7b2cb8b33a3"&gt;https://github.com/danger/danger-js/commit/087a7290264cc6fb7154ea8c2552a7b2cb8b33a3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/danger/danger-js"&gt;https://github.com/danger/danger-js&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/danger/danger-js/releases/tag/13.0.8"&gt;https://github.com/danger/danger-js/releases/tag/13.0.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/cve/CVE-2026-16629"&gt;https://vuldb.com/cve/CVE-2026-16629&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/submit/860211"&gt;https://vuldb.com/submit/860211&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://vuldb.com/vuln/382377"&gt;https://vuldb.com/vuln/382377&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3x93-p86w-5jvh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-c6mw-8xh8-gpq6: CodeWhale: Argument Injection in `git_blame` Tool Allows Arbitrary File Read Without Approval</title>
     <id>https://osv.dev/vulnerability/GHSA-c6mw-8xh8-gpq6</id>
@@ -233,7 +306,7 @@ The issue appears to be in the serialization path for `ENTITY_REFERENCE_NODE`.
 For several other node types, `requireWellFormed: true` performs specific validation checks before serialization. For example, comments, pro…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/xmldom/xmldom/security/advisories/GHSA-6gmq-8vp8-gcm6"&gt;https://github.com/xmldom/xmldom/security/advisories/GHSA-6gmq-8vp8-gcm6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-83610"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-83610&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/xmldom/xmldom/pull/1071"&gt;https://github.com/xmldom/xmldom/pull/1071&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/xmldom/xmldom/pull/1072"&gt;https://github.com/xmldom/xmldom/pull/1072&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/xmldom/xmldom/commit/4664386e4f4d99d17b416a151dbe8323e245284b"&gt;https://github.com/xmldom/xmldom/commit/4664386e4f4d99d17b416a151dbe8323e245284b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/xmldom/xmldom/commit/6c3fb5ffeafe7901ec928ce9010988dd716c94a0"&gt;https://github.com/xmldom/xmldom/commit/6c3fb5ffeafe7901ec928ce9010988dd716c94a0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/xmldom/xmldom"&gt;https://github.com/xmldom/xmldom&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/xmldom/xmldom/releases/tag/0.8.15"&gt;https://github.com/xmldom/xmldom/releases/tag/0.8.15&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6gmq-8vp8-gcm6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-gcr2-9v8m-gq45: DiceBear: SVG injection via the unescaped rotate option in @dicebear/core (and fontSize/fontWeight in @dicebear/initials)</title>
+    <title>[UPDATED] GHSA-gcr2-9v8m-gq45: DiceBear: SVG injection via the unescaped rotate option in @dicebear/core (and fontSize/fontWeight in @dicebear/initials)</title>
     <id>https://osv.dev/vulnerability/GHSA-gcr2-9v8m-gq45</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gcr2-9v8m-gq45"/>
     <published>2026-09-02T22:44:25Z</published>
@@ -2250,20 +2323,6 @@ package.json declares a runtime dependency `microfrontend` whose source is a bar
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bx-ui-framework/microfrontend/v/15.0.0"&gt;https://www.npmjs.com/package/@bx-ui-framework/microfrontend/v/15.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15868"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-15866: Malicious code in @bx-ui-framework/authentication (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-15866</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15866"/>
-    <published>2026-09-04T01:12:20Z</published>
-    <updated>2026-09-04T01:30:05Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @bx-ui-framework/authentication (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@bx-ui-framework/authentication&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (a80fea2ddf5689952ca33aee5f32efb088024bd1a243621b558d3cdc41ed7d57)
-package.json at line 14 declares a runtime dependency `microfrontend` whose source is a bare HTTPS URL (`https://repo.artifactorymanager.com/bx-ui-framework/authentication`) rather than an npm registry version range. On `npm install`, npm fetches whatever bytes that host returns and installs them as a dependency, running any lifecycle scripts contained in the fetched artifact. There is no version pin, no integrity hash, and no signature check, so the delivered content is fully controlled by whoever operates `repo.artifactorymanager.com`, and can change between installs. The shipped package itself is a minimal stub, so this manifest ent…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bx-ui-framework/authentication/v/1.2.0"&gt;https://www.npmjs.com/package/@bx-ui-framework/authentication/v/1.2.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@bx-ui-framework/authentication/v/15.0.0"&gt;https://www.npmjs.com/package/@bx-ui-framework/authentication/v/15.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] MAL-2026-15867: Malicious code in @bx-ui-framework/common (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-15867</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-15867"/>
@@ -2400,71 +2459,5 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (856277989637849346e759b8d07577326b164b5521ee643a84d704a457ad9f87)
 package.json declares a preinstall hook that runs index.js on npm install. index.js requires os, dns, https, querystring, and the package&amp;#x27;s own package.json, then collects host identifiers (os.hostname(), os.userInfo().username, os.homedir(), dns.getServers(), the package path and package.json contents) and POSTs them via https to the hardcoded host mj9ouelpgm0d26s3wp0syow03r9ix8lx.burp.attack.live. The package under the @avigilon scope exposes no other advertised functionality, and the destination is an unrelated third-party collector subdomain rather than any Avigilon or Motorola infrastructure. The shape matches a dependency-confusi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@avigilon/node-webrtc/v/2.1.5"&gt;https://www.npmjs.com/package/@avigilon/node-webrtc/v/2.1.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/@avigilon/node-webrtc/v/2.1.4"&gt;https://www.npmjs.com/package/@avigilon/node-webrtc/v/2.1.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-15865"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-82x6-q7mm-w9cf: toml-node: Uncontrolled Recursion</title>
-    <id>https://osv.dev/vulnerability/GHSA-82x6-q7mm-w9cf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-82x6-q7mm-w9cf"/>
-    <published>2026-09-03T20:56:13Z</published>
-    <updated>2026-09-03T21:15:04Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-77465"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;toml-node: Uncontrolled Recursion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-77465&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;toml&lt;/code&gt; — fixed in 4.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-
-`toml.parse()` crashes with an uncaught `RangeError: Maximum call stack size exceeded` when parsing deeply nested arrays or inline tables. The parser is generated by **Peggy 5.1.0** (a PEG parser generator) as a recursive-descent parser; the value rule mutually recurses with the array and inline-table rules with **no depth limit**, so nesting depth equal to the input depth exhausts Node&amp;#x27;s call stack.
-
-A small payload — a bare array nested a few thousand levels deep (**~5–6 KB**) — reliably crashes the process on a default Node.js configuration. `toml` has **~47 million monthly downloads**.
-
----
-
-## Vulnerable Code
-
-The parser is a **generated** recursive-descent parser (`lib/parser.js`, header: `// @generated by Peggy 5.1.0.`). The recursion sink is the mutual recursion betwe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/BinaryMuse/toml-node/security/advisories/GHSA-82x6-q7mm-w9cf"&gt;https://github.com/BinaryMuse/toml-node/security/advisories/GHSA-82x6-q7mm-w9cf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BinaryMuse/toml-node/pull/72"&gt;https://github.com/BinaryMuse/toml-node/pull/72&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BinaryMuse/toml-node/commit/967b8b06754f3ecd9863cea118dc50792a8c353f"&gt;https://github.com/BinaryMuse/toml-node/commit/967b8b06754f3ecd9863cea118dc50792a8c353f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BinaryMuse/toml-node"&gt;https://github.com/BinaryMuse/toml-node&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-82x6-q7mm-w9cf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-v5mp-jgw5-2x6j: toml-node: Prototype Pollution Leads to `Object.prototype` Corruption via `__proto__` Key-Path Desynchronization</title>
-    <id>https://osv.dev/vulnerability/GHSA-v5mp-jgw5-2x6j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v5mp-jgw5-2x6j"/>
-    <published>2026-09-03T20:55:32Z</published>
-    <updated>2026-09-03T21:00:04Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-63376"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;toml-node: Prototype Pollution Leads to `Object.prototype` Corruption via `__proto__` Key-Path Desynchronization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63376&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;toml&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`toml.parse()` writes attacker-controlled keys onto `Object.prototype`. The compiler protects the tables it builds by creating them with `Object.create(null)`, which neutralizes a direct `[__proto__]` table. An attacker bypasses that protection by routing a table path *through a scalar value* and into the real prototype chain: a path such as `a.b.y.__proto__.__proto__`, where `a.b.y` holds a number, resolves to `Object.prototype` and every subsequent key/value writes onto it.
-
-The bypass succeeds because the compiler&amp;#x27;s duplicate-key guards track paths with keys that do not match the keys used during traversal. The tracking strings and the traversal strings **desynchronize**, so the guard that should reject descending through an existing scalar never fires.
-
-### Steps to reprod…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/BinaryMuse/toml-node/security/advisories/GHSA-v5mp-jgw5-2x6j"&gt;https://github.com/BinaryMuse/toml-node/security/advisories/GHSA-v5mp-jgw5-2x6j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BinaryMuse/toml-node/commit/def6ab5ea99038c0dd482cd6af1745a6af8b4c44"&gt;https://github.com/BinaryMuse/toml-node/commit/def6ab5ea99038c0dd482cd6af1745a6af8b4c44&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BinaryMuse/toml-node/commit/dfaff662276adc38a2e03df3139f7119b0185463"&gt;https://github.com/BinaryMuse/toml-node/commit/dfaff662276adc38a2e03df3139f7119b0185463&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BinaryMuse/toml-node"&gt;https://github.com/BinaryMuse/toml-node&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v5mp-jgw5-2x6j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-63mc-hw7g-86rr: Phoenix: Presence keys colliding with `Object.prototype` members break existence checks</title>
-    <id>https://osv.dev/vulnerability/GHSA-63mc-hw7g-86rr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-63mc-hw7g-86rr"/>
-    <published>2026-09-03T20:30:33Z</published>
-    <updated>2026-09-03T20:45:04Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-56812"/>
-    <category term="EEF-CVE-2026-56812"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Phoenix: Presence keys colliding with `Object.prototype` members break existence checks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56812, EEF-CVE-2026-56812&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;phoenix&lt;/code&gt; — fixed in 1.5.15&lt;/li&gt;&lt;li&gt;&lt;code&gt;phoenix&lt;/code&gt; — fixed in 1.6.17&lt;/li&gt;&lt;li&gt;&lt;code&gt;phoenix&lt;/code&gt; — fixed in 1.7.24&lt;/li&gt;&lt;li&gt;&lt;code&gt;phoenix&lt;/code&gt; — fixed in 1.8.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;phoenix&lt;/code&gt; — fixed in 1.5.15&lt;/li&gt;&lt;li&gt;&lt;code&gt;phoenix&lt;/code&gt; — fixed in 1.6.17&lt;/li&gt;&lt;li&gt;&lt;code&gt;phoenix&lt;/code&gt; — fixed in 1.7.24&lt;/li&gt;&lt;li&gt;&lt;code&gt;phoenix&lt;/code&gt; — fixed in 1.8.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The Phoenix JavaScript presence client (`assets/js/phoenix/presence.js`) tests whether a presence already exists using a bare truthiness check (`state[key]`) rather than an own-property check. Because applications commonly track presences under a client-supplied username or id, the presence key can be attacker-controlled. A user who joins a channel and picks a key that names an `Object.prototype` member (`__proto__`, `constructor`, `toString`, `hasOwnProperty`, and similar) makes the lookup return the inherited `Object.prototype` object instead of `undefined`, which is truthy. The code then reads `.metas.map(...)` off it and throws an uncaught `TypeError`, breaking presence sync for every viewer of that channel topic. Any authenticated channel participant can trigger it.
-
-### …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/phoenixframework/phoenix/security/advisories/GHSA-63mc-hw7g-86rr"&gt;https://github.com/phoenixframework/phoenix/security/advisories/GHSA-63mc-hw7g-86rr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-56812"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-56812&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/phoenixframework/phoenix/commit/7f7b971c1ea0994e3fbd1c11ddb05e780bd38ad8"&gt;https://github.com/phoenixframework/phoenix/commit/7f7b971c1ea0994e3fbd1c11ddb05e780bd38ad8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/phoenixframework/phoenix/commit/89a1c4be161e436241e12b2378a719904b9bd96f"&gt;https://github.com/phoenixframework/phoenix/commit/89a1c4be161e436241e12b2378a719904b9bd96f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/phoenixframework/phoenix/commit/b90b22521465ece00eb5a19d5aa2b9465b209c85"&gt;https://github.com/phoenixframework/phoenix/commit/b90b22521465ece00eb5a19d5aa2b9465b209c85&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/phoenixframework/phoenix/commit/beffc4da1e787e572121f68902c63daf4fe7d9c2"&gt;https://github.com/phoenixframework/phoenix/commit/beffc4da1e787e572121f68902c63daf4fe7d9c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://cna.erlef.org/cves/CVE-2026-56812.html"&gt;https://cna.erlef.org/cves/CVE-2026-56812.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/phoenixframework/phoenix"&gt;https://github.com/phoenixframework/phoenix&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-63mc-hw7g-86rr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-528h-pc64-c93x: stream-json: pick/ignore/filter/replace filters are O(depth²) on nested input — small crafted JSON blocks the event loop for seconds→minutes (DoS)</title>
-    <id>https://osv.dev/vulnerability/GHSA-528h-pc64-c93x</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-528h-pc64-c93x"/>
-    <published>2026-09-03T20:27:53Z</published>
-    <updated>2026-09-03T20:45:04Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-71429"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;stream-json: pick/ignore/filter/replace filters are O(depth²) on nested input — small crafted JSON blocks the event loop for seconds→minutes (DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-71429&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stream-json&lt;/code&gt; — fixed in 3.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
-
-The path filters `pick`, `ignore`, `filter`, and `replace` — the library&amp;#x27;s headline &amp;quot;surgical extraction&amp;quot; feature — recompute the full path string from the nesting stack on **every checkable token**. Because the stack length equals the current nesting depth, and a checkable token is emitted at every level, processing a document of depth *D* costs **O(D²)**, not O(D).
-
-This is triggered by document **structure (nesting depth), not byte volume**, so a tiny payload achieves outsized CPU cost, and it is the ordinary &amp;quot;traverse until the filter matches&amp;quot; path — including the exact README flagship example `pick({filter: &amp;#x27;data&amp;#x27;})`. Any service that uses these filters to extract a field from an untrusted (or larger-than-memory) JSON body — the primary documented use case — can be mad…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/uhop/stream-json/security/advisories/GHSA-528h-pc64-c93x"&gt;https://github.com/uhop/stream-json/security/advisories/GHSA-528h-pc64-c93x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uhop/stream-json/commit/a869fb98aaef9225556f49901a8f55954ff856e6"&gt;https://github.com/uhop/stream-json/commit/a869fb98aaef9225556f49901a8f55954ff856e6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/uhop/stream-json"&gt;https://github.com/uhop/stream-json&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-528h-pc64-c93x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

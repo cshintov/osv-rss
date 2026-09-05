@@ -3,12 +3,73 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-09-04T20:30:04Z</updated>
+  <updated>2026-09-04T21:00:07Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-q729-696q-g9pq: SurrealDB has Denial of Service in JSON parser due to nested objects</title>
+    <id>https://osv.dev/vulnerability/GHSA-q729-696q-g9pq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q729-696q-g9pq"/>
+    <published>2026-07-01T20:03:33Z</published>
+    <updated>2026-09-04T21:00:07Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-63760"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB has Denial of Service in JSON parser due to nested objects&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63760&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The SurrealDB value and JSON parser did not enforce the configured recursion depth limit when parsing nested `{`, `[`, or `(` tokens. The expression parser already enforced the limit for these tokens; the value/JSON parser omitted it. An unauthenticated attacker could send a deeply nested JSON payload to the WebSocket `/rpc` endpoint and exhaust server memory, crashing the process.
+
+This is an incomplete fix for [GHSA-6r8p-hpg7-825g](https://github.com/surrealdb/surrealdb/security/advisories/GHSA-6r8p-hpg7-825g), which addressed the same class of bug in the expression parser but did not cover the value/JSON parser code path.
+
+### Impact
+
+An unauthenticated remote attacker can crash a SurrealDB server with a single WebSocket message. No credentials or query execution privileges are required…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-q729-696q-g9pq"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-q729-696q-g9pq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-63760"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-63760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/1bd9826f477f4089134460dc5574b6f4e6916973"&gt;https://github.com/surrealdb/surrealdb/commit/1bd9826f477f4089134460dc5574b6f4e6916973&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/surrealdb-before-denial-of-service-via-json-parser"&gt;https://www.vulncheck.com/advisories/surrealdb-before-denial-of-service-via-json-parser&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q729-696q-g9pq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-66r2-5gwj-gxm2: SurrealDB: Writes in a PERMISSIONS clause bypass table permissions</title>
+    <id>https://osv.dev/vulnerability/GHSA-66r2-5gwj-gxm2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-66r2-5gwj-gxm2"/>
+    <published>2026-09-04T20:50:40Z</published>
+    <updated>2026-09-04T21:00:07Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-63733"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: Writes in a PERMISSIONS clause bypass table permissions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63733&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb-core&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A `PERMISSIONS ... WHERE` clause is evaluated with permission enforcement disabled, so it can&amp;#x27;t recurse into its own checks. But the clause could also contain data-modifying statements, and these ran with enforcement still off — so evaluating a permission check could write to tables the caller cannot write.
+
+For example:
+
+```surql
+DEFINE TABLE post PERMISSIONS FOR update
+    WHERE (CREATE log SET at = time::now()) OR true;
+```
+
+Any user allowed to update a `post` now also creates a `log` record, even with no permission on `log`. The clause is evaluated once per matched record, so one statement can cause several writes.
+
+### Impact
+
+Only databases with a `PERMISSIONS` clause that contains a write are affected; `FULL`, `NONE`, and read-only clauses are not.
+
+What an attacker **can** do:
+
+- W…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-66r2-5gwj-gxm2"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-66r2-5gwj-gxm2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-63733"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-63733&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/1e4c3d743e1591f14f340cb627e56d98b6bd7fd7"&gt;https://github.com/surrealdb/surrealdb/commit/1e4c3d743e1591f14f340cb627e56d98b6bd7fd7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/afea699dfb3c8f274ab36861f8a95f5e98d82f1b"&gt;https://github.com/surrealdb/surrealdb/commit/afea699dfb3c8f274ab36861f8a95f5e98d82f1b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/releases/tag/v3.2.0"&gt;https://github.com/surrealdb/surrealdb/releases/tag/v3.2.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/surrealdb-before-permissions-bypass-via-permissions-clause"&gt;https://www.vulncheck.com/advisories/surrealdb-before-permissions-bypass-via-permissions-clause&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-66r2-5gwj-gxm2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fwg2-gr34-q3w8: SurrealDB: ES512 silently downgraded to ES384 due to jsonwebtoken crate limitation</title>
+    <id>https://osv.dev/vulnerability/GHSA-fwg2-gr34-q3w8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fwg2-gr34-q3w8"/>
+    <published>2026-07-01T20:23:01Z</published>
+    <updated>2026-09-04T20:45:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-63761"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB: ES512 silently downgraded to ES384 due to jsonwebtoken crate limitation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63761&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;surrealdb&lt;/code&gt; — fixed in 3.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When a user configures `ALGORITHM ES512` for any JWT access method (`DEFINE ACCESS ... TYPE JWT ALGORITHM ES512`), SurrealDB silently substitutes ES384 at all four internal algorithm conversion points. This occurs because the underlying `jsonwebtoken` crate (v10.x) does not include an ES512 algorithm variant, so the mapping defaults to ES384 without raising an error, warning, or log message.
+ 
+Users who provide the correct P-521 key type for ES512 will experience authentication handshake failures due to the curve mismatch with ES384 (which expects P-384).
+ 
+### Impact
+ 
+Authentication handshake failures when using ES512 with the correct P-521 key type, and when tokens are verified by external systems expecting real ES512 signatures. 
+ 
+This vulnerability cannot be exploited to forge tokens…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-fwg2-gr34-q3w8"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-fwg2-gr34-q3w8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-63761"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-63761&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/7226"&gt;https://github.com/surrealdb/surrealdb/pull/7226&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/bd043d73dad583219d7df2b91f81ab0054c53730"&gt;https://github.com/surrealdb/surrealdb/commit/bd043d73dad583219d7df2b91f81ab0054c53730&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb"&gt;https://github.com/surrealdb/surrealdb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/surrealdb-before-algorithm-downgrade-via-es512"&gt;https://www.vulncheck.com/advisories/surrealdb-before-algorithm-downgrade-via-es512&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fwg2-gr34-q3w8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-97vg-427p-8hx5: SurrealDB: Port-specific --deny-net rules silently bypassed on HTTP redirect</title>
     <id>https://osv.dev/vulnerability/GHSA-97vg-427p-8hx5</id>
@@ -435,36 +496,5 @@ The image_analyze tool resolves its image_path with a bare context.workspace.joi
     <content type="html">&lt;p&gt;&lt;strong&gt;SurrealDB allows bypass of deny-net flags via DNS resolution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71390&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:N/VI:L/VA:L/SC:H/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;SurrealDB&lt;/code&gt; — fixed in 2.1.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;SurrealDB&lt;/code&gt; — fixed in 2.2.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;SurrealDB&lt;/code&gt; — fixed in 3.0.0-alpha.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;SurrealDB&lt;/code&gt; — fixed in 2.3.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SurrealDB offers http functions that can access external network endpoints. A typical, albeit [not recommended ](https://surrealdb.com/docs/surrealdb/reference-guide/security-best-practices#example-deny-all-capabilities-with-some-exceptions)configuration would be to start SurrealDB with all network connections allowed with the exception of a deny list. For example, `surreal start --allow-net --deny-net 10.0.0.0/8` will allow all network connections except to the 10.0.0.0/8 block.
 
 An authenticated user of SurrealDB can use bypass this restriction, using `http::&amp;lt;fn&amp;gt;(&amp;lt;url&amp;gt;)` functions where the hostname resolves to an IP within the `--deny-net` block. For example if a SurrealDB administrator wanted to restrict access to other services within a private network and thus set the `--deny-net` to…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/security/advisories/GHSA-m3c3-78fh-w3w7"&gt;https://github.com/surrealdb/surrealdb/security/advisories/GHSA-m3c3-78fh-w3w7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-71390"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-71390&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/6101"&gt;https://github.com/surrealdb/surrealdb/pull/6101&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/6119"&gt;https://github.com/surrealdb/surrealdb/pull/6119&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/6120"&gt;https://github.com/surrealdb/surrealdb/pull/6120&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/pull/6121"&gt;https://github.com/surrealdb/surrealdb/pull/6121&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/4b317d850c7dabaee228144423741097232f7955"&gt;https://github.com/surrealdb/surrealdb/commit/4b317d850c7dabaee228144423741097232f7955&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/surrealdb/surrealdb/commit/7c574dfa90211923e2ff1b12510c8479f8805b3d"&gt;https://github.com/surrealdb/surrealdb/commit/7c574dfa90211923e2ff1b12510c8479f8805b3d&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m3c3-78fh-w3w7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-7w2g-9mf9-324m: Hurl: Cookies in Cookies section leak when redirecting to a different host</title>
-    <id>https://osv.dev/vulnerability/GHSA-7w2g-9mf9-324m</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7w2g-9mf9-324m"/>
-    <published>2026-09-02T22:11:11Z</published>
-    <updated>2026-09-02T22:15:05Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-63481"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Hurl: Cookies in Cookies section leak when redirecting to a different host&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63481&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hurl&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## The Bug
-
-Hurl &amp;lt;= 8.0.1 lets you define cookies two ways in a .hurl file:
-
-1. As a raw Cookie: header in the [Header]/headers area
-2. In a dedicated [Cookies] section (parsed into RequestSpec.cookies)
-
-When following a redirect to a different host, Hurl correctly strips security-sensitive data (Authorization, Cookie header, and basic-auth user) to avoid leaking credentials cross-host — mirroring libcurl&amp;#x27;s default behavior. But it only stripped the cookie that came in as a header. Cookies declared in the [Cookies] section were carried over to the new host unchanged — a credential-leak bug. 
-
-Hurl file that leaks cookies:
-
-```hurl
-GET http://localhost:8000/follow-redirect-basic-auth?change_host=true
-[Cookies]
-fruit: lemon
-HTTP 200
-```
-
-Hurl file that doesn&amp;#x27;t leak cookie:
-
-```hurl
-GET http:…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Orange-OpenSource/hurl/security/advisories/GHSA-7w2g-9mf9-324m"&gt;https://github.com/Orange-OpenSource/hurl/security/advisories/GHSA-7w2g-9mf9-324m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-63481"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-63481&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Orange-OpenSource/hurl/pull/5119"&gt;https://github.com/Orange-OpenSource/hurl/pull/5119&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Orange-OpenSource/hurl/commit/ed91c894c2cf11704422010554037e3ba70b446e"&gt;https://github.com/Orange-OpenSource/hurl/commit/ed91c894c2cf11704422010554037e3ba70b446e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Orange-OpenSource/hurl"&gt;https://github.com/Orange-OpenSource/hurl&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7w2g-9mf9-324m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,178 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-09-08T12:39:05Z</updated>
+  <updated>2026-09-08T18:27:48Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-mmg6-4qmv-6pc8: Infracost: Arbitrary file read via config-template readFile symlink traversal</title>
+    <id>https://osv.dev/vulnerability/GHSA-mmg6-4qmv-6pc8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mmg6-4qmv-6pc8"/>
+    <published>2026-09-08T18:14:00Z</published>
+    <updated>2026-09-08T18:27:48Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-71493"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Infracost: Arbitrary file read via config-template readFile symlink traversal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-71493&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/infracost/infracost&lt;/code&gt; — fixed in 0.10.45&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Path traversal via link following in the Infracost config-template parser. The `readFile`, `pathExists`, `isDir`, and `matchPaths` template functions confined repo-supplied paths with a lexical `filepath.Rel` check plus a leaf-only `os.Lstat`:
+
+```
+{{ readFile &amp;quot;evil/file&amp;quot; }}
+```
+
+With an intermediate directory symlink committed in the repo (`evil -&amp;gt; /`), the path is lexically clean and the leaf is a regular file, so both checks pass, but `os.ReadFile` follows the symlink and reads outside the checkout. The contents are rendered into the generated config and surfaced via the Infracost dashboard and PR comment, so anyone who can open a pull request can read files off the runner.
+
+Affects `infracost` up to and including `v0.10.44`. Successful exploitation reads any file the CLI pr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost/security/advisories/GHSA-mmg6-4qmv-6pc8"&gt;https://github.com/infracost/infracost/security/advisories/GHSA-mmg6-4qmv-6pc8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-71493"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-71493&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost/pull/3586"&gt;https://github.com/infracost/infracost/pull/3586&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost/commit/4d39331afc0e27752d16d9d91c34583e5e8487fb"&gt;https://github.com/infracost/infracost/commit/4d39331afc0e27752d16d9d91c34583e5e8487fb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost"&gt;https://github.com/infracost/infracost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost/releases/tag/v0.10.45"&gt;https://github.com/infracost/infracost/releases/tag/v0.10.45&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mmg6-4qmv-6pc8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6x6c-w9w9-hv4h: Infracost: Terraform Cloud and registry token disclosure via unvalidated hostname</title>
+    <id>https://osv.dev/vulnerability/GHSA-6x6c-w9w9-hv4h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6x6c-w9w9-hv4h"/>
+    <published>2026-09-08T18:14:12Z</published>
+    <updated>2026-09-08T18:27:47Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-71494"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Infracost: Terraform Cloud and registry token disclosure via unvalidated hostname&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-71494&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/infracost/infracost&lt;/code&gt; — fixed in 0.10.45&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Sensitive information exposure in the Infracost Terraform Cloud/Enterprise integration. Several code paths attached a configured secret token to a request whose host was taken straight from the scanned Terraform, with no check that the host was the trusted endpoint. 
+
+The condition that matters is whether a Terraform Cloud/Enterprise (or registry) token is present in the run: if one is, the injected hostname can disclose it. Impact therefore depends on the trigger. Under `on: pull_request` (the only configuration in Infracost&amp;#x27;s documentation) fork pull requests run without secrets, so no token is present. It only reaches token disclosure under `pull_request_target`, a same-repository pull request, or another CI setup that provides the token alongside untrusted Terraform, and ex…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost/security/advisories/GHSA-6x6c-w9w9-hv4h"&gt;https://github.com/infracost/infracost/security/advisories/GHSA-6x6c-w9w9-hv4h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-71494"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-71494&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost/pull/3590"&gt;https://github.com/infracost/infracost/pull/3590&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost/commit/3d24c757f5e4e60c7259f1b89ad7ceaabcfca86f"&gt;https://github.com/infracost/infracost/commit/3d24c757f5e4e60c7259f1b89ad7ceaabcfca86f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost"&gt;https://github.com/infracost/infracost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/infracost/infracost/releases/tag/v0.10.45"&gt;https://github.com/infracost/infracost/releases/tag/v0.10.45&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6x6c-w9w9-hv4h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xp7j-h7jc-4w8p: Semaphore U: OS Command Injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-xp7j-h7jc-4w8p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xp7j-h7jc-4w8p"/>
+    <published>2026-09-08T17:57:44Z</published>
+    <updated>2026-09-08T18:15:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-73294"/>
+    <category term="CVE-2026-73682"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Semaphore U: OS Command Injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73294, CVE-2026-73682&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/semaphoreui/semaphore&lt;/code&gt; — fixed in 0.0.0-20260704181911-7e8a9434bd81&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Summary
+An OS command injection in repository git_url handling lets any user holding the Manager or Owner role on any project (the normal project-collaborator roles) achieve remote code execution on the Semaphore server host. Using git&amp;#x27;s --upload-pack=&amp;lt;cmd&amp;gt; option, an attacker runs arbitrary commands. The command executes inside the main Semaphore server process (via the schedule commit-hash poller), so it runs even when jobs are configured for remote runners — bypassing runner isolation and exposing the master encryption key and every project&amp;#x27;s secrets. Reproducible on a default install (git_client: cmd_git); no non-default configuration is required.
+
+# Details
+The repository git_url is attacker-controlled (HTTP body) and reaches exec.Command(&amp;quot;git&amp;quot;, ...) unvalidated. Two missing control…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/semaphoreui/semaphore/security/advisories/GHSA-xp7j-h7jc-4w8p"&gt;https://github.com/semaphoreui/semaphore/security/advisories/GHSA-xp7j-h7jc-4w8p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-73294"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-73294&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/semaphoreui/semaphore/commit/7e8a9434bd81b82cf42220151c74801ea97542d6"&gt;https://github.com/semaphoreui/semaphore/commit/7e8a9434bd81b82cf42220151c74801ea97542d6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/semaphoreui/semaphore/commit/a7a7a33a64aea382a0726b3722856f298663eacf"&gt;https://github.com/semaphoreui/semaphore/commit/a7a7a33a64aea382a0726b3722856f298663eacf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/semaphoreui/semaphore"&gt;https://github.com/semaphoreui/semaphore&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/semaphoreui/semaphore/tree/v2.18.17"&gt;https://github.com/semaphoreui/semaphore/tree/v2.18.17&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/semaphoreui/semaphore/tree/v2.19.5-beta2"&gt;https://github.com/semaphoreui/semaphore/tree/v2.19.5-beta2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xp7j-h7jc-4w8p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p2w3-6x73-2f6x: Dozzle: SSRF guard bypass via IPv6 transition addresses (6to4/NAT64/Teredo) in webhook notification dispatcher</title>
+    <id>https://osv.dev/vulnerability/GHSA-p2w3-6x73-2f6x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p2w3-6x73-2f6x"/>
+    <published>2026-09-08T18:11:56Z</published>
+    <updated>2026-09-08T18:15:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-73087"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dozzle: SSRF guard bypass via IPv6 transition addresses (6to4/NAT64/Teredo) in webhook notification dispatcher&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73087&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/amir20/dozzle&lt;/code&gt; — fixed in 1.29.1-0.20260804193351-8cf7ccd5ee04&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The `isBlockedIP` SSRF guard in Dozzle&amp;#x27;s webhook notification dispatcher blocks loopback, link-local, multicast, and unspecified addresses but does not recognize IPv6 transition mechanism addresses (RFC 3056 6to4, RFC 6052 NAT64, RFC 4380 Teredo) that embed arbitrary IPv4 addresses. An authenticated user can bypass the guard to reach loopback services, cloud metadata endpoints (169.254.169.254), and other blocked ranges via webhook notification URLs.
+
+## Affected component / versions
+
+- Package: `github.com/amir20/dozzle`
+- Affected versions: all versions with SSRF guard (current HEAD [`b9df313`](https://github.com/amir20/dozzle/commit/b9df31356fc024e6768a1aac605844dc041d95ee))
+- Vulnerable code: `internal/notification/dispatcher/webhook.go`
+
+## Details
+
+### Root cause (CWE-918…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/amir20/dozzle/security/advisories/GHSA-p2w3-6x73-2f6x"&gt;https://github.com/amir20/dozzle/security/advisories/GHSA-p2w3-6x73-2f6x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-73087"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-73087&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/amir20/dozzle/pull/4887"&gt;https://github.com/amir20/dozzle/pull/4887&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/amir20/dozzle/commit/8cf7ccd5ee041ecaea92b49951793d4d2393761f"&gt;https://github.com/amir20/dozzle/commit/8cf7ccd5ee041ecaea92b49951793d4d2393761f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/amir20/dozzle"&gt;https://github.com/amir20/dozzle&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/amir20/dozzle/releases/tag/v10.6.15"&gt;https://github.com/amir20/dozzle/releases/tag/v10.6.15&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p2w3-6x73-2f6x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7j72-f6wg-cxw6: SiYuan: Anonymous publish-password authentication bypass via getHeadingChildrenDOM / getHeading*Transaction / getBacklinkDoc (publish mode)</title>
+    <id>https://osv.dev/vulnerability/GHSA-7j72-f6wg-cxw6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7j72-f6wg-cxw6"/>
+    <published>2026-09-03T21:22:42Z</published>
+    <updated>2026-09-08T18:03:33Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-68584"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Anonymous publish-password authentication bypass via getHeadingChildrenDOM / getHeading*Transaction / getBacklinkDoc (publish mode)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-68584&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260721020826-2d069dce84a2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**CVE:** This vulnerability corresponds to [CVE-2026-68584](https://nvd.nist.gov/vuln/detail/CVE-2026-68584).
+
+### Summary
+
+SiYuan&amp;#x27;s publish mode defines a &amp;quot;protected&amp;quot; access level: a document that is publicly listed but requires a password to read (per the product&amp;#x27;s own UI help text, protected = &amp;quot;Publicly visible, requires password to access&amp;quot;). The password is enforced on the primary content path (`getDoc`, via `FilterContentByPublishAccess`).
+
+Several other content-returning endpoints `getHeadingChildrenDOM`, `getHeadingDeleteTransaction`/`getHeadingLevelTransaction`/ `getHeadingInsertTransaction`, and `getBacklinkDoc`/`getBackmentionDoc` return rendered block DOM with **no password check at all**. Combined with reader-reachable endpoints that leak a protected document&amp;#x27;s internal block I…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-7j72-f6wg-cxw6"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-7j72-f6wg-cxw6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-68584"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-68584&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/2d069dce84a25c959ef0093c72c98e05778ef218"&gt;https://github.com/siyuan-note/siyuan/commit/2d069dce84a25c959ef0093c72c98e05778ef218&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/siyuan-before-authentication-bypass-via-content-endpoints"&gt;https://www.vulncheck.com/advisories/siyuan-before-authentication-bypass-via-content-endpoints&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7j72-f6wg-cxw6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rcr6-4jqh-j84m: Gitea: Remote Code Execution via diffpatch Git Hook Installation</title>
+    <id>https://osv.dev/vulnerability/GHSA-rcr6-4jqh-j84m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rcr6-4jqh-j84m"/>
+    <published>2026-09-08T17:56:30Z</published>
+    <updated>2026-09-08T18:00:03Z</updated>
+    <category term="Go"/>
+    <category term="BIT-gitea-2026-60004"/>
+    <category term="CVE-2026-60004"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gitea: Remote Code Execution via diffpatch Git Hook Installation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-gitea-2026-60004, CVE-2026-60004&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitea.dev&lt;/code&gt; — fixed in 1.27.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Gitea&amp;#x27;s `diffpatch` endpoint can be abused to install and execute a Git hook from repository-controlled content.
+
+An attacker with ordinary write access to a repository can execute arbitrary shell commands as the Gitea OS user. With default open registration, an unauthenticated visitor can obtain the required write access by registering an account and creating a repository.
+
+### Details
+
+`services/repository/files/patch.go` applies attacker-controlled patches in a shared bare temporary clone:
+
+```go
+cmdApply := gitcmd.NewCommand(&amp;quot;apply&amp;quot;, &amp;quot;--index&amp;quot;, &amp;quot;--recount&amp;quot;, &amp;quot;--cached&amp;quot;, &amp;quot;--binary&amp;quot;)
+if git.DefaultFeatures().CheckVersionAtLeast(&amp;quot;2.32&amp;quot;) {
+    cmdApply.AddArguments(&amp;quot;-3&amp;quot;)
+}
+````
+
+Submitting the same patch twice creates an add/add collision. Git&amp;#x27;s three-way fallback checks the in…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/security/advisories/GHSA-rcr6-4jqh-j84m"&gt;https://github.com/go-gitea/gitea/security/advisories/GHSA-rcr6-4jqh-j84m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-60004"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-60004&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38637"&gt;https://github.com/go-gitea/gitea/pull/38637&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/pull/38638"&gt;https://github.com/go-gitea/gitea/pull/38638&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/470d34b1de87d901bd9135564d5ee18c0d339e82"&gt;https://github.com/go-gitea/gitea/commit/470d34b1de87d901bd9135564d5ee18c0d339e82&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-gitea/gitea/commit/d7bc52beeadff4be5f5690de4d5de42abd10affe"&gt;https://github.com/go-gitea/gitea/commit/d7bc52beeadff4be5f5690de4d5de42abd10affe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.gitea.com/release-of-1.27.1"&gt;https://blog.gitea.com/release-of-1.27.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xBlackash/CVE-2026-60004"&gt;https://github.com/0xBlackash/CVE-2026-60004&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rcr6-4jqh-j84m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-v684-q882-jgmq: SiYuan: The publish-access gate treats encrypted notebooks as publicly accessible by default, allowing anonymous readers to retrieve fully decrypted document content while a notebook is unlocked</title>
+    <id>https://osv.dev/vulnerability/GHSA-v684-q882-jgmq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v684-q882-jgmq"/>
+    <published>2026-09-08T17:56:07Z</published>
+    <updated>2026-09-08T18:00:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-72789"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: The publish-access gate treats encrypted notebooks as publicly accessible by default, allowing anonymous readers to retrieve fully decrypted document content while a notebook is unlocked&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-72789&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260726020813-a25c2dd06aae&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**CVE:** This vulnerability corresponds to [CVE-2026-72789](https://nvd.nist.gov/vuln/detail/CVE-2026-72789).
+
+### Summary
+
+`publishAccess.json` is an opt-out list. The publish gate returns *accessible* for anything not explicitly listed in it. Encrypted notebooks are never written into that file, because only the administrator-gated `setPublishAccess` writes it and no part of the encryption subsystem does. Consequently every encrypted notebook is publish-accessible as far as the gate is concerned.
+
+While an encrypted notebook is unlocked, an anonymous reader in publish mode can list it, enumerate its documents, and retrieve their fully decrypted content. No key material, no password, and no cracking is involved. The kernel decrypts the data and serves it because the authorization layer ne…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-v684-q882-jgmq"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-v684-q882-jgmq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-72789"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-72789&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/a25c2dd06aae13d1de70cc61cbf98169689c9d86"&gt;https://github.com/siyuan-note/siyuan/commit/a25c2dd06aae13d1de70cc61cbf98169689c9d86&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/siyuan-before-authentication-bypass-via-encrypted-notebooks"&gt;https://www.vulncheck.com/advisories/siyuan-before-authentication-bypass-via-encrypted-notebooks&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v684-q882-jgmq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-57v5-wqx3-cgj4: SiYuan: Database view structure (all view names, layout types and per-field visibility) is returned to anonymous readers by /api/av/getAttributeViewFieldViews</title>
+    <id>https://osv.dev/vulnerability/GHSA-57v5-wqx3-cgj4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-57v5-wqx3-cgj4"/>
+    <published>2026-09-08T17:53:44Z</published>
+    <updated>2026-09-08T18:00:03Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Database view structure (all view names, layout types and per-field visibility) is returned to anonymous readers by /api/av/getAttributeViewFieldViews&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260726004013-64c26e74bb82&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Scope note (please read first)
+
+This endpoint does not exist in v3.7.3 or on master. It was introduced on the development branch by commit `acfc02ee8` (&amp;quot;Improve database field visibility across views&amp;quot;, #11020) and is live on `v3.7.4-alpha.1`, so it will ship in v3.7.4 unless gated first. No released stable version is affected.
+
+### Summary
+
+`/api/av/getAttributeViewFieldViews` is registered with `CheckAuth` only and applies no publish-access filtering. Given a database `avID`, it returns the complete view structure of that database: every view&amp;#x27;s name, icon, layout type and the per-field `Hidden` flag, regardless of whether the caller is authorized to see that database or those views.
+
+The route registered immediately before it, `getAttributeViewKeys`, does gate reader roles.
+
+### Detai…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-57v5-wqx3-cgj4"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-57v5-wqx3-cgj4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/64c26e74bb82c24a73513107684b91cc01335fab"&gt;https://github.com/siyuan-note/siyuan/commit/64c26e74bb82c24a73513107684b91cc01335fab&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-57v5-wqx3-cgj4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-74pj-6g7r-j55c: SiYuan: Notebook name, document count, size and timestamps are returned for any notebook, including notebooks hidden from readers, by /api/notebook/getNotebookInfo</title>
+    <id>https://osv.dev/vulnerability/GHSA-74pj-6g7r-j55c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-74pj-6g7r-j55c"/>
+    <published>2026-09-08T17:54:19Z</published>
+    <updated>2026-09-08T18:00:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-72790"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Notebook name, document count, size and timestamps are returned for any notebook, including notebooks hidden from readers, by /api/notebook/getNotebookInfo&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-72790&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260726005141-9edb321eb451&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**CVE:** This vulnerability corresponds to [CVE-2026-72790](https://nvd.nist.gov/vuln/detail/CVE-2026-72790).
+
+### Relationship to GHSA-8x84-r2ff-h8pq (please read first)
+
+`getNotebookInfo` is named in the earlier advisory GHSA-8x84-r2ff-h8pq, in its remediation section, which asked for reader filtering on both `getNotebookConf` and `getNotebookInfo`. Commit `3bc014c7d` applied that filtering to `getNotebookConf` only.
+
+That advisory grouped `getNotebookInfo` under `BoxCrypt`, and `getNotebookInfo` never returns `BoxCrypt`. Anyone checking the handler for key material would correctly find none and move on. This report corrects that characterisation and states what the handler actually discloses, which is notebook metadata rather than key material. If you would prefer this tracked as a foll…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-74pj-6g7r-j55c"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-74pj-6g7r-j55c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-72790"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-72790&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/9edb321eb451db445f3c824380e1993c3df0fc16"&gt;https://github.com/siyuan-note/siyuan/commit/9edb321eb451db445f3c824380e1993c3df0fc16&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/siyuan-before-information-disclosure-via-getnotebookinfo"&gt;https://www.vulncheck.com/advisories/siyuan-before-information-disclosure-via-getnotebookinfo&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-74pj-6g7r-j55c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-6218: Avoid quadratic complexity in resolvePath in net/url</title>
     <id>https://osv.dev/vulnerability/GO-2026-6218</id>
@@ -99,115 +265,5 @@ This is an incomplete fix for [CVE-2024-41110](https://github.com/moby/moby/secu
 Using a specially-crafted API request, an attacker could make the Docker daemon forward the request to an authorization plugin without the body. The authorization plugin may allow a request which it would have otherwise denied if the body had been forwarded to it.
 
 Anyone who depends on authorization plugins that introspect the request body to m…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/moby/moby/security/advisories/GHSA-v23v-6jw2-98fq"&gt;https://github.com/moby/moby/security/advisories/GHSA-v23v-6jw2-98fq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/moby/moby/security/advisories/GHSA-x744-4wpc-v9h2"&gt;https://github.com/moby/moby/security/advisories/GHSA-x744-4wpc-v9h2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-34040"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-34040&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/moby/moby/commit/e89edb19ad7de0407a5d31e3111cb01aa10b5a38"&gt;https://github.com/moby/moby/commit/e89edb19ad7de0407a5d31e3111cb01aa10b5a38&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://docs.docker.com/engine/extend/plugins_authorization"&gt;https://docs.docker.com/engine/extend/plugins_authorization&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/moby/moby"&gt;https://github.com/moby/moby&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/moby/moby/releases/tag/docker-v29.3.1"&gt;https://github.com/moby/moby/releases/tag/docker-v29.3.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x744-4wpc-v9h2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6095: Authentication bypass via default NoopAuthenticationFunc in github.com/getkin/kin-openapi</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6095</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6095"/>
-    <published>2026-08-18T16:38:10Z</published>
-    <updated>2026-09-06T03:25:56Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-73501"/>
-    <category term="GHSA-r277-6w6q-xmqw"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Authentication bypass via default NoopAuthenticationFunc in github.com/getkin/kin-openapi&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73501, GHSA-r277-6w6q-xmqw&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.144.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Authentication bypass via default NoopAuthenticationFunc in github.com/getkin/kin-openapi&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-r277-6w6q-xmqw"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-r277-6w6q-xmqw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/f0407d53b0730280266f454b755010e7eeb985da"&gt;https://github.com/getkin/kin-openapi/commit/f0407d53b0730280266f454b755010e7eeb985da&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.144.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.144.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6095"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6112: Nil-pointer panic on content parameter without schema in github.com/getkin/kin-openapi</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6112</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6112"/>
-    <published>2026-08-18T16:38:10Z</published>
-    <updated>2026-09-06T03:25:56Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-73502"/>
-    <category term="GHSA-jpcw-4wr7-c3vq"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nil-pointer panic on content parameter without schema in github.com/getkin/kin-openapi&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73502, GHSA-jpcw-4wr7-c3vq&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.144.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Nil-pointer panic on content parameter without schema in github.com/getkin/kin-openapi&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-jpcw-4wr7-c3vq"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-jpcw-4wr7-c3vq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/68ac2affa325514d7d6e731204d6a1edf6bdff64"&gt;https://github.com/getkin/kin-openapi/commit/68ac2affa325514d7d6e731204d6a1edf6bdff64&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.144.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.144.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6112"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6325: Grafana Tempo vulnerable to an out-of-memory crash in github.com/grafana/tempo</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6325</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6325"/>
-    <published>2026-09-02T18:37:27Z</published>
-    <updated>2026-09-06T03:25:56Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-27878"/>
-    <category term="GHSA-6xff-cpcq-vpw2"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Grafana Tempo vulnerable to an out-of-memory crash in github.com/grafana/tempo&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-27878, GHSA-6xff-cpcq-vpw2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/grafana/tempo&lt;/code&gt; — fixed in 1.5.1-0.20260303204923-b13f74291d48&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Grafana Tempo vulnerable to an out-of-memory crash in github.com/grafana/tempo&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-6xff-cpcq-vpw2"&gt;https://github.com/advisories/GHSA-6xff-cpcq-vpw2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-27878"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-27878&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/commit/3d7c78d438890991df594c20ae2031f8934aba3b"&gt;https://github.com/grafana/tempo/commit/3d7c78d438890991df594c20ae2031f8934aba3b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/commit/b13f74291d489672601a10297f8fbcbf7dd19192"&gt;https://github.com/grafana/tempo/commit/b13f74291d489672601a10297f8fbcbf7dd19192&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/commit/b481ae9693f99785691197915066e6306950fa09"&gt;https://github.com/grafana/tempo/commit/b481ae9693f99785691197915066e6306950fa09&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/commit/e2d51b786aff94de3319c07994c6a5539b121eb5"&gt;https://github.com/grafana/tempo/commit/e2d51b786aff94de3319c07994c6a5539b121eb5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/pull/6559"&gt;https://github.com/grafana/tempo/pull/6559&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grafana/tempo/pull/6646"&gt;https://github.com/grafana/tempo/pull/6646&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6325"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-7rx3-5wx3-5v76: Nebula-mesh allows non-admin operators to disable webhook SSRF protection via `allow_private`</title>
-    <id>https://osv.dev/vulnerability/GHSA-7rx3-5wx3-5v76</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7rx3-5wx3-5v76"/>
-    <published>2026-07-14T20:28:42Z</published>
-    <updated>2026-09-05T11:55:21Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-63464"/>
-    <category term="GO-2026-5985"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nebula-mesh allows non-admin operators to disable webhook SSRF protection via `allow_private`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63464, GO-2026-5985&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/forgekeep/nebula-mesh&lt;/code&gt; — fixed in 0.7.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Non-admin operators (role `user`) can set `allow_private: true` on their own managed webhook subscription (`POST`/`PATCH /api/v1/webhook-subscriptions`). No admin check exists on this field. At delivery time, `allow_private` switches the dispatcher to an unguarded HTTP client, bypassing the private/loopback/link-local SSRF guard — letting a low-privilege operator make the server request internal addresses.
-
-### Details
-
-`internal/api/webhooks.go:67` (`handleCreateWebhookSubscription`) and `:110` (`handleUpdateWebhookSubscription`) persist operator-supplied `AllowPrivate` with no role check — only ownership is enforced (`canAccessWebhookSub`), and that&amp;#x27;s not even called on create.
-
-`internal/webhook/webhook.go:294-296`:
-```go
-client := d.guarded
-if tgt.AllowPrivate {
-    client…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-7rx3-5wx3-5v76"&gt;https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-7rx3-5wx3-5v76&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/f3c54530e388dd21763e548923426e60a8e93ff0"&gt;https://github.com/forgekeep/nebula-mesh/commit/f3c54530e388dd21763e548923426e60a8e93ff0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh"&gt;https://github.com/forgekeep/nebula-mesh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.7.2"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.7.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7rx3-5wx3-5v76"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5985: Nebula-mesh allows non-admin operators to disable webhook SSRF protection via `allow_private` in github.com/forgekeep/nebula-mesh</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5985</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5985"/>
-    <published>2026-07-17T19:42:05Z</published>
-    <updated>2026-09-05T11:55:21Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-63464"/>
-    <category term="GHSA-7rx3-5wx3-5v76"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Nebula-mesh allows non-admin operators to disable webhook SSRF protection via `allow_private` in github.com/forgekeep/nebula-mesh&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-63464, GHSA-7rx3-5wx3-5v76&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/forgekeep/nebula-mesh&lt;/code&gt; — fixed in 0.7.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Nebula-mesh allows non-admin operators to disable webhook SSRF protection via `allow_private` in github.com/forgekeep/nebula-mesh&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-7rx3-5wx3-5v76"&gt;https://github.com/forgekeep/nebula-mesh/security/advisories/GHSA-7rx3-5wx3-5v76&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/commit/f3c54530e388dd21763e548923426e60a8e93ff0"&gt;https://github.com/forgekeep/nebula-mesh/commit/f3c54530e388dd21763e548923426e60a8e93ff0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forgekeep/nebula-mesh/releases/tag/v0.7.2"&gt;https://github.com/forgekeep/nebula-mesh/releases/tag/v0.7.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5985"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-fm8w-2m5w-9j7r: Cilium may unexpectedly allow ingress traffic from the local namespace when a Kubernetes NetworkPolicy is configured with an ipBlock match</title>
-    <id>https://osv.dev/vulnerability/GHSA-fm8w-2m5w-9j7r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fm8w-2m5w-9j7r"/>
-    <published>2026-09-03T17:17:47Z</published>
-    <updated>2026-09-05T10:10:53Z</updated>
-    <category term="Go"/>
-    <category term="BIT-cilium-2026-56743"/>
-    <category term="BIT-cilium-operator-2026-56743"/>
-    <category term="BIT-hubble-relay-2026-56743"/>
-    <category term="CVE-2026-56743"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Cilium may unexpectedly allow ingress traffic from the local namespace when a Kubernetes NetworkPolicy is configured with an ipBlock match&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-cilium-2026-56743, BIT-cilium-operator-2026-56743, BIT-hubble-relay-2026-56743, CVE-2026-56743&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cilium/cilium&lt;/code&gt; — fixed in 1.19.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-Standard Kubernetes `NetworkPolicy` specifications using CIDR-based `ipBlock` rules without pod or namespace selectors erroneously generate a wildcard namespace allow rule under specific cluster configurations.
-
-When Cilium deployment is configured with a specific custom `clusterName` (rather than the default `&amp;quot;any&amp;quot;` value), the parser incorrectly instantiates a pod selector on selectorless peer definitions. This leads to Cilium appending an unintended wildcard namespace label selector to the policy&amp;#x27;s allowed Layer 3 rules, which allows traffic from other workloads in the same namespace as the subject of the policy.
-
-Example policy affected by this issue:
-```
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: test-server
-  namespace: default
-spec:
-  podSelec…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/security/advisories/GHSA-fm8w-2m5w-9j7r"&gt;https://github.com/cilium/cilium/security/advisories/GHSA-fm8w-2m5w-9j7r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-56743"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-56743&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/pull/46305"&gt;https://github.com/cilium/cilium/pull/46305&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/pull/46456"&gt;https://github.com/cilium/cilium/pull/46456&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/commit/1c84ae3b58a7cd54f7ee355e6c524c82f620eae8"&gt;https://github.com/cilium/cilium/commit/1c84ae3b58a7cd54f7ee355e6c524c82f620eae8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/commit/bacea640404c0805c23515353dc1681c5bf35171"&gt;https://github.com/cilium/cilium/commit/bacea640404c0805c23515353dc1681c5bf35171&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium"&gt;https://github.com/cilium/cilium&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cilium/cilium/releases/tag/v1.19.5"&gt;https://github.com/cilium/cilium/releases/tag/v1.19.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fm8w-2m5w-9j7r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rh53-xvx2-j327: OpenChoreo: cluster-gateway internal proxy performs no caller authentication and is not read-only — data-plane Secret disclosure and arbitrary Kubernetes mutation</title>
-    <id>https://osv.dev/vulnerability/GHSA-rh53-xvx2-j327</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rh53-xvx2-j327"/>
-    <published>2026-09-04T21:41:38Z</published>
-    <updated>2026-09-04T22:00:09Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-73842"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OpenChoreo: cluster-gateway internal proxy performs no caller authentication and is not read-only — data-plane Secret disclosure and arbitrary Kubernetes mutation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73842&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/openchoreo/openchoreo&lt;/code&gt; — fixed in 1.0.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/openchoreo/openchoreo&lt;/code&gt; — fixed in 1.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/openchoreo/openchoreo&lt;/code&gt; — fixed in 1.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The OpenChoreo control-plane cluster-gateway exposes internal management APIs (`/api/proxy/`, `/api/exec/`, `/api/wirelogs/`) that tunnel requests through to connected data planes&amp;#x27; Kubernetes APIs, but the internal listener authenticates no caller. Its request validator permits mutating HTTP methods and reads of Secrets in tenant namespaces (only kube-system Secrets are blocked), so although the client library documents these requests as &amp;quot;read-only,&amp;quot; the server enforces no such restriction. Any party able to reach the internal listener can — with no client certificate or token — read Secrets in any tenant namespace, create/modify/delete workloads, and exec into pods across every connected data plane.
-
-### Impact
-
-An attacker with network access to the cluster-gateway internal …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/openchoreo/openchoreo/security/advisories/GHSA-rh53-xvx2-j327"&gt;https://github.com/openchoreo/openchoreo/security/advisories/GHSA-rh53-xvx2-j327&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-73842"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-73842&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openchoreo/openchoreo/pull/4256"&gt;https://github.com/openchoreo/openchoreo/pull/4256&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openchoreo/openchoreo/pull/4258"&gt;https://github.com/openchoreo/openchoreo/pull/4258&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openchoreo/openchoreo/pull/4259"&gt;https://github.com/openchoreo/openchoreo/pull/4259&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openchoreo/openchoreo/commit/50fcae3f1753fd0ac3ae655a3fc080a761c49c04"&gt;https://github.com/openchoreo/openchoreo/commit/50fcae3f1753fd0ac3ae655a3fc080a761c49c04&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openchoreo/openchoreo/commit/93e6f10953cfc249af2222ddb6730d4b0a729129"&gt;https://github.com/openchoreo/openchoreo/commit/93e6f10953cfc249af2222ddb6730d4b0a729129&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/openchoreo/openchoreo/commit/e3da3c63dcf0895c693cb17ce142ef95e959b62a"&gt;https://github.com/openchoreo/openchoreo/commit/e3da3c63dcf0895c693cb17ce142ef95e959b62a&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rh53-xvx2-j327"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

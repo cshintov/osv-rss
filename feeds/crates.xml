@@ -3,12 +3,51 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-09-13T20:15:02Z</updated>
+  <updated>2026-09-14T10:00:03Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0284: Double free in `Map::into_iter` and an uninitialized `Arc` in `SharedIncin::clear`</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0284</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0284"/>
+    <published>2026-08-26T12:00:00Z</published>
+    <updated>2026-09-14T10:00:03Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Double free in `Map::into_iter` and an uninitialized `Arc` in `SharedIncin::clear`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;lockfree&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Two independent soundness problems, both reachable from safe Rust.
+
+`Map::into_iter` drops `builder` (the caller-supplied hasher `H`) and `incin` by
+hand, then commits the ownership transfer with `mem::forget(self)`. `H::drop` is
+user code and may panic. If it does, `mem::forget(self)` is skipped and the
+still-live `Map` unwinds, whose field drop glue destroys `builder` a second
+time. An empty map is enough — no entries or concurrency required.
+
+`SharedIncin::clear` writes `mem::uninitialized::&amp;lt;Arc&amp;lt;_&amp;gt;&amp;gt;()` into `self.inner`
+before taking the real `Arc` out. `Arc` has a validity invariant, so this is
+undefined behaviour at the point of creation, with no panic or concurrency
+involved. Between that write and the repairing one, `self.inner` also holds
+garbage while `self` is still droppable, so…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/lockfree"&gt;https://crates.io/crates/lockfree&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0284.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0284.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gitlab.com/bzim/lockfree/-/issues/7"&gt;https://gitlab.com/bzim/lockfree/-/issues/7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0284"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2023-0071: Marvin Attack: potential key recovery through timing sidechannels</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2023-0071</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2023-0071"/>
+    <published>2023-11-22T12:00:00Z</published>
+    <updated>2026-09-14T09:45:02Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2023-49092"/>
+    <category term="GHSA-4grx-2x9w-596c"/>
+    <category term="GHSA-c38w-74pg-36hr"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Marvin Attack: potential key recovery through timing sidechannels&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-49092, GHSA-4grx-2x9w-596c, GHSA-c38w-74pg-36hr&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rsa&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+Due to a non-constant-time implementation, information about the private key is leaked through timing information which is observable over the network. An attacker may be able to use that information to recover the key.
+
+### Patches
+No patch is yet available. The crypto-bigint migration ([RustCrypto/RSA#394](https://github.com/RustCrypto/RSA/pull/394)) did not close this. Tracking is [RustCrypto/RSA#626](https://github.com/RustCrypto/RSA/issues/626) (padding still not constant-time). Implicit rejection work is in [RustCrypto/RSA#680](https://github.com/RustCrypto/RSA/pull/680); default-path blinding is in [RustCrypto/RSA#702](https://github.com/RustCrypto/RSA/pull/702).
+
+Still affected as of 2026-09-12: rsa 0.9.10 (latest stable) and rsa 0.10.0-rc.18 (latest). `patched = []` is …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/rsa"&gt;https://crates.io/crates/rsa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2023-0071.html"&gt;https://rustsec.org/advisories/RUSTSEC-2023-0071.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/RSA/issues/626"&gt;https://github.com/RustCrypto/RSA/issues/626&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/RSA/issues/19#issuecomment-1822995643"&gt;https://github.com/RustCrypto/RSA/issues/19#issuecomment-1822995643&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://people.redhat.com/~hkario/marvin/"&gt;https://people.redhat.com/~hkario/marvin/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/RSA/pull/394"&gt;https://github.com/RustCrypto/RSA/pull/394&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/RSA/pull/680"&gt;https://github.com/RustCrypto/RSA/pull/680&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/RSA/pull/702"&gt;https://github.com/RustCrypto/RSA/pull/702&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2023-0071"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] RUSTSEC-2026-0283: clear_on_drop is unmaintained</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0283</id>
@@ -235,55 +274,5 @@ If the high bits `[8..]` of the selector loaded into a register in the `Cmov` im
     <content type="html">&lt;p&gt;&lt;strong&gt;PyO3 has a missing `Sync` bound on `PyCFunction::new_closure` closures&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0177&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pyo3&lt;/code&gt; — fixed in 0.29.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`PyCFunction::new_closure` (and the temporary `new_closure_bound` complement in the 0.21–0.22 series) required the supplied closure to be `Send + &amp;#x27;static` but not `Sync`. The resulting `PyCFunction` is a Python callable that can be invoked from any Python thread, which means the closure may be called concurrently from multiple threads, and needs a `Sync` bound to prevent possible data races.
 
 The problem exists under all Python versions but is particularly vulnerable under the newer free-threaded Python variant, which do not have serial execution imposed by the Global Interpreter Lock. Under releases protected by the GIL, the ability to &amp;quot;detach&amp;quot; from the Python interpreter temporarily inside the closure (e.g. by `Python::detach`) makes it possible for interleaved and/or concurrent executio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3/pull/6096"&gt;https://github.com/PyO3/pyo3/pull/6096&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3"&gt;https://github.com/PyO3/pyo3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3/releases/tag/v0.29.0"&gt;https://github.com/PyO3/pyo3/releases/tag/v0.29.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0177.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0177.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-chgr-c6px-7xpp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-36hh-v3qg-5jq4: PyO3 has an Out-of-bounds Read in `nth` / `nth_back` for `PyList` and `PyTuple` iterators</title>
-    <id>https://osv.dev/vulnerability/GHSA-36hh-v3qg-5jq4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-36hh-v3qg-5jq4"/>
-    <published>2026-06-12T19:32:47Z</published>
-    <updated>2026-09-10T03:51:07Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0176"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;PyO3 has an Out-of-bounds Read in `nth` / `nth_back` for `PyList` and `PyTuple` iterators&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0176&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pyo3&lt;/code&gt; — fixed in 0.29.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;PyO3 0.24.0 added optimized implementations of `Iterator::nth` and `DoubleEndedIterator::nth_back` for the `BoundListIterator` and `BoundTupleIterator` types. These implementations computed the target index using unchecked `usize` addition (`index + n`) before bounds-checking against the sequence length, then read the element via `get_item_unchecked`.
-
-In `nth` methods, a sufficiently large `n` (combined with a non-zero internal index) could cause the addition to overflow and wrap around, producing a small &amp;quot;target index&amp;quot; that passed the bounds check and enabling reads at the front of the `list` or `tuple` of elements previously yielded by the iterator.
-
-In `nth_back` methods, a sufficiently large `n` could cause underflow in a similar fashion, however would instead allow reads of arbitrary…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3/pull/6086"&gt;https://github.com/PyO3/pyo3/pull/6086&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PyO3/pyo3"&gt;https://github.com/PyO3/pyo3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0176.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0176.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-36hh-v3qg-5jq4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2r75-cxrj-cmph: wasmtime-wasi: WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction</title>
-    <id>https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph"/>
-    <published>2026-06-05T15:47:02Z</published>
-    <updated>2026-09-10T03:51:07Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-47261"/>
-    <category term="RUSTSEC-2026-0149"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;wasmtime-wasi: WASI path_open(TRUNCATE) bypasses `FilePerms::WRITE` host restriction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47261, RUSTSEC-2026-0149&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 44.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 36.0.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 24.0.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-In `wasmtime-wasi`, when a filesystem preopen is given `DirPerms::all()` and `FilePerms::READ` without `FilePerms::WRITE`,  this wasmtime-wasi enforced access control mechanism can be bypassed by using the wasip2 `descriptor.open-at` or wasip1 `path_open` interfaces by opening a file with `OpenFlags::TRUNCATE` oflag only, for example:
-
-```rust
-dir_descriptor.open_at(
-   PathFlags::empty(),
-   FILENAME,
-   OpenFlags::TRUNCATE,
-   DescriptorFlags::READ,
-)
-```
-
-```rust
-wasip1::path_open(
-    dir_fd,
-    0,
-    FILENAME,
-    wasip1::OFLAGS_TRUNC,
-    wasip1::RIGHTS_FD_READ,
-    0,
-    0
-)
-```
-
-The root cause is that the clause that considered `OpenFlags::TRUNCATE` did not set `open_mode |= OpenMode::WRITE;`, used later in that function for the access control check against `FilePerm…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2r75-cxrj-cmph&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-47261"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-47261&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime"&gt;https://github.com/bytecodealliance/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v24.0.9"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v24.0.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v36.0.10"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v36.0.10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v44.0.2"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v44.0.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/releases/tag/v45.0.0"&gt;https://github.com/bytecodealliance/wasmtime/releases/tag/v45.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0149.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0149.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2r75-cxrj-cmph"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

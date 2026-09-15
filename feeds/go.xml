@@ -3,12 +3,309 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-09-15T12:45:34Z</updated>
+  <updated>2026-09-15T21:00:08Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-4595-rvpx-4q34: emp3r0r has an unauthenticated HTTP Polling DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-4595-rvpx-4q34</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4595-rvpx-4q34"/>
+    <published>2026-09-15T20:47:17Z</published>
+    <updated>2026-09-15T21:00:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-61554"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;emp3r0r has an unauthenticated HTTP Polling DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61554&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/jm33-m0/emp3r0r/core&lt;/code&gt; — fixed in 0.0.0-20260531142011-aed3d81641ab&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The `http_poll` C2 transport accepts attacker-controlled HTTP polling sessions before CBOR `MsgAuth` authentication is completed. A remote unauthenticated attacker can create arbitrary polling sessions and send request bodies that are forwarded into the C2 dispatch path. This can consume server resources and trigger pre-auth C2 processing.
+
+### Details
+The plain HTTP C2 server starts the HTTP polling listener and forwards requests into `HandleHTTPServerSession`:
+```go
+// core/internal/cc/server/c2_http_server.go
+mux.HandleFunc(c2Path, func(w http.ResponseWriter, req *http.Request) {
+    stream, err := transport.HandleHTTPServerSession(w, req, &amp;amp;live.RuntimeConfig.MalleableC2)
+    ...
+    if stream != nil {
+        go cborStreamAccept(transport.NewStreamTransport(stream, req.Remo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jm33-m0/emp3r0r/security/advisories/GHSA-4595-rvpx-4q34"&gt;https://github.com/jm33-m0/emp3r0r/security/advisories/GHSA-4595-rvpx-4q34&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jm33-m0/emp3r0r"&gt;https://github.com/jm33-m0/emp3r0r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jm33-m0/emp3r0r/releases/tag/v4.2.5"&gt;https://github.com/jm33-m0/emp3r0r/releases/tag/v4.2.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4595-rvpx-4q34"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rf68-8gjr-36q7: Nezha: OAuth2 redirect_uri Host header injection regression when dashboard_host is empty</title>
+    <id>https://osv.dev/vulnerability/GHSA-rf68-8gjr-36q7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rf68-8gjr-36q7"/>
+    <published>2026-09-15T19:50:08Z</published>
+    <updated>2026-09-15T20:00:40Z</updated>
+    <category term="Go"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha: OAuth2 redirect_uri Host header injection regression when dashboard_host is empty&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N/E:P&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Nezha v2.2.3 regresses the GHSA-9rc6-8cjv-rcvx host header injection fix for deployments where the new `dashboard_host` setting is empty. In that configuration, `/api/v1/oauth2/{provider}` again reflects the request `Host` header into the OAuth2 `redirect_uri` sent to the identity provider, even if `install_host` is configured.
+
+## Impact
+
+An attacker who can get a victim to start OAuth2 login through a request that reaches Nezha with a forged `Host` header can make Nezha send an attacker-controlled callback URL as the OAuth2 `redirect_uri`. If the configured OAuth2 provider accepts that redirect URI, the victim&amp;#x27;s authorization code is sent to the attacker origin. The attacker can then complete the OAuth2 binding or login flow described in GHSA-9rc6.
+
+This is configuration-depe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-rf68-8gjr-36q7"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-rf68-8gjr-36q7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/commit/38824dbc11a63964c5b9296ae4c68e62b34fa04b"&gt;https://github.com/nezhahq/nezha/commit/38824dbc11a63964c5b9296ae4c68e62b34fa04b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rf68-8gjr-36q7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mxq2-5jpg-7474: Mattermost doesn't validate channel ownership of an existing subscription before applying edits</title>
+    <id>https://osv.dev/vulnerability/GHSA-mxq2-5jpg-7474</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mxq2-5jpg-7474"/>
+    <published>2026-06-22T15:30:45Z</published>
+    <updated>2026-09-15T20:00:39Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-6062"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Mattermost doesn&amp;#x27;t validate channel ownership of an existing subscription before applying edits&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6062&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.7.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.6.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.5.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 10.11.18&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Mattermost versions 11.7.x &amp;lt;= 11.7.0, 11.6.x &amp;lt;= 11.6.2, 11.5.x &amp;lt;= 11.5.5, 10.11.x &amp;lt;= 10.11.17 Fail to validate channel ownership of an existing subscription before applying edits which allows an authenticated attacker to hijack subscriptions from channels they have no access to via a crafted PUT request to the subscription edit endpoint.. Mattermost Advisory ID: MMSA-2026-00650&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6062"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6062&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattermost/mattermost"&gt;https://github.com/mattermost/mattermost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://mattermost.com/security-updates"&gt;https://mattermost.com/security-updates&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mxq2-5jpg-7474"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-2g8v-grq3-hq2g: Mattermost doesn't enforce administrator authorization on the {{setDefaultInstance}} call within the {{/gitlab connect}} command handler</title>
+    <id>https://osv.dev/vulnerability/GHSA-2g8v-grq3-hq2g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2g8v-grq3-hq2g"/>
+    <published>2026-06-22T15:30:45Z</published>
+    <updated>2026-09-15T20:00:39Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-5139"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Mattermost doesn&amp;#x27;t enforce administrator authorization on the {{setDefaultInstance}} call within the {{/gitlab connect}} command handler&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-5139&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.7.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.6.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.5.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 10.11.18&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Mattermost versions 11.7.x &amp;lt;= 11.7.0, 11.6.x &amp;lt;= 11.6.2, 11.5.x &amp;lt;= 11.5.5, 10.11.x &amp;lt;= 10.11.17 fail to enforce administrator authorization on the {{setDefaultInstance}} call within the {{/gitlab connect}} command handler, which allows any authenticated user to overwrite the global default GitLab instance configuration via the {{/gitlab connect &amp;lt;instance-name&amp;gt;}} slash command.. Mattermost Advisory ID: MMSA-2026-00644&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-5139"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-5139&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattermost/mattermost"&gt;https://github.com/mattermost/mattermost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://mattermost.com/security-updates"&gt;https://mattermost.com/security-updates&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2g8v-grq3-hq2g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-jqgv-39mg-7c2r: Mattermost doesn't authenticate Atlassian Connect installed callbacks, allowing a remote unauthenticated attacker to inject a rogue sharedSecret</title>
+    <id>https://osv.dev/vulnerability/GHSA-jqgv-39mg-7c2r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jqgv-39mg-7c2r"/>
+    <published>2026-06-22T15:30:45Z</published>
+    <updated>2026-09-15T20:00:39Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-6673"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Mattermost doesn&amp;#x27;t authenticate Atlassian Connect installed callbacks, allowing a remote unauthenticated attacker to inject a rogue sharedSecret&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-6673&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.7.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.6.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.5.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 10.11.18&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Mattermost versions 11.7.x &amp;lt;= 11.7.0, 11.6.x &amp;lt;= 11.6.2, 11.5.x &amp;lt;= 11.5.5, 10.11.x &amp;lt;= 10.11.17 fail to authenticate Atlassian Connect installed callbacks, allowing a remote unauthenticated attacker to inject a rogue sharedSecret and disrupt the Jira integration via POST to /ac/installed during the pending-install window.. Mattermost Advisory ID: MMSA-2026-00654&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-6673"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-6673&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattermost/mattermost"&gt;https://github.com/mattermost/mattermost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://mattermost.com/security-updates"&gt;https://mattermost.com/security-updates&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jqgv-39mg-7c2r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h998-hxxj-8q83: Mattermost doesn't invalidate cached authentication state for active WebSocket connections during global session revocation</title>
+    <id>https://osv.dev/vulnerability/GHSA-h998-hxxj-8q83</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h998-hxxj-8q83"/>
+    <published>2026-06-22T15:30:46Z</published>
+    <updated>2026-09-15T20:00:39Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-9162"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Mattermost doesn&amp;#x27;t invalidate cached authentication state for active WebSocket connections during global session revocation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-9162&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.7.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.6.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.5.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 10.11.18&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Mattermost versions 11.7.x &amp;lt;= 11.7.0, 11.6.x &amp;lt;= 11.6.2, 11.5.x &amp;lt;= 11.5.5, 10.11.x &amp;lt;= 10.11.17 fail to invalidate cached authentication state for active WebSocket connections during global session revocation, which allows a user with an existing WebSocket connection to remain authenticated and continue receiving real-time events until the cached session expires or the client reconnects.. Mattermost Advisory ID: MMSA-2026-00664&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-9162"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-9162&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattermost/mattermost"&gt;https://github.com/mattermost/mattermost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://mattermost.com/security-updates"&gt;https://mattermost.com/security-updates&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h998-hxxj-8q83"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-r8cr-4f9w-7r75: Netmaker has a boolean‑based SQL Injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-r8cr-4f9w-7r75</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r8cr-4f9w-7r75"/>
+    <published>2026-09-15T19:48:49Z</published>
+    <updated>2026-09-15T20:00:39Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-32599"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Netmaker has a boolean‑based SQL Injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-32599&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gravitl/netmaker&lt;/code&gt; — fixed in 1.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# SQL Injection in Netmaker SQLite Database Backend
+
+## Summary
+
+The `sqliteDeleteRecord` function in Netmaker&amp;#x27;s database layer constructs SQL `DELETE` statements using direct string concatenation of user-supplied input. This allows an authenticated attacker to perform **boolean-based SQL injection**.
+
+---
+
+## Details
+
+The endpoint:
+
+
+DELETE /api/dns/{network}/{domain}
+
+
+passes user-controlled path parameters through the following flow:
+
+
+logic.DeleteDNS → database.DeleteRecord → sqliteDeleteRecord
+
+
+Depending on the configured database backend, the request eventually reaches the SQLite database implementation.
+
+### Vulnerable Code
+
+The SQL query is constructed using direct string concatenation without parameterization.
+
+```go
+// database/sqlite.go
+deleteSQL := &amp;quot;DELETE FROM &amp;quot; + tableName +…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gravitl/netmaker/security/advisories/GHSA-r8cr-4f9w-7r75"&gt;https://github.com/gravitl/netmaker/security/advisories/GHSA-r8cr-4f9w-7r75&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gravitl/netmaker"&gt;https://github.com/gravitl/netmaker&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gravitl/netmaker/releases/tag/v1.5.0"&gt;https://github.com/gravitl/netmaker/releases/tag/v1.5.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r8cr-4f9w-7r75"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g5vr-6pgg-74qv: Mattermost doesn't enforce bot-specific permission checks on the user active status endpoint</title>
+    <id>https://osv.dev/vulnerability/GHSA-g5vr-6pgg-74qv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g5vr-6pgg-74qv"/>
+    <published>2026-06-22T15:30:46Z</published>
+    <updated>2026-09-15T20:00:39Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-8074"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Mattermost doesn&amp;#x27;t enforce bot-specific permission checks on the user active status endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-8074&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 11.7.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/mattermost/mattermost-server&lt;/code&gt; — fixed in 10.11.18&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Mattermost versions 11.7.x &amp;lt;= 11.7.0, 10.11.x &amp;lt;= 10.11.17 fail to enforce bot-specific permission checks on the user active status endpoint, which allows a User Manager with user management write access but no Integrations access to deactivate bot accounts via the PUT /api/v4/users/{id}/active API endpoint.. Mattermost Advisory ID: MMSA-2026-00667&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-8074"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-8074&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mattermost/mattermost"&gt;https://github.com/mattermost/mattermost&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://mattermost.com/security-updates"&gt;https://mattermost.com/security-updates&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g5vr-6pgg-74qv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mhc4-g3wh-cw7m: Vitess: Missing authorization on vttablet /debug/vrlog exposes live VReplication SQL data</title>
+    <id>https://osv.dev/vulnerability/GHSA-mhc4-g3wh-cw7m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mhc4-g3wh-cw7m"/>
+    <published>2026-08-18T20:50:54Z</published>
+    <updated>2026-09-15T19:10:55Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-65959"/>
+    <category term="GO-2026-6356"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vitess: Missing authorization on vttablet /debug/vrlog exposes live VReplication SQL data&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-65959, GO-2026-6356&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vitess.io/vitess&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;vitess.io/vitess&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability Details
+
+**File**: `go/vt/vttablet/tabletmanager/vreplication/vrlog.go`
+
+### Summary
+`vttablet`&amp;#x27;s `/debug/vrlog` HTTP endpoint streams live VReplication event data — including the literal SQL DML statements being replicated by MoveTables, Reshard, Materialize, and &amp;quot;vitess&amp;quot;-strategy Online DDL workflows — with no authorization check at all. Every comparable &amp;quot;debugging&amp;quot; HTTP endpoint in vttablet/vtgate (querylogz, queryz, txlogz, livequeryz, schemaz, debugenv, hotrows, tablet_plans, query_stats, query_rules) calls `acl.CheckAccessHTTP(r, acl.DEBUGGING)` before serving data, so that the cluster operator&amp;#x27;s configured `--security-policy` (e.g. `deny-all`, `read-only`, or a custom plugin) is actually honored. `vrlog.go` is the one exception: it has zero references to the `acl` p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/security/advisories/GHSA-mhc4-g3wh-cw7m"&gt;https://github.com/vitessio/vitess/security/advisories/GHSA-mhc4-g3wh-cw7m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-65959"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-65959&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/pull/20467"&gt;https://github.com/vitessio/vitess/pull/20467&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/commit/4c58cd70edc6b03d61cb65842c342ac08341e64f"&gt;https://github.com/vitessio/vitess/commit/4c58cd70edc6b03d61cb65842c342ac08341e64f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/commit/657662e78bde1c82df680e9cc43a686d619f8094"&gt;https://github.com/vitessio/vitess/commit/657662e78bde1c82df680e9cc43a686d619f8094&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/commit/d929225a450027406687d27af8dca45620945ceb"&gt;https://github.com/vitessio/vitess/commit/d929225a450027406687d27af8dca45620945ceb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess"&gt;https://github.com/vitessio/vitess&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mhc4-g3wh-cw7m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6c5v-hqjr-5xxp: amqp091-go has a Potential Memory Exhaustion/Protocol Violation via Broker-Controlled Oversized Payload</title>
+    <id>https://osv.dev/vulnerability/GHSA-6c5v-hqjr-5xxp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6c5v-hqjr-5xxp"/>
+    <published>2026-09-03T20:15:13Z</published>
+    <updated>2026-09-15T19:10:48Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-79921"/>
+    <category term="GO-2026-6372"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;amqp091-go has a Potential Memory Exhaustion/Protocol Violation via Broker-Controlled Oversized Payload&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-79921, GO-2026-6372&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rabbitmq/amqp091-go&lt;/code&gt; — fixed in 1.13.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;**Summary**
+A vulnerability exists in the amqp091-go client library where a compromised or malicious AMQP broker can force the client to allocate resources for and process content body frames that exceed the negotiated frame_max limit. This can lead to unexpected memory consumption or application-layer denial of service (DoS), bypassing the protocol&amp;#x27;s built-in framing constraints.
+
+**Details**
+During a standard AMQP 0-9-1 connection handshake, the client and the broker negotiate a maximum frame size (frame_max), for example, 4096 bytes.
+
+However, after negotiation, a malicious broker can send a valid basic.deliver sequence containing a content body frame whose header declares a payload size larger than the negotiated frame_max. Instead of enforcing the agreed-upon limit and closing the con…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go/security/advisories/GHSA-6c5v-hqjr-5xxp"&gt;https://github.com/rabbitmq/amqp091-go/security/advisories/GHSA-6c5v-hqjr-5xxp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-79921"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-79921&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go/pull/353"&gt;https://github.com/rabbitmq/amqp091-go/pull/353&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go/commit/6beb7b51f59e46ddcf8066ad498dad32491d3be0"&gt;https://github.com/rabbitmq/amqp091-go/commit/6beb7b51f59e46ddcf8066ad498dad32491d3be0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go"&gt;https://github.com/rabbitmq/amqp091-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go/releases/tag/v1.13.0"&gt;https://github.com/rabbitmq/amqp091-go/releases/tag/v1.13.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6c5v-hqjr-5xxp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-2v4p-qf9q-27wj: gRPC-Go xDS servers: Denial of Service (DoS) via crash due to missing `:authority` and `Host` headers</title>
+    <id>https://osv.dev/vulnerability/GHSA-2v4p-qf9q-27wj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2v4p-qf9q-27wj"/>
+    <published>2026-09-08T21:21:43Z</published>
+    <updated>2026-09-15T19:10:45Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84445"/>
+    <category term="GO-2026-6443"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;gRPC-Go xDS servers: Denial of Service (DoS) via crash due to missing `:authority` and `Host` headers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84445, GO-2026-6443&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.82.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.83.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.85.0-dev.0.20260825072537-93e31b48545e&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability exists in gRPC-Go servers configured with `xds.NewGRPCServer()` where a crafted request missing both `:authority` and `Host` headers can cause a server panic, resulting in a Denial of Service (DoS).
+
+Servers built with `xds.NewGRPCServer` install an xDS routing interceptor on every RPC. This interceptor looks up the request’s `:authority` header to pick a virtual host. The HTTP/2 server transport previously accepted requests that had neither `:authority` nor `Host`. When this happened, the xDS routing interceptor attempted to access the first element of an empty slice of authorities, leading to an index out of bounds panic. Since the per-RPC goroutine does not recover from panics, the entire server process would terminate.
+
+This panic occurs in the interceptor pipeline, mea…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-2v4p-qf9q-27wj"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-2v4p-qf9q-27wj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/issues/9354"&gt;https://github.com/grpc/grpc-go/issues/9354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9365"&gt;https://github.com/grpc/grpc-go/pull/9365&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9366"&gt;https://github.com/grpc/grpc-go/pull/9366&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9367"&gt;https://github.com/grpc/grpc-go/pull/9367&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/3822494d8ea03b992c089fd2a195f041762fffb7"&gt;https://github.com/grpc/grpc-go/commit/3822494d8ea03b992c089fd2a195f041762fffb7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/8668b69c167df908b6b3666dcbf40992b9e932a4"&gt;https://github.com/grpc/grpc-go/commit/8668b69c167df908b6b3666dcbf40992b9e932a4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/93e31b48545e2a8aaeb6e06b47fb249f94e6297f"&gt;https://github.com/grpc/grpc-go/commit/93e31b48545e2a8aaeb6e06b47fb249f94e6297f&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2v4p-qf9q-27wj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vp52-pcj8-j9qc: gRPC-Go: Heap Memory Exhaustion (OOM) via HTTP/2 DATA Frame Fragmentation</title>
+    <id>https://osv.dev/vulnerability/GHSA-vp52-pcj8-j9qc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vp52-pcj8-j9qc"/>
+    <published>2026-09-01T21:32:41Z</published>
+    <updated>2026-09-15T19:10:44Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84304"/>
+    <category term="GO-2026-6348"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;gRPC-Go: Heap Memory Exhaustion (OOM) via HTTP/2 DATA Frame Fragmentation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84304, GO-2026-6348&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.83.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+An unauthenticated remote attacker can initiate a gRPC stream and purposefully fragment their payload into millions of tiny (e.g., 1-byte) HTTP/2 DATA frames. Even if the total payload volume falls within the configured connection and stream flow-control windows, each independent fragment incurs memory overhead due to internal tracking structures and queue allocation.
+
+Repeated fragmentation massively inflates the heap space consumed by the stream. An attacker multiplexing multiple concurrent streams can exhaust the memory bounds of the runtime, forcing a runtime panic or OutOfMemory condition and leading to a remote Denial of Service (DoS).
+
+### Patches
+The change to fix this issue is merged in `master` and a patch release, 1.83.1, has been published that contains this fix.
+
+##…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-vp52-pcj8-j9qc"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-vp52-pcj8-j9qc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84304"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84304&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9331"&gt;https://github.com/grpc/grpc-go/pull/9331&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9333"&gt;https://github.com/grpc/grpc-go/pull/9333&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/7354d9c8debb4bcf2225bf429857078de310c176"&gt;https://github.com/grpc/grpc-go/commit/7354d9c8debb4bcf2225bf429857078de310c176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/8cfeca0e1ee5ea0980dcc320e20240fa1079ec77"&gt;https://github.com/grpc/grpc-go/commit/8cfeca0e1ee5ea0980dcc320e20240fa1079ec77&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go"&gt;https://github.com/grpc/grpc-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/releases/tag/v1.83.1"&gt;https://github.com/grpc/grpc-go/releases/tag/v1.83.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vp52-pcj8-j9qc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-qc2q-p7wx-3px3: gRPC-Go: xDS RBAC HTTP Filter bypass via mixed-case Header Matching and gRFC A41 validation evasion</title>
+    <id>https://osv.dev/vulnerability/GHSA-qc2q-p7wx-3px3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qc2q-p7wx-3px3"/>
+    <published>2026-09-08T20:50:21Z</published>
+    <updated>2026-09-15T19:10:32Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84303"/>
+    <category term="GO-2026-6441"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;gRPC-Go: xDS RBAC HTTP Filter bypass via mixed-case Header Matching and gRFC A41 validation evasion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84303, GO-2026-6441&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.83.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A vulnerability in the xDS RBAC HTTP filter implementation in grpc-go allows remote attackers to bypass authorization policies (specifically DENY rules) by using mixed-case or canonical-case header matchers (e.g., X-Role instead of x-role). Additionally, the safety guards introduced by gRFC A41 to block grpc- prefixed headers can be evaded via variations in casing (e.g., Grpc-Status).
+
+### Impact
+When an operator defines an RBAC policy referencing headers containing uppercase letters (e.g. X-Role), grpc-go fails to match incoming metadata keys because they are unconditionally lowercased. Because of this case-sensitivity mismatch, a policy designed to block requests containing specific header values fails open: the rule is evaluated as a non-match, and traffic that should have b…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-qc2q-p7wx-3px3"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-qc2q-p7wx-3px3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84303"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84303&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9332"&gt;https://github.com/grpc/grpc-go/pull/9332&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9335"&gt;https://github.com/grpc/grpc-go/pull/9335&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/db9482836c298f234c896cf82ab68cafc78237f8"&gt;https://github.com/grpc/grpc-go/commit/db9482836c298f234c896cf82ab68cafc78237f8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/ebba6f3f1b206e2b4dc4d1d5a96d18430302c2fe"&gt;https://github.com/grpc/grpc-go/commit/ebba6f3f1b206e2b4dc4d1d5a96d18430302c2fe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go"&gt;https://github.com/grpc/grpc-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/releases/tag/v1.83.1"&gt;https://github.com/grpc/grpc-go/releases/tag/v1.83.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qc2q-p7wx-3px3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-8q3c-rjr9-xxrp: VictoriaMetrics vmrestore: Path traversal via crafted backup part names escapes restore root</title>
+    <id>https://osv.dev/vulnerability/GHSA-8q3c-rjr9-xxrp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8q3c-rjr9-xxrp"/>
+    <published>2026-09-03T17:49:29Z</published>
+    <updated>2026-09-15T19:10:30Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-61625"/>
+    <category term="GO-2026-6366"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;VictoriaMetrics vmrestore: Path traversal via crafted backup part names escapes restore root&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61625, GO-2026-6366&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/VictoriaMetrics/VictoriaMetrics&lt;/code&gt; — fixed in 1.146.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/VictoriaMetrics/VictoriaMetrics&lt;/code&gt; — fixed in 1.136.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/VictoriaMetrics/VictoriaMetrics&lt;/code&gt; — fixed in 1.122.25&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The VictoriaMetrics `vmrestore` utility does not validate backup part path components before writing restored files to the local filesystem. An attacker who can provide or modify a backup source can craft object names containing `..` path components that cause vmrestore to write files outside the intended `-storageDataPath` restore root, subject to the permissions of the `vmrestore` process.
+
+### Impact
+An attacker who can supply or modify the backup source -- for example by writing malicious object names to a compromised or misconfigured storage bucket -- can cause arbitrary files to be created or overwritten on the host running `vmrestore`, within the limits of the process&amp;#x27;s filesystem permissions.
+
+### Patches
+Versions 1.146.0, 1.136.12, 1.122.25
+
+### Resources
+  - https://g…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/security/advisories/GHSA-8q3c-rjr9-xxrp"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/security/advisories/GHSA-8q3c-rjr9-xxrp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-61625"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-61625&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/commit/710c920d6083327042a309e449fae4383617d817"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/commit/710c920d6083327042a309e449fae4383617d817&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.122.25"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.122.25&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.136.12"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.136.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.146.0"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.146.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8q3c-rjr9-xxrp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6443: Server panic via missing authority or Host headers in google.golang.org/grpc</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6443</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6443"/>
+    <published>2026-09-15T18:39:25Z</published>
+    <updated>2026-09-15T19:00:17Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84445"/>
+    <category term="GHSA-2v4p-qf9q-27wj"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Server panic via missing authority or Host headers in google.golang.org/grpc&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84445, GHSA-2v4p-qf9q-27wj&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.82.2, 1.83.2, 1.85.0-dev.0.20260825072537-93e31b48545e&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In google.golang.org/grpc, servers configured with xDS routing can panic when processing requests that lack both :authority and Host headers. The HTTP/2 transport layer accepted requests missing these headers, and the xDS server routing interceptor attempted to index the empty authority slice, causing an unhandled panic and terminating the server.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-2v4p-qf9q-27wj"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-2v4p-qf9q-27wj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/issues/9354"&gt;https://github.com/grpc/grpc-go/issues/9354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9365"&gt;https://github.com/grpc/grpc-go/pull/9365&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6443"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6441: Bypass of xDS RBAC HTTP filter header matching in google.golang.org/grpc</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6441</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6441"/>
+    <published>2026-09-15T18:39:25Z</published>
+    <updated>2026-09-15T19:00:17Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84303"/>
+    <category term="GHSA-qc2q-p7wx-3px3"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Bypass of xDS RBAC HTTP filter header matching in google.golang.org/grpc&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84303, GHSA-qc2q-p7wx-3px3&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.83.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In google.golang.org/grpc, the xDS RBAC HTTP filter does not lowercase header matcher names before evaluating them against incoming request metadata. When an RBAC policy defines rules (such as DENY) referencing headers with uppercase or mixed-case characters, the rule fails to match, causing authorization policies to fail open. Additionally, callers can evade gRFC A41 validation blocking &amp;quot;grpc-&amp;quot; prefixed headers and &amp;quot;:scheme&amp;quot; via variations in casing.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-qc2q-p7wx-3px3"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-qc2q-p7wx-3px3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9332"&gt;https://github.com/grpc/grpc-go/pull/9332&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6441"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6372: Potential Memory Exhaustion/Protocol Violation via Broker-Controlled Oversized Payload in github.com/rabbitmq/amqp091-go</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6372</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6372"/>
+    <published>2026-09-15T18:39:25Z</published>
+    <updated>2026-09-15T19:00:17Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-79921"/>
+    <category term="GHSA-6c5v-hqjr-5xxp"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Potential Memory Exhaustion/Protocol Violation via Broker-Controlled Oversized Payload in github.com/rabbitmq/amqp091-go&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-79921, GHSA-6c5v-hqjr-5xxp&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/rabbitmq/amqp091-go&lt;/code&gt; — fixed in 1.13.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Potential Memory Exhaustion/Protocol Violation via Broker-Controlled Oversized Payload in github.com/rabbitmq/amqp091-go&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go/security/advisories/GHSA-6c5v-hqjr-5xxp"&gt;https://github.com/rabbitmq/amqp091-go/security/advisories/GHSA-6c5v-hqjr-5xxp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go/commit/6beb7b51f59e46ddcf8066ad498dad32491d3be0"&gt;https://github.com/rabbitmq/amqp091-go/commit/6beb7b51f59e46ddcf8066ad498dad32491d3be0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go/pull/353"&gt;https://github.com/rabbitmq/amqp091-go/pull/353&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rabbitmq/amqp091-go/releases/tag/v1.13.0"&gt;https://github.com/rabbitmq/amqp091-go/releases/tag/v1.13.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6372"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6356: Missing authorization on vttablet /debug/vrlog in vitess.io/vitess</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6356</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6356"/>
+    <published>2026-09-15T18:39:25Z</published>
+    <updated>2026-09-15T19:00:16Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-65959"/>
+    <category term="GHSA-mhc4-g3wh-cw7m"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Missing authorization on vttablet /debug/vrlog in vitess.io/vitess&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-65959, GHSA-mhc4-g3wh-cw7m&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vitess.io/vitess&lt;/code&gt; — fixed in 0.23.6, 0.24.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The vttablet /debug/vrlog HTTP endpoint streams live VReplication event data, including SQL statements and table row changes, without verifying authorization via acl.CheckAccessHTTP. An unauthenticated actor with network access to the debug endpoint can stream live replicated SQL data.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/security/advisories/GHSA-mhc4-g3wh-cw7m"&gt;https://github.com/vitessio/vitess/security/advisories/GHSA-mhc4-g3wh-cw7m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/pull/20467"&gt;https://github.com/vitessio/vitess/pull/20467&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6356"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6348: Heap Memory Exhaustion (OOM) via HTTP/2 DATA Frame Fragmentation in google.golang.org/grpc</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6348</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6348"/>
+    <published>2026-09-15T18:39:25Z</published>
+    <updated>2026-09-15T19:00:16Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84304"/>
+    <category term="GHSA-vp52-pcj8-j9qc"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Heap Memory Exhaustion (OOM) via HTTP/2 DATA Frame Fragmentation in google.golang.org/grpc&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84304, GHSA-vp52-pcj8-j9qc&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;google.golang.org/grpc&lt;/code&gt; — fixed in 1.83.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Heap Memory Exhaustion (OOM) via HTTP/2 DATA Frame Fragmentation in google.golang.org/grpc&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/security/advisories/GHSA-vp52-pcj8-j9qc"&gt;https://github.com/grpc/grpc-go/security/advisories/GHSA-vp52-pcj8-j9qc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/7354d9c8debb4bcf2225bf429857078de310c176"&gt;https://github.com/grpc/grpc-go/commit/7354d9c8debb4bcf2225bf429857078de310c176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/commit/8cfeca0e1ee5ea0980dcc320e20240fa1079ec77"&gt;https://github.com/grpc/grpc-go/commit/8cfeca0e1ee5ea0980dcc320e20240fa1079ec77&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9331"&gt;https://github.com/grpc/grpc-go/pull/9331&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/pull/9333"&gt;https://github.com/grpc/grpc-go/pull/9333&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-go/releases/tag/v1.83.1"&gt;https://github.com/grpc/grpc-go/releases/tag/v1.83.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6348"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GO-2026-6366: Path traversal via crafted backup part names escapes restore root in github.com/VictoriaMetrics/VictoriaMetrics</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6366</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6366"/>
+    <published>2026-09-15T18:39:25Z</published>
+    <updated>2026-09-15T19:00:16Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-61625"/>
+    <category term="GHSA-8q3c-rjr9-xxrp"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Path traversal via crafted backup part names escapes restore root in github.com/VictoriaMetrics/VictoriaMetrics&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61625, GHSA-8q3c-rjr9-xxrp&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/VictoriaMetrics/VictoriaMetrics&lt;/code&gt; — fixed in 1.122.25, 1.136.12, 1.146.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Path traversal via crafted backup part names escapes restore root in github.com/VictoriaMetrics/VictoriaMetrics&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/security/advisories/GHSA-8q3c-rjr9-xxrp"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/security/advisories/GHSA-8q3c-rjr9-xxrp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/commit/710c920d6083327042a309e449fae4383617d817"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/commit/710c920d6083327042a309e449fae4383617d817&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.122.25"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.122.25&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.136.12"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.136.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.146.0"&gt;https://github.com/VictoriaMetrics/VictoriaMetrics/releases/tag/v1.146.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6366"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-vgwf-h737-ff37: golang.org/x/crypto: Invoking client can cause server deadlock on unexpected responses</title>
     <id>https://osv.dev/vulnerability/GHSA-vgwf-h737-ff37</id>

@@ -3,12 +3,196 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-09-17T16:45:06Z</updated>
+  <updated>2026-09-17T20:45:07Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-xjw9-38cr-6372: djust: A template binding inherits a context safety grant it never earned (XSS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-xjw9-38cr-6372</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xjw9-38cr-6372"/>
+    <published>2026-09-17T20:31:48Z</published>
+    <updated>2026-09-17T20:45:07Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;djust: A template binding inherits a context safety grant it never earned (XSS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;djust&lt;/code&gt; — fixed in 1.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A context safety grant was inherited by a template **binding** that never earned it, so rebinding a name the view had marked safe left the mark attached to the new, attacker-controlled value.
+
+djust&amp;#x27;s context safety channel is keyed by **name**, not by value. Every bind copied the value and left the grant in place:
+
+```
+view marks   p = mark_safe(&amp;#x27;&amp;lt;b&amp;gt;trusted&amp;lt;/b&amp;gt;&amp;#x27;)
+template     {% with p=user_input %}{{ p }}{% endwith %}
+
+  djust   &amp;#x27;&amp;lt;img src=x onerror=alert(1)&amp;gt;&amp;#x27;          &amp;lt;- executes
+  django  &amp;#x27;&amp;amp;lt;img src=x onerror=alert(1)&amp;amp;gt;&amp;#x27;
+```
+
+## Affected binds
+
+Eight distinct shapes were live. All are fixed in 1.1.2:
+
+| shape | example |
+|---|---|
+| `{% with %}` rebinding a marked name | `{% with p=hostile %}{{ p }}{% endwith %}` |
+| `{% with %}` **descendant** of a rebound name | `{% with p=hostile…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/security/advisories/GHSA-xjw9-38cr-6372"&gt;https://github.com/djust-org/djust/security/advisories/GHSA-xjw9-38cr-6372&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust"&gt;https://github.com/djust-org/djust&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/releases/tag/v1.1.2"&gt;https://github.com/djust-org/djust/releases/tag/v1.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xjw9-38cr-6372"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-gjv8-xp57-g29c: Soup Sieve: Polynomial-time ReDoS (O(n²)) in the `IDENTIFIER` / `VALUE` selector sub-patterns</title>
+    <id>https://osv.dev/vulnerability/GHSA-gjv8-xp57-g29c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gjv8-xp57-g29c"/>
+    <published>2026-09-17T20:32:58Z</published>
+    <updated>2026-09-17T20:45:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-86000"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Soup Sieve: Polynomial-time ReDoS (O(n²)) in the `IDENTIFIER` / `VALUE` selector sub-patterns&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-86000&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;soupsieve&lt;/code&gt; — fixed in 2.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+soupsieve compiles CSS selector strings with a set of hand-written regular expressions. The shared `IDENTIFIER` sub-pattern (also embedded in `VALUE`, and therefore in attribute selectors) places two adjacent quantified groups over overlapping character classes: `(?:[classA]|ESC)+(?:[classB]|ESC)*`, where both classes match ordinary identifier characters such as `a`. When a selector contains a long identifier/value run that must ultimately fail to match (e.g. an attribute value with no closing `]`, or an identifier followed by an invalid character), the regex engine backtracks across all O(n) ways to split the run between the `+` group and the `*` group, giving O(n²) parse time. A single attacker-controlled selector of a few kilobytes stalls the interpreter for many seconds of …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/facelessuser/soupsieve/security/advisories/GHSA-gjv8-xp57-g29c"&gt;https://github.com/facelessuser/soupsieve/security/advisories/GHSA-gjv8-xp57-g29c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-86000"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-86000&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/facelessuser/soupsieve/commit/ce44e4996e6632871c18cdd7a7fb641be8ef34ef"&gt;https://github.com/facelessuser/soupsieve/commit/ce44e4996e6632871c18cdd7a7fb641be8ef34ef&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/facelessuser/soupsieve"&gt;https://github.com/facelessuser/soupsieve&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/facelessuser/soupsieve/releases/tag/2.9"&gt;https://github.com/facelessuser/soupsieve/releases/tag/2.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gjv8-xp57-g29c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9395-2g46-rj3f: djust: Six template-layer defects emit attacker-controlled markup unescaped (XSS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-9395-2g46-rj3f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9395-2g46-rj3f"/>
+    <published>2026-09-17T20:31:43Z</published>
+    <updated>2026-09-17T20:45:06Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;djust: Six template-layer defects emit attacker-controlled markup unescaped (XSS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;djust&lt;/code&gt; — fixed in 1.1.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Five independent defects in djust&amp;#x27;s template auto-escaping cause attacker-controlled input to be rendered as live markup where Django escapes it. All four are present in shipped 1.1.0 and are fixed in 1.1.1.
+
+They share one shape: **a filter or grant that escapes nothing itself and relies on the render-time auto-escape, which something downstream then removes.** They are grouped into a single advisory because the mitigation is identical — upgrade to 1.1.1 — and because no single one of them is meaningfully actionable in isolation.
+
+## 1. `linenumbers` never escaped its input (#2291)
+
+```
+{{ p|linenumbers|safe }}   with p = &amp;#x27;&amp;lt;img src=x onerror=alert(1)&amp;gt;&amp;#x27;
+  djust   &amp;#x27;1. &amp;lt;img src=x onerror=alert(1)&amp;gt;&amp;#x27;      &amp;lt;- executes
+  django  &amp;#x27;1. &amp;amp;lt;img src=x onerror=alert(1)&amp;amp;gt;&amp;#x27;
+```
+
+The filter deferred al…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/security/advisories/GHSA-9395-2g46-rj3f"&gt;https://github.com/djust-org/djust/security/advisories/GHSA-9395-2g46-rj3f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust"&gt;https://github.com/djust-org/djust&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/releases/tag/v1.1.1"&gt;https://github.com/djust-org/djust/releases/tag/v1.1.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9395-2g46-rj3f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-j934-xhv5-fg8f: Soup Sieve: Polynomial-time ReDoS (O(n²)) in the whitespace/comment trimming regex `RE_WS_END` (triggers on VALID selectors)</title>
+    <id>https://osv.dev/vulnerability/GHSA-j934-xhv5-fg8f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j934-xhv5-fg8f"/>
+    <published>2026-09-17T20:32:53Z</published>
+    <updated>2026-09-17T20:45:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-85999"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Soup Sieve: Polynomial-time ReDoS (O(n²)) in the whitespace/comment trimming regex `RE_WS_END` (triggers on VALID selectors)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-85999&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;soupsieve&lt;/code&gt; — fixed in 2.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Before tokenizing, `selector_iter` trims leading/trailing whitespace and comments by running two regexes over the whole raw selector with `.search()`. The trailing one, `RE_WS_END = re.compile(r&amp;#x27;{WSC}*$&amp;#x27;)`, is anchored only at the end (`$`), not the start. Because `.search()` retries the pattern at every offset, a long run of whitespace or CSS comments that is not sitting exactly at the end of the string makes each retry greedily consume the run and then fail `$`, producing O(n²) time. This triggers on perfectly valid selectors — e.g. a descendant combinator with a long whitespace gap, `a` + `&amp;quot; &amp;quot;*n` + `b` — so no malformed input is required. A single valid ~20 KB selector stalls the interpreter for ~10 s of CPU.
+
+## Trust model (Q0)
+
+The selector string is the input, reaching t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/facelessuser/soupsieve/security/advisories/GHSA-j934-xhv5-fg8f"&gt;https://github.com/facelessuser/soupsieve/security/advisories/GHSA-j934-xhv5-fg8f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-85999"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-85999&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/facelessuser/soupsieve/commit/cf198fcddc9230f06ed39f974eba0ce076b85cda"&gt;https://github.com/facelessuser/soupsieve/commit/cf198fcddc9230f06ed39f974eba0ce076b85cda&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/facelessuser/soupsieve"&gt;https://github.com/facelessuser/soupsieve&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/facelessuser/soupsieve/releases/tag/2.9"&gt;https://github.com/facelessuser/soupsieve/releases/tag/2.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j934-xhv5-fg8f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c3mw-737p-c7g2: Jupyter Server: 5xx request logging leaks token-bearing Referer header values</title>
+    <id>https://osv.dev/vulnerability/GHSA-c3mw-737p-c7g2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c3mw-737p-c7g2"/>
+    <published>2026-09-17T20:28:55Z</published>
+    <updated>2026-09-17T20:45:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-86049"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Jupyter Server: 5xx request logging leaks token-bearing Referer header values&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-86049&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;jupyter-server&lt;/code&gt; — fixed in 2.21.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When a request returns a 500, `jupyter_server/log.py` logs a small JSON block of request headers. 
+
+The Referer header was copied into it as-is, so a token in the Referer URL ended up in the logs in plain text.
+
+### Impact
+
+Anyone who can read the server logs can pick tokens out of these 500 entries. Tokens end up in the Referer during normal token-based login and launch flows.
+
+Affected: all versions before 2.21.0.
+
+### PoC
+
+Any malformed request that returns a 500 works:
+
+```bash
+curl -i -X POST \
+  -H &amp;#x27;Content-Type: application/json&amp;#x27; \
+  -H &amp;#x27;Referer: http://127.0.0.1:8899/tree?token=REFERTOKEN&amp;#x27; \
+  --data &amp;#x27;{&amp;quot;name&amp;quot;:123}&amp;#x27; \
+  &amp;#x27;http://127.0.0.1:8899/api/kernels?token=VALIDTOKEN&amp;#x27;
+```
+
+The log shows the token twice, once raw and once redacted:
+
+```
+&amp;quot;Referer&amp;quot;: &amp;quot;http://127.0.0.1:8…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jupyter-server/jupyter_server/security/advisories/GHSA-c3mw-737p-c7g2"&gt;https://github.com/jupyter-server/jupyter_server/security/advisories/GHSA-c3mw-737p-c7g2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyter-server/jupyter_server/pull/1681"&gt;https://github.com/jupyter-server/jupyter_server/pull/1681&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyter-server/jupyter_server/commit/52513529af7096e622c00911b17627b266294717"&gt;https://github.com/jupyter-server/jupyter_server/commit/52513529af7096e622c00911b17627b266294717&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyter-server/jupyter_server"&gt;https://github.com/jupyter-server/jupyter_server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jupyter-server/jupyter_server/releases/tag/v2.21.0"&gt;https://github.com/jupyter-server/jupyter_server/releases/tag/v2.21.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c3mw-737p-c7g2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-16264: Malicious code in aiosendletter (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-16264</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-16264"/>
+    <published>2026-09-17T19:40:07Z</published>
+    <updated>2026-09-17T20:30:05Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in aiosendletter (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiosendletter&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: kam193 (4e81e3b63bbe719f6d0bdd42930bb2f3235b8e41cbacf449743bb7dca67c9f08)
+Package hides code to exfiltrate files. Most releases target unclear files, but some reveal the goal to exfiltrate sensitive Telegram data.
+
+
+---
+
+Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
+
+
+Campaign: 2026-09-aiosendletter
+
+
+Reasons (based on the campaign):
+
+
+ - files-exfiltration
+
+
+ - target:telegram
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/aiosendletter"&gt;https://bad-packages.kam193.eu/pypi/package/aiosendletter&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-16264"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4hg4-9mf5-wxxq: incorrect order of evaluation of side effects for some builtins</title>
+    <id>https://osv.dev/vulnerability/GHSA-4hg4-9mf5-wxxq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4hg4-9mf5-wxxq"/>
+    <published>2023-09-04T16:39:49Z</published>
+    <updated>2026-09-17T19:30:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2023-41052"/>
+    <category term="PYSEC-2023-168"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;incorrect order of evaluation of side effects for some builtins&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-41052, PYSEC-2023-168&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vyper&lt;/code&gt; — fixed in 0.3.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+The order of evaluation of the arguments of the builtin functions `uint256_addmod`, `uint256_mulmod`, `ecadd` and `ecmul` does not follow source order.
+• For `uint256_addmod(a,b,c)` and `uint256_mulmod(a,b,c)`, the order is `c,a,b`.
+• For `ecadd(a,b)` and `ecmul(a,b)`, the order is `b,a`.
+
+Note that this behaviour is problematic when the evaluation of one of the arguments produces side effects that other arguments depend on. 
+
+### Patches
+https://github.com/vyperlang/vyper/pull/3583
+
+### Workarounds
+When using builtins from the list above, make sure that the arguments of the expression do not produce side effects or, if one does, that no other argument is dependent on those side effects.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/security/advisories/GHSA-4hg4-9mf5-wxxq"&gt;https://github.com/vyperlang/vyper/security/advisories/GHSA-4hg4-9mf5-wxxq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-41052"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-41052&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/pull/3583"&gt;https://github.com/vyperlang/vyper/pull/3583&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/commit/78fa8dd8f91ba0cb26277eeffb585c68c83e7daa"&gt;https://github.com/vyperlang/vyper/commit/78fa8dd8f91ba0cb26277eeffb585c68c83e7daa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/vyper/PYSEC-2023-168.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/vyper/PYSEC-2023-168.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper"&gt;https://github.com/vyperlang/vyper&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4hg4-9mf5-wxxq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8pw2-6jv3-mj5j: vLLM: Request-selected PyNvVideoCodec GPU decode bypasses static VRAM reservation</title>
+    <id>https://osv.dev/vulnerability/GHSA-8pw2-6jv3-mj5j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8pw2-6jv3-mj5j"/>
+    <published>2026-09-17T17:17:39Z</published>
+    <updated>2026-09-17T17:30:07Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69147"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: Request-selected PyNvVideoCodec GPU decode bypasses static VRAM reservation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69147&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.28.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Current vLLM `main` lets an inference request choose the PyNvVideoCodec GPU video decoder through `media_io_kwargs.video.video_backend`, but engine GPU memory reservation is computed only from static startup configuration and `VLLM_VIDEO_LOADER_BACKEND`. If the server starts with the default OpenCV/software backend and no `--mm-ipc-gpu-memory-gb` budget, a client can still route a video request into the PyNvVideoCodec path after startup, causing frontend CUDA-context, decoder-surface, and decoded-frame GPU allocations that were not carved out of the engine KV-cache budget.
+
+## Technical Details
+
+The vulnerable boundary is the split between request-time media decoding choices in the API server and startup-time memory budgeting in the engine worker. Request bodies for Chat Comple…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-8pw2-6jv3-mj5j"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-8pw2-6jv3-mj5j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-69147"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-69147&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/47259"&gt;https://github.com/vllm-project/vllm/pull/47259&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/283893c72292ede38d277e3cd2b9b64c3e4f1dda"&gt;https://github.com/vllm-project/vllm/commit/283893c72292ede38d277e3cd2b9b64c3e4f1dda&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/ba22152096b2484faa3579624a253d54804d876d"&gt;https://github.com/vllm-project/vllm/commit/ba22152096b2484faa3579624a253d54804d876d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/releases/tag/v0.25.0"&gt;https://github.com/vllm-project/vllm/releases/tag/v0.25.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8pw2-6jv3-mj5j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-pq59-9fq7-m886: Zope AccessControl vulnerable to information disclosure through Python string `format` and `format_map` functions</title>
     <id>https://osv.dev/vulnerability/GHSA-pq59-9fq7-m886</id>

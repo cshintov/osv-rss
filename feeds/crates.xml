@@ -3,12 +3,113 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-09-17T16:45:06Z</updated>
+  <updated>2026-09-17T19:10:56Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-j5cx-ph8g-95v3: Fulgur: Unbounded page slicing from attacker-controlled CSS height causes denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-j5cx-ph8g-95v3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j5cx-ph8g-95v3"/>
+    <published>2026-09-17T18:48:55Z</published>
+    <updated>2026-09-17T19:10:56Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-68523"/>
+    <category term="RUSTSEC-2026-0200"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fulgur: Unbounded page slicing from attacker-controlled CSS height causes denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-68523, RUSTSEC-2026-0200&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fulgur&lt;/code&gt; — fixed in 0.19.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`fulgur` converts untrusted HTML/CSS into PDF, commonly on a server that
+processes input supplied by many tenants. In versions prior to 0.19.0, a
+body-direct child whose CSS-resolved height greatly exceeds the page height was
+sliced into one fragment per page with **no upper bound**.
+
+The height is taken directly from attacker-controlled HTML/CSS (`height`, `vh`
+units), so a few bytes such as:
+
+```html
+&amp;lt;div style=&amp;quot;height:99999999px&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;
+```
+
+forced on the order of 125,000 page fragments. The pagination code then
+allocates `vec![Vec::new(); page_count]` and runs a per-page render loop,
+resulting in CPU and memory exhaustion. A non-finite height (one that resolves
+to `+inf`) additionally made the slicing loop&amp;#x27;s `remaining -= last_slice_h`
+decrement never terminate, causing an infinite loo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-j5cx-ph8g-95v3"&gt;https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-j5cx-ph8g-95v3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur/pull/501"&gt;https://github.com/fulgur-rs/fulgur/pull/501&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur"&gt;https://github.com/fulgur-rs/fulgur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0200.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0200.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j5cx-ph8g-95v3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0200: Unbounded page slicing from attacker-controlled CSS height causes denial of service</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0200</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0200"/>
+    <published>2026-07-05T12:00:00Z</published>
+    <updated>2026-09-17T19:10:56Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-68523"/>
+    <category term="GHSA-j5cx-ph8g-95v3"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unbounded page slicing from attacker-controlled CSS height causes denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-68523, GHSA-j5cx-ph8g-95v3&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fulgur&lt;/code&gt; — fixed in 0.19.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`fulgur` converts untrusted HTML/CSS into PDF, commonly on a server that
+processes input supplied by many tenants. In versions prior to 0.19.0, a
+body-direct child whose CSS-resolved height greatly exceeds the page height was
+sliced into one fragment per page with no upper bound.
+
+The height is taken directly from attacker-controlled HTML/CSS (`height`, `vh`
+units), so a few bytes such as `&amp;lt;div style=&amp;quot;height:99999999px&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;` forced on
+the order of 125,000 page fragments. The pagination code then allocates
+`vec![Vec::new(); page_count]` and runs a per-page render loop, resulting in CPU
+and memory exhaustion. A non-finite height (one that resolves to `+inf`)
+additionally made the slicing loop&amp;#x27;s `remaining -= last_slice_h` decrement never
+terminate, causing an infinite loop.
+
+An attacker a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/fulgur"&gt;https://crates.io/crates/fulgur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0200.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0200.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-j5cx-ph8g-95v3"&gt;https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-j5cx-ph8g-95v3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0200"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4rf6-qx84-q9fv: Fulgur: Non-painting replaced elements amplify to thousands of blank PDF pages (denial of service)</title>
+    <id>https://osv.dev/vulnerability/GHSA-4rf6-qx84-q9fv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4rf6-qx84-q9fv"/>
+    <published>2026-09-17T18:49:15Z</published>
+    <updated>2026-09-17T19:10:53Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-68537"/>
+    <category term="RUSTSEC-2026-0201"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Fulgur: Non-painting replaced elements amplify to thousands of blank PDF pages (denial of service)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-68537, RUSTSEC-2026-0201&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fulgur&lt;/code&gt; — fixed in 0.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`fulgur` converts untrusted HTML/CSS into PDF, commonly on a server that
+processes input supplied by many tenants. In versions prior to 0.26.0, a
+childless box that resolves to a pathologically tall height was amplified into
+thousands of blank PDF pages, even when it produces no visible output.
+
+The childless-collapse defense that would normally collapse such a box was gated
+by a tag-only &amp;quot;replaced content&amp;quot; check, so any **non-painting replaced element**
+bypassed it, including:
+
+- an unresolved `src` (the common offline-first case),
+- a `visibility:hidden` image,
+- an undecodable image format, and
+- an empty `&amp;lt;svg&amp;gt;`.
+
+A trailing-sibling variant of the same gap was also open. A few bytes of HTML
+therefore amplified into roughly `MAX_PAGES` (10,000) blank pages; the renderer
+allocates and ru…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-4rf6-qx84-q9fv"&gt;https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-4rf6-qx84-q9fv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur/pull/575"&gt;https://github.com/fulgur-rs/fulgur/pull/575&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur"&gt;https://github.com/fulgur-rs/fulgur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0201.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0201.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4rf6-qx84-q9fv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0201: Non-painting replaced elements amplify to thousands of blank PDF pages (denial of service)</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0201</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0201"/>
+    <published>2026-07-05T12:00:00Z</published>
+    <updated>2026-09-17T19:10:53Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-68537"/>
+    <category term="GHSA-4rf6-qx84-q9fv"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Non-painting replaced elements amplify to thousands of blank PDF pages (denial of service)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-68537, GHSA-4rf6-qx84-q9fv&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fulgur&lt;/code&gt; — fixed in 0.26.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`fulgur` converts untrusted HTML/CSS into PDF, commonly on a server that
+processes input supplied by many tenants. In versions prior to 0.26.0, a
+childless box that resolves to a pathologically tall height was amplified into
+thousands of blank PDF pages, even when it produces no visible output.
+
+The childless-collapse defense that would normally collapse such a box was gated
+by a tag-only &amp;quot;replaced content&amp;quot; check, so any non-painting replaced element
+bypassed it, including an unresolved `src` (the common offline-first case), a
+`visibility:hidden` image, an undecodable image format, and an empty `&amp;lt;svg&amp;gt;`. A
+trailing-sibling variant of the same gap was also open.
+
+A few bytes of HTML therefore amplified into roughly `MAX_PAGES` (10,000) blank
+pages; the renderer allocates and runs a per-page …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/fulgur"&gt;https://crates.io/crates/fulgur&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0201.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0201.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-4rf6-qx84-q9fv"&gt;https://github.com/fulgur-rs/fulgur/security/advisories/GHSA-4rf6-qx84-q9fv&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0201"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-9g45-5xwm-f3wc: RMCP: Custom HTTP headers leak to cross-origin redirect targets</title>
     <id>https://osv.dev/vulnerability/GHSA-9g45-5xwm-f3wc</id>
@@ -75,7 +176,7 @@ RFC 9728 specifies two MUST requirements for resource parameter validation:
 In the current implementation (`crates/rmcp/src/transport/auth.rs`), the `ResourceServerMetadata` struct (lines 390–394) does not include a r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/security/advisories/GHSA-33f5-2c5q-wgwj"&gt;https://github.com/modelcontextprotocol/rust-sdk/security/advisories/GHSA-33f5-2c5q-wgwj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-63127"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-63127&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/pull/937"&gt;https://github.com/modelcontextprotocol/rust-sdk/pull/937&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/commit/c1a8b29ff2cc45e7820b900dae42cbb4958089ec"&gt;https://github.com/modelcontextprotocol/rust-sdk/commit/c1a8b29ff2cc45e7820b900dae42cbb4958089ec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk"&gt;https://github.com/modelcontextprotocol/rust-sdk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v2.0.0"&gt;https://github.com/modelcontextprotocol/rust-sdk/releases/tag/rmcp-v2.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-33f5-2c5q-wgwj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-5hq8-qhww-jm7q: libp2p-quic: Remote panic via certificate expiry race during QUIC handshake</title>
+    <title>[UPDATED] GHSA-5hq8-qhww-jm7q: libp2p-quic: Remote panic via certificate expiry race during QUIC handshake</title>
     <id>https://osv.dev/vulnerability/GHSA-5hq8-qhww-jm7q</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5hq8-qhww-jm7q"/>
     <published>2026-09-15T20:01:17Z</published>
@@ -209,75 +310,5 @@ Three independent sinks contribute to the vulnerability:
 
 ```rust
 let bytes = if url.scheme() == &amp;quot;http&amp;quot; || …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/EricLBuehler/mistral.rs/security/advisories/GHSA-m3wp-48jr-vr4g"&gt;https://github.com/EricLBuehler/mistral.rs/security/advisories/GHSA-m3wp-48jr-vr4g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/EricLBuehler/mistral.rs"&gt;https://github.com/EricLBuehler/mistral.rs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/EricLBuehler/mistral.rs/releases/tag/v0.8.18"&gt;https://github.com/EricLBuehler/mistral.rs/releases/tag/v0.8.18&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m3wp-48jr-vr4g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-wfgq-w7cq-qj7j: mistral.rs Media Loader: Unauthenticated SSRF and arbitrary local file read via image_url</title>
-    <id>https://osv.dev/vulnerability/GHSA-wfgq-w7cq-qj7j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wfgq-w7cq-qj7j"/>
-    <published>2026-09-10T21:54:14Z</published>
-    <updated>2026-09-10T22:00:05Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;mistral.rs Media Loader: Unauthenticated SSRF and arbitrary local file read via image_url&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mistralrs-server-core&lt;/code&gt; — fixed in 0.8.18&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-mistral.rs fetches any request-supplied image/audio URL with no host or IP validation, and opens arbitrary local files (a `file://` URL, or any existing relative/absolute path). A remote, unauthenticated client of any vision/audio deployment can cause the server to issue requests to internal or cloud-metadata addresses (SSRF) and to open arbitrary local files, via the standard OpenAI `image_url` / `audio_url` message content. The server is unauthenticated by default.
-
-### Details
-`parse_image_url` in `mistralrs-server-core/src/util.rs` (lines 45-88) resolves the request string and fetches/opens it:
-
-```rust
-let url = if let Ok(url) = url::Url::parse(url_unparsed) {
-    url
-} else if File::open(url_unparsed).await.is_ok() {            // a bare existing path (relative or absolut…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/EricLBuehler/mistral.rs/security/advisories/GHSA-wfgq-w7cq-qj7j"&gt;https://github.com/EricLBuehler/mistral.rs/security/advisories/GHSA-wfgq-w7cq-qj7j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/EricLBuehler/mistral.rs/commit/74793379649febc758b6a0d4b71aa6aeabc80f9c"&gt;https://github.com/EricLBuehler/mistral.rs/commit/74793379649febc758b6a0d4b71aa6aeabc80f9c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/EricLBuehler/mistral.rs"&gt;https://github.com/EricLBuehler/mistral.rs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wfgq-w7cq-qj7j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rgqc-3x5p-6gwg: postgres-protocol: Panic decoding a malformed `hstore` value allows denial of service</title>
-    <id>https://osv.dev/vulnerability/GHSA-rgqc-3x5p-6gwg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rgqc-3x5p-6gwg"/>
-    <published>2026-08-24T19:47:49Z</published>
-    <updated>2026-09-10T03:51:14Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0180"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;postgres-protocol: Panic decoding a malformed `hstore` value allows denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0180&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;postgres-protocol&lt;/code&gt; — fixed in 0.6.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A malicious or compromised server can return a binary `hstore` value with an
-invalid internal length field, causing the client to panic while decoding it.
-
-Applications that connect only to a trusted database are not exposed; the risk
-applies to clients that may connect to untrusted or user-supplied servers, or
-whose connection can be intercepted by a man-in-the-middle.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres/commit/a7cf84b5c46431cbca9d8ff50508c23f446efa7d"&gt;https://github.com/rust-postgres/rust-postgres/commit/a7cf84b5c46431cbca9d8ff50508c23f446efa7d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres"&gt;https://github.com/rust-postgres/rust-postgres&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres/releases/tag/postgres-protocol-v0.6.12"&gt;https://github.com/rust-postgres/rust-postgres/releases/tag/postgres-protocol-v0.6.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0180.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0180.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rgqc-3x5p-6gwg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-m65r-rprj-r5rg: Russh: Channel-scoped server callbacks can be reached without an open channel</title>
-    <id>https://osv.dev/vulnerability/GHSA-m65r-rprj-r5rg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m65r-rprj-r5rg"/>
-    <published>2026-08-03T15:35:00Z</published>
-    <updated>2026-09-10T03:51:14Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-68930"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Channel-scoped server callbacks can be reached without an open channel&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-68930&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;There is a server-side channel state issue in `russh`.
-
-After a client is authenticated, `russh` can dispatch channel-scoped handler callbacks for recipient channel IDs that were never opened or confirmed. In the strongest reproduced case, the client does not send `SSH_MSG_CHANNEL_OPEN` at all. It authenticates normally, then sends `SSH_MSG_CHANNEL_REQUEST` packets with request type `exec` for a range of recipient channel IDs. `russh` still calls the server application&amp;#x27;s `exec_request` handler.
-
-This is not an authentication bypass. A valid login is required. The issue is that the SSH channel lifecycle is not enforced before channel-scoped callbacks are delivered to the application.
-
-## Impact
-
-An authenticated client can bypass the server application&amp;#x27;s channel-open policy.
-
-A server may d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-m65r-rprj-r5rg"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-m65r-rprj-r5rg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/7c5659f8cf6f6f2f9989d12dba0ebf49dc50a171"&gt;https://github.com/Eugeny/russh/commit/7c5659f8cf6f6f2f9989d12dba0ebf49dc50a171&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.5"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m65r-rprj-r5rg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5x78-73v4-xg6w: postgres-protocol: Unbounded SCRAM iteration count allows a malicious server to cause CPU-exhaustion denial of service</title>
-    <id>https://osv.dev/vulnerability/GHSA-5x78-73v4-xg6w</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5x78-73v4-xg6w"/>
-    <published>2026-08-24T19:43:31Z</published>
-    <updated>2026-09-10T03:51:13Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0179"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;postgres-protocol: Unbounded SCRAM iteration count allows a malicious server to cause CPU-exhaustion denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0179&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;postgres-protocol&lt;/code&gt; — fixed in 0.6.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A malicious, compromised, or man-in-the-middle server can supply an arbitrarily
-large SCRAM-SHA-256 PBKDF2 iteration count during authentication. The client
-runs it inline with no upper bound, pinning a `tokio` worker thread for minutes
-per connection, possibly stalling the whole async runtime.
-
-Applications that connect only to a trusted database are not exposed; the risk
-applies to clients that may connect to untrusted or user-supplied servers, or
-whose connection can be intercepted by a man-in-the-middle.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres/commit/d40097a36a85068ea50a3afbf0ce154ba439e7f0"&gt;https://github.com/rust-postgres/rust-postgres/commit/d40097a36a85068ea50a3afbf0ce154ba439e7f0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres"&gt;https://github.com/rust-postgres/rust-postgres&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-postgres/rust-postgres/releases/tag/postgres-protocol-v0.6.12"&gt;https://github.com/rust-postgres/rust-postgres/releases/tag/postgres-protocol-v0.6.12&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0179.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0179.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5x78-73v4-xg6w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

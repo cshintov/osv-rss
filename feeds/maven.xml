@@ -3,12 +3,171 @@
   <title>OSV — new &amp; updated vulnerabilities: Maven (Java)</title>
   <subtitle>Open-source vulns affecting Maven (Java) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:maven</id>
-  <updated>2026-09-17T16:45:06Z</updated>
+  <updated>2026-09-17T20:45:06Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/maven.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-gq9c-wmrm-5hvr: HAPI FHIR: SHCParser DEFLATE infinite loop causes denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-gq9c-wmrm-5hvr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gq9c-wmrm-5hvr"/>
+    <published>2026-09-17T20:32:21Z</published>
+    <updated>2026-09-17T20:45:06Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-81876"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;HAPI FHIR: SHCParser DEFLATE infinite loop causes denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-81876&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ca.uhn.hapi.fhir:org.hl7.fhir.r5&lt;/code&gt; — fixed in 6.9.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;ca.uhn.hapi.fhir:org.hl7.fhir.validation&lt;/code&gt; — fixed in 6.9.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;ca.uhn.hapi.fhir:org.hl7.fhir.validation.cli&lt;/code&gt; — fixed in 6.9.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A malformed Smart Health Card (SHC) JWT with `zip: &amp;quot;DEF&amp;quot;` and an empty or truncated DEFLATE payload causes `SHCParser.inflate()` to loop forever. This allows an attacker who can submit SHC content for validation to pin a JVM worker thread indefinitely, causing denial of service.
+
+### Details
+The vulnerable code is in `org.hl7.fhir.r5/src/main/java/org/hl7/fhir/r5/elementmodel/SHCParser.java`.
+
+`decodeJWT()` inflates the JWT payload when the header contains `&amp;quot;zip&amp;quot;:&amp;quot;DEF&amp;quot;`:
+
+```java
+// SHCParser.java:300-302
+if (&amp;quot;DEF&amp;quot;.equals(res.header.asString(&amp;quot;zip&amp;quot;))) {
+  payloadJson = inflate(payloadJson);
+}
+```
+
+`inflate()` loops only on `!inflater.finished()` and does not check `inflater.needsInput()`, `inflater.needsDictionary()`, or zero-progress output:
+
+```java
+// SHCParser.java:455-468
+w…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/security/advisories/GHSA-gq9c-wmrm-5hvr"&gt;https://github.com/hapifhir/org.hl7.fhir.core/security/advisories/GHSA-gq9c-wmrm-5hvr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-81876"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-81876&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/pull/2493"&gt;https://github.com/hapifhir/org.hl7.fhir.core/pull/2493&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/commit/d804558bd77372b1629e55a5b901cad3f5134cdc"&gt;https://github.com/hapifhir/org.hl7.fhir.core/commit/d804558bd77372b1629e55a5b901cad3f5134cdc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/commit/edd5d8c139e669e39270785f08be7b63aefef24c"&gt;https://github.com/hapifhir/org.hl7.fhir.core/commit/edd5d8c139e669e39270785f08be7b63aefef24c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core"&gt;https://github.com/hapifhir/org.hl7.fhir.core&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gq9c-wmrm-5hvr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3w98-rrpr-fprr: HAPI FHIR: SHCParser unbounded DEFLATE decompression causes denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-3w98-rrpr-fprr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3w98-rrpr-fprr"/>
+    <published>2026-09-17T20:32:16Z</published>
+    <updated>2026-09-17T20:45:05Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-81875"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;HAPI FHIR: SHCParser unbounded DEFLATE decompression causes denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-81875&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ca.uhn.hapi.fhir:org.hl7.fhir.r5&lt;/code&gt; — fixed in 6.9.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;ca.uhn.hapi.fhir:org.hl7.fhir.validation&lt;/code&gt; — fixed in 6.9.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;ca.uhn.hapi.fhir:org.hl7.fhir.validation.cli&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`SHCParser` inflates compressed Smart Health Card JWT payloads into memory without a decompressed-size limit. An attacker who can submit SHC content for validation can craft a small compressed JWT payload that expands to a very large byte array, causing memory exhaustion or severe garbage collection pressure.
+
+### Details
+The vulnerable code is in `org.hl7.fhir.r5/src/main/java/org/hl7/fhir/r5/elementmodel/SHCParser.java`.
+
+`decodeJWT()` checks `MAX_ALLOWED_SHC_LENGTH`, but this only logs an error and parsing continues:
+
+```java
+// SHCParser.java:282-284
+if (jwt.length() &amp;gt; MAX_ALLOWED_SHC_LENGTH) {
+  logError(...);
+}
+```
+
+If the header contains `&amp;quot;zip&amp;quot;:&amp;quot;DEF&amp;quot;`, the payload is inflated before JSON parsing:
+
+```java
+// SHCParser.java:300-304
+if (&amp;quot;DEF&amp;quot;.equals(res.header.asString(&amp;quot;zi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/security/advisories/GHSA-3w98-rrpr-fprr"&gt;https://github.com/hapifhir/org.hl7.fhir.core/security/advisories/GHSA-3w98-rrpr-fprr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-81875"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-81875&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/pull/2493"&gt;https://github.com/hapifhir/org.hl7.fhir.core/pull/2493&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/commit/fbb94216e0ad21ded75be77e5e20242ba194e83f"&gt;https://github.com/hapifhir/org.hl7.fhir.core/commit/fbb94216e0ad21ded75be77e5e20242ba194e83f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core"&gt;https://github.com/hapifhir/org.hl7.fhir.core&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/releases/tag/6.9.11"&gt;https://github.com/hapifhir/org.hl7.fhir.core/releases/tag/6.9.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hapifhir/org.hl7.fhir.core/releases/tag/6.9.12"&gt;https://github.com/hapifhir/org.hl7.fhir.core/releases/tag/6.9.12&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3w98-rrpr-fprr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-r56g-q4p6-m3p6: Kestra: SSRF via Pebble http() function allows unauthenticated access to internal services &amp; cloud metadata</title>
+    <id>https://osv.dev/vulnerability/GHSA-r56g-q4p6-m3p6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r56g-q4p6-m3p6"/>
+    <published>2026-09-17T17:15:50Z</published>
+    <updated>2026-09-17T17:30:07Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-73247"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Kestra: SSRF via Pebble http() function allows unauthenticated access to internal services &amp;amp; cloud metadata&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73247&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.kestra:core&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;io.kestra:kestra-core&lt;/code&gt; — fixed in 2.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The Pebble template engine&amp;#x27;s `http()` function in Kestra OSS accepts user-controlled URLs without any validation, allowing Server-Side Request Forgery (SSRF) attacks. An unauthenticated attacker can import a malicious Flow YAML and execute it to access internal services, cloud metadata endpoints (AWS 169.254.169.254), or localhost services. The vulnerability affects all Kestra OSS deployments with default configuration.
+
+### Details
+The root cause is in `core/src/main/java/io/kestra/core/runners/pebble/functions/HttpFunction.java` (lines 77-106):
+
+1. **No URL validation**: User input is passed directly to `URI.create()` with no checks for private IPs, internal hosts, or restricted schemes
+2. **No IP filtering**: Missing checks for 10.0.0.0/8, 192.168.0.0/16, 169.254.169.254, 12…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kestra-io/kestra/security/advisories/GHSA-r56g-q4p6-m3p6"&gt;https://github.com/kestra-io/kestra/security/advisories/GHSA-r56g-q4p6-m3p6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-73247"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-73247&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kestra-io/kestra"&gt;https://github.com/kestra-io/kestra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r56g-q4p6-m3p6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-f8m2-889x-vw4x: AsyncHttpClient re-sends client-wide realm credentials to a cross-origin redirect target</title>
+    <id>https://osv.dev/vulnerability/GHSA-f8m2-889x-vw4x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f8m2-889x-vw4x"/>
+    <published>2026-09-17T17:19:31Z</published>
+    <updated>2026-09-17T17:30:07Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-85717"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AsyncHttpClient re-sends client-wide realm credentials to a cross-origin redirect target&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-85717&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.asynchttpclient:async-http-client&lt;/code&gt; — fixed in 3.0.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.asynchttpclient:async-http-client&lt;/code&gt; — fixed in 2.16.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+A client configured with a client-wide realm (a Realm set on the config builder rather than on an individual request) and following redirects could re-send those credentials to a redirect target on a different origin. The redirect code strips the per-exchange realm, but when the target answered 401 the credentials were re-derived from the client config, handing Basic or Digest credentials, or a Negotiate or NTLM token, to an attacker controlled origin. This is a residual of the earlier cross-origin credential leak advisories, whose strip this bypassed.
+
+### Affected versions
+* 3.x: 3.0.9 through 3.0.11
+* 2.x: 2.14.5 through 2.16.0
+
+Releases below those floors are covered by the earlier advisories GHSA-cmxv-58fp-fm3g and GHSA-fmxf-pm6p-7xgm: the cross-origin strip that this issue…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/security/advisories/GHSA-f8m2-889x-vw4x"&gt;https://github.com/AsyncHttpClient/async-http-client/security/advisories/GHSA-f8m2-889x-vw4x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/pull/2224"&gt;https://github.com/AsyncHttpClient/async-http-client/pull/2224&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/43db7bba81430cbd61ec2dc2c7be464e0ff6a0ff"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/43db7bba81430cbd61ec2dc2c7be464e0ff6a0ff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/b66757bec34def2e9867bb2b77bd848b1112abb4"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/b66757bec34def2e9867bb2b77bd848b1112abb4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client"&gt;https://github.com/AsyncHttpClient/async-http-client&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f8m2-889x-vw4x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fj9w-c36g-h5x8: AsyncHttpClient doesn't verify SCRAM and Digest mutual-authentication responses</title>
+    <id>https://osv.dev/vulnerability/GHSA-fj9w-c36g-h5x8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fj9w-c36g-h5x8"/>
+    <published>2026-09-17T17:18:39Z</published>
+    <updated>2026-09-17T17:30:07Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-85716"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AsyncHttpClient doesn&amp;#x27;t verify SCRAM and Digest mutual-authentication responses&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-85716&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.asynchttpclient:async-http-client&lt;/code&gt; — fixed in 3.0.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+For SCRAM, and for Digest with mutual authentication, the client computes the server&amp;#x27;s verification value (the SCRAM ServerSignature, or the Digest rspauth) but does not act on the result. If the value is present and does not verify, the client only logs it and still delivers the response to the application as a successful, authenticated result. A server that never proved knowledge of the shared secret is accepted, so the client loses its ability to detect an impostor. Over TLS the real server always returns a valid value and the issue is inert; it matters over a non TLS transport, or when the transport is already compromised, where it removes the client&amp;#x27;s only signal that the peer does not know the secret.
+
+### Affected versions
+* 3.x: 3.0.8 through 3.0.11
+
+Earlier 3.0.x releas…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/security/advisories/GHSA-fj9w-c36g-h5x8"&gt;https://github.com/AsyncHttpClient/async-http-client/security/advisories/GHSA-fj9w-c36g-h5x8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/pull/2235"&gt;https://github.com/AsyncHttpClient/async-http-client/pull/2235&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/10b3db9910f0bbad2ea3dc7c7553bae12bc4a5e4"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/10b3db9910f0bbad2ea3dc7c7553bae12bc4a5e4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/685173afea07892462071d966ef6ce5c88cbc66f"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/685173afea07892462071d966ef6ce5c88cbc66f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/7fe8700fd5b46c668cee7774624f36b87b9dd32a"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/7fe8700fd5b46c668cee7774624f36b87b9dd32a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client"&gt;https://github.com/AsyncHttpClient/async-http-client&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fj9w-c36g-h5x8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7grg-jcf7-rpmx: AsyncHttpClient's unbounded HTTP/1.1 response decompression enables a decompression-bomb denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-7grg-jcf7-rpmx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7grg-jcf7-rpmx"/>
+    <published>2026-09-17T17:18:56Z</published>
+    <updated>2026-09-17T17:30:05Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-85721"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AsyncHttpClient&amp;#x27;s unbounded HTTP/1.1 response decompression enables a decompression-bomb denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-85721&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.asynchttpclient:async-http-client&lt;/code&gt; — fixed in 3.0.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.asynchttpclient:async-http-client&lt;/code&gt; — fixed in 2.16.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+With automatic response decompression enabled (the default), the HTTP/1.1 path decompresses response bodies with no limit on the total output size. A hostile or compromised server, or an attacker who can change a response in transit, can send a small compressed body that inflates without bound in memory, exhausting the client&amp;#x27;s heap and causing an OutOfMemoryError. gzip, deflate and snappy are always available as vectors; brotli and zstd apply only when those optional codecs are on the classpath.
+
+### Affected versions
+* 3.x: up to and including 3.0.11
+* 2.x: up to and including 2.16.0
+
+The HTTP/2 path carries its own limit from 3.0.11 onward. On 3.0.8, 3.0.9 and 3.0.10 the HTTP/2 decompressor is also unbounded, so on those versions switching to HTTP/2 is not a mitigation.
+
+### …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/security/advisories/GHSA-7grg-jcf7-rpmx"&gt;https://github.com/AsyncHttpClient/async-http-client/security/advisories/GHSA-7grg-jcf7-rpmx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/5ee2841cbf268bba4a200578be3938ccfc6cc6d6"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/5ee2841cbf268bba4a200578be3938ccfc6cc6d6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/663a1a91757904b22cfe37e2e6049f1f8ea6ae59"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/663a1a91757904b22cfe37e2e6049f1f8ea6ae59&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/e1871a19972fb496be1b8ac6be11d79e22ff2162"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/e1871a19972fb496be1b8ac6be11d79e22ff2162&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/e9f2f7423e0f6503f529656f2955a1317e56ba14"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/e9f2f7423e0f6503f529656f2955a1317e56ba14&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client"&gt;https://github.com/AsyncHttpClient/async-http-client&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7grg-jcf7-rpmx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xr57-gcx8-52hf: AsyncHttpClient sends origin credentials to the proxy on the plaintext CONNECT request</title>
+    <id>https://osv.dev/vulnerability/GHSA-xr57-gcx8-52hf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xr57-gcx8-52hf"/>
+    <published>2026-09-17T17:19:12Z</published>
+    <updated>2026-09-17T17:30:05Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-85720"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AsyncHttpClient sends origin credentials to the proxy on the plaintext CONNECT request&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-85720&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.asynchttpclient:async-http-client&lt;/code&gt; — fixed in 3.0.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.asynchttpclient:async-http-client&lt;/code&gt; — fixed in 2.16.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+When a request uses an HTTP proxy to reach an HTTPS origin, the client opens the tunnel with a plaintext CONNECT sent to the proxy before any TLS exists. On affected versions the origin&amp;#x27;s preemptive credentials were added to that CONNECT. A Basic realm sent `Authorization: Basic base64(user:pass)` to the proxy in the clear, and NTLM, SPNEGO or Kerberos realms sent their token. The proxy, and anyone who can read the client to proxy hop, saw credentials that were meant only for the origin.
+
+### Affected versions
+* 3.x: up to and including 3.0.11
+* 2.x: up to and including 2.16.0
+
+### Patches
+Fixed in 3.0.12 on the 3.x line and in 2.16.1 on the 2.x line. The origin Basic or Digest Authorization is no longer put on the CONNECT; it is added to the tunnelled request once the tunnel is…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/security/advisories/GHSA-xr57-gcx8-52hf"&gt;https://github.com/AsyncHttpClient/async-http-client/security/advisories/GHSA-xr57-gcx8-52hf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/pull/2234"&gt;https://github.com/AsyncHttpClient/async-http-client/pull/2234&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client/commit/9dba5ac988b7e750551f59b2eab550b60ac8a0d6"&gt;https://github.com/AsyncHttpClient/async-http-client/commit/9dba5ac988b7e750551f59b2eab550b60ac8a0d6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/AsyncHttpClient/async-http-client"&gt;https://github.com/AsyncHttpClient/async-http-client&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xr57-gcx8-52hf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hpj9-grjp-7vc7: Kestra: Unauthenticated management/actuator endpoints exposed on port 8081 (/env, /loggers) bypass API basic-auth</title>
+    <id>https://osv.dev/vulnerability/GHSA-hpj9-grjp-7vc7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hpj9-grjp-7vc7"/>
+    <published>2026-09-17T17:17:55Z</published>
+    <updated>2026-09-17T17:30:05Z</updated>
+    <category term="Maven"/>
+    <category term="CVE-2026-73245"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Kestra: Unauthenticated management/actuator endpoints exposed on port 8081 (/env, /loggers) bypass API basic-auth&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73245&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;io.kestra:kestra&lt;/code&gt; — fixed in 2.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+Kestra&amp;#x27;s Micronaut **management endpoints are served on port 8081 with no authentication**, even when the main API (port 8080) has basic-auth enabled. Anyone who can reach `:8081` can read `GET /env` (full resolved environment/configuration) and mutate runtime state via `POST /loggers/{name}` (change log levels), among the other management endpoints. Enabling basic-auth creates a false sense of protection because the auth filter only covers `/api/v1/**` on 8080 and never applies to the 8081 management port. The shipped repository contains no statement that 8081 is management-only / must-not-be-exposed, and the vendor&amp;#x27;s reference `docker-compose.yml` publishes it with no warning.
+ 
+## Affected
+- Product: Kestra (`kestra-io/kestra`), an open-source orchestration/data-pipeline plat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kestra-io/kestra/security/advisories/GHSA-hpj9-grjp-7vc7"&gt;https://github.com/kestra-io/kestra/security/advisories/GHSA-hpj9-grjp-7vc7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-73245"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-73245&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kestra-io/kestra"&gt;https://github.com/kestra-io/kestra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hpj9-grjp-7vc7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-wxmm-q36w-r9xj: MariaDB Connector/J does not enforce allowLocalInfile=false  on server-initiated LOCAL INFILE requests</title>
     <id>https://osv.dev/vulnerability/GHSA-wxmm-q36w-r9xj</id>
@@ -125,7 +284,7 @@ Two cooperating defects made this possible:
 2. **Sandbox whitelist bypass.** The GraalVM sandbox restricts direct class lookups to a configured `allow…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb/security/advisories/GHSA-48qw-824m-86pr"&gt;https://github.com/ArcadeData/arcadedb/security/advisories/GHSA-48qw-824m-86pr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb"&gt;https://github.com/ArcadeData/arcadedb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ArcadeData/arcadedb/releases/tag/26.7.1"&gt;https://github.com/ArcadeData/arcadedb/releases/tag/26.7.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-48qw-824m-86pr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-grh8-3p95-f9rr: Http4s: CookieJar middleware matches by substring, leaking cookies cross-origin</title>
+    <title>[UPDATED] GHSA-grh8-3p95-f9rr: Http4s: CookieJar middleware matches by substring, leaking cookies cross-origin</title>
     <id>https://osv.dev/vulnerability/GHSA-grh8-3p95-f9rr</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-grh8-3p95-f9rr"/>
     <published>2026-09-15T20:00:54Z</published>
@@ -146,7 +305,7 @@ Disclosure of session and authentication cookies to an attacker-controlled host,
 ## Workaro…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-grh8-3p95-f9rr"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-grh8-3p95-f9rr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/c0a37f38d5ee2a568ba57bd9da62f8d79b8b1fcc"&gt;https://github.com/http4s/http4s/commit/c0a37f38d5ee2a568ba57bd9da62f8d79b8b1fcc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-grh8-3p95-f9rr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-gq9p-f254-h286: Http4s: Ember HTTP/2 buffers a frame's declared payload before checking SETTINGS_MAX_FRAME_SIZE</title>
+    <title>[UPDATED] GHSA-gq9p-f254-h286: Http4s: Ember HTTP/2 buffers a frame's declared payload before checking SETTINGS_MAX_FRAME_SIZE</title>
     <id>https://osv.dev/vulnerability/GHSA-gq9p-f254-h286</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gq9p-f254-h286"/>
     <published>2026-09-15T20:01:22Z</published>
@@ -162,255 +321,5 @@ H2Frame.RawFrame.fromByteVector (ember-core/.../h2/H2Frame.scala:66-69) reads th
 ```
 val length = (bv(2) &amp;amp; 0xff) | ((bv(1) &amp;amp; 0xff) &amp;lt;&amp;lt; 8) | ((bv(0) &amp;amp; 0xff) &amp;lt;&amp;lt; 16)
 …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-gq9p-f254-h286"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-gq9p-f254-h286&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/87cf334fa3f608ef7d3eb359e71e037ba3336d29"&gt;https://github.com/http4s/http4s/commit/87cf334fa3f608ef7d3eb359e71e037ba3336d29&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.37"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.37&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M48"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M48&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gq9p-f254-h286"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-crq5-92j2-j7wv: Http4s: ResourceService and Webjar Service path escape via percent-encoded separators</title>
-    <id>https://osv.dev/vulnerability/GHSA-crq5-92j2-j7wv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-crq5-92j2-j7wv"/>
-    <published>2026-09-15T20:01:12Z</published>
-    <updated>2026-09-15T20:15:05Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69201"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s: ResourceService and Webjar Service path escape via percent-encoded separators&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69201&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-server_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-server_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-server_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-server_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-server_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The static content handlers `ResourceService` and `WebjarService` URL decode each path segment and then reject only segments that are exactly `&amp;quot;&amp;quot;`, `&amp;quot;.&amp;quot;`, or `&amp;quot;..&amp;quot;`.  A percent-encoded separator (`%2F`) lets an attacker smuggle a `../` segment past that filter and escape the configured base, reading resources that should not be public.
-
-On Windows, a similar attack exists with (`%5C`).
-
-## Impact
-
-Disclosure of classpath or webjar resources outside the configured base.
-
-## Preconditions
-
-- Application uses `ResourceService` (with a non-root base path) or `WebjarService`
-- At least one classpath entry is served from a directory (e.g. `sbt run`, exploded .war)
-- Backend forwards `%2F`/`%5C` without normalizing (e.g., Ember, Blaze)
-
-## Fixes
-
-The patch rejects any decoded path segment contain…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-crq5-92j2-j7wv"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-crq5-92j2-j7wv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/bcd99cdc1342ef58a0f132acb814af06a668a8d3"&gt;https://github.com/http4s/http4s/commit/bcd99cdc1342ef58a0f132acb814af06a668a8d3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-crq5-92j2-j7wv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-8f3q-3jmv-7prw: Http4s Ember HTTP/2 has an unbounded outbound frame queue</title>
-    <id>https://osv.dev/vulnerability/GHSA-8f3q-3jmv-7prw</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8f3q-3jmv-7prw"/>
-    <published>2026-09-15T20:00:36Z</published>
-    <updated>2026-09-15T20:15:05Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69213"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s Ember HTTP/2 has an unbounded outbound frame queue&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69213&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Ember&amp;#x27;s HTTP/2 connection serializes all outgoing frames through a single unbounded queue drained by one writer fiber (`writeLoop`).  When the write side stalls, any frames the connection keeps producing accumulate in that queue without limit.  The peer can drive this cheaply because the connection emits a control frame in response to inbound frames it does not flow-control: one `PING` ACK per `PING`, one `SETTINGS` ACK per `SETTINGS`, and a `WINDOW_UPDATE` per inbound DATA.  A single unauthenticated connection can therefore exhaust heap and OOM the process.
-
-This affects an ember server (malicious client) and an ember client (malicious/compromised server that floods the client and stops reading its ACKs).
-
-## Impact
-
-Unauthenticated remote denial of service (OOM) against any ember server …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-8f3q-3jmv-7prw"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-8f3q-3jmv-7prw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/13fe24d6440bde2f1eb70121486cf59c278e6bae"&gt;https://github.com/http4s/http4s/commit/13fe24d6440bde2f1eb70121486cf59c278e6bae&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8f3q-3jmv-7prw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-wv64-j4fq-5f9x: Http4s: CookieJar middleware accepts arbitrary Set-Cookie domain</title>
-    <id>https://osv.dev/vulnerability/GHSA-wv64-j4fq-5f9x</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wv64-j4fq-5f9x"/>
-    <published>2026-09-15T20:00:43Z</published>
-    <updated>2026-09-15T20:15:05Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69214"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s: CookieJar middleware accepts arbitrary Set-Cookie domain&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69214&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-client_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-client_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-client_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-client_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-client_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When processing a `Set-Cookie` from a response, the `CookieJar` client middleware trusts the server-supplied `Domain` attribute verbatim, with no check that it domain-matches the host that sent the cookie (RFC6265 §5.3 step 6) and no public suffix check.  A malicious or compromised server can therefore plant a cookie for any domain in the cookie jar, which is subsequently set on the client&amp;#x27;s next request to that victim domain, enabling session fixation or overwriting security-relevant cookies.
-
-## Impact
-
-Session fixation and overwrite of security-relevant cookies for arbitrary domains contacted by the same wrapped client.
-
-## Preconditions
-
-- Application uses the `CookieJar` client middleware.
-- Application contacts an attacker-controlled (or compromised) server using the same jar it uses…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-wv64-j4fq-5f9x"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-wv64-j4fq-5f9x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/87535f7288f3baaf6736e2735087e473762b5b2f"&gt;https://github.com/http4s/http4s/commit/87535f7288f3baaf6736e2735087e473762b5b2f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wv64-j4fq-5f9x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-jrpm-956j-96jg: Http4s: Ember chunk parser lenience (TE.TE request smuggling)</title>
-    <id>https://osv.dev/vulnerability/GHSA-jrpm-956j-96jg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jrpm-956j-96jg"/>
-    <published>2026-09-15T20:01:00Z</published>
-    <updated>2026-09-15T20:15:05Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69216"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s: Ember chunk parser lenience (TE.TE request smuggling)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69216&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Ember&amp;#x27;s chunk decoder parses the size token leniently: it strips leading and trailing whitespace and accepts a leading `+` or `-` sign.  RFC9112 §7.1 defines `chunk-size = 1*HEXDIG`.  An intermediary that parses the chunk boundary differently (or rejects it) will disagree with Ember on request framing, enabling HTTP request smuggling (TE.TE).
-
-## Impact
-
-### Server
-
-Request smuggling (TE.TE) when ember-server is an origin behind an intermediary that forwards the body verbatim but interprets the malformed chunk sizes differently
-
-- Front-end security bypass: the smuggled request reaches paths the intermediary might have blocked, with attacker-chosen method and headers.
-- Cache poisoning: the smuggled response is associated with the next request key in a caching proxy.
-- Request …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-jrpm-956j-96jg"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-jrpm-956j-96jg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/d78612a5abd5a2547487598d3342be05573e16f0"&gt;https://github.com/http4s/http4s/commit/d78612a5abd5a2547487598d3342be05573e16f0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jrpm-956j-96jg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-cp4q-fqw9-4hf6: Http4s Ember HTTP/2: unbounded continuation frame accumulation</title>
-    <id>https://osv.dev/vulnerability/GHSA-cp4q-fqw9-4hf6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cp4q-fqw9-4hf6"/>
-    <published>2026-09-15T20:01:08Z</published>
-    <updated>2026-09-15T20:15:05Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69218"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s Ember HTTP/2: unbounded continuation frame accumulation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69218&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When Ember receives an HTTP/2 `HEADERS` or `PUSH_PROMISE` frame without the `END_HEADERS` flag, it buffers the header block fragment and waits for subsequent `CONTINUATION` frames.  These accumulate unbounded until the connection closes. 
-
-### Impact
-
-A remote, unauthenticated peer can exhaust the heap on any Ember endpoint that has HTTP/2 enabled:
-
-- **ember-server with `.withHttp2`**: any HTTP/2 client can trigger this against any reachable path (including paths that return 404).  No authentication is required because the attack completes before the request is decoded.
-- **ember-client with `.withHttp2`**:  a malicious or compromised origin server can trigger this via the response header block.  A single in-flight request is sufficient.
-
-Memory consumption is bounded only by the attacker…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-cp4q-fqw9-4hf6"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-cp4q-fqw9-4hf6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/6e8eccd64a6a74ab4811897881e95e0e1b3a818e"&gt;https://github.com/http4s/http4s/commit/6e8eccd64a6a74ab4811897881e95e0e1b3a818e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cp4q-fqw9-4hf6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-9vwc-pc8p-253q: Http4s Ember HTTP/2 does not enforce SETTINGS_MAX_CONCURRENT_STREAMS</title>
-    <id>https://osv.dev/vulnerability/GHSA-9vwc-pc8p-253q</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9vwc-pc8p-253q"/>
-    <published>2026-09-15T19:53:14Z</published>
-    <updated>2026-09-15T20:00:40Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69203"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s Ember HTTP/2 does not enforce SETTINGS_MAX_CONCURRENT_STREAMS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69203&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An ember server with HTTP/2 enabled (`.withHttp2`) does not enforce `SETTINGS_MAX_CONCURRENT_STREAMS` on streams opened by the peer.  A single unauthenticated connection can open an unbounded number of concurrent streams, each of which allocates per-stream server state that is never released, exhausting the heap.
-
-## Impact
-
-Unauthenticated remote denial of service (memory exhaustion) against any Ember server built `.withHttp2`.  This is the resource-exhaustion class of the HTTP/2 &amp;quot;Rapid Reset&amp;quot; family (CVE-2023-44487).
-
-The same unchecked allocation path is reachable on the client via server-initiated `PUSH_PROMISE` frames, so a malicious or compromised server can exhaust an ember-client&amp;#x27;s heap the same way.
-
-## Preconditions
-
-- Server: with `.withHttp2` enabled.
-- Client: makes HTTP/2 req…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-9vwc-pc8p-253q"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-9vwc-pc8p-253q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/4983de1f93f2caaa3b9de310cf6a9db32c50d66e"&gt;https://github.com/http4s/http4s/commit/4983de1f93f2caaa3b9de310cf6a9db32c50d66e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9vwc-pc8p-253q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-9998-894r-fwvr: Http4s Ember Transfer-Encoding value parsing (TE.CL / TE.0 request smuggling)</title>
-    <id>https://osv.dev/vulnerability/GHSA-9998-894r-fwvr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9998-894r-fwvr"/>
-    <published>2026-09-15T19:54:25Z</published>
-    <updated>2026-09-15T20:00:40Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69205"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s Ember Transfer-Encoding value parsing (TE.CL / TE.0 request smuggling)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69205&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Ember&amp;#x27;s HTTP/1.1 header parser matches the `Transfer-Encoding` header value
-with a case-sensitive substring test (`hValue.contains(&amp;quot;chunked&amp;quot;)`). RFC
-9112 §7 requires transfer-coding names to be compared case-insensitively. A
-request carrying `Transfer-Encoding: Chunked` (capital C) is therefore not
-recognised as chunked, and Ember falls back to framing by `Content-Length`
-(or zero if absent) while a compliant intermediary frames the same bytes by
-chunked encoding. The two parsers then disagree on where the request body
-ends, enabling HTTP request smuggling (TE.CL / TE.0).
-
-The same line of code admits two further variants:
-
-- The substring test misfires on `Transfer-Encoding: notchunked` (an inverse
-  desync — Ember treats it as chunked while a compliant intermediary
-  rejects …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-9998-894r-fwvr"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-9998-894r-fwvr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/5e88b2e7b4e6ea2f0c61040a4bc9de0d73e51217"&gt;https://github.com/http4s/http4s/commit/5e88b2e7b4e6ea2f0c61040a4bc9de0d73e51217&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9998-894r-fwvr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-fm4g-76c9-7w69: Http4s: DigestAuth nonce map grows unbounded</title>
-    <id>https://osv.dev/vulnerability/GHSA-fm4g-76c9-7w69</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fm4g-76c9-7w69"/>
-    <published>2026-09-15T19:54:37Z</published>
-    <updated>2026-09-15T20:00:39Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69208"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s: DigestAuth nonce map grows unbounded&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69208&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-server_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-server_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-server_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-server_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-server_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `DigestAuth` server middleware&amp;#x27;s stale-nonce cleanup uses an inverted comparison: it removes *fresh* nonces and stops at the first *stale* one.  Because a new nonce is created for every unauthenticated challenge, an attacker can drive the nonce map to grow without bound until the JVM runs out of heap.
-
-## Impact
-
-Unauthenticated remote denial of service (gradual heap exhaustion / OOM) against
-any service using DigestAuth.  The leak is persistent.
-
-## Preconditions
-
-- Application uses `DigestAuth` on at least one route.
-
-## Workarounds
-
-- Front the DigestAuth protected routes with a rate limiter to slow the leak.
-- Restart periodically.
-
-## Fixes
-
-- The eviction logic is corrected.
-- A max cache size of 1000000 is imposed to protected against a burst between evictions.  This limit is no…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-fm4g-76c9-7w69"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-fm4g-76c9-7w69&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/8cfeda8472954d631dfbe5dc026463a27653e482"&gt;https://github.com/http4s/http4s/commit/8cfeda8472954d631dfbe5dc026463a27653e482&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fm4g-76c9-7w69"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-8h4c-x2wg-6xp8: Http4s Ember accepts Transfer-Encoding combined with Content-Length (CL.TE request smuggling)</title>
-    <id>https://osv.dev/vulnerability/GHSA-8h4c-x2wg-6xp8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8h4c-x2wg-6xp8"/>
-    <published>2026-09-15T19:53:44Z</published>
-    <updated>2026-09-15T20:00:39Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69204"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s Ember accepts Transfer-Encoding combined with Content-Length (CL.TE request smuggling)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69204&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Ember&amp;#x27;s HTTP/1.1 request parser does not reject a message that carries both a
-`Transfer-Encoding` and a `Content-Length` header. RFC 9112 §6.1 requires a
-server to treat such a message as a framing error and close the connection.
-An intermediary that follows the RFC&amp;#x27;s CL-strip-and-forward path (or that
-prioritises `Content-Length`) will frame the body differently from Ember,
-enabling HTTP request smuggling (CL.TE).
-
-## Impact
-
-### Server
-
-Request smuggling when ember-server is an origin behind an intermediary that
-forwards both headers over a keep-alive backend connection and frames by
-`Content-Length` while Ember frames by chunked:
-
-- Front-end security bypass: the smuggled request reaches paths the
-  intermediary&amp;#x27;s ACL/auth layer would have blocked, with attacker-chosen
-  met…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-8h4c-x2wg-6xp8"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-8h4c-x2wg-6xp8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/9feaf8677951a52af906ae9664ff6f0543d9d810"&gt;https://github.com/http4s/http4s/commit/9feaf8677951a52af906ae9664ff6f0543d9d810&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8h4c-x2wg-6xp8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-6m4x-pp6q-5jmm: Http4s Ember HTTP/2: unbounded inbound body buffering</title>
-    <id>https://osv.dev/vulnerability/GHSA-6m4x-pp6q-5jmm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6m4x-pp6q-5jmm"/>
-    <published>2026-09-15T19:52:58Z</published>
-    <updated>2026-09-15T20:00:39Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69202"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s Ember HTTP/2: unbounded inbound body buffering&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69202&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Ember&amp;#x27;s HTTP/2 stack replenishes the inbound flow-control window based on bytes
-received off the wire, not bytes consumed by the application.  Received DATA is buffered in an unbounded per-stream channel.  Flow control therefore
-provides no backpressure: a peer can stream a large or unbounded body faster than the application drains it and the connection retains every payload in heap.
-
-This is the read-path mirror of the [outbound queue issue](https://github.com/http4s/http4s/security/advisories/GHSA-8f3q-3jmv-7prw).
-
-This affects an Ember receiving a request body and an Ember client receiving a response body from a hostile server.
-
-### Impact
-
-Unauthenticated remote denial of service (OOM) against any Ember server built
-`.withHttp2` for a non-draining or slow-draining route, and against an…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-6m4x-pp6q-5jmm"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-6m4x-pp6q-5jmm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/22d2335975d02dc9fb9fb75cfe002279521d86ac"&gt;https://github.com/http4s/http4s/commit/22d2335975d02dc9fb9fb75cfe002279521d86ac&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6m4x-pp6q-5jmm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-9xww-74xv-gjfp: Http4s: DigestAuth allows replay of captured requests</title>
-    <id>https://osv.dev/vulnerability/GHSA-9xww-74xv-gjfp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9xww-74xv-gjfp"/>
-    <published>2026-09-15T19:54:32Z</published>
-    <updated>2026-09-15T20:00:39Z</updated>
-    <category term="Maven"/>
-    <category term="CVE-2026-69206"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Http4s: DigestAuth allows replay of captured requests&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69206&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.12&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 0.23.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_2.13&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;li&gt;&lt;code&gt;org.http4s:http4s-ember-core_3&lt;/code&gt; — fixed in 1.0.0-M47&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `DigestAuth` replay defence stores `lastNc + 1` rather than the nonce-count (`nc`) value it just accepted. When a legitimate client sends non-contiguous `nc` values (parallel or retried requests, as browsers do), the server&amp;#x27;s counter lags behind the highest `nc` seen, and a captured `Authorization` header can be replayed multiple times.
-
-## Impact
-
-A passive observer can turn one captured Digest-authenticated request into several replayed authenticated (state-changing) requests, defeating the core
-replay protection Digest provides over Basic.
-
-## Preconditions
-
-- Application uses `DigestAuth`.
-- Attacker can passively observe at least one legitimate digest request.
-- Legitimate client emits an `nc` more than one greater than the last, for instance from a parallel or retried request.
-
-#…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/security/advisories/GHSA-9xww-74xv-gjfp"&gt;https://github.com/http4s/http4s/security/advisories/GHSA-9xww-74xv-gjfp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/commit/7f065101c45f3d86bc105e8fc6323c2c4a11471f"&gt;https://github.com/http4s/http4s/commit/7f065101c45f3d86bc105e8fc6323c2c4a11471f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s"&gt;https://github.com/http4s/http4s&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v0.23.35"&gt;https://github.com/http4s/http4s/releases/tag/v0.23.35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/http4s/http4s/releases/tag/v1.0.0-M47"&gt;https://github.com/http4s/http4s/releases/tag/v1.0.0-M47&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9xww-74xv-gjfp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

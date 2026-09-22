@@ -3,12 +3,117 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-09-22T14:45:10Z</updated>
+  <updated>2026-09-22T20:15:05Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-pg59-5vwg-4jxq: SIPGO: DoS via unvalidated Content-Length in the stream parser</title>
+    <id>https://osv.dev/vulnerability/GHSA-pg59-5vwg-4jxq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pg59-5vwg-4jxq"/>
+    <published>2026-09-22T19:57:51Z</published>
+    <updated>2026-09-22T20:15:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-58268"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SIPGO: DoS via unvalidated Content-Length in the stream parser&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-58268&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/emiago/sipgo&lt;/code&gt; — fixed in 1.4.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The stream parser allocates the SIP body buffer from the `Content-Length` header before validating its size, which can lead to an unauthenticated DoS.
+
+### Details
+
+`ParserStream.parseSingle` allocates the body buffer from the declared `Content-Length` with no size check (https://github.com/emiago/sipgo/blob/v1.4.0/sip/parser_stream.go#L195):
+
+```go
+body := make([]byte, contentLength)   // contentLength is client-controlled, up to 2^32-1 (uint32)
+```
+
+The `ParseMaxMessageLength` (65535) check is in the caller `ParseNext` (https://github.com/emiago/sipgo/blob/v1.4.0/sip/parser_stream.go#L132), and only runs after `parseSingle` has already allocated the buffer.
+
+### PoC
+
+Tested on emiago/sipgo v1.4.0 (latest).
+
+Send a single message with a large `Content-Length` and no body to a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/emiago/sipgo/security/advisories/GHSA-pg59-5vwg-4jxq"&gt;https://github.com/emiago/sipgo/security/advisories/GHSA-pg59-5vwg-4jxq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/emiago/sipgo/commit/a7be60a07f48c06b3cdd5a7d35eb820b3df5736c"&gt;https://github.com/emiago/sipgo/commit/a7be60a07f48c06b3cdd5a7d35eb820b3df5736c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/emiago/sipgo"&gt;https://github.com/emiago/sipgo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/emiago/sipgo/releases/tag/v1.4.1"&gt;https://github.com/emiago/sipgo/releases/tag/v1.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pg59-5vwg-4jxq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-cqxr-jxr2-85pq: Dasel: Unbounded recursion in JSON and XML readers causes unrecoverable stack-overflow DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-cqxr-jxr2-85pq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cqxr-jxr2-85pq"/>
+    <published>2026-09-22T19:51:07Z</published>
+    <updated>2026-09-22T20:00:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-59168"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dasel: Unbounded recursion in JSON and XML readers causes unrecoverable stack-overflow DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-59168&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/tomwright/dasel/v3&lt;/code&gt; — fixed in 3.11.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`dasel`&amp;#x27;s JSON and XML readers parse nested structures with unbounded recursion, one
+native stack frame per nesting level, with no depth guard. A small (sub-10 MB), deeply
+nested document drives the Go runtime past its goroutine stack limit and triggers a
+`fatal error: stack overflow`. This is **unrecoverable**: it is a runtime fatal error, not
+a `panic`, so a consumer&amp;#x27;s `defer`/`recover` cannot intercept it, the entire process dies.
+
+Both readers are affected; neither has a depth limit, and the JSON reader additionally has
+no input-size cap (the XML reader caps size at 10 MB but not depth).
+
+## Affected Versions
+
+`github.com/tomwright/dasel/v3` and all v3.x releases through **v3.11.0** (current `main`,
+commit `abc1e1d`). This vulnerability is fixed in 3.11.1. Pre-v3 is out of …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel/security/advisories/GHSA-cqxr-jxr2-85pq"&gt;https://github.com/TomWright/dasel/security/advisories/GHSA-cqxr-jxr2-85pq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-59168"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-59168&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel/commit/4c91d0d02dc59ce8404709b1bfed7a6fabe62f68"&gt;https://github.com/TomWright/dasel/commit/4c91d0d02dc59ce8404709b1bfed7a6fabe62f68&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel"&gt;https://github.com/TomWright/dasel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel/releases/tag/v3.11.1"&gt;https://github.com/TomWright/dasel/releases/tag/v3.11.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cqxr-jxr2-85pq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-65gg-g7rw-6cpc: Dasel: Selector lexer panics on trailing whitespace in `parseCurRune`</title>
+    <id>https://osv.dev/vulnerability/GHSA-65gg-g7rw-6cpc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-65gg-g7rw-6cpc"/>
+    <published>2026-09-22T19:52:16Z</published>
+    <updated>2026-09-22T20:00:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-62866"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dasel: Selector lexer panics on trailing whitespace in `parseCurRune`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-62866&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/tomwright/dasel/v3&lt;/code&gt; — fixed in 3.11.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Same panic class as GHSA-m5j3-4634-c2vq and GHSA-m6xr-fvfg-5g64, sister site on the same function. Trigger is any selector ending in whitespace: `dasel query &amp;#x27;a &amp;#x27;` panics at `selector/lexer/tokenize.go:60`.
+
+The whitespace-skip loop right above (lines 55-57) advances `p.i` to `p.srcLen` when the input is all-whitespace or whitespace-trailing. The very next line reads `p.src[p.i]` without a bounds check.
+
+## Vulnerable code
+
+`selector/lexer/tokenize.go:53-74` (v3.11.0):
+
+```go
+func (p *Tokenizer) parseCurRune() (Token, error) {
+	// Skip over whitespace
+	for p.i &amp;lt; p.srcLen &amp;amp;&amp;amp; unicode.IsSpace(rune(p.src[p.i])) {
+		p.i++
+	}
+
+	// Skip over comments
+	if p.src[p.i] == &amp;#x27;/&amp;#x27; &amp;amp;&amp;amp; p.i+1 &amp;lt; p.srcLen &amp;amp;&amp;amp; p.src[p.i+1] == &amp;#x27;/&amp;#x27; {
+		// ...
+```
+
+Lines 69-71 right below already do the bounds check after the comme…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel/security/advisories/GHSA-65gg-g7rw-6cpc"&gt;https://github.com/TomWright/dasel/security/advisories/GHSA-65gg-g7rw-6cpc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-62866"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-62866&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel/commit/eee03aec28d4a33d6138098d065b7b37b85e3c55"&gt;https://github.com/TomWright/dasel/commit/eee03aec28d4a33d6138098d065b7b37b85e3c55&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel"&gt;https://github.com/TomWright/dasel&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/TomWright/dasel/releases/tag/v3.11.2"&gt;https://github.com/TomWright/dasel/releases/tag/v3.11.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-65gg-g7rw-6cpc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7v4p-328v-8v5g: Traefik vulnerable to HTTP/2 request causing denial of service </title>
+    <id>https://osv.dev/vulnerability/GHSA-7v4p-328v-8v5g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7v4p-328v-8v5g"/>
+    <published>2023-10-17T02:37:42Z</published>
+    <updated>2026-09-22T19:45:04Z</updated>
+    <category term="Go"/>
+    <category term="BIT-golang-2023-54365"/>
+    <category term="CVE-2023-54365"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Traefik vulnerable to HTTP/2 request causing denial of service &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2023-54365, CVE-2023-54365&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik&lt;/code&gt; — fixed in 2.10.5&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/traefik/traefik&lt;/code&gt; — fixed in 3.0.0-beta4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A vulnerability CVE-2023-39325 exists in [Go managing HTTP/2 requests](https://groups.google.com/g/golang-announce/c/iNNxDTCjZvo/m/UDd7VKQuAAAJ?pli=1), which impacts Traefik. This vulnerability could be exploited to cause a denial of service.
+
+### References
+
+- [CVE-2023-44487](https://www.cve.org/CVERecord?id=CVE-2023-44487)
+- [CVE-2023-39325](https://www.cve.org/CVERecord?id=CVE-2023-39325)
+
+### Patches
+
+- https://github.com/traefik/traefik/releases/tag/v2.10.5
+- https://github.com/traefik/traefik/releases/tag/v3.0.0-beta4&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik/security/advisories/GHSA-7v4p-328v-8v5g"&gt;https://github.com/traefik/traefik/security/advisories/GHSA-7v4p-328v-8v5g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-54365"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-54365&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2023-54365"&gt;https://access.redhat.com/security/cve/CVE-2023-54365&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2491710"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2491710&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/traefik/traefik"&gt;https://github.com/traefik/traefik&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iNNxDTCjZvo/m/UDd7VKQuAAAJ?pli=1"&gt;https://groups.google.com/g/golang-announce/c/iNNxDTCjZvo/m/UDd7VKQuAAAJ?pli=1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://security.access.redhat.com/data/csaf/v2/vex/2023/cve-2023-54365.json"&gt;https://security.access.redhat.com/data/csaf/v2/vex/2023/cve-2023-54365.json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/traefik-denial-of-service-via-http-2-request-handling"&gt;https://www.vulncheck.com/advisories/traefik-denial-of-service-via-http-2-request-handling&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7v4p-328v-8v5g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-xmfh-3ccg-c9fx: Mattermost has an Incorrect Authorization issue</title>
     <id>https://osv.dev/vulnerability/GHSA-xmfh-3ccg-c9fx</id>

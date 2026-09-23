@@ -3,12 +3,104 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-09-23T05:30:07Z</updated>
+  <updated>2026-09-23T14:30:05Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] MAL-2026-16475: Malicious code in memoryos (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-16475</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-16475"/>
+    <published>2026-09-23T11:05:40Z</published>
+    <updated>2026-09-23T14:30:05Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in memoryos (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;memoryos&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (91081756ee0d7e550180abd300ce4ed9634862248dd07ea9eed5fb740e4aaffc)
+On `import memos`, memos/__init__.py invokes configure_logging() which reaches memos._stage0.trigger(). That function locates a per-OS/arch prebuilt Go binary shipped inside the wheel at src/memos/.sckit/{darwin,linux,windows}-{amd64,arm64}/sckit (linux-amd64 is a 7.4MB ELF, sha256 c1b0998347b489582bae7b7f4930f9831d9ef4b6bc150cfd488ee1a43272dd36) and Popen-launches it detached (start_new_session=True, output silenced) with a base64 --config64 payload. The decoded configuration declares campaign_id &amp;quot;memos-semi-nuclear&amp;quot;, an Ed25519 root_public key, state_dir $HOME/.memos/.cache/runtime, inventory_roots=[&amp;quot;$HOME&amp;quot;], and three anonymous hex-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://safedep.io/memtensor-sckit-worm-npm-pypi/"&gt;https://safedep.io/memtensor-sckit-worm-npm-pypi/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/8f647f17a1934679c4095e21bee2b9bd83e28476603758bc91408a0c8443e3b4/detection"&gt;https://www.virustotal.com/gui/file/8f647f17a1934679c4095e21bee2b9bd83e28476603758bc91408a0c8443e3b4/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/campaign/2026-09-compr-memoryos"&gt;https://bad-packages.kam193.eu/pypi/campaign/2026-09-compr-memoryos&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/MemoryOS/2.0.34/"&gt;https://pypi.org/project/MemoryOS/2.0.34/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-16475"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6cp7-3m3c-5x5c: Zapros: Streaming decoders ignored the requested chunk size, allowing a single compressed response chunk to allocate unbounded memory (decompression bomb)</title>
+    <id>https://osv.dev/vulnerability/GHSA-6cp7-3m3c-5x5c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6cp7-3m3c-5x5c"/>
+    <published>2026-09-23T13:57:48Z</published>
+    <updated>2026-09-23T14:15:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-61652"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Zapros: Streaming decoders ignored the requested chunk size, allowing a single compressed response chunk to allocate unbounded memory (decompression bomb)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61652&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zapros&lt;/code&gt; — fixed in 0.14.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Denial of service via memory exhaustion. Affects all callers who streamed compressed responses relying on the chunk size — explicit (`iter_bytes(chunk_size=...)`) or the default — to bound memory. The decoder ignored that bound, so a chunk could be far larger than requested and a single compressed response could overflow memory.
+
+```python
+import gzip, zapros
+
+# Server returns ~1 GiB of zeros gzip-compressed to ~1 MiB,
+# with header: Content-Encoding: gzip
+bomb = gzip.compress(b&amp;quot;\0&amp;quot; * 1_000_000_000)  # ~1 MiB on the wire
+
+with zapros.stream(&amp;quot;GET&amp;quot;, &amp;quot;https://malicious.example/bomb&amp;quot;) as response:
+    # Caller asks for 8 KiB chunks, expecting bounded memory:
+    for chunk in response.iter_bytes(chunk_size=8192):
+        ...  # first `chunk` is ~1 GiB, not 8 KiB -&amp;gt; memory exhaustion…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kap-sh/zapros/security/advisories/GHSA-6cp7-3m3c-5x5c"&gt;https://github.com/kap-sh/zapros/security/advisories/GHSA-6cp7-3m3c-5x5c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-61652"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-61652&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kap-sh/zapros/commit/9b59fa65857734599c34b0b3dff4c2b62293a68d"&gt;https://github.com/kap-sh/zapros/commit/9b59fa65857734599c34b0b3dff4c2b62293a68d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kap-sh/zapros"&gt;https://github.com/kap-sh/zapros&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kap-sh/zapros/releases/tag/v0.14.0"&gt;https://github.com/kap-sh/zapros/releases/tag/v0.14.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6cp7-3m3c-5x5c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5vjj-2r48-q622: Zapros has an Unbounded Content-Encoding decompression chain that allows denial of service</title>
+    <id>https://osv.dev/vulnerability/GHSA-5vjj-2r48-q622</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5vjj-2r48-q622"/>
+    <published>2026-09-23T13:58:35Z</published>
+    <updated>2026-09-23T14:15:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-61541"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Zapros has an Unbounded Content-Encoding decompression chain that allows denial of service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-61541&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zapros&lt;/code&gt; — fixed in 0.14.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+**Who is impacted**:
+  - Any application using Zapros to make HTTP requests to untrusted servers
+  - Applications that follow redirects to attacker-controlled hosts
+
+**Attack vector**:
+  - A malicious HTTP server returns a response with many chained content encodings. When the client attempts to decode, it creates a deeply nested decompression chain consuming excessive resources.
+
+### Patches
+
+Fixed in version 0.14.0.
+
+  The fix adds a hardcoded limit of **5** `Content-Encoding` layers. Responses exceeding this limit raise `DecodingError`.
+
+### Workarounds
+
+Add middleware that checks for a malicious Content-Encoding header.
+
+```python
+from typing import cast
+
+from zapros import (
+    AsyncBaseHandler,
+    AsyncBaseMiddleware,
+    BaseHandler,
+    BaseMiddleware,
+    Client,
+   …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kap-sh/zapros/security/advisories/GHSA-5vjj-2r48-q622"&gt;https://github.com/kap-sh/zapros/security/advisories/GHSA-5vjj-2r48-q622&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-61541"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-61541&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kap-sh/zapros/commit/7971fbca9707eb01455ca2d73416ac091f96908b"&gt;https://github.com/kap-sh/zapros/commit/7971fbca9707eb01455ca2d73416ac091f96908b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kap-sh/zapros"&gt;https://github.com/kap-sh/zapros&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kap-sh/zapros/releases/tag/v0.14.0"&gt;https://github.com/kap-sh/zapros/releases/tag/v0.14.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5vjj-2r48-q622"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rr49-f9g6-c9r5: plone.app.portlets Vulnerable to Remote Code Execution via TALES Injection</title>
+    <id>https://osv.dev/vulnerability/GHSA-rr49-f9g6-c9r5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rr49-f9g6-c9r5"/>
+    <published>2026-09-23T13:55:47Z</published>
+    <updated>2026-09-23T14:00:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-57149"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;plone.app.portlets Vulnerable to Remote Code Execution via TALES Injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-57149&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;plone-app-portlets&lt;/code&gt; — fixed in 7.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;plone-app-portlets&lt;/code&gt; — fixed in 6.0.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;plone-app-portlets&lt;/code&gt; — fixed in 5.0.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+The Classic portlet (plone.app.portlets.portlets.classic) used its user-supplied template/macro fields to build a TALES path expression that was then evaluated by the TAL path() helper. Because the value was interpreted as a full TALES expression, a user able to add or edit a Classic portlet could supply a crafted value that escapes simple path traversal and is evaluated as arbitrary code.
+
+This is exploitable by any authenticated user who can configure a Classic portlet - which, with the default role map, includes regular users on their personal dashboard. The result is code execution in the context of the Plone process, i.e. a privilege escalation across the trust boundary between an authenticated web user and the server-side process.
+
+### Patches
+The problem has been patched …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.portlets/security/advisories/GHSA-rr49-f9g6-c9r5"&gt;https://github.com/plone/plone.app.portlets/security/advisories/GHSA-rr49-f9g6-c9r5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-57149"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-57149&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.portlets/commit/1d9cacacfad9ed08b890dadc6e75741e295dc151"&gt;https://github.com/plone/plone.app.portlets/commit/1d9cacacfad9ed08b890dadc6e75741e295dc151&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.portlets/commit/8a0641dc4054a2b13834bba00c67cd9a2fd189e1"&gt;https://github.com/plone/plone.app.portlets/commit/8a0641dc4054a2b13834bba00c67cd9a2fd189e1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.portlets/commit/fb979f01b57dd2fc06c90ee6577eb5eb285da8f1"&gt;https://github.com/plone/plone.app.portlets/commit/fb979f01b57dd2fc06c90ee6577eb5eb285da8f1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.portlets"&gt;https://github.com/plone/plone.app.portlets&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.portlets/releases/tag/5.0.8"&gt;https://github.com/plone/plone.app.portlets/releases/tag/5.0.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/plone/plone.app.portlets/releases/tag/6.0.4"&gt;https://github.com/plone/plone.app.portlets/releases/tag/6.0.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rr49-f9g6-c9r5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] MAL-2026-16122: Malicious code in pylever (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-16122</id>
@@ -286,7 +378,7 @@ _-= Per source details. Do not edit below this line.=-_
 The pip install of auclean 0.4.2 runs a custom setup.py build_py command that chmod 0755&amp;#x27;s and executes a 1.8MB bundled Rust ELF binary `auclean/_auclean_native` with `--init`, output suppressed. The package&amp;#x27;s stated purpose is pure-Python audio DSP (numpy/wave/soundfile) and no C/Rust source is shipped, so the binary is opaque and its execution is unrelated to any advertised functionality. Strings inside the binary reveal a full HTTPS client stack (ureq 2.12.1, rustls 0.23.45), DNS/socket primitives, hardcoded references to container-secret and system paths (`/var/run/secrets`, `/etc/resolv.conf`, `/dev/shm`, `/tmp/_ac`), and process-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/2a2212676b699cdd44b480d8ac44a4ea0e9887c8ea43b8a531d4ac7279ac2526/detection"&gt;https://www.virustotal.com/gui/file/2a2212676b699cdd44b480d8ac44a4ea0e9887c8ea43b8a531d4ac7279ac2526/detection&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260922-zncd8sw14q/behavioral1"&gt;https://tria.ge/260922-zncd8sw14q/behavioral1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/auclean"&gt;https://bad-packages.kam193.eu/pypi/package/auclean&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://tria.ge/260922-zve4pssdmf/behavioral1"&gt;https://tria.ge/260922-zve4pssdmf/behavioral1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/auclean/0.4.2/"&gt;https://pypi.org/project/auclean/0.4.2/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-16410"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-16356: Malicious code in starlette-healthchecks (PyPI)</title>
+    <title>[UPDATED] MAL-2026-16356: Malicious code in starlette-healthchecks (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-16356</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-16356"/>
     <published>2026-09-21T16:50:02Z</published>

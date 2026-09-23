@@ -3,12 +3,49 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-09-23T03:55:40Z</updated>
+  <updated>2026-09-23T08:00:03Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0305: Use-after-free when XML includes have duplicated entities</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0305</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0305"/>
+    <published>2026-09-23T12:00:00Z</published>
+    <updated>2026-09-23T08:00:03Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Use-after-free when XML includes have duplicated entities&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;librsvg&lt;/code&gt; — fixed in 2.62.4, 2.63.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Librsvg uses libxml2, a C library, to parse XML.  When librsvg parses
+an SVG document which has a nested Xinclude, an XML entity declaration
+with a duplicate name as an existing one can cause a use-after-free error.
+
+While libxml2 is expanding an internal entity, a recursive XInclude
+can parse another document that declares an entity with the same
+name. Both parses use the same `XmlState` entity
+map on the librsvg side. `entity_insert()` replaces the first entry, whose `Drop`
+implementation calls `xmlFreeNode()`. The outer `xmlCtxtParseEntity()`
+then keeps using the freed 144-byte `xmlEntity`.
+
+The included parse should not free an entity that the outer parser is still using.
+
+The fix is in commit 8a1b0cd319e9af2d1e9cf878081dd77f227a0504, where
+librsvg will no longer free xmlEntity pointer…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/librsvg"&gt;https://crates.io/crates/librsvg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0305.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0305.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gitlab.gnome.org/GNOME/librsvg/-/work_items/1241"&gt;https://gitlab.gnome.org/GNOME/librsvg/-/work_items/1241&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0305"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0304: Finished streaming calls keep reading a stalled request body indefinitely</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0304</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0304"/>
+    <published>2026-09-21T12:00:00Z</published>
+    <updated>2026-09-23T07:45:03Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-jx5x-3mcr-qp8r"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Finished streaming calls keep reading a stalled request body indefinitely&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-jx5x-3mcr-qp8r&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;connectrpc&lt;/code&gt; — fixed in 0.8.2, 0.9.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions of `connectrpc` start a background task to read the request body of every client-streaming and bidirectional-streaming call, before the interceptors or the handler run. A call can finish before it has consumed its request: the handler can return without reading all of its request stream, an interceptor can reject the call, or the request timeout can fire. The background task then keeps reading, with no time limit. If the client stops sending part-way through a message, or never sends the rest, the task, the partial message it has buffered (up to `max_message_size`, 4 MiB by default) and the HTTP/2 stream, or the HTTP/1.x connection, are held until the client finishes the stream or closes the connection.
+
+## Impact
+
+A client can use this to exhaust the memory, tasks and fi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/connectrpc"&gt;https://crates.io/crates/connectrpc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0304.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0304.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/connectrpc/connect-rust/pull/313"&gt;https://github.com/connectrpc/connect-rust/pull/313&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/connectrpc/connect-rust/pull/314"&gt;https://github.com/connectrpc/connect-rust/pull/314&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/connectrpc/connect-rust/pull/315"&gt;https://github.com/connectrpc/connect-rust/pull/315&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0304"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0294: Unsoundness in UTF-8 'String' trait</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0294</id>
@@ -230,48 +267,5 @@ As a result, if an instance of `ApplyResult` is duplicated through `Clone` and b
     <content type="html">&lt;p&gt;&lt;strong&gt;Double free / use-after-free in `Chunk` and `InlineArray` removal methods when an element&amp;#x27;s `Drop` panics&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;imbl-sized-chunks&lt;/code&gt; — fixed in 0.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`Chunk::{clear, drop_left, drop_right}` and `InlineArray::{clear, truncate}` drop the removed elements before updating the metadata that records which slots hold live values — the `left`/`right` index pair for `Chunk`, the length field for `InlineArray`. If an element&amp;#x27;s `Drop` panics during the drop, that update is never reached, so the collection still treats the already-dropped elements as live. When the collection is later dropped (its destructor walks the range described by the stale metadata), or a subsequent operation touches the same slots, those elements are dropped a second time — a double free (CWE-415) / use-after-free (CWE-416) reachable from safe Rust.
 
 The stale field is `left` and `right` for `Chunk::clear`, `left` for `drop_left`, `right` for `drop_right`, and the length fi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/imbl-sized-chunks"&gt;https://crates.io/crates/imbl-sized-chunks&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0292.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0292.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jneem/imbl-sized-chunks/pull/14"&gt;https://github.com/jneem/imbl-sized-chunks/pull/14&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0292"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] RUSTSEC-2026-0293: Double free / use-after-free in `Consumer::skip` and `Consumer::clear` when an element's `Drop` panics</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0293</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0293"/>
-    <published>2026-09-21T12:00:00Z</published>
-    <updated>2026-09-21T09:15:02Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Double free / use-after-free in `Consumer::skip` and `Consumer::clear` when an element&amp;#x27;s `Drop` panics&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ringbuf&lt;/code&gt; — fixed in 0.5.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`Consumer::skip()` and `Consumer::clear()` are not panic-safe. They drop the
-consumed elements in place and only afterwards call `advance_read_index()` to move
-the ring buffer&amp;#x27;s read index past them. If an element&amp;#x27;s `Drop` panics mid-loop,
-`advance_read_index()` is never reached, so the read index still points at the
-already-dropped elements. When the ring buffer is later dropped, its destructor
-re-visits those slots and drops the same elements a second time — a double free
-(CWE-415) / use-after-free (CWE-416) reachable from safe Rust, confirmed under
-AddressSanitizer.
-
-`Consumer::clear()` delegates to `Consumer::skip(self.len())`, so both share the
-same root cause and the same fix.
-
-## Mitigation
-
-Update to 0.5.2 or later (fixed in agerasev/ringbuf#60).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/ringbuf"&gt;https://crates.io/crates/ringbuf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0293.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0293.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/agerasev/ringbuf/pull/60"&gt;https://github.com/agerasev/ringbuf/pull/60&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0293"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0291: Double free in `OwnedAlloc::drop_in_place` when the contained value's `Drop` panics</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0291</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0291"/>
-    <published>2026-09-09T12:00:00Z</published>
-    <updated>2026-09-21T09:15:02Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Double free in `OwnedAlloc::drop_in_place` when the contained value&amp;#x27;s `Drop` panics&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;owned-alloc&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`OwnedAlloc::drop_in_place` destroys the contained value by hand, then commits
-the ownership transfer with `mem::forget(self)` — which lives inside `into_raw`
-and so runs only after the destruction. `T::drop` is user code and may panic. If
-it does, the forget is skipped and the still-live `OwnedAlloc` unwinds, whose
-destructor drops the same `T` a second time and then deallocates. For a `T` that
-owns an allocation, the same block is freed twice — a double free (CWE-415).
-That destructor also reads the already-destroyed value through
-`Layout::for_value` before deallocating, a use-after-free (CWE-416).
-
-`MaybeUninitAlloc::drop_in_place` delegates to the same function, so both public
-entry points are affected. Storing a value whose `Drop` can panic and calling
-either is enough — no `unsafe` o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/owned-alloc"&gt;https://crates.io/crates/owned-alloc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0291.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0291.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gitlab.com/bzim/owned-alloc/-/issues/1"&gt;https://gitlab.com/bzim/owned-alloc/-/issues/1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0291"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,40 @@
   <title>OSV — new &amp; updated vulnerabilities: RubyGems</title>
   <subtitle>Open-source vulns affecting RubyGems packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:rubygems</id>
-  <updated>2026-09-23T05:30:07Z</updated>
+  <updated>2026-09-23T19:01:49Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/rubygems.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-jjq7-m736-w977: OpenC3 COSMOS: Authenticated remote code execution via the user-writable config overlay (table definitions, cmd/tlm definitions, and script suites)</title>
+    <id>https://osv.dev/vulnerability/GHSA-jjq7-m736-w977</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jjq7-m736-w977"/>
+    <published>2026-09-23T18:57:24Z</published>
+    <updated>2026-09-23T19:01:49Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-77602"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenC3 COSMOS: Authenticated remote code execution via the user-writable config overlay (table definitions, cmd/tlm definitions, and script suites)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-77602&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openc3&lt;/code&gt; — fixed in 7.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+COSMOS reads configuration from a user-writable overlay (`targets_modified/`) before the read-only plugin-installed `targets/` tree, and the config subsystem executes code on those files: `ConfigParser` renders every file as ERB by default, a `GENERIC_READ_CONVERSION` / `GENERIC_WRITE_CONVERSION` block is evaluated as code by `GenericConversion` (Ruby and Python), and the Script Runner suite analysis `require`s a procedure file. An authenticated user can write into `targets_modified/` below the admin tier (the storage-upload endpoint exempts that area from the admin gate, and the screen-save endpoint stores its body verbatim there), so the same root cause is reachable through several features, each giving arbitrary code execution on a COSMOS server.
+
+Three vulnerable routes we…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos/security/advisories/GHSA-jjq7-m736-w977"&gt;https://github.com/OpenC3/cosmos/security/advisories/GHSA-jjq7-m736-w977&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos/pull/3488"&gt;https://github.com/OpenC3/cosmos/pull/3488&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos/commit/71943352a28128ef3e7e894319d97a656b5cd4f2"&gt;https://github.com/OpenC3/cosmos/commit/71943352a28128ef3e7e894319d97a656b5cd4f2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos/commit/7a1538a4626f82c0d1540fcaa27ffdcbbd71ff81"&gt;https://github.com/OpenC3/cosmos/commit/7a1538a4626f82c0d1540fcaa27ffdcbbd71ff81&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos"&gt;https://github.com/OpenC3/cosmos&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jjq7-m736-w977"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vp3w-52v9-q57f: OpenC3 COSMOS: Authenticated OS command injection via the `pypi_url` setting</title>
+    <id>https://osv.dev/vulnerability/GHSA-vp3w-52v9-q57f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vp3w-52v9-q57f"/>
+    <published>2026-09-23T18:51:01Z</published>
+    <updated>2026-09-23T19:01:49Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-77601"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenC3 COSMOS: Authenticated OS command injection via the `pypi_url` setting&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-77601&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;openc3&lt;/code&gt; — fixed in 7.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+An authenticated user can execute arbitrary operating system commands on the `openc3-cosmos-cmd-tlm-api` service. The `pypi_url` setting is interpolated, unescaped, into a command line that is run through a shell backtick when a plugin is installed. Shell metacharacters in the setting value are executed by `/bin/sh`.
+
+## Details
+The `pypi_url` value is written through the `set_setting` API method, reachable over the JSON-RPC endpoint `POST /openc3-api/api`. In the open-source edition, `authorize` (`openc3/lib/openc3/utilities/authorization.rb`) verifies only that the session token is valid and returns the anonymous user; the `permission:` argument is not enforced, so any authenticated user can write the setting and install a plugin. In the Enterprise edition these actions requir…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos/security/advisories/GHSA-vp3w-52v9-q57f"&gt;https://github.com/OpenC3/cosmos/security/advisories/GHSA-vp3w-52v9-q57f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos/pull/3489"&gt;https://github.com/OpenC3/cosmos/pull/3489&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos/commit/be70d1d836c83c3b084e768e31a399312d4cbe0b"&gt;https://github.com/OpenC3/cosmos/commit/be70d1d836c83c3b084e768e31a399312d4cbe0b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos"&gt;https://github.com/OpenC3/cosmos&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OpenC3/cosmos/releases/tag/v7.2.1"&gt;https://github.com/OpenC3/cosmos/releases/tag/v7.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vp3w-52v9-q57f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-16466: Malicious code in wurl_show_data (RubyGems)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-16466</id>
@@ -230,43 +258,5 @@ early return checks total capacity instead of remaining capacity:
 if (RB_UNLIKELY(fb-&amp;gt;io)) {
     if (fb-&amp;gt;capa &amp;lt; FBUFFER_IO_BUFFER_SIZE) {
         fbuffer_realloc(fb, FBUFFER_IO_BUFFER_…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/json/security/advisories/GHSA-x2f5-4prf-w687"&gt;https://github.com/ruby/json/security/advisories/GHSA-x2f5-4prf-w687&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-54696"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-54696&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/json/commit/996bac686d64e4e3aaeae03b14a7f9ee9695ebdb"&gt;https://github.com/ruby/json/commit/996bac686d64e4e3aaeae03b14a7f9ee9695ebdb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/json"&gt;https://github.com/ruby/json&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ruby/json/releases/tag/v2.19.9"&gt;https://github.com/ruby/json/releases/tag/v2.19.9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rubysec/ruby-advisory-db/blob/master/gems/json/CVE-2026-54696.yml"&gt;https://github.com/rubysec/ruby-advisory-db/blob/master/gems/json/CVE-2026-54696.yml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x2f5-4prf-w687"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-cj75-f6xr-r4g7: Rails HTML Sanitizers: Possible XSS vulnerability with certain configurations</title>
-    <id>https://osv.dev/vulnerability/GHSA-cj75-f6xr-r4g7</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cj75-f6xr-r4g7"/>
-    <published>2026-07-21T22:05:28Z</published>
-    <updated>2026-09-10T03:51:11Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-73648"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rails HTML Sanitizers: Possible XSS vulnerability with certain configurations&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73648&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rails-html-sanitizer&lt;/code&gt; — fixed in 1.7.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-There is a possible cross-site scripting vulnerability in rails-html-sanitizer when the sanitizer is configured to allow an SVG reference element such as `&amp;lt;use&amp;gt;`. See related [GHSA-9wjq-cp2p-hrgf](https://github.com/flavorjones/loofah/security/advisories/GHSA-9wjq-cp2p-hrgf) in Loofah, whose SVG local-reference logic rails-html-sanitizer mirrors.
-
-- Versions affected: `&amp;gt;= 1.0.3, &amp;lt; 1.7.1`
-- Not affected: `&amp;lt; 1.0.3`
-- Fixed versions: `1.7.1`
-
-## Impact
-
-`Rails::HTML::PermitScrubber` restricts SVG reference elements in the `SVG_ALLOW_LOCAL_HREF` collection to local, same-document references, but that restriction covered only the `xlink:href` attribute. Browsers also accept a plain `href` attribute per the SVG 2 spec, and it was not restricted, so those elements could reference arbi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rails/rails-html-sanitizer/security/advisories/GHSA-cj75-f6xr-r4g7"&gt;https://github.com/rails/rails-html-sanitizer/security/advisories/GHSA-cj75-f6xr-r4g7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rails/rails-html-sanitizer/commit/74dcb8053e6da9921246ce71b06ad9fd65b19586"&gt;https://github.com/rails/rails-html-sanitizer/commit/74dcb8053e6da9921246ce71b06ad9fd65b19586&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rails/rails-html-sanitizer"&gt;https://github.com/rails/rails-html-sanitizer&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rails/rails-html-sanitizer/releases/tag/v1.7.1"&gt;https://github.com/rails/rails-html-sanitizer/releases/tag/v1.7.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cj75-f6xr-r4g7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9wjq-cp2p-hrgf: Loofah: SVG `href` attribute bypasses local-reference restriction</title>
-    <id>https://osv.dev/vulnerability/GHSA-9wjq-cp2p-hrgf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9wjq-cp2p-hrgf"/>
-    <published>2026-07-21T22:01:58Z</published>
-    <updated>2026-09-10T03:51:11Z</updated>
-    <category term="RubyGems"/>
-    <category term="CVE-2026-73490"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Loofah: SVG `href` attribute bypasses local-reference restriction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73490&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;loofah&lt;/code&gt; — fixed in 2.25.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Loofah&amp;#x27;s HTML5 sanitizer restricted only the `xlink:href` attribute on certain SVG elements to local, same-document references. Browsers also accept a plain `href` attribute as an alternative to the deprecated `xlink:href` per the SVG 2 spec, but Loofah did not apply the same restriction to it, allowing those elements to reference arbitrary external documents.
-
-## Impact
-
-SVG `&amp;lt;use&amp;gt;` can load and render external SVG content by reference. If the referenced external SVG is same-origin and contains scripts or other dangerous content, it could execute in the context of the sanitized document. `&amp;lt;feImage&amp;gt;` can load external images, which can be used for tracking. Modern browsers restrict cross-origin `&amp;lt;use&amp;gt;` fetches, which limits but does not eliminate the risk.
-
-Applications that sa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/flavorjones/loofah/security/advisories/GHSA-9wjq-cp2p-hrgf"&gt;https://github.com/flavorjones/loofah/security/advisories/GHSA-9wjq-cp2p-hrgf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/flavorjones/loofah/commit/20867b9be689521887364b74822c41ef830523c9"&gt;https://github.com/flavorjones/loofah/commit/20867b9be689521887364b74822c41ef830523c9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/flavorjones/loofah"&gt;https://github.com/flavorjones/loofah&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/flavorjones/loofah/releases/tag/v2.25.2"&gt;https://github.com/flavorjones/loofah/releases/tag/v2.25.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9wjq-cp2p-hrgf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

@@ -3,12 +3,69 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-09-23T10:41:39Z</updated>
+  <updated>2026-09-23T19:30:05Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-4fwh-wrm6-97xm: Klever-Go: Unauthenticated WebSocket /subscribe: no read-size limit, no connection cap, permissive origin -&gt; remote node memory/goroutine exhaustion (DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-4fwh-wrm6-97xm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4fwh-wrm6-97xm"/>
+    <published>2026-09-23T19:16:40Z</published>
+    <updated>2026-09-23T19:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-86065"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Klever-Go: Unauthenticated WebSocket /subscribe: no read-size limit, no connection cap, permissive origin -&amp;gt; remote node memory/goroutine exhaustion (DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-86065&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klever-io/klever-go&lt;/code&gt; — fixed in 1.7.20&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+The unauthenticated WebSocket endpoint `GET /subscribe` is registered `open: true` by default
+(`config/node/api.yaml`) and lets a remote, unauthenticated client exhaust the node&amp;#x27;s memory and
+goroutines. Because the REST API runs IN-PROCESS with the node — `network/api/api.go` `Start(...)`
+ends with `ws.Run(kleverFacade.RestAPIInterface())` — exhausting/killing the API process takes down
+the entire node, including its P2P and consensus participation. No API key, account, stake, or funds
+are required.
+
+Three compounding, independently-exploitable gaps stack on this one endpoint:
+
+1. Permissive origin — `upgrader.CheckOrigin` always returns `true`
+   (`network/api/websocket/routes.go`), so any web origin can complete the handshake.
+2. No read-size limit — the connection never calls…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/security/advisories/GHSA-4fwh-wrm6-97xm"&gt;https://github.com/klever-io/klever-go/security/advisories/GHSA-4fwh-wrm6-97xm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/pull/76"&gt;https://github.com/klever-io/klever-go/pull/76&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/commit/b8af922e749ec1fa7451b2c6e7c9f634d8603be2"&gt;https://github.com/klever-io/klever-go/commit/b8af922e749ec1fa7451b2c6e7c9f634d8603be2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go"&gt;https://github.com/klever-io/klever-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/releases/tag/v1.7.20"&gt;https://github.com/klever-io/klever-go/releases/tag/v1.7.20&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4fwh-wrm6-97xm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-97cv-x867-6xhm: Klever-Go Account takeover: `kleverUpdateAccountPermission` authorizes on attacker-controlled `RecipientAddr` instead of the authenticated caller</title>
+    <id>https://osv.dev/vulnerability/GHSA-97cv-x867-6xhm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-97cv-x867-6xhm"/>
+    <published>2026-09-23T19:27:08Z</published>
+    <updated>2026-09-23T19:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-82405"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Klever-Go Account takeover: `kleverUpdateAccountPermission` authorizes on attacker-controlled `RecipientAddr` instead of the authenticated caller&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82405&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klever-io/klever-go&lt;/code&gt; — fixed in 1.7.20&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Description
+
+The VM built-in function `KleverUpdateAccountPermission` (registered always-active, `creator.go:381-390` / `core/vmconstants.go:234`) rewrites an account&amp;#x27;s entire permission set. Its authorization check uses `vmInput.RecipientAddr` **attacker-controlled**  instead of the authenticated `vmInput.CallerAddr`. The sibling handler `kleverChangeOwnerAddress.go:86` uses `vmInput.CallerAddr` correctly, so the safe pattern exists in-repo; this handler deviates. The native transaction path (`txProcess.go:833`) is safe  it uses `tx.GetSender()`.
+
+Mechanism:
+1. **Wrong variable:** `CallerAddr` is never referenced in the handler; auth is `contractHasValidPermission(target.GetPermissions(), RecipientAddr)`, which returns true if `RecipientAddr` is a signer with `Weight &amp;gt;= Threshold` in …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/security/advisories/GHSA-97cv-x867-6xhm"&gt;https://github.com/klever-io/klever-go/security/advisories/GHSA-97cv-x867-6xhm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/commit/c58740eb74d7ee8f07db1e18a7d6214b5559ba32"&gt;https://github.com/klever-io/klever-go/commit/c58740eb74d7ee8f07db1e18a7d6214b5559ba32&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gist.github.com/mabdullah22/a41f90aa5ba86bbebf121f739bd5f5e9"&gt;https://gist.github.com/mabdullah22/a41f90aa5ba86bbebf121f739bd5f5e9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go"&gt;https://github.com/klever-io/klever-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/releases/tag/v1.7.20"&gt;https://github.com/klever-io/klever-go/releases/tag/v1.7.20&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-97cv-x867-6xhm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9v8p-frvj-2pcm: Klever-Go: /log controls global node logging</title>
+    <id>https://osv.dev/vulnerability/GHSA-9v8p-frvj-2pcm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9v8p-frvj-2pcm"/>
+    <published>2026-09-23T19:13:46Z</published>
+    <updated>2026-09-23T19:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-86064"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Klever-Go: /log controls global node logging&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-86064&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klever-io/klever-go&lt;/code&gt; — fixed in 1.7.20&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An unauthenticated client can connect to `GET /log`, send an arbitrary logger profile as the first WebSocket message, and mutate the node&amp;#x27;s global logging configuration before receiving live logs from the process. I confirmed this against a local validator built from this repository: an unauthenticated client set the global log level to `*:NONE`, the node accepted the profile, and the node stopped emitting normal slot logs while the WebSocket connection remained open.
+
+This is not a duplicate of the published KVM or P2P advisories. It is a management-plane flaw in the public WebSocket logging endpoint.
+
+## Vulnerability details
+
+### Affected code
+
+- Route exposed by default in `config/node/api.yaml`
+- Route registration in `network/api/api.go`
+- Unauthenticated upgrade in `network/api/api.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/security/advisories/GHSA-9v8p-frvj-2pcm"&gt;https://github.com/klever-io/klever-go/security/advisories/GHSA-9v8p-frvj-2pcm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/pull/74"&gt;https://github.com/klever-io/klever-go/pull/74&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/commit/a2740c985a788fb69e17742ea4f0c37c440733b2"&gt;https://github.com/klever-io/klever-go/commit/a2740c985a788fb69e17742ea4f0c37c440733b2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go"&gt;https://github.com/klever-io/klever-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klever-io/klever-go/releases/tag/v1.7.20"&gt;https://github.com/klever-io/klever-go/releases/tag/v1.7.20&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9v8p-frvj-2pcm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-6090: Limit handshake messages we are willing to accept post-handshake in crypto/tls</title>
     <id>https://osv.dev/vulnerability/GO-2026-6090</id>
@@ -1075,16 +1132,5 @@ The gin i18n middleware in nginx-ignition&amp;#x27;s API server runs in front of
 ### Impact
 
 An actor able to create pods (the activity k8saudit is intended to audit) could run a privileged container without triggering the default `Create Privileged Pod` rule, by declaring it as an `initContainer` or `ephemeralContainer` instead of a regular container. Kubernetes runs such containers with the requested privileges, but the shipped rule did not see them. The same gap applied to other per-container security set…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/falcosecurity/plugins/security/advisories/GHSA-jhjp-4c2q-xmx4"&gt;https://github.com/falcosecurity/plugins/security/advisories/GHSA-jhjp-4c2q-xmx4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/falcosecurity/plugins/pull/1400"&gt;https://github.com/falcosecurity/plugins/pull/1400&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/falcosecurity/plugins/commit/0adb9b3c7e2c8bad53f30d01c057e038b2afa5e1"&gt;https://github.com/falcosecurity/plugins/commit/0adb9b3c7e2c8bad53f30d01c057e038b2afa5e1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/falcosecurity/plugins"&gt;https://github.com/falcosecurity/plugins&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/falcosecurity/plugins/releases/tag/plugins/k8saudit-aks/v0.6.0"&gt;https://github.com/falcosecurity/plugins/releases/tag/plugins/k8saudit-aks/v0.6.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/falcosecurity/plugins/releases/tag/plugins/k8saudit-eks/v0.12.0"&gt;https://github.com/falcosecurity/plugins/releases/tag/plugins/k8saudit-eks/v0.12.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/falcosecurity/plugins/releases/tag/plugins/k8saudit-gke/v0.9.0"&gt;https://github.com/falcosecurity/plugins/releases/tag/plugins/k8saudit-gke/v0.9.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/falcosecurity/plugins/releases/tag/plugins/k8saudit-ovh/v0.6.0"&gt;https://github.com/falcosecurity/plugins/releases/tag/plugins/k8saudit-ovh/v0.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jhjp-4c2q-xmx4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-3h3x-2hwv-hr52: Golang FIPS OpenSSL has a Use of Uninitialized Variable vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-3h3x-2hwv-hr52</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3h3x-2hwv-hr52"/>
-    <published>2024-10-01T21:31:34Z</published>
-    <updated>2026-09-21T18:45:04Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2024-9355"/>
-    <category term="GO-2024-3167"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Golang FIPS OpenSSL has a Use of Uninitialized Variable vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-9355, GO-2024-3167&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/golang-fips/openssl&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability was found in Golang FIPS OpenSSL. This flaw allows a malicious user to randomly cause an uninitialized buffer length variable with a zeroed buffer to be returned in FIPS mode. It may also be possible to force a false positive match between non-equal hashes when comparing a trusted computed hmac sum to an untrusted input sum if an attacker can send a zeroed buffer in place of a pre-computed sum.  It is also possible to force a derived key to be all zeros instead of an unpredictable value.  This may have follow-on implications for the Go TLS stack.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-9355"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-9355&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/golang-fips/openssl/pull/198"&gt;https://github.com/golang-fips/openssl/pull/198&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/github/advisory-database/pull/4950"&gt;https://github.com/github/advisory-database/pull/4950&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pkg.go.dev/vuln/GO-2024-3167"&gt;https://pkg.go.dev/vuln/GO-2024-3167&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/golang-fips/openssl"&gt;https://github.com/golang-fips/openssl&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.redhat.com/show_bug.cgi?id=2315719"&gt;https://bugzilla.redhat.com/show_bug.cgi?id=2315719&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/cve/CVE-2024-9355"&gt;https://access.redhat.com/security/cve/CVE-2024-9355&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:69235"&gt;https://access.redhat.com/errata/RHSA-2026:69235&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3h3x-2hwv-hr52"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

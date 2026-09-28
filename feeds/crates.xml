@@ -3,12 +3,57 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-09-26T11:56:37Z</updated>
+  <updated>2026-09-28T09:45:02Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0312: Excluded iPAddress name constraints with an all-zero mask are not applied</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0312</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0312"/>
+    <published>2026-09-24T12:00:00Z</published>
+    <updated>2026-09-28T09:45:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-39mm-4q6x-3vrx"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excluded iPAddress name constraints with an all-zero mask are not applied&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-39mm-4q6x-3vrx&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;x509-validator&lt;/code&gt; — fixed in 0.3.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An `excluded_subtrees` iPAddress name constraint with an all-zero mask
+(`0.0.0.0/0` or `::/0`) does not restrict iPAddress SANs in certificates issued
+beneath it. The mask check treated an all-zero mask as matching nothing, when a
+`/0` prefix matches every address of its family, so the exclusion was silently
+ignored.
+
+CA/Browser Forum Baseline Requirements §7.1.2.5.2 require exactly these
+exclusions on every technically constrained sub-CA that may not issue for IP
+addresses. As a result, anyone holding (or having compromised) the key of such
+a sub-CA can issue a certificate for an arbitrary IP address, and `Validator`
+with `RFC5280Policy` and `ServerIdentityPolicy` accepts it for that address. A
+`permitted_subtrees` dNSName entry on the same issuer does not prevent this,
+because iPAddress …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/x509-validator"&gt;https://crates.io/crates/x509-validator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0312.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0312.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/namecare/x509-validator/commit/da661f8ecee820e05d089a76ecb654ff52a2c987"&gt;https://github.com/namecare/x509-validator/commit/da661f8ecee820e05d089a76ecb654ff52a2c987&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0312"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0311: Stack overflow on deeply nested LaTeX input</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0311</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0311"/>
+    <published>2026-09-27T12:00:00Z</published>
+    <updated>2026-09-28T08:45:03Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Stack overflow on deeply nested LaTeX input&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;latex-rust&lt;/code&gt; — fixed in 1.0.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The parser and layout engine in affected versions of `latex-rust` recurse once
+per level of nesting with no limit. Deeply nested input, such as `\frac{1}{…}`,
+braces, `\sqrt{…}`, `\left(`, or superscripts nested hundreds or thousands of
+levels deep, exhausts the call stack.
+
+A stack overflow in Rust aborts the process. It is not a panic, so it cannot be
+caught with `catch_unwind`. A program that renders LaTeX from untrusted input
+can therefore be terminated by a short string. With a release build on an 8 MiB
+stack, 700 nested `\frac{1}{…}` (about 7 KB of input) abort version 1.0.4, and
+10,000 nested braces (about 20 KB) abort it as well. The threshold is lower on
+smaller stacks and in debug builds; on a 2 MiB thread in a debug build, about
+35 nested fractions are enough.
+
+```rust
+let mut s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/latex-rust"&gt;https://crates.io/crates/latex-rust&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0311.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0311.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jscarr64/LaTeX-Rust/issues/6"&gt;https://github.com/jscarr64/LaTeX-Rust/issues/6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jscarr64/LaTeX-Rust/pull/10"&gt;https://github.com/jscarr64/LaTeX-Rust/pull/10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jscarr64/LaTeX-Rust/releases/tag/v1.0.5"&gt;https://github.com/jscarr64/LaTeX-Rust/releases/tag/v1.0.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0311"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-f89h-2fjh-2r9q: gix-fs: Symlink prefix-reuse allows worktree escape during checkout</title>
     <id>https://osv.dev/vulnerability/GHSA-f89h-2fjh-2r9q</id>
@@ -229,44 +274,5 @@ Link to Pull-Request: https://github.com/eclipse-iceoryx/iceoryx2/pull/1956&lt;/
 `sg_stack_graph_free` frees the pointer with `Box::from_raw`. `sg_stack_graph_free(std::ptr::null_mut())` is immediate undefined behavior. The same shape is used by the other `*_free` exports and by getters and mutators that dereference the caller-supplied pointer or pass it to `from_raw_parts` (`sg_stack_graph_nodes`, `sg_stack_graph_add_edges`, and the rest of the pointer-taking functions in `src/c.rs`). Constructors that take no pointer are not part of this issue.
 
 The upstream repository is archived, so a fix cannot be filed there and no patched release exists. The soundness fix is to ma…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/stack-graphs"&gt;https://crates.io/crates/stack-graphs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0302.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0302.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustsec/advisory-db/issues/3241"&gt;https://github.com/rustsec/advisory-db/issues/3241&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/github/stack-graphs"&gt;https://github.com/github/stack-graphs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0302"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0301: Double free in `StackVec::retain` when a predicate or element `Drop` panics</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0301</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0301"/>
-    <published>2026-09-22T12:00:00Z</published>
-    <updated>2026-09-22T21:00:02Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Double free in `StackVec::retain` when a predicate or element `Drop` panics&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stack_collections&lt;/code&gt; — fixed in 0.3.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`StackVec::retain` committed its new length to `self.len` only after
-its internal loop completed. If the retain predicate or a removed
-element&amp;#x27;s `Drop` implementation panicked before the loop finished,
-unwinding proceeded with `self.len` still equal to the original,
-pre-retain length, leaving either a duplicated or already-destroyed
-element inside `0..len`. `StackVec`&amp;#x27;s own `Drop` then revisited that
-slot, causing a double-drop (and for heap-owning types, a double-free).
-
-## Impact
-
-Affects `StackVec&amp;lt;T, CAP&amp;gt;::retain` for `T: Drop` types where the
-predicate or the removed element&amp;#x27;s destructor can panic, on builds
-with unwinding enabled (`panic = &amp;quot;unwind&amp;quot;`). `no_std`/`panic = &amp;quot;abort&amp;quot;`
-builds cannot trigger this, since unwinding never occurs.
-
-## Patch
-
-Fixed in 0.3.3 using an unw…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/stack_collections"&gt;https://crates.io/crates/stack_collections&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0301.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0301.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/OverwrittenCode/stack_collections/pull/4"&gt;https://github.com/OverwrittenCode/stack_collections/pull/4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0301"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0303: `stack-graphs` is archived and unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0303</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0303"/>
-    <published>2026-09-22T12:00:00Z</published>
-    <updated>2026-09-22T21:00:02Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`stack-graphs` is archived and unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stack-graphs&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The upstream repository [github/stack-graphs](https://github.com/github/stack-graphs) has been archived. Issues and pull requests are disabled, so maintainers cannot be reached there.
-
-The last crates.io release is 0.14.1 (2024-12-13). The repository&amp;#x27;s last push was 2025-09-09. There is no published successor.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/stack-graphs"&gt;https://crates.io/crates/stack-graphs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0303.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0303.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustsec/advisory-db/issues/3241"&gt;https://github.com/rustsec/advisory-db/issues/3241&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/github/stack-graphs"&gt;https://github.com/github/stack-graphs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0303"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

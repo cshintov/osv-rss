@@ -3,12 +3,70 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-09-29T10:56:43Z</updated>
+  <updated>2026-09-29T21:30:09Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-wfqx-gjrf-g28r: Crossplane: Signature verification TOCTOU allows installing unverified package content via mutable tag</title>
+    <id>https://osv.dev/vulnerability/GHSA-wfqx-gjrf-g28r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wfqx-gjrf-g28r"/>
+    <published>2026-06-19T20:47:55Z</published>
+    <updated>2026-09-29T21:30:09Z</updated>
+    <category term="Go"/>
+    <category term="GO-2026-5709"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Crossplane: Signature verification TOCTOU allows installing unverified package content via mutable tag&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GO-2026-5709&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/crossplane/crossplane/v2&lt;/code&gt; — fixed in 2.3.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/crossplane/crossplane/v2&lt;/code&gt; — fixed in 2.2.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/crossplane/crossplane&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Crossplane allows package signature verification to be configured via the `ImageConfig` mechanism. When enabled, the package manager uses cosign to verify that packages are correctly signed before pulling and installing them.
+
+When a package is installed using a tag reference (e.g., a semantic version), a malicious OCI registry could serve a correctly signed image for verification, then subsequently serve an unsigned image for installation. This is possible because Crossplane resolves the tag reference separately for each step.
+
+This vulnerability is relevant only for users who do all three of the following:
+
+1. Configure signature verification for packages,
+2. Install packages using tag references rather than digests, and
+3. Install packages from registries they do not control…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/crossplane/crossplane/security/advisories/GHSA-wfqx-gjrf-g28r"&gt;https://github.com/crossplane/crossplane/security/advisories/GHSA-wfqx-gjrf-g28r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/crossplane/crossplane"&gt;https://github.com/crossplane/crossplane&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wfqx-gjrf-g28r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hjf4-fphr-2h65: OpenTelemetry-Go: BatchProcessor can busy-spin when export buffer is full</title>
+    <id>https://osv.dev/vulnerability/GHSA-hjf4-fphr-2h65</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hjf4-fphr-2h65"/>
+    <published>2026-09-29T17:59:53Z</published>
+    <updated>2026-09-29T18:15:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-81872"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenTelemetry-Go: BatchProcessor can busy-spin when export buffer is full&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-81872&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel/sdk/log&lt;/code&gt; — fixed in 0.21.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A `BatchingProcessor` in `go.opentelemetry.io/otel/sdk/log` can enter a tight CPU loop when the asynchronous export buffer is full. Under exporter backpressure, attacker-driven high-volume log emission can keep the queue at or above the batch size, causing repeated immediate export retries and a denial of service through CPU exhaustion.
+
+Introduced in commit: 4af9c20
+
+### Details
+
+`NewBatchingProcessor` wraps the exporter with `newBufferExporter(exporter, 1)` (`sdk/log/batch.go:116-122`), so the asynchronous export input can fill quickly when the downstream exporter blocks. The poll goroutine dequeues a batch with `b.q.TryDequeue`, calls `b.exporter.EnqueueExport(r)`, and then immediately sends on `b.pollTrigger` whenever `qLen &amp;gt;= b.batchSize` (`sdk/log/batch.go:129-165`).
+
+`b…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-hjf4-fphr-2h65"&gt;https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-hjf4-fphr-2h65&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-81872"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-81872&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/issues/6797"&gt;https://github.com/open-telemetry/opentelemetry-go/issues/6797&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/pull/8620"&gt;https://github.com/open-telemetry/opentelemetry-go/pull/8620&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/commit/ba71b09e6ed272e93a669aeaec1e98b1df4cc582"&gt;https://github.com/open-telemetry/opentelemetry-go/commit/ba71b09e6ed272e93a669aeaec1e98b1df4cc582&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go"&gt;https://github.com/open-telemetry/opentelemetry-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/releases/tag/sdk/log/v0.21.0"&gt;https://github.com/open-telemetry/opentelemetry-go/releases/tag/sdk/log/v0.21.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hjf4-fphr-2h65"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p9f8-wvj8-2fg8: OpenTelemetry-Go: UTF-8 replacement rune bypasses attribute length truncation</title>
+    <id>https://osv.dev/vulnerability/GHSA-p9f8-wvj8-2fg8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p9f8-wvj8-2fg8"/>
+    <published>2026-09-29T17:59:10Z</published>
+    <updated>2026-09-29T18:15:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-81869"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenTelemetry-Go: UTF-8 replacement rune bypasses attribute length truncation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-81869&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;go.opentelemetry.io/otel/sdk&lt;/code&gt; — fixed in 1.33.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The OpenTelemetry Go SDK trace package can fail to enforce `AttributeValueLengthLimit` for string attributes containing the valid Unicode replacement character U+FFFD. An oversized attacker-controlled attribute value that includes U+FFFD is returned untruncated, bypassing the configured memory/DoS protection and allowing increased per-span memory usage. The finding is low severity because it requires a deployment with attribute value length limits enabled and attacker-controlled data being recorded into span attributes.
+
+Introduced in commit 49a6536
+
+### Details
+
+String and string-slice span attributes are truncated through `safeTruncate` when `AttributeValueLengthLimit` is non-negative. The finding evidence identifies this enforcement path in `sdk/trace/span.go:303-331`, with…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-p9f8-wvj8-2fg8"&gt;https://github.com/open-telemetry/opentelemetry-go/security/advisories/GHSA-p9f8-wvj8-2fg8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-81869"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-81869&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/issues/5996"&gt;https://github.com/open-telemetry/opentelemetry-go/issues/5996&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/pull/5997"&gt;https://github.com/open-telemetry/opentelemetry-go/pull/5997&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/commit/e016a78c9f5b24a1c2beeaad47686c2f2213f49a"&gt;https://github.com/open-telemetry/opentelemetry-go/commit/e016a78c9f5b24a1c2beeaad47686c2f2213f49a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go"&gt;https://github.com/open-telemetry/opentelemetry-go&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-go/releases/tag/sdk/v1.33.0"&gt;https://github.com/open-telemetry/opentelemetry-go/releases/tag/sdk/v1.33.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p9f8-wvj8-2fg8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-4981: Crash when handling long CNAME response in net</title>
     <id>https://osv.dev/vulnerability/GO-2026-4981</id>

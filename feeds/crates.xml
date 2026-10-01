@@ -3,12 +3,153 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-09-30T07:15:39Z</updated>
+  <updated>2026-10-01T03:56:08Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-9857-6mw7-fq2m: gix-transport: HTTP credentials leaked to redirected host in curl backend</title>
+    <id>https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m"/>
+    <published>2026-05-05T19:16:35Z</published>
+    <updated>2026-10-01T03:56:08Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-82255"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;gix-transport: HTTP credentials leaked to redirected host in curl backend&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82255&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gix-transport&lt;/code&gt; — fixed in 0.56.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The curl-based HTTP transport in `gix-transport` sends user credentials (passwords, tokens) to an attacker-controlled server after an HTTP redirect. When a server responds with a 302 redirect during the initial `GET /info/refs`, gitoxide records the redirected base URL and rewrites all subsequent requests to point at the redirected host. The `Authorization` header is still attached because `add_basic_auth_if_present()` only checks `self.url` (the original, never-updated URL).
+
+The reqwest backend is not affected. Its custom redirect policy at `reqwest/remote.rs` lines 60-64 compares `prev_url.host_str()` to `curr_url.host_str()` and calls `attempt.stop()` on cross-domain redirects, so `redirected_base_url` is never set to a different host.
+
+## Details
+
+The vulnerability involve…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-9857-6mw7-fq2m"&gt;https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-9857-6mw7-fq2m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide"&gt;https://github.com/GitoxideLabs/gitoxide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-35g8-35p8-c8fw: Russh: Unbounded memory exhaustion via CHANNEL_OPEN flood during a client-stalled rekey</title>
+    <id>https://osv.dev/vulnerability/GHSA-35g8-35p8-c8fw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-35g8-35p8-c8fw"/>
+    <published>2026-09-30T23:40:43Z</published>
+    <updated>2026-10-01T00:00:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-102821"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Unbounded memory exhaustion via CHANNEL_OPEN flood during a client-stalled rekey&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102821&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.63.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A russh **server** can be driven to unbounded heap growth (process OOM / kill) by
+a peer that speaks only standard SSH messages, in the **default configuration**.
+
+The peer starts a key re-exchange (sends `SSH_MSG_KEXINIT`) but never sends the
+follow-up `SSH_MSG_KEX_ECDH_INIT`, leaving the server&amp;#x27;s kex state machine in
+`SessionKexState::InProgress` **indefinitely**. While a rekey is in progress the
+server&amp;#x27;s three message-drain paths are all gated off (`if !self.kex.active()`),
+but the network-read path stays active, so every `SSH_MSG_CHANNEL_OPEN` the peer
+sends is processed inline and appends one reply to an **unbounded** internal
+queue (`priority_receiver`, an `UnboundedReceiver`) that is not dequeued until
+the rekey completes. Because the peer decides whether the rekey ever …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-35g8-35p8-c8fw"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-35g8-35p8-c8fw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102821"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102821&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/a282af361ac99bc76b80876d1aae128e89dbf66b"&gt;https://github.com/Eugeny/russh/commit/a282af361ac99bc76b80876d1aae128e89dbf66b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.2"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-35g8-35p8-c8fw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g4mp-vgx3-xrvm: pageant: Out-of-bounds read / oversized allocation in `pageant` MemoryMap::read via a malicious Pageant agent (Windows)</title>
+    <id>https://osv.dev/vulnerability/GHSA-g4mp-vgx3-xrvm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g4mp-vgx3-xrvm"/>
+    <published>2026-09-30T23:41:02Z</published>
+    <updated>2026-10-01T00:00:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-102820"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;pageant: Out-of-bounds read / oversized allocation in `pageant` MemoryMap::read via a malicious Pageant agent (Windows)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102820&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pageant&lt;/code&gt; — fixed in 0.2.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`MemoryMap::read` in the `pageant` crate (part of the russh workspace, used by
+russh&amp;#x27;s SSH-agent client on Windows via `AgentClient::connect_pageant`) copies a
+**peer-controlled** number of bytes out of an 8192-byte shared-memory view with
+**no bounds check** — unlike the sibling `MemoryMap::write`, which correctly
+rejects oversize access with `Error::Overflow`. The byte count comes straight
+from a `u32` length prefix that the responding &amp;quot;Pageant&amp;quot; process writes into the
+shared mapping. A malicious local process that answers as the Pageant agent can
+therefore cause:
+
+- an **out-of-bounds read** past the 8 KiB view (access violation → process
+  crash; or disclosure of adjacent process memory if the following page is
+  committed)
+- an allocation of up to **~4 GiB** from a single …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-g4mp-vgx3-xrvm"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-g4mp-vgx3-xrvm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102820"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102820&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/5d566989ebabfdebfe6b33243d31765a0812260b"&gt;https://github.com/Eugeny/russh/commit/5d566989ebabfdebfe6b33243d31765a0812260b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.2"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g4mp-vgx3-xrvm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-47hw-gvq5-r2gm: russh: Client-side channel-scoped Handler callbacks fire for channel IDs the client never opened</title>
+    <id>https://osv.dev/vulnerability/GHSA-47hw-gvq5-r2gm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-47hw-gvq5-r2gm"/>
+    <published>2026-09-30T23:27:17Z</published>
+    <updated>2026-09-30T23:45:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-102823"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;russh: Client-side channel-scoped Handler callbacks fire for channel IDs the client never opened&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102823&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.63.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+CVE-2026-68930 was fixed by adding `Session::is_established_channel()` in `russh/src/server/encrypted.rs`, which gates every channel-scoped SERVER-side message (CHANNEL_REQUEST, CHANNEL_DATA, CHANNEL_EOF, CHANNEL_CLOSE, CHANNEL_WINDOW_ADJUST, CHANNEL_EXTENDED_DATA) on `enc.channels.get(&amp;amp;channel).is_some_and(|c| c.confirmed)` before invoking any `Handler` callback. The identical validation was never added to the CLIENT side (`russh/src/client/encrypted.rs`), which processes channel-scoped messages sent by the SSH SERVER once the client has authenticated.
+
+### Details
+In `client_read_authenticated` (`russh/src/client/encrypted.rs`, ~lines 431-757), for CHANNEL_DATA, CHANNEL_EXTENDED_DATA, CHANNEL_EOF, CHANNEL_CLOSE, CHANNEL_OPEN_FAILURE, CHANNEL_SUCCESS, CHANNEL_FAILURE, and the …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-47hw-gvq5-r2gm"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-47hw-gvq5-r2gm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102823"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102823&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/3430fd26ecafc0dc3705210f5f39a9119fa22774"&gt;https://github.com/Eugeny/russh/commit/3430fd26ecafc0dc3705210f5f39a9119fa22774&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.1"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-47hw-gvq5-r2gm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p8qx-h547-fjw9: russh: negotiating a MAC-requiring block cipher (CTR/CBC) with mac=none causes a slice-index-out-of-range panic</title>
+    <id>https://osv.dev/vulnerability/GHSA-p8qx-h547-fjw9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p8qx-h547-fjw9"/>
+    <published>2026-09-30T23:27:30Z</published>
+    <updated>2026-09-30T23:45:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-102822"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;russh: negotiating a MAC-requiring block cipher (CTR/CBC) with mac=none causes a slice-index-out-of-range panic&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102822&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.63.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`SshBlockCipher` implementations (AES-CBC, AES-CTR, 3DES-CBC, etc.) report `needs_mac() == true`, meaning they are documented/intended to always be paired with a separate integrity MAC. However, key-exchange negotiation only checks `needs_mac()` inside the *fallback* branch of MAC algorithm selection (used when no common MAC algorithm exists). If both peers&amp;#x27; preferred MAC lists simply contain `none` and it is successfully negotiated through the normal selection path, nothing rejects pairing `none` with a cipher that requires a MAC. Once negotiated, a single crafted packet from either peer causes `cipher::read()` to shrink an already-allocated buffer below the number of bytes it is about to index, causing a Rust slice-index-out-of-range panic and killing that connection&amp;#x27;s task.
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-p8qx-h547-fjw9"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-p8qx-h547-fjw9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102822"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102822&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/2885385abfee279092a41d80c6cb6ac367353159"&gt;https://github.com/Eugeny/russh/commit/2885385abfee279092a41d80c6cb6ac367353159&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.1"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p8qx-h547-fjw9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-w3jg-pjxf-73p4: Russh: Missing X25519 zero-point validation in hybrid ML-KEM key exchange</title>
+    <id>https://osv.dev/vulnerability/GHSA-w3jg-pjxf-73p4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w3jg-pjxf-73p4"/>
+    <published>2026-09-30T23:26:48Z</published>
+    <updated>2026-09-30T23:30:05Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-102824"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Missing X25519 zero-point validation in hybrid ML-KEM key exchange&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102824&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.63.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability
+
+The hybrid ML-KEM 768 + X25519 key exchange implementation in `russh/src/kex/hybrid_mlkem.rs` does not validate that the remote peer&amp;#x27;s X25519 public key is not the zero point (all-zero 32-byte value). This allows a remote peer to force the X25519 contribution to the combined shared secret to zero, reducing the hybrid KEX to a single-algorithm exchange.
+
+Affected code at HEAD (v0.62.4, commit 0089c89):
+
+**Server-side** (`server_dh`, lines 92-93):
+```rust
+let mut c_pk1 = MontgomeryPoint([0; 32]);
+c_pk1.0.copy_from_slice(c_pk1_bytes);
+// No zero-point check - proceeds to: let k_cl = s_secret * c_pk1;
+```
+
+**Client-side** (`compute_shared_secret`, lines 154-155):
+```rust
+let mut s_pk1 = MontgomeryPoint([0; 32]);
+s_pk1.0.copy_from_slice(s_pk1_bytes);
+// No zero-point check - p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-w3jg-pjxf-73p4"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-w3jg-pjxf-73p4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102824"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102824&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/8da8967f196472576b1565d518a0ed60fce60f0c"&gt;https://github.com/Eugeny/russh/commit/8da8967f196472576b1565d518a0ed60fce60f0c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.0"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w3jg-pjxf-73p4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g6xm-f9xp-qq35: Russh: Configured server auth-attempt cap is not enforced in the USERAUTH_REQUEST runtime path</title>
+    <id>https://osv.dev/vulnerability/GHSA-g6xm-f9xp-qq35</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6xm-f9xp-qq35"/>
+    <published>2026-09-30T23:26:17Z</published>
+    <updated>2026-09-30T23:30:05Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-102825"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Configured server auth-attempt cap is not enforced in the USERAUTH_REQUEST runtime path&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102825&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Details
+
+#### Affected versions and vulnerable location
+
+- Confirmed present on default branch `main` at HEAD `0089c89c94753bebbec12b956c07a1cd38740379`.
+- Crate version at HEAD: `0.62.4`.
+- Vulnerable locations on current default branch:
+  - `russh/src/server/mod.rs:91` (`pub max_auth_attempts: usize`)
+  - `russh/src/server/mod.rs:121` (default `max_auth_attempts: 10`)
+  - `russh/src/server/encrypted.rs:89` (`USERAUTH_REQUEST` dispatch into auth handler path)
+  - `russh/src/server/encrypted.rs:98` (`self.common.auth_attempts += 1`)
+  - `russh/src/server/encrypted.rs:53` (only runtime read of `auth_attempts`, used for initial reject timing, not attempt limiting)
+- Default-branch history check did not show a newer merged commit adding enforcement against `config.max_auth_attempts`.
+
+###…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-g6xm-f9xp-qq35"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-g6xm-f9xp-qq35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102825"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102825&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/f8fd0b11a393364dc7f01a182482d86adafdd653"&gt;https://github.com/Eugeny/russh/commit/f8fd0b11a393364dc7f01a182482d86adafdd653&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.6"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6xm-f9xp-qq35"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0213: XSS in ammonia via SVG `animate` and `set` animation tags</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0213</id>
@@ -169,147 +310,5 @@ a sub-CA can issue a certificate for an arbitrary IP address, and `Validator`
 with `RFC5280Policy` and `ServerIdentityPolicy` accepts it for that address. A
 `permitted_subtrees` dNSName entry on the same issuer does not prevent this,
 because iPAddress …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/x509-validator"&gt;https://crates.io/crates/x509-validator&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0312.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0312.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/namecare/x509-validator/commit/da661f8ecee820e05d089a76ecb654ff52a2c987"&gt;https://github.com/namecare/x509-validator/commit/da661f8ecee820e05d089a76ecb654ff52a2c987&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0312"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0311: Stack overflow on deeply nested LaTeX input</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0311</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0311"/>
-    <published>2026-09-27T12:00:00Z</published>
-    <updated>2026-09-28T08:45:03Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Stack overflow on deeply nested LaTeX input&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;latex-rust&lt;/code&gt; — fixed in 1.0.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The parser and layout engine in affected versions of `latex-rust` recurse once
-per level of nesting with no limit. Deeply nested input, such as `\frac{1}{…}`,
-braces, `\sqrt{…}`, `\left(`, or superscripts nested hundreds or thousands of
-levels deep, exhausts the call stack.
-
-A stack overflow in Rust aborts the process. It is not a panic, so it cannot be
-caught with `catch_unwind`. A program that renders LaTeX from untrusted input
-can therefore be terminated by a short string. With a release build on an 8 MiB
-stack, 700 nested `\frac{1}{…}` (about 7 KB of input) abort version 1.0.4, and
-10,000 nested braces (about 20 KB) abort it as well. The threshold is lower on
-smaller stacks and in debug builds; on a 2 MiB thread in a debug build, about
-35 nested fractions are enough.
-
-```rust
-let mut s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/latex-rust"&gt;https://crates.io/crates/latex-rust&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0311.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0311.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jscarr64/LaTeX-Rust/issues/6"&gt;https://github.com/jscarr64/LaTeX-Rust/issues/6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jscarr64/LaTeX-Rust/pull/10"&gt;https://github.com/jscarr64/LaTeX-Rust/pull/10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jscarr64/LaTeX-Rust/releases/tag/v1.0.5"&gt;https://github.com/jscarr64/LaTeX-Rust/releases/tag/v1.0.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0311"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f89h-2fjh-2r9q: gix-fs: Symlink prefix-reuse allows worktree escape during checkout</title>
-    <id>https://osv.dev/vulnerability/GHSA-f89h-2fjh-2r9q</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f89h-2fjh-2r9q"/>
-    <published>2026-05-07T00:01:28Z</published>
-    <updated>2026-09-26T11:56:37Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-44471"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;gix-fs: Symlink prefix-reuse allows worktree escape during checkout&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-44471&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gix-fs&lt;/code&gt; — fixed in 0.21.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-A malicious tree can be constructed that will, when checked out with gitoxide, permit writing an attacker-controlled symlink into any existing directory the user has write access to.
-
-### Details
-
-During checkout, all symlink index entries are deferred and created after regular files using a single shared `gix_worktree::Stack`. Internally, this uses a `gix_fs::Stack`.
-
-`gix_fs::Stack::make_relative_path_current()` caches validated path prefixes: when the previously-processed leaf component exactly matches the leading component(s) of the next path, the leaf-to-directory transition at `gix-fs/src/stack.rs:195-197` invokes only `delegate.push_directory()`, never `delegate.push()`.
-
-In `gix_worktree::stack::delegate::StackDelegate`, when the state member is `State::CreateDirectory…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-f89h-2fjh-2r9q"&gt;https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-f89h-2fjh-2r9q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-44471"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-44471&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide"&gt;https://github.com/GitoxideLabs/gitoxide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f89h-2fjh-2r9q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0310: Various panics, soundness and resource exhaustion issues</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0310</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0310"/>
-    <published>2026-09-25T12:00:00Z</published>
-    <updated>2026-09-25T18:00:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Various panics, soundness and resource exhaustion issues&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;domain&lt;/code&gt; — fixed in 0.12.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Version 0.12.3 fixes a large number of panics, soundness issues, and
-CPU and memory exhaustion issues in all parts of the crate.
-
-The following is a summary of the issues per affected components.
-For details, please see the [release
-notes](https://github.com/NLnetLabs/domain/releases/tag/v0.12.3).
-
-## Base
-
-* Limited the number of compression pointers that are followed when parsing
-  a compressed name to 255 to avoid following really long chains.
-* Limited the length of CNAME chains followed by `Message::canonical_name`
-  to 20. This also fixed an integer overflow in this method when ANCOUNT
-  was`u16::MAX`.
-* Changed `QuestionSection::answer` to skip over all remaining questions
-  without parsing the QNAMEs to avoid being slowed down by malicious
-  names.
-* Added length checks when scanni…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/domain"&gt;https://crates.io/crates/domain&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0310.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0310.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NLnetLabs/domain/releases/tag/v0.12.3"&gt;https://github.com/NLnetLabs/domain/releases/tag/v0.12.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0310"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0309: `SinglyLinkedList::remove` dereferences a null link</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0309</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0309"/>
-    <published>2026-09-20T12:00:00Z</published>
-    <updated>2026-09-25T18:00:04Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`SinglyLinkedList::remove` dereferences a null link&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;bun_collections&lt;/code&gt; — fixed in 0.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In versions before 0.2.1, `SinglyLinkedList::remove` is safe and walks the intrusive list with an unchecked dereference. On an empty list, or when `node` is not in the list, `(*current_elm).next` reads a null pointer. That is undefined behavior. The list head is a raw `*mut Node&amp;lt;T&amp;gt;`, and safe code can construct the empty list.
-
-The maintainer fixed this in 0.2.1 by rejecting those two cases with an unconditional `assert!` before the pointer is followed, matching the upstream Zig `unwrap` on the same paths. 0.2.0 was yanked. Versions 0.1.0 through 0.1.13 are still published and still contain the unchecked walk.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/bun_collections"&gt;https://crates.io/crates/bun_collections&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0309.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0309.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/putao520/bao/issues/46"&gt;https://github.com/putao520/bao/issues/46&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0309"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2018-0011: Enum repr causing potential memory corruption</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2018-0011</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2018-0011"/>
-    <published>2018-12-18T12:00:00Z</published>
-    <updated>2026-09-25T14:45:02Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2018-20998"/>
-    <category term="GHSA-69fv-gw6g-8ccg"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Enum repr causing potential memory corruption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2018-20998, GHSA-69fv-gw6g-8ccg&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;arrayfire&lt;/code&gt; — fixed in 3.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The attribute repr() added to enums to be compatible with C-FFI caused
-memory corruption on MSVC toolchain.
-
-arrayfire crates &amp;lt;= version 3.5.0 do not have this issue when used with
-Rust versions 1.27 or earlier. The issue only started to appear since
-Rust version 1.28.
-
-The issue seems to be interlinked with which version of Rust is being used.
-
-The issue was fixed in crate 3.6.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/arrayfire"&gt;https://crates.io/crates/arrayfire&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2018-0011.html"&gt;https://rustsec.org/advisories/RUSTSEC-2018-0011.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/arrayfire/arrayfire-rust/pull/177"&gt;https://github.com/arrayfire/arrayfire-rust/pull/177&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2018-0011"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0279: Rojo development server vulnerable to DNS rebinding, allowing unauthenticated read/write access and local program execution</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0279</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0279"/>
-    <published>2026-06-02T12:00:00Z</published>
-    <updated>2026-09-25T12:00:03Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-97875"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rojo development server vulnerable to DNS rebinding, allowing unauthenticated read/write access and local program execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-97875&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rojo&lt;/code&gt; — fixed in 7.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Rojo&amp;#x27;s `rojo serve` command starts an unauthenticated HTTP API on localhost
-(default port 34872) with no `Host` or `Origin` header validation. While
-direct cross-origin `fetch()` requests from a malicious website are blocked by
-the browser&amp;#x27;s default CORS policy, an attacker can use DNS rebinding to bypass
-this restriction entirely.
- 
-The serve API is a two-way sync protocol. Once a DNS rebind is established, a
-malicious webpage visited by a developer running `rojo serve` can, without any
-further user interaction:
- 
-- **Read the full project source:** `GET /api/rojo` returns the session ID,
-  root instance ID, and project name. `GET /api/read/{id}` enumerates the
-  complete instance tree including all script contents, exposing proprietary
-  game logic, configuration, and any secrets embedde…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/rojo"&gt;https://crates.io/crates/rojo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0279.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0279.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rojo-rbx/rojo/pull/1270"&gt;https://github.com/rojo-rbx/rojo/pull/1270&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rojo-rbx/rojo/commit/ac6941f05483b0875fda52c7664cd42033db7fa2"&gt;https://github.com/rojo-rbx/rojo/commit/ac6941f05483b0875fda52c7664cd42033db7fa2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0279"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2jx3-ff3v-j7jj: yara-x: Unvalidated deserialization in safe `Rules::deserialize` allows memory corruption and UB</title>
-    <id>https://osv.dev/vulnerability/GHSA-2jx3-ff3v-j7jj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2jx3-ff3v-j7jj"/>
-    <published>2026-09-24T19:09:28Z</published>
-    <updated>2026-09-24T19:15:05Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;yara-x: Unvalidated deserialization in safe `Rules::deserialize` allows memory corruption and UB&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;yara-x&lt;/code&gt; — fixed in 1.19.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&amp;gt; [!NOTE]
-&amp;gt; This finding was identified during an agentic unsafe Rust code review performed by Gemini AI, followed by human review and verification.
-
-
-## The Issue
-
-The crate exports a public safe API [`Rules::deserialize`](https://github.com/VirusTotal/yara-x/blob/5bd1f35db783679c90a3ea1a66bd15fe4e55bef1/lib/src/compiler/rules.rs#L187-L254)  accepting any generic byte sequence `B: AsRef&amp;lt;[u8]&amp;gt;`. It restores compiled rule structures directly from raw bytes using `bincode::serde::decode_from_slice`.
-
-This decoded `Rules` struct contains internal lookup tables, including `sub_patterns: Vec&amp;lt;(PatternId, SubPattern)&amp;gt;`, `atoms: Vec&amp;lt;SubPatternAtom&amp;gt;`, and `lit_pool: BStringPool`. Subsequent safe operations assume these internal tables satisfy strict structural invariants:
-
-- `Rules::get_sub_pattern…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/VirusTotal/yara-x/security/advisories/GHSA-2jx3-ff3v-j7jj"&gt;https://github.com/VirusTotal/yara-x/security/advisories/GHSA-2jx3-ff3v-j7jj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VirusTotal/yara-x/commit/25efa375572efcfbe880a263ee3b0932d4b61a24"&gt;https://github.com/VirusTotal/yara-x/commit/25efa375572efcfbe880a263ee3b0932d4b61a24&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VirusTotal/yara-x"&gt;https://github.com/VirusTotal/yara-x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/VirusTotal/yara-x/releases/tag/v1.19.0"&gt;https://github.com/VirusTotal/yara-x/releases/tag/v1.19.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2jx3-ff3v-j7jj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

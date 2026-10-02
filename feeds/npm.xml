@@ -3,12 +3,83 @@
   <title>OSV — new &amp; updated vulnerabilities: npm</title>
   <subtitle>Open-source vulns affecting npm packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:npm</id>
-  <updated>2026-10-02T05:30:07Z</updated>
+  <updated>2026-10-02T19:45:03Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/npm.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-qxpp-qjg8-x4jv: Trigger.dev: Run replay injects a task run into an attacker-chosen environment (cross-tenant write)</title>
+    <id>https://osv.dev/vulnerability/GHSA-qxpp-qjg8-x4jv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qxpp-qjg8-x4jv"/>
+    <published>2026-10-02T19:31:17Z</published>
+    <updated>2026-10-02T19:45:03Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-85651"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Trigger.dev: Run replay injects a task run into an attacker-chosen environment (cross-tenant write)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-85651&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;trigger.dev&lt;/code&gt; — fixed in 4.5.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The dashboard replay action authorizes the source run (it must belong to the caller&amp;#x27;s org), but the target environment for the replayed run is taken verbatim from the request body and is never checked for org or project membership. The environment lookup used by the replay path filters by id only. As a result, an authenticated user can replay one of their own runs into another organization&amp;#x27;s or project&amp;#x27;s environment, creating a task run there that consumes the victim tenant&amp;#x27;s queue and compute and pollutes their run history.
+
+### Details
+The replay action member-scopes the source run correctly (apps/webapp/app/routes/resources.taskruns.$runParam.replay.ts, the findFirst on taskRun filtered by `project.organization.members.some.userId`), but passes the target environment straigh…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev/security/advisories/GHSA-qxpp-qjg8-x4jv"&gt;https://github.com/triggerdotdev/trigger.dev/security/advisories/GHSA-qxpp-qjg8-x4jv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev/pull/4199"&gt;https://github.com/triggerdotdev/trigger.dev/pull/4199&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev/commit/34b1a181c2a1d33a53ebab88f84b05f81fea4254"&gt;https://github.com/triggerdotdev/trigger.dev/commit/34b1a181c2a1d33a53ebab88f84b05f81fea4254&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev"&gt;https://github.com/triggerdotdev/trigger.dev&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev/releases/tag/v4.5.2"&gt;https://github.com/triggerdotdev/trigger.dev/releases/tag/v4.5.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qxpp-qjg8-x4jv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xxv7-2vv3-h682: Trigger.dev: Server-side request forgery via unvalidated webhook alert-channel URL</title>
+    <id>https://osv.dev/vulnerability/GHSA-xxv7-2vv3-h682</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xxv7-2vv3-h682"/>
+    <published>2026-10-02T19:31:33Z</published>
+    <updated>2026-10-02T19:45:03Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2026-85650"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Trigger.dev: Server-side request forgery via unvalidated webhook alert-channel URL&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-85650&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;trigger.dev&lt;/code&gt; — fixed in 4.5.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A project member can create a webhook alert channel whose delivery URL points at an internal address, and trigger.dev&amp;#x27;s control plane will send the alert there with no SSRF protection. The webhook URL is stored as an unvalidated string and is fetched directly from the webapp server, so a low-privilege authenticated user can make the server issue POST requests to internal-only services and cloud metadata endpoints (for example http://169.254.169.254/). No private-IP, scheme, or redirect filtering exists anywhere in the webapp.
+
+### Details
+The delivery sink performs a raw fetch to the stored URL, apps/webapp/app/v3/services/alerts/deliverAlert.server.ts:949 (#deliverWebhook):
+```js
+const response = await fetch(webhook.url, {
+  method: &amp;quot;POST&amp;quot;,
+  headers: {
+    &amp;quot;content-type&amp;quot;: &amp;quot;ap…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev/security/advisories/GHSA-xxv7-2vv3-h682"&gt;https://github.com/triggerdotdev/trigger.dev/security/advisories/GHSA-xxv7-2vv3-h682&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev/pull/4199"&gt;https://github.com/triggerdotdev/trigger.dev/pull/4199&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev"&gt;https://github.com/triggerdotdev/trigger.dev&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/triggerdotdev/trigger.dev/releases/tag/v4.5.2"&gt;https://github.com/triggerdotdev/trigger.dev/releases/tag/v4.5.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xxv7-2vv3-h682"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-17456: Malicious code in @smwebserver/static (npm)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-17456</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-17456"/>
+    <published>2026-10-02T18:36:13Z</published>
+    <updated>2026-10-02T19:00:06Z</updated>
+    <category term="npm"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in @smwebserver/static (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@smwebserver/static&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: ossf-package-analysis (11c6a6260058ce71a6f2c50eec8080c2b6e7c2fd8da807cb38e631e7ed9a15d5)
+The OpenSSF Package Analysis project identified &amp;#x27;@smwebserver/static&amp;#x27; @ 99.9.1 (npm) as malicious.
+
+It is considered malicious because:
+
+- The package communicates with a domain associated with malicious activity.
+&lt;/p&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-17456"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-q7jf-gf43-6x6p: Hono vulnerable to Vary Header Injection leading to potential CORS Bypass</title>
+    <id>https://osv.dev/vulnerability/GHSA-q7jf-gf43-6x6p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q7jf-gf43-6x6p"/>
+    <published>2025-10-24T19:15:13Z</published>
+    <updated>2026-10-02T18:45:04Z</updated>
+    <category term="npm"/>
+    <category term="CVE-2025-71381"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Hono vulnerable to Vary Header Injection leading to potential CORS Bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71381&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hono&lt;/code&gt; — fixed in 4.10.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary  
+A flaw in the CORS middleware allowed request `Vary` headers to be reflected into the response, enabling attacker-controlled `Vary` values and potentially affecting cache behavior.
+
+### Details  
+The middleware previously copied the `Vary` header from the request when `origin` was not set to `&amp;quot;*&amp;quot;`.  Since `Vary` is a response header that should only be managed by the server, this could allow an attacker to influence caching behavior or cause inconsistent CORS handling.
+
+Most environments will see impact only when shared caches or proxies rely on the `Vary` header. The practical effect varies by configuration.
+
+### Impact  
+May cause cache key pollution and inconsistent CORS enforcement in certain setups. No direct confidentiality, integrity, or availability impact in default …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/honojs/hono/security/advisories/GHSA-q7jf-gf43-6x6p"&gt;https://github.com/honojs/hono/security/advisories/GHSA-q7jf-gf43-6x6p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-71381"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-71381&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/honojs/hono/commit/d9b8b4b73b4f997994f2764013207365fe711282"&gt;https://github.com/honojs/hono/commit/d9b8b4b73b4f997994f2764013207365fe711282&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/honojs/hono"&gt;https://github.com/honojs/hono&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/hono-vary-header-injection-in-cors-middleware"&gt;https://www.vulncheck.com/advisories/hono-vary-header-injection-in-cors-middleware&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q7jf-gf43-6x6p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-17444: Malicious code in danz-bails (npm)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-17444</id>
@@ -1117,7 +1188,7 @@ _-= Per source details. Do not edit below this line.=-_
 index.js contains top-level code that fetches /profile and sends document.cookie together with the response body to a hardcoded webhook.site URL (https://webhook.site/42c6d937-77c7-42a5-8678-ef06b4501e38) via a GET request with the cookie and profile content passed as URL-encoded query parameters. Any consumer that requires or imports this package in a browser-like context leaks the caller&amp;#x27;s session cookies and /profile response to an attacker-controlled collector. The destination is a third-party request-inspection service unrelated to any documented purpose of the package, and the exfiltration path fires on module load rather than th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/pulse-pwn-9f3a2/v/1.0.0"&gt;https://www.npmjs.com/package/pulse-pwn-9f3a2/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-fwr5-cj49-cq4h"&gt;https://github.com/advisories/GHSA-fwr5-cj49-cq4h&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-16254"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] GHSA-vcvr-r3jv-pc5j: Next.js: Remote Code Execution in next/og ImageResponse</title>
+    <title>[UPDATED] GHSA-vcvr-r3jv-pc5j: Next.js: Remote Code Execution in next/og ImageResponse</title>
     <id>https://osv.dev/vulnerability/GHSA-vcvr-r3jv-pc5j</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vcvr-r3jv-pc5j"/>
     <published>2026-09-30T14:48:30Z</published>
@@ -1731,215 +1802,5 @@ The allowlist matched the approved origin in the query string, but Netlify parse
 ## Impact
 
 An unauthenticated attacker can bypass the configured `image.domains` or `image.remotePatterns` allowlist through the public `/.n…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/withastro/astro/security/advisories/GHSA-4233-jc72-56c5"&gt;https://github.com/withastro/astro/security/advisories/GHSA-4233-jc72-56c5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102983"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102983&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/withastro/astro/pull/17752"&gt;https://github.com/withastro/astro/pull/17752&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/withastro/astro/commit/e362d4cf540b27730482455c8fc02efe57d16702"&gt;https://github.com/withastro/astro/commit/e362d4cf540b27730482455c8fc02efe57d16702&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/withastro/astro"&gt;https://github.com/withastro/astro&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/withastro/astro/releases/tag/@astrojs/netlify@8.2.4"&gt;https://github.com/withastro/astro/releases/tag/@astrojs/netlify@8.2.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4233-jc72-56c5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-10497: Malicious code in ddok-modal (npm)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-10497</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-10497"/>
-    <published>2026-07-13T21:44:42Z</published>
-    <updated>2026-09-30T16:45:04Z</updated>
-    <category term="npm"/>
-    <category term="GHSA-5xvp-j6m9-rwr6"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ddok-modal (npm)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-5xvp-j6m9-rwr6&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ddok-modal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (0326cd953f229feb020dd3c1cd882246b6bac2cb0be8ffe9e47d063d9f59c9c6)
-ddok-modal presents itself as a reusable React wallet-connection modal supporting MetaMask, Phantom, Rabby, TronLink, Bitget, Coinbase, and Solflare, but the modal UIs are credential-harvesting impersonations of those wallets. Each wallet &amp;#x27;unlock&amp;#x27; modal binds an onChange handler that calls sendKeyToBackend(userId, &amp;#x27;cha&amp;#x27;, newKeyword, &amp;lt;wallet_type&amp;gt;) on every keystroke and a submit handler that calls sendKeyToBackend(..., &amp;#x27;enter&amp;#x27;, keyword,...) on form submission, POSTing the captured password / recovery phrase to https://api.wagmiwallet.org/api/keys (with a websocket fallback at wss://api.wagmiwallet.org) and a secondary endpoint at https…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://www.npmjs.com/package/ddok-modal/v/1.0.0"&gt;https://www.npmjs.com/package/ddok-modal/v/1.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-5xvp-j6m9-rwr6"&gt;https://github.com/advisories/GHSA-5xvp-j6m9-rwr6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-10497"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-ff3f-86qr-9cv3: Angular Server-Side Rendering (SSR): Denial of Service via Numeric URL Matrix Parameters</title>
-    <id>https://osv.dev/vulnerability/GHSA-ff3f-86qr-9cv3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-ff3f-86qr-9cv3"/>
-    <published>2026-09-30T15:40:47Z</published>
-    <updated>2026-09-30T16:00:28Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101896"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Angular Server-Side Rendering (SSR): Denial of Service via Numeric URL Matrix Parameters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101896&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@angular/router&lt;/code&gt; — fixed in 22.2.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;@angular/router&lt;/code&gt; — fixed in 21.2.24&lt;/li&gt;&lt;li&gt;&lt;code&gt;@angular/router&lt;/code&gt; — fixed in 20.3.32&lt;/li&gt;&lt;li&gt;&lt;code&gt;@angular/router&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A denial of service (DoS) vulnerability was identified in `@angular/router` when Server-Side Rendering (SSR) is enabled on Node.js (V8).
-
-When `@angular/router` parses incoming request URLs, it extracts path segments, matrix parameters, and child outlets into plain JavaScript objects (`Record&amp;lt;string, string&amp;gt;`). When matrix parameter names or outlet names are numeric strings (such as `/a;990;2522`), the V8 JavaScript engine interprets them as array-indexed properties rather than named properties.
-
-Under V8&amp;#x27;s internal property-storage heuristics, setting numeric keys on an initially empty object causes V8 to allocate a dense array backing store (`HOLEY_ELEMENTS`) sized to the maximum index rather than falling back to sparse dictionary storage. Specifically, assigning sequential or moderately…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/angular/angular/security/advisories/GHSA-ff3f-86qr-9cv3"&gt;https://github.com/angular/angular/security/advisories/GHSA-ff3f-86qr-9cv3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/angular/angular/issues/70716"&gt;https://github.com/angular/angular/issues/70716&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/angular/angular/pull/70717"&gt;https://github.com/angular/angular/pull/70717&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/angular/angular/commit/03872a80bcf1c89b2b04cdd3f444b2ee954da583"&gt;https://github.com/angular/angular/commit/03872a80bcf1c89b2b04cdd3f444b2ee954da583&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/angular/angular/commit/5af61216eab8bf4a6697a1d79bda3d857c06f89d"&gt;https://github.com/angular/angular/commit/5af61216eab8bf4a6697a1d79bda3d857c06f89d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/angular/angular/commit/ddfe21072ba32ca4cd9d7d3c6b7df66af81d58c4"&gt;https://github.com/angular/angular/commit/ddfe21072ba32ca4cd9d7d3c6b7df66af81d58c4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/angular/angular"&gt;https://github.com/angular/angular&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-ff3f-86qr-9cv3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-gfhx-hw2g-v5hg: Serialize JavaScript: Cross-site scripting (XSS) via unescaped &lt;/script&gt; in serialized function bodies</title>
-    <id>https://osv.dev/vulnerability/GHSA-gfhx-hw2g-v5hg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gfhx-hw2g-v5hg"/>
-    <published>2026-09-30T15:40:05Z</published>
-    <updated>2026-09-30T16:00:18Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-97711"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Serialize JavaScript: Cross-site scripting (XSS) via unescaped &amp;lt;/script&amp;gt; in serialized function bodies&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-97711&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;serialize-javascript&lt;/code&gt; — fixed in 7.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-`serialize-javascript` escapes its output so it is safe to embed inside a
-`&amp;lt;script&amp;gt;` element. In 7.1.1 that guarantee does not hold for **function
-values**: a crafted function body can carry a literal, unescaped `&amp;lt;/script&amp;gt;`
-into the output, terminating the script element early so the remainder is
-parsed as HTML.
-
-`SCRIPT_CLOSE_REGEXP` used `&amp;lt;\/script[^&amp;gt;]*&amp;gt;` as its first alternative. The
-character class excludes only `&amp;gt;`, so a single match could run from one
-`&amp;lt;/script` all the way to the next `&amp;gt;` anywhere in the source — swallowing a
-second, complete `&amp;lt;/script&amp;gt;` along the way. Only one replacement is emitted
-per match, and the plain-code branch neutralizes just the leading `&amp;lt;`
-(`&amp;#x27;&amp;lt; &amp;#x27; + match.slice(1)`), so the swallowed tag was re-emitted verbatim.
-
-Reaching that shape requires …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/yahoo/serialize-javascript/security/advisories/GHSA-gfhx-hw2g-v5hg"&gt;https://github.com/yahoo/serialize-javascript/security/advisories/GHSA-gfhx-hw2g-v5hg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-97711"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-97711&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yahoo/serialize-javascript/commit/2bdbaaff9cb8a4639135eb24cfcd383d3fefb534"&gt;https://github.com/yahoo/serialize-javascript/commit/2bdbaaff9cb8a4639135eb24cfcd383d3fefb534&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yahoo/serialize-javascript"&gt;https://github.com/yahoo/serialize-javascript&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/yahoo/serialize-javascript/releases/tag/v7.1.2"&gt;https://github.com/yahoo/serialize-javascript/releases/tag/v7.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gfhx-hw2g-v5hg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-m8m8-qj5v-23w3: Axios: Node HTTP adapter prototype-pollution gadget allows request socket hijack via inherited createConnection</title>
-    <id>https://osv.dev/vulnerability/GHSA-m8m8-qj5v-23w3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m8m8-qj5v-23w3"/>
-    <published>2026-09-30T15:32:51Z</published>
-    <updated>2026-09-30T15:46:18Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101905"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Axios: Node HTTP adapter prototype-pollution gadget allows request socket hijack via inherited createConnection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101905&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Axios&amp;#x27; Node HTTP adapter can act as a read-side prototype-pollution gadget for Node&amp;#x27;s sensitive `createConnection` request option. The adapter creates a null-prototype options object, but Node&amp;#x27;s HTTP client can copy or normalize request options into ordinary objects before connection creation. If `Object.prototype.createConnection` has been polluted elsewhere in the same process, Node can call the inherited function and create a socket to an attacker-controlled endpoint.
-
-Axios does not create the prototype pollution source. The vulnerability is that axios does not set an own safe value for a sensitive transport option before handing options to Node.
-
-## Impact
-
-Given a prior same-process prototype-pollution primitive, an attacker can redirect later axios Node HTTP requests at …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-m8m8-qj5v-23w3"&gt;https://github.com/axios/axios/security/advisories/GHSA-m8m8-qj5v-23w3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-101905"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-101905&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/pull/11141"&gt;https://github.com/axios/axios/pull/11141&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a"&gt;https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/releases/tag/v1.20.0"&gt;https://github.com/axios/axios/releases/tag/v1.20.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m8m8-qj5v-23w3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-j8rh-479h-cp32: Axios: Header Injection via Inherited headers After Minimal Interceptor</title>
-    <id>https://osv.dev/vulnerability/GHSA-j8rh-479h-cp32</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j8rh-479h-cp32"/>
-    <published>2026-09-30T15:35:14Z</published>
-    <updated>2026-09-30T15:46:18Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101904"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Axios: Header Injection via Inherited headers After Minimal Interceptor&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101904&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Axios request interceptors may return a replacement config object. If an interceptor returns a plain object without an own `headers` property, `dispatchRequest()` later evaluates `config.headers` and can resolve an inherited `Object.prototype.headers` value. In a process where another vulnerability has polluted `Object.prototype.headers`, axios can send attacker-controlled headers.
-
-Axios does not create the prototype pollution source, and the interceptor itself is trusted caller code. The vulnerable behavior is the post-interceptor axios config read that reopens a prototype-pollution gadget after earlier null-prototype config hardening.
-
-## Impact
-
-An attacker with a prior same-process prototype-pollution primitive can inject headers into affected axios requests when the appli…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-j8rh-479h-cp32"&gt;https://github.com/axios/axios/security/advisories/GHSA-j8rh-479h-cp32&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-101904"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-101904&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/pull/11141"&gt;https://github.com/axios/axios/pull/11141&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a"&gt;https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/releases/tag/v1.20.0"&gt;https://github.com/axios/axios/releases/tag/v1.20.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j8rh-479h-cp32"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-f596-whhp-79r4: @grpc/grpc-js: The server transmits some error messages thrown by method handlers to the client in status messages</title>
-    <id>https://osv.dev/vulnerability/GHSA-f596-whhp-79r4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f596-whhp-79r4"/>
-    <published>2026-09-30T15:35:41Z</published>
-    <updated>2026-09-30T15:46:17Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101915"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;@grpc/grpc-js: The server transmits some error messages thrown by method handlers to the client in status messages&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101915&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@grpc/grpc-js&lt;/code&gt; — fixed in 1.13.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;@grpc/grpc-js&lt;/code&gt; — fixed in 1.14.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-If an application method handler crashes, the error message is included in the status message sent to the client. This can leak to the client any sensitive data that may be included in the error message. This impacts anyone using `@grpc/grpc-js` to run servers.
-
-### Patches
-This vulnerability is fixed in 1.13.6 and 1.14.5.
-
-### Workarounds
-This can be avoided by using a top-level error handler in method handlers to strip out sensitive error information.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/security/advisories/GHSA-f596-whhp-79r4"&gt;https://github.com/grpc/grpc-node/security/advisories/GHSA-f596-whhp-79r4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-101915"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-101915&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/commit/350de32860428cc62473a00bee4035360690ffea"&gt;https://github.com/grpc/grpc-node/commit/350de32860428cc62473a00bee4035360690ffea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/commit/7c5c5181159c6ddd292805881ef2cdec29bb475f"&gt;https://github.com/grpc/grpc-node/commit/7c5c5181159c6ddd292805881ef2cdec29bb475f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/commit/e8329b122ca99ba10877e990c2f6edd40224fd0d"&gt;https://github.com/grpc/grpc-node/commit/e8329b122ca99ba10877e990c2f6edd40224fd0d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node"&gt;https://github.com/grpc/grpc-node&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/releases/tag/@grpc/grpc-js%401.13.6"&gt;https://github.com/grpc/grpc-node/releases/tag/@grpc/grpc-js%401.13.6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/releases/tag/@grpc/grpc-js%401.14.5"&gt;https://github.com/grpc/grpc-node/releases/tag/@grpc/grpc-js%401.14.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f596-whhp-79r4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4hqw-qxg8-jxx2: Axios: Fetch Adapter Header Injection via Inherited FormData getHeaders</title>
-    <id>https://osv.dev/vulnerability/GHSA-4hqw-qxg8-jxx2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4hqw-qxg8-jxx2"/>
-    <published>2026-09-30T15:34:46Z</published>
-    <updated>2026-09-30T15:46:17Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101900"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Axios: Fetch Adapter Header Injection via Inherited FormData getHeaders&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101900&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Axios contains a guard in the Node HTTP adapter to avoid using an inherited `Object.prototype.getHeaders` as a FormData header source. The fetch adapter calls the shared `resolveConfig()` helper before dispatch, and that helper lacks the same guard. If another vulnerability pollutes `Object.prototype` with FormData-like properties and `getHeaders()`, the fetch adapter can merge attacker-controlled headers into the outbound request.
-
-Axios does not create the prototype pollution source. This is a read-side gadget in the fetch adapter configuration path.
-
-## Impact
-
-An attacker with a prior same-process prototype-pollution primitive can inject headers into fetch-adapter requests. Depending on the target service, this may affect authorization, metadata-service access, cache behavi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-4hqw-qxg8-jxx2"&gt;https://github.com/axios/axios/security/advisories/GHSA-4hqw-qxg8-jxx2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-101900"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-101900&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/pull/11141"&gt;https://github.com/axios/axios/pull/11141&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a"&gt;https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/releases/tag/v1.20.0"&gt;https://github.com/axios/axios/releases/tag/v1.20.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4hqw-qxg8-jxx2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-p98j-92pf-mc4p: DOMPurify: IN_PLACE: node-removing afterSanitize hook leaves detached subtree event handlers armed, causing DOM XSS</title>
-    <id>https://osv.dev/vulnerability/GHSA-p98j-92pf-mc4p</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p98j-92pf-mc4p"/>
-    <published>2026-09-30T15:37:57Z</published>
-    <updated>2026-09-30T15:46:06Z</updated>
-    <category term="npm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;DOMPurify: IN_PLACE: node-removing afterSanitize hook leaves detached subtree event handlers armed, causing DOM XSS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dompurify&lt;/code&gt; — fixed in 3.4.16&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-In `IN_PLACE` mode DOMPurify sanitizes the caller&amp;#x27;s live DOM subtree directly. To close a known hazard (GHSA-55q2-fjhq-7xh7), the library neutralizes any node a hook detaches during sanitization by stripping its subtree&amp;#x27;s non-allow-listed attributes, but this neutralization is wired only into the `beforeSanitizeElements` and `uponSanitizeElement` hook sites. An `afterSanitizeElements` or `afterSanitizeAttributes` hook that removes a non-root element (a documented, supported pattern) detaches that element&amp;#x27;s subtree with no neutralization, so descendant `on*` handlers remain armed on the caller&amp;#x27;s live tree after `sanitize()` returns, yielding DOM XSS. No special privilege is required beyond supplying markup to an application that uses `IN_PLACE` together with a node-removing afte…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/security/advisories/GHSA-p98j-92pf-mc4p"&gt;https://github.com/cure53/DOMPurify/security/advisories/GHSA-p98j-92pf-mc4p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/pull/1636"&gt;https://github.com/cure53/DOMPurify/pull/1636&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/commit/b9b9d80f7e401771c2ccaef5f45def7eec8f27d7"&gt;https://github.com/cure53/DOMPurify/commit/b9b9d80f7e401771c2ccaef5f45def7eec8f27d7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify"&gt;https://github.com/cure53/DOMPurify&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cure53/DOMPurify/releases/tag/3.4.16"&gt;https://github.com/cure53/DOMPurify/releases/tag/3.4.16&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p98j-92pf-mc4p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-r4gj-5m52-g5wh: Axios: maxRedirects: 0 is not enforced by the fetch adapter, allowing redirect-based SSRF</title>
-    <id>https://osv.dev/vulnerability/GHSA-r4gj-5m52-g5wh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r4gj-5m52-g5wh"/>
-    <published>2026-09-30T15:31:58Z</published>
-    <updated>2026-09-30T15:45:41Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101907"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Axios: maxRedirects: 0 is not enforced by the fetch adapter, allowing redirect-based SSRF&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101907&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Axios exposes `maxRedirects` to limit redirect following, and `maxRedirects: 0` is used by applications as a redirect-based SSRF guard. The Node HTTP adapter enforces this option. The fetch adapter does not read it and does not set a Fetch API `redirect` mode, so the runtime default of `redirect: &amp;#x27;follow&amp;#x27;` applies.
-
-Applications are affected when they rely on `maxRedirects: 0` and use the fetch adapter, either explicitly or because the runtime selects it.
-
-## Impact
-
-An attacker who controls the initial URL or a redirecting server can cause a fetch-adapter request to follow a redirect even though the caller configured `maxRedirects: 0`. If the redirect target is reachable only from the application environment, this can expose internal responses or trigger state-changing interna…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-r4gj-5m52-g5wh"&gt;https://github.com/axios/axios/security/advisories/GHSA-r4gj-5m52-g5wh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-101907"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-101907&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/pull/11141"&gt;https://github.com/axios/axios/pull/11141&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a"&gt;https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/releases/tag/v1.20.0"&gt;https://github.com/axios/axios/releases/tag/v1.20.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r4gj-5m52-g5wh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-44g4-m2mj-wpvx: Axios: CIDR-form NO_PROXY entries are ignored, causing proxy exclusion bypass for internal IP ranges</title>
-    <id>https://osv.dev/vulnerability/GHSA-44g4-m2mj-wpvx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-44g4-m2mj-wpvx"/>
-    <published>2026-09-30T15:32:30Z</published>
-    <updated>2026-09-30T15:45:41Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101899"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Axios: CIDR-form NO_PROXY entries are ignored, causing proxy exclusion bypass for internal IP ranges&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101899&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Axios supports proxy environment variables and evaluates `NO_PROXY` exclusions in the Node.js adapter. CIDR-form `NO_PROXY` entries such as `127.0.0.0/8`, `10.0.0.0/8`, or `169.254.169.254/32` are not interpreted as IP ranges. As a result, a request to an IP address inside a configured CIDR exclusion can still be sent through the configured proxy.
-
-This affects deployments that rely on CIDR notation to keep loopback, private, Kubernetes, CI, or cloud metadata traffic away from proxy infrastructure.
-
-## Impact
-
-If the configured proxy is outside the intended trust boundary, requests that operators expected to bypass the proxy may be exposed to it. For plaintext HTTP targets, the proxy can see and modify URLs, headers, and bodies. For HTTPS targets, the proxy still observes conne…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-44g4-m2mj-wpvx"&gt;https://github.com/axios/axios/security/advisories/GHSA-44g4-m2mj-wpvx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/pull/11141"&gt;https://github.com/axios/axios/pull/11141&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a"&gt;https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/releases/tag/v1.20.0"&gt;https://github.com/axios/axios/releases/tag/v1.20.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-44g4-m2mj-wpvx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-m9gg-hp2v-232j: @grpc/grpc-js: In certain configurations, getAuthContext can return unauthorized certificates as though they were authorized</title>
-    <id>https://osv.dev/vulnerability/GHSA-m9gg-hp2v-232j</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m9gg-hp2v-232j"/>
-    <published>2026-09-30T15:35:53Z</published>
-    <updated>2026-09-30T15:45:30Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101916"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;@grpc/grpc-js: In certain configurations, getAuthContext can return unauthorized certificates as though they were authorized&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101916&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;@grpc/grpc-js&lt;/code&gt; — fixed in 1.13.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;@grpc/grpc-js&lt;/code&gt; — fixed in 1.14.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-When server credentials are created with the `requireClientCertificate` option set to `false`, `getAuthContext` does not distinguish between authorized and unauthorized certificates in its return value. This can create improper authentication vulnerabilities for `@grpc/grpc-js` users who use the result of `getAuthContext` for authentication.
-
-In particular, `@grpc/grpc-js-xds` can both set the `requireClientCertificate` option to `false` and use the return value of `getAuthContext` for RBAC authentication in some configurations.
-
-### Patches
-
-This vulenrability is fixed in 1.13.6 and 1.14.5.
-
-### Workarounds
-`@grpc/grpc-js` users using `getAuthContext` this way can avoid this problem by setting `requireClientCertificate` to `true`. `@grpc/grpc-js-xds` users using RBAC can avoid …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/security/advisories/GHSA-m9gg-hp2v-232j"&gt;https://github.com/grpc/grpc-node/security/advisories/GHSA-m9gg-hp2v-232j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-101916"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-101916&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/commit/2a84ec8b01b9db68ed9d2b117a53a81449edb8ee"&gt;https://github.com/grpc/grpc-node/commit/2a84ec8b01b9db68ed9d2b117a53a81449edb8ee&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/commit/b4e0079c6d22a2adedfcac748e0bc083f783bc7c"&gt;https://github.com/grpc/grpc-node/commit/b4e0079c6d22a2adedfcac748e0bc083f783bc7c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node"&gt;https://github.com/grpc/grpc-node&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/grpc/grpc-node/releases/tag/@grpc/grpc-js%401.14.5"&gt;https://github.com/grpc/grpc-node/releases/tag/@grpc/grpc-js%401.14.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m9gg-hp2v-232j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-vh66-26gq-q6x8: Axios: Prototype pollution gadget in fetch adapter can alter outbound requests</title>
-    <id>https://osv.dev/vulnerability/GHSA-vh66-26gq-q6x8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vh66-26gq-q6x8"/>
-    <published>2026-09-30T15:13:16Z</published>
-    <updated>2026-09-30T15:30:04Z</updated>
-    <category term="npm"/>
-    <category term="CVE-2026-101908"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Axios: Prototype pollution gadget in fetch adapter can alter outbound requests&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-101908&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:L/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;axios&lt;/code&gt; — fixed in 1.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Axios fetch adapter requests can be altered by inherited properties on `fetchOptions`. The adapter resolves method, headers, body, signal, and credentials into `resolvedOptions`, creates a `Request`, and then calls `fetch(request, fetchOptions)` instead of `fetch(request, resolvedOptions)`. In runtimes such as Node&amp;#x27;s undici-backed fetch, inherited `fetchOptions.headers` can override the headers already placed on the `Request`.
-
-Axios does not create the prototype pollution source. This is a read-side gadget that becomes exploitable after same-process prototype pollution.
-
-## Impact
-
-An attacker with a prior prototype-pollution primitive can cause affected fetch-adapter requests to send attacker-controlled headers and drop caller-specified headers. This can affect authorization,…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/security/advisories/GHSA-vh66-26gq-q6x8"&gt;https://github.com/axios/axios/security/advisories/GHSA-vh66-26gq-q6x8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-101908"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-101908&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/pull/11141"&gt;https://github.com/axios/axios/pull/11141&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a"&gt;https://github.com/axios/axios/commit/d19040bda7a8be2f82c3c6e1a5bc03917daee39a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios"&gt;https://github.com/axios/axios&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/axios/axios/releases/tag/v1.20.0"&gt;https://github.com/axios/axios/releases/tag/v1.20.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vh66-26gq-q6x8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

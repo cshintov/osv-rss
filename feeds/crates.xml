@@ -3,12 +3,63 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-10-03T03:56:08Z</updated>
+  <updated>2026-10-03T08:15:02Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2024-0448: `parse_arguments` reads a caller-supplied pointer as a slice</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2024-0448</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2024-0448"/>
+    <published>2024-11-25T12:00:00Z</published>
+    <updated>2026-10-03T08:15:02Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`parse_arguments` reads a caller-supplied pointer as a slice&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rutie&lt;/code&gt; — fixed in 0.10.3, 0.11.3, 0.12.1, 0.13.1, 0.14.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`parse_arguments` is safe. It takes `arguments: *const AnyObject` and `argc`, and calls `slice::from_raw_parts(arguments, argc as usize)`.
+
+It does not check that `arguments` is non-null and aligned, or that `argc` elements are initialized. Safe Rust can pass a null pointer or a length past the allocation. The maintainer confirmed this on 2026-10-03, including a debug abort on Rust 1.78+ when Ruby calls an arity -1 method (`to_s` via `format`, `puts`, or `Array#join`) with a NULL `argv` and `argc` of 0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/rutie"&gt;https://crates.io/crates/rutie&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2024-0448.html"&gt;https://rustsec.org/advisories/RUSTSEC-2024-0448.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/danielpclark/rutie/issues/190"&gt;https://github.com/danielpclark/rutie/issues/190&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2024-0448"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0328: `decompress`: tar-family extractors write archive entries without a path-traversal check (tar-slip)</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0328</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0328"/>
+    <published>2026-09-19T12:00:00Z</published>
+    <updated>2026-10-03T07:30:03Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`decompress`: tar-family extractors write archive entries without a path-traversal check (tar-slip)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;decompress&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The tar-family extractors in `decompress` (`.tar`, `.tar.gz`, `.tar.xz`,
+`.tar.bz2`, `.tar.zst`) build each output path from the **raw archive entry path**
+and write to it with no traversal check, so a malicious archive can write files
+**outside** the destination directory, a &amp;quot;tar-slip&amp;quot; / zip-slip path traversal
+(CWE-22 / CWE-23).
+
+In `src/decompressors/tar_common.rs` (`tar_extract`):
+
+```rust
+let filepath = entry.path()?;                                    // raw entry path
+let filepath = filepath.components().skip(opts.strip).collect::&amp;lt;PathBuf&amp;gt;();
+                                     // strips leading components only — keeps `..`
+let outpath = to.join(filepath);
+// ...
+let mut outfile = fs::File::create(&amp;amp;outpath)?;                   // writes anywhere
+```
+
+`.components().skip(opts.strip)…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/decompress"&gt;https://crates.io/crates/decompress&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0328.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0328.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rusty-ferris-club/decompress/issues/21"&gt;https://github.com/rusty-ferris-club/decompress/issues/21&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0328"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0223: Preemption and traps during bulk operations enable breaking internal VM state</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0223</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0223"/>
+    <published>2026-07-31T12:00:00Z</published>
+    <updated>2026-10-03T07:19:45Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-104855"/>
+    <category term="GHSA-2hw9-mc66-jc2q"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Preemption and traps during bulk operations enable breaking internal VM state&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104855, GHSA-2hw9-mc66-jc2q&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:H/UI:P/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 46.0.2, 47.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
+located at
+https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q
+For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0223.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0223.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0223"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-pvmv-cwg8-v6c8: Zebra v4.4.0 still accepts V5 SIGHASH_SINGLE without a corresponding output</title>
     <id>https://osv.dev/vulnerability/GHSA-pvmv-cwg8-v6c8</id>
@@ -121,20 +172,6 @@ This bug was fixed in upstream pingora v0.8.1, but our fork (v0.8.2) is missing 
 Wasmtime&amp;#x27;s implementation of bulk-data-transfer WebAssembly instructions, such as `memory.copy`, contains a vulnerability when a preemption via epochs or fuel is combined with altering the store&amp;#x27;s state or cancelling a computation. To prevent these operations from taking too long Wasmtime injects fuel/epoch checks during these operations, but this enables embedders, and possible WebAssembly, to witness intermediate state in the middle of the operation. Examples of this include:
 
 * When a non-nullable WebAssembly table is grown the new elements initially start as null and are filled in as part of a loop with preemption checks. If this computation is then cancelled this left the table in a grown-but-uninitialized state where subsequent usage via WebAssembly could possibly segfaul…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-104855"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-104855&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14041"&gt;https://github.com/bytecodealliance/wasmtime/pull/14041&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14043"&gt;https://github.com/bytecodealliance/wasmtime/pull/14043&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14045"&gt;https://github.com/bytecodealliance/wasmtime/pull/14045&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/3ebfbe5af4927c157d6fcaca42b8dbb6d17b73fb"&gt;https://github.com/bytecodealliance/wasmtime/commit/3ebfbe5af4927c157d6fcaca42b8dbb6d17b73fb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/99b0bc39d447317a4102c056081c83a9a84a46e0"&gt;https://github.com/bytecodealliance/wasmtime/commit/99b0bc39d447317a4102c056081c83a9a84a46e0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/a3eb27af01ba5a30320a90ea1405059cdfedd353"&gt;https://github.com/bytecodealliance/wasmtime/commit/a3eb27af01ba5a30320a90ea1405059cdfedd353&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2hw9-mc66-jc2q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0223: Preemption and traps during bulk operations enable breaking internal VM state</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0223</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0223"/>
-    <published>2026-07-31T12:00:00Z</published>
-    <updated>2026-10-02T23:10:45Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-104855"/>
-    <category term="GHSA-2hw9-mc66-jc2q"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Preemption and traps during bulk operations enable breaking internal VM state&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104855, GHSA-2hw9-mc66-jc2q&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:H/UI:P/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 46.0.2, 47.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0223.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0223.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0223"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[NEW] GHSA-8ffr-xgwf-xj56: aws-smithy-json: Uncontrolled recursion in the aws-smithy-json unknown-key skip path allows unauthenticated remote denial of service in smithy-rs generated servers</title>
@@ -347,24 +384,5 @@ The included parse should not free an entity that the outer parser is still usin
 
 The fix is in commit 8a1b0cd319e9af2d1e9cf878081dd77f227a0504, where
 librsvg will no longer free xmlEntity pointer…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/librsvg"&gt;https://crates.io/crates/librsvg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0305.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0305.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://gitlab.gnome.org/GNOME/librsvg/-/work_items/1241"&gt;https://gitlab.gnome.org/GNOME/librsvg/-/work_items/1241&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0305"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0317: A 512-byte workbook can provoke a multi-gigabyte allocation and abort the process</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0317</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0317"/>
-    <published>2026-09-29T12:00:00Z</published>
-    <updated>2026-10-01T07:45:02Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-w5x2-6474-pqp4"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;A 512-byte workbook can provoke a multi-gigabyte allocation and abort the process&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-w5x2-6474-pqp4&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;sheets-diff&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Affected versions passed caller-supplied bytes to `calamine`&amp;#x27;s `Xlsx::new` without first checking
-that they were a ZIP archive. `Xlsx::new` tests for password protection on its first line, which
-parses the input as an OLE/CFB container, and a sector-count field read from the file&amp;#x27;s own header
-reaches `Vec::with_capacity` without being checked against the file&amp;#x27;s actual length. A 512-byte input
-can therefore request several gigabytes; 9,261,285,372 bytes was measured.
-
-**The oversized allocation is always attempted. Whether it aborts depends on what the allocator can
-satisfy.** On a large host with overcommit the reservation is granted untouched and the call returns
-an ordinary &amp;quot;not an xlsx file&amp;quot; error, which looks like a malformed file being correctly rejected.
-Under a memory limit the same…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/sheets-diff"&gt;https://crates.io/crates/sheets-diff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0317.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0317.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forskscope/sheets-diff-rs/commit/fb70d62c88ca906284703c8071e51951c6ab43e2"&gt;https://github.com/forskscope/sheets-diff-rs/commit/fb70d62c88ca906284703c8071e51951c6ab43e2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forskscope/sheets-diff-rs/blob/3.2.0/CHANGELOG.md#320---2026-09-29"&gt;https://github.com/forskscope/sheets-diff-rs/blob/3.2.0/CHANGELOG.md#320---2026-09-29&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tafia/calamine/issues/714"&gt;https://github.com/tafia/calamine/issues/714&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0317"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

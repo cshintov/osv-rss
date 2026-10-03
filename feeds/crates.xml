@@ -3,12 +3,155 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-10-02T20:30:03Z</updated>
+  <updated>2026-10-03T03:56:08Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-pvmv-cwg8-v6c8: Zebra v4.4.0 still accepts V5 SIGHASH_SINGLE without a corresponding output</title>
+    <id>https://osv.dev/vulnerability/GHSA-pvmv-cwg8-v6c8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pvmv-cwg8-v6c8"/>
+    <published>2026-05-08T18:27:26Z</published>
+    <updated>2026-10-03T03:56:08Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-104435"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Zebra v4.4.0 still accepts V5 SIGHASH_SINGLE without a corresponding output&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104435&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:H/SC:N/SI:H/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.4.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebra-script&lt;/code&gt; — fixed in 6.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Consensus Divergence in V5 Transparent SIGHASH_SINGLE With No Corresponding Output
+
+## Summary
+
+Zebra failed to enforce a ZIP-244 consensus rule for V5 transparent transactions: when an input is signed with `SIGHASH_SINGLE` and there is no transparent output at the same index as that input, validation must fail. Zebra instead asked the underlying sighash library to compute a digest, and that library produced a digest over an empty output set rather than failing. An attacker could craft a V5 transaction with more transparent inputs than outputs that Zebra accepts but `zcashd` rejects, creating a consensus split between Zebra and `zcashd` nodes.
+
+A previous fix ([`GHSA-cwfq-rfcr-8hmp`](https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-cwfq-rfcr-8hmp)) addressed a closely re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-pvmv-cwg8-v6c8"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-pvmv-cwg8-v6c8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pvmv-cwg8-v6c8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-cwfq-rfcr-8hmp: Zebra's Transparent SIGHASH_SINGLE Handling Diverges from zcashd for Corresponding Outputs</title>
+    <id>https://osv.dev/vulnerability/GHSA-cwfq-rfcr-8hmp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cwfq-rfcr-8hmp"/>
+    <published>2026-05-07T21:02:30Z</published>
+    <updated>2026-10-03T03:56:05Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-104437"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Zebra&amp;#x27;s Transparent SIGHASH_SINGLE Handling Diverges from zcashd for Corresponding Outputs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104437&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:H/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# `Zebra` Transparent `SIGHASH_SINGLE` Corresponding-Output Handling Diverges From `zcashd`
+
+### Summary
+For V5+ transparent spends, `Zebra` and `zcashd` disagree on the same consensus rule: `SIGHASH_SINGLE` must fail when the input index has no corresponding output. `zcashd` treats this as consensus-invalid under ZIP-244, while `Zebra`&amp;#x27;s transparent verification path computes a digest for the missing-output case instead of failing.
+
+The result is a direct block-validity split. A malformed V5 transparent transaction can be accepted by `Zebra`, retained in `Zebra`&amp;#x27;s mempool, selected into `Zebra` `getblocktemplate`, mined into a block, and then rejected by `zcashd`.
+
+### Details
+Validated code revisions used during analysis:
+
+- `zcashd`: `2c63e9aa08cb170b0feb374161bea94720c3e1f5`
+- `Zebra`:…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-cwfq-rfcr-8hmp"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-cwfq-rfcr-8hmp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/releases/tag/v4.4.0"&gt;https://github.com/ZcashFoundation/zebra/releases/tag/v4.4.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cwfq-rfcr-8hmp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-c8w6-x74f-vmg3: zebrad vulnerable to full node denial of service via crafted Sapling receiver in z_listunifiedreceivers</title>
+    <id>https://osv.dev/vulnerability/GHSA-c8w6-x74f-vmg3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c8w6-x74f-vmg3"/>
+    <published>2026-07-02T19:37:58Z</published>
+    <updated>2026-10-03T03:56:05Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-104434"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zebrad vulnerable to full node denial of service via crafted Sapling receiver in z_listunifiedreceivers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104434&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebra-rpc&lt;/code&gt; — fixed in 8.0.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
+
+You are affected if:
+
+1. You run `zebrad` up to and including `v4.4.1`.
+2. Your `zebrad.toml` sets `rpc.listen_addr` to a TCP address (RPC server is enabled).
+3. An attacker can authenticate to the RPC endpoint. With the default `enable_cookie_auth = true`, this requires the attacker to read the `.cookie` file (typically local access). With `enable_cookie_auth = false`, any network client reaching the RPC port can trigger it.
+
+### Summary
+
+The `z_listunifiedreceivers` RPC handler panics when processing a structurally valid Unified Address whose Sapling receiver carries 43 bytes that fail cryptographic validation (`sapling_crypto::PaymentAddress::from_bytes` returns `None` for non-subgroup Jubjub points). The handler calls `.expect(&amp;quot;using data already decoded as valid&amp;quot;)` …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-c8w6-x74f-vmg3"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-c8w6-x74f-vmg3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/Cargo.toml#L305"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/Cargo.toml#L305&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-rpc/src/methods.rs#L2867-L2914"&gt;https://github.com/ZcashFoundation/zebra/blob/d4cd662c716382f6397d2a730148025a1ca79fec/zebra-rpc/src/methods.rs#L2867-L2914&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c8w6-x74f-vmg3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-443g-gwgp-49x4: zebrad vulnerable to getblocks/getheaders locator CPU amplification via uncapped vector length</title>
+    <id>https://osv.dev/vulnerability/GHSA-443g-gwgp-49x4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-443g-gwgp-49x4"/>
+    <published>2026-07-02T19:34:21Z</published>
+    <updated>2026-10-03T03:56:03Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-104436"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zebrad vulnerable to getblocks/getheaders locator CPU amplification via uncapped vector length&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104436&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zebrad&lt;/code&gt; — fixed in 4.5.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;zebra-chain&lt;/code&gt; — fixed in 8.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Am I affected
+
+You are affected if:
+
+1. You run `zebrad` up to and including `v4.4.1`.
+2. Your node accepts inbound P2P connections.
+
+### Summary
+
+The `read_getblocks` and `read_getheaders` codec paths accepted block locator vectors up to approximately 65,535 entries (the generic `TrustedPreallocate` ceiling derived from `MAX_PROTOCOL_MESSAGE_LEN`), rather than the protocol-specification limit of 101 entries (matching zcashd&amp;#x27;s `MAX_LOCATOR_SZ`). Each entry in the locator vector triggers a per-hash chain lookup (`HashMap::contains_key` + `RocksDB::contains_hash`) in `find_chain_intersection` on a tokio blocking-pool thread.
+
+A single maximally-sized `getblocks` message occupies one blocking-pool thread for approximately 10–65ms. Under sustained load from multiple peers, this can degrade…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-443g-gwgp-49x4"&gt;https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-443g-gwgp-49x4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/pull/10570"&gt;https://github.com/ZcashFoundation/zebra/pull/10570&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra/commit/8981a1b95d4807cad99e5bb3b94fc8bc723ac033"&gt;https://github.com/ZcashFoundation/zebra/commit/8981a1b95d4807cad99e5bb3b94fc8bc723ac033&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ZcashFoundation/zebra"&gt;https://github.com/ZcashFoundation/zebra&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-443g-gwgp-49x4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-cjcg-cxmh-9wcr: Praxis affected by HTTP/2 Bomb </title>
+    <id>https://osv.dev/vulnerability/GHSA-cjcg-cxmh-9wcr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cjcg-cxmh-9wcr"/>
+    <published>2026-10-02T23:09:37Z</published>
+    <updated>2026-10-02T23:30:06Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Praxis affected by HTTP/2 Bomb &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;praxis-proxy&lt;/code&gt; — fixed in 0.5.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Multiple denial-of-service vulnerabilities have been discovered in HTTP/2 server implementations. All have been rated with a severity impact of [Important](https://access.redhat.com/security/updates/classification). The vulnerabilities target HPACK, the header compression scheme in HTTP/2, where a small request can trigger large memory allocations on the server. 
+
+### Details
+
+Credit to the original researcher, I&amp;#x27;m mostly just run their tool against the code base.
+
+[Security Bulletins](https://access.redhat.com/security/vulnerabilities/RHSB-2026-007): https://access.redhat.com/security/vulnerabilities/RHSB-2026-007 
+Exploit details: https://blog.calif.io/p/codex-discovered-a-hidden-http2-bomb
+
+This bug was fixed in upstream pingora v0.8.1, but our fork (v0.8.2) is missing this…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/praxis-proxy/praxis/security/advisories/GHSA-cjcg-cxmh-9wcr"&gt;https://github.com/praxis-proxy/praxis/security/advisories/GHSA-cjcg-cxmh-9wcr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/praxis-proxy/praxis/commit/2bb7b29d6992fc2d8045628475912d734e6bee97"&gt;https://github.com/praxis-proxy/praxis/commit/2bb7b29d6992fc2d8045628475912d734e6bee97&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/security/vulnerabilities/RHSB-2026-007"&gt;https://access.redhat.com/security/vulnerabilities/RHSB-2026-007&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://blog.calif.io/p/codex-discovered-a-hidden-http2-bomb"&gt;https://blog.calif.io/p/codex-discovered-a-hidden-http2-bomb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/praxis-proxy/praxis"&gt;https://github.com/praxis-proxy/praxis&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/praxis-proxy/praxis/releases/tag/v0.5.2"&gt;https://github.com/praxis-proxy/praxis/releases/tag/v0.5.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cjcg-cxmh-9wcr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2hw9-mc66-jc2q: Wasmtime: Preemption and traps during bulk operations enable breaking internal VM state</title>
+    <id>https://osv.dev/vulnerability/GHSA-2hw9-mc66-jc2q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2hw9-mc66-jc2q"/>
+    <published>2026-10-02T22:45:29Z</published>
+    <updated>2026-10-02T23:10:45Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-104855"/>
+    <category term="RUSTSEC-2026-0223"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Wasmtime: Preemption and traps during bulk operations enable breaking internal VM state&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104855, RUSTSEC-2026-0223&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:H/UI:P/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 46.0.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 47.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Wasmtime&amp;#x27;s implementation of bulk-data-transfer WebAssembly instructions, such as `memory.copy`, contains a vulnerability when a preemption via epochs or fuel is combined with altering the store&amp;#x27;s state or cancelling a computation. To prevent these operations from taking too long Wasmtime injects fuel/epoch checks during these operations, but this enables embedders, and possible WebAssembly, to witness intermediate state in the middle of the operation. Examples of this include:
+
+* When a non-nullable WebAssembly table is grown the new elements initially start as null and are filled in as part of a loop with preemption checks. If this computation is then cancelled this left the table in a grown-but-uninitialized state where subsequent usage via WebAssembly could possibly segfaul…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-104855"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-104855&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14041"&gt;https://github.com/bytecodealliance/wasmtime/pull/14041&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14043"&gt;https://github.com/bytecodealliance/wasmtime/pull/14043&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14045"&gt;https://github.com/bytecodealliance/wasmtime/pull/14045&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/3ebfbe5af4927c157d6fcaca42b8dbb6d17b73fb"&gt;https://github.com/bytecodealliance/wasmtime/commit/3ebfbe5af4927c157d6fcaca42b8dbb6d17b73fb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/99b0bc39d447317a4102c056081c83a9a84a46e0"&gt;https://github.com/bytecodealliance/wasmtime/commit/99b0bc39d447317a4102c056081c83a9a84a46e0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/a3eb27af01ba5a30320a90ea1405059cdfedd353"&gt;https://github.com/bytecodealliance/wasmtime/commit/a3eb27af01ba5a30320a90ea1405059cdfedd353&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2hw9-mc66-jc2q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0223: Preemption and traps during bulk operations enable breaking internal VM state</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0223</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0223"/>
+    <published>2026-07-31T12:00:00Z</published>
+    <updated>2026-10-02T23:10:45Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-104855"/>
+    <category term="GHSA-2hw9-mc66-jc2q"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Preemption and traps during bulk operations enable breaking internal VM state&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104855, GHSA-2hw9-mc66-jc2q&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:H/UI:P/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 46.0.2, 47.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
+located at
+https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q
+For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0223.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0223.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-2hw9-mc66-jc2q&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0223"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8ffr-xgwf-xj56: aws-smithy-json: Uncontrolled recursion in the aws-smithy-json unknown-key skip path allows unauthenticated remote denial of service in smithy-rs generated servers</title>
+    <id>https://osv.dev/vulnerability/GHSA-8ffr-xgwf-xj56</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8ffr-xgwf-xj56"/>
+    <published>2026-10-02T22:44:52Z</published>
+    <updated>2026-10-02T23:01:22Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-18140"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;aws-smithy-json: Uncontrolled recursion in the aws-smithy-json unknown-key skip path allows unauthenticated remote denial of service in smithy-rs generated servers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-18140&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aws-smithy-json&lt;/code&gt; — fixed in 0.62.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Smithy-RS is a Rust code generation and runtime framework that generates HTTP clients and servers from Smithy interface definitions, powering the AWS SDK for Rust and custom service implementations. An issue exists which allows uncontrolled recursion in the unknown-key skip path of the Amazon aws-smithy-json runtime crate in versions 0.62.6 and earlier.
+
+### Impact
+Uncontrolled recursion in the unknown-key skip path of the aws-smithy-json runtime crate before 0.62.7, which the smithy-rs code generator invokes from every generated struct deserializer, might allow remote unauthenticated users to cause a denial of service (process abort via stack exhaustion) via a single small HTTP request containing deeply nested JSON to a smithy-rs generated server.
+
+Impacted versions: aws-smith…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/smithy-lang/smithy-rs/security/advisories/GHSA-8ffr-xgwf-xj56"&gt;https://github.com/smithy-lang/smithy-rs/security/advisories/GHSA-8ffr-xgwf-xj56&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-18140"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-18140&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/smithy-lang/smithy-rs/pull/4685"&gt;https://github.com/smithy-lang/smithy-rs/pull/4685&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/smithy-lang/smithy-rs/commit/8f0882046c467981ba5b4fd91a10befa96bd262f"&gt;https://github.com/smithy-lang/smithy-rs/commit/8f0882046c467981ba5b4fd91a10befa96bd262f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://aws.amazon.com/security/security-bulletins/2026-067-aws"&gt;https://aws.amazon.com/security/security-bulletins/2026-067-aws&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/aws-smithy-json/0.62.7"&gt;https://crates.io/crates/aws-smithy-json/0.62.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/smithy-lang/smithy-rs"&gt;https://github.com/smithy-lang/smithy-rs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8ffr-xgwf-xj56"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] RUSTSEC-2026-0320: Wasmtime wasi:http implementation panics with a zero timeout supplied</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0320</id>
@@ -223,146 +366,5 @@ can therefore request several gigabytes; 9,261,285,372 bytes was measured.
 satisfy.** On a large host with overcommit the reservation is granted untouched and the call returns
 an ordinary &amp;quot;not an xlsx file&amp;quot; error, which looks like a malformed file being correctly rejected.
 Under a memory limit the same…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/sheets-diff"&gt;https://crates.io/crates/sheets-diff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0317.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0317.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forskscope/sheets-diff-rs/commit/fb70d62c88ca906284703c8071e51951c6ab43e2"&gt;https://github.com/forskscope/sheets-diff-rs/commit/fb70d62c88ca906284703c8071e51951c6ab43e2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/forskscope/sheets-diff-rs/blob/3.2.0/CHANGELOG.md#320---2026-09-29"&gt;https://github.com/forskscope/sheets-diff-rs/blob/3.2.0/CHANGELOG.md#320---2026-09-29&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tafia/calamine/issues/714"&gt;https://github.com/tafia/calamine/issues/714&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0317"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9857-6mw7-fq2m: gix-transport: HTTP credentials leaked to redirected host in curl backend</title>
-    <id>https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m"/>
-    <published>2026-05-05T19:16:35Z</published>
-    <updated>2026-10-01T03:56:08Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-82255"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;gix-transport: HTTP credentials leaked to redirected host in curl backend&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82255&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gix-transport&lt;/code&gt; — fixed in 0.56.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The curl-based HTTP transport in `gix-transport` sends user credentials (passwords, tokens) to an attacker-controlled server after an HTTP redirect. When a server responds with a 302 redirect during the initial `GET /info/refs`, gitoxide records the redirected base URL and rewrites all subsequent requests to point at the redirected host. The `Authorization` header is still attached because `add_basic_auth_if_present()` only checks `self.url` (the original, never-updated URL).
-
-The reqwest backend is not affected. Its custom redirect policy at `reqwest/remote.rs` lines 60-64 compares `prev_url.host_str()` to `curr_url.host_str()` and calls `attempt.stop()` on cross-domain redirects, so `redirected_base_url` is never set to a different host.
-
-## Details
-
-The vulnerability involve…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-9857-6mw7-fq2m"&gt;https://github.com/GitoxideLabs/gitoxide/security/advisories/GHSA-9857-6mw7-fq2m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/GitoxideLabs/gitoxide"&gt;https://github.com/GitoxideLabs/gitoxide&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9857-6mw7-fq2m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-35g8-35p8-c8fw: Russh: Unbounded memory exhaustion via CHANNEL_OPEN flood during a client-stalled rekey</title>
-    <id>https://osv.dev/vulnerability/GHSA-35g8-35p8-c8fw</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-35g8-35p8-c8fw"/>
-    <published>2026-09-30T23:40:43Z</published>
-    <updated>2026-10-01T00:00:04Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-102821"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Unbounded memory exhaustion via CHANNEL_OPEN flood during a client-stalled rekey&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102821&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.63.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-A russh **server** can be driven to unbounded heap growth (process OOM / kill) by
-a peer that speaks only standard SSH messages, in the **default configuration**.
-
-The peer starts a key re-exchange (sends `SSH_MSG_KEXINIT`) but never sends the
-follow-up `SSH_MSG_KEX_ECDH_INIT`, leaving the server&amp;#x27;s kex state machine in
-`SessionKexState::InProgress` **indefinitely**. While a rekey is in progress the
-server&amp;#x27;s three message-drain paths are all gated off (`if !self.kex.active()`),
-but the network-read path stays active, so every `SSH_MSG_CHANNEL_OPEN` the peer
-sends is processed inline and appends one reply to an **unbounded** internal
-queue (`priority_receiver`, an `UnboundedReceiver`) that is not dequeued until
-the rekey completes. Because the peer decides whether the rekey ever …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-35g8-35p8-c8fw"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-35g8-35p8-c8fw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102821"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102821&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/a282af361ac99bc76b80876d1aae128e89dbf66b"&gt;https://github.com/Eugeny/russh/commit/a282af361ac99bc76b80876d1aae128e89dbf66b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.2"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-35g8-35p8-c8fw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-g4mp-vgx3-xrvm: pageant: Out-of-bounds read / oversized allocation in `pageant` MemoryMap::read via a malicious Pageant agent (Windows)</title>
-    <id>https://osv.dev/vulnerability/GHSA-g4mp-vgx3-xrvm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g4mp-vgx3-xrvm"/>
-    <published>2026-09-30T23:41:02Z</published>
-    <updated>2026-10-01T00:00:04Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-102820"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;pageant: Out-of-bounds read / oversized allocation in `pageant` MemoryMap::read via a malicious Pageant agent (Windows)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102820&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pageant&lt;/code&gt; — fixed in 0.2.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`MemoryMap::read` in the `pageant` crate (part of the russh workspace, used by
-russh&amp;#x27;s SSH-agent client on Windows via `AgentClient::connect_pageant`) copies a
-**peer-controlled** number of bytes out of an 8192-byte shared-memory view with
-**no bounds check** — unlike the sibling `MemoryMap::write`, which correctly
-rejects oversize access with `Error::Overflow`. The byte count comes straight
-from a `u32` length prefix that the responding &amp;quot;Pageant&amp;quot; process writes into the
-shared mapping. A malicious local process that answers as the Pageant agent can
-therefore cause:
-
-- an **out-of-bounds read** past the 8 KiB view (access violation → process
-  crash; or disclosure of adjacent process memory if the following page is
-  committed)
-- an allocation of up to **~4 GiB** from a single …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-g4mp-vgx3-xrvm"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-g4mp-vgx3-xrvm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102820"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102820&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/5d566989ebabfdebfe6b33243d31765a0812260b"&gt;https://github.com/Eugeny/russh/commit/5d566989ebabfdebfe6b33243d31765a0812260b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.2"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g4mp-vgx3-xrvm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-47hw-gvq5-r2gm: russh: Client-side channel-scoped Handler callbacks fire for channel IDs the client never opened</title>
-    <id>https://osv.dev/vulnerability/GHSA-47hw-gvq5-r2gm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-47hw-gvq5-r2gm"/>
-    <published>2026-09-30T23:27:17Z</published>
-    <updated>2026-09-30T23:45:04Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-102823"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;russh: Client-side channel-scoped Handler callbacks fire for channel IDs the client never opened&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102823&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.63.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-CVE-2026-68930 was fixed by adding `Session::is_established_channel()` in `russh/src/server/encrypted.rs`, which gates every channel-scoped SERVER-side message (CHANNEL_REQUEST, CHANNEL_DATA, CHANNEL_EOF, CHANNEL_CLOSE, CHANNEL_WINDOW_ADJUST, CHANNEL_EXTENDED_DATA) on `enc.channels.get(&amp;amp;channel).is_some_and(|c| c.confirmed)` before invoking any `Handler` callback. The identical validation was never added to the CLIENT side (`russh/src/client/encrypted.rs`), which processes channel-scoped messages sent by the SSH SERVER once the client has authenticated.
-
-### Details
-In `client_read_authenticated` (`russh/src/client/encrypted.rs`, ~lines 431-757), for CHANNEL_DATA, CHANNEL_EXTENDED_DATA, CHANNEL_EOF, CHANNEL_CLOSE, CHANNEL_OPEN_FAILURE, CHANNEL_SUCCESS, CHANNEL_FAILURE, and the …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-47hw-gvq5-r2gm"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-47hw-gvq5-r2gm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102823"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102823&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/3430fd26ecafc0dc3705210f5f39a9119fa22774"&gt;https://github.com/Eugeny/russh/commit/3430fd26ecafc0dc3705210f5f39a9119fa22774&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.1"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-47hw-gvq5-r2gm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-p8qx-h547-fjw9: russh: negotiating a MAC-requiring block cipher (CTR/CBC) with mac=none causes a slice-index-out-of-range panic</title>
-    <id>https://osv.dev/vulnerability/GHSA-p8qx-h547-fjw9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p8qx-h547-fjw9"/>
-    <published>2026-09-30T23:27:30Z</published>
-    <updated>2026-09-30T23:45:04Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-102822"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;russh: negotiating a MAC-requiring block cipher (CTR/CBC) with mac=none causes a slice-index-out-of-range panic&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102822&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.63.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-`SshBlockCipher` implementations (AES-CBC, AES-CTR, 3DES-CBC, etc.) report `needs_mac() == true`, meaning they are documented/intended to always be paired with a separate integrity MAC. However, key-exchange negotiation only checks `needs_mac()` inside the *fallback* branch of MAC algorithm selection (used when no common MAC algorithm exists). If both peers&amp;#x27; preferred MAC lists simply contain `none` and it is successfully negotiated through the normal selection path, nothing rejects pairing `none` with a cipher that requires a MAC. Once negotiated, a single crafted packet from either peer causes `cipher::read()` to shrink an already-allocated buffer below the number of bytes it is about to index, causing a Rust slice-index-out-of-range panic and killing that connection&amp;#x27;s task.
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-p8qx-h547-fjw9"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-p8qx-h547-fjw9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102822"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102822&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/2885385abfee279092a41d80c6cb6ac367353159"&gt;https://github.com/Eugeny/russh/commit/2885385abfee279092a41d80c6cb6ac367353159&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.1"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p8qx-h547-fjw9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-w3jg-pjxf-73p4: Russh: Missing X25519 zero-point validation in hybrid ML-KEM key exchange</title>
-    <id>https://osv.dev/vulnerability/GHSA-w3jg-pjxf-73p4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w3jg-pjxf-73p4"/>
-    <published>2026-09-30T23:26:48Z</published>
-    <updated>2026-09-30T23:30:05Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-102824"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Missing X25519 zero-point validation in hybrid ML-KEM key exchange&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102824&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.63.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Vulnerability
-
-The hybrid ML-KEM 768 + X25519 key exchange implementation in `russh/src/kex/hybrid_mlkem.rs` does not validate that the remote peer&amp;#x27;s X25519 public key is not the zero point (all-zero 32-byte value). This allows a remote peer to force the X25519 contribution to the combined shared secret to zero, reducing the hybrid KEX to a single-algorithm exchange.
-
-Affected code at HEAD (v0.62.4, commit 0089c89):
-
-**Server-side** (`server_dh`, lines 92-93):
-```rust
-let mut c_pk1 = MontgomeryPoint([0; 32]);
-c_pk1.0.copy_from_slice(c_pk1_bytes);
-// No zero-point check - proceeds to: let k_cl = s_secret * c_pk1;
-```
-
-**Client-side** (`compute_shared_secret`, lines 154-155):
-```rust
-let mut s_pk1 = MontgomeryPoint([0; 32]);
-s_pk1.0.copy_from_slice(s_pk1_bytes);
-// No zero-point check - p…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-w3jg-pjxf-73p4"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-w3jg-pjxf-73p4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102824"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102824&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/8da8967f196472576b1565d518a0ed60fce60f0c"&gt;https://github.com/Eugeny/russh/commit/8da8967f196472576b1565d518a0ed60fce60f0c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.63.0"&gt;https://github.com/Eugeny/russh/releases/tag/v0.63.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w3jg-pjxf-73p4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-g6xm-f9xp-qq35: Russh: Configured server auth-attempt cap is not enforced in the USERAUTH_REQUEST runtime path</title>
-    <id>https://osv.dev/vulnerability/GHSA-g6xm-f9xp-qq35</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g6xm-f9xp-qq35"/>
-    <published>2026-09-30T23:26:17Z</published>
-    <updated>2026-09-30T23:30:05Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-102825"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Russh: Configured server auth-attempt cap is not enforced in the USERAUTH_REQUEST runtime path&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102825&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.62.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Details
-
-#### Affected versions and vulnerable location
-
-- Confirmed present on default branch `main` at HEAD `0089c89c94753bebbec12b956c07a1cd38740379`.
-- Crate version at HEAD: `0.62.4`.
-- Vulnerable locations on current default branch:
-  - `russh/src/server/mod.rs:91` (`pub max_auth_attempts: usize`)
-  - `russh/src/server/mod.rs:121` (default `max_auth_attempts: 10`)
-  - `russh/src/server/encrypted.rs:89` (`USERAUTH_REQUEST` dispatch into auth handler path)
-  - `russh/src/server/encrypted.rs:98` (`self.common.auth_attempts += 1`)
-  - `russh/src/server/encrypted.rs:53` (only runtime read of `auth_attempts`, used for initial reject timing, not attempt limiting)
-- Default-branch history check did not show a newer merged commit adding enforcement against `config.max_auth_attempts`.
-
-###…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-g6xm-f9xp-qq35"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-g6xm-f9xp-qq35&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102825"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102825&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/f8fd0b11a393364dc7f01a182482d86adafdd653"&gt;https://github.com/Eugeny/russh/commit/f8fd0b11a393364dc7f01a182482d86adafdd653&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.62.6"&gt;https://github.com/Eugeny/russh/releases/tag/v0.62.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g6xm-f9xp-qq35"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

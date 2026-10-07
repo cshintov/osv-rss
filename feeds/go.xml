@@ -3,12 +3,129 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-10-06T15:46:48Z</updated>
+  <updated>2026-10-06T20:45:03Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-r3rm-qphw-hh76: Coraza: Truncated multipart body bypasses MULTIPART_STRICT_ERROR (rule 200003) via silent io.ErrUnexpectedEOF handling</title>
+    <id>https://osv.dev/vulnerability/GHSA-r3rm-qphw-hh76</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r3rm-qphw-hh76"/>
+    <published>2026-10-06T20:37:54Z</published>
+    <updated>2026-10-06T20:45:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41508"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coraza: Truncated multipart body bypasses MULTIPART_STRICT_ERROR (rule 200003) via silent io.ErrUnexpectedEOF handling&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41508&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/corazawaf/coraza/v3&lt;/code&gt; — fixed in 3.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Root Cause
+
+File: `internal/bodyprocessors/multipart.go` (since commit `3347961b`, PR #1453 *&amp;quot;feat: ignore unexpected EOF in MIME multipart request body processor&amp;quot;*, merged 2026-03-06, first shipped in `v3.4.0`).
+
+The multipart body processor treats `io.ErrUnexpectedEOF` as a benign condition. Three sites are affected; all mishandle the error the same way.
+
+### File branch, filesystem-backed (lines 71–77)
+
+```go
+sz, err := io.Copy(temp, p)
+if err != nil {
+    if !errors.Is(err, io.ErrUnexpectedEOF) {
+        v.MultipartStrictError().(*collections.Single).Set(&amp;quot;1&amp;quot;)
+        return err
+    }
+    seenUnexpectedEOF = true     // &amp;lt;-- flag never set for UnexpectedEOF
+}
+```
+
+### File branch, TinyGo path (lines 82–88)
+
+```go
+sz, err := io.Copy(io.Discard, p)
+if err != nil {
+    if !errors.Is(err,…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/security/advisories/GHSA-r3rm-qphw-hh76"&gt;https://github.com/corazawaf/coraza/security/advisories/GHSA-r3rm-qphw-hh76&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/commit/f94c81bec209f658120c418448d0590a549b71df"&gt;https://github.com/corazawaf/coraza/commit/f94c81bec209f658120c418448d0590a549b71df&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza"&gt;https://github.com/corazawaf/coraza&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/releases/tag/v3.8.0"&gt;https://github.com/corazawaf/coraza/releases/tag/v3.8.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r3rm-qphw-hh76"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6r3q-mjv7-xr8m: Coraza: Silent argument drop at ArgumentLimit allows bypass of ARGS-targeted rules via parameter flooding</title>
+    <id>https://osv.dev/vulnerability/GHSA-6r3q-mjv7-xr8m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6r3q-mjv7-xr8m"/>
+    <published>2026-10-06T20:38:03Z</published>
+    <updated>2026-10-06T20:45:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41510"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coraza: Silent argument drop at ArgumentLimit allows bypass of ARGS-targeted rules via parameter flooding&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41510&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/corazawaf/coraza/v3&lt;/code&gt; — fixed in 3.8.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Root Cause
+
+File: `internal/corazawaf/transaction.go`, lines 770–808 (since commit 2fd87b89, PR #812, 2023-06-14)
+
+```go
+func (tx *Transaction) AddGetRequestArgument(key string, value string) {
+    if tx.checkArgumentLimit(tx.variables.argsGet) {
+        tx.debugLogger.Warn().Msg(&amp;quot;skipping get request argument, over limit&amp;quot;)
+        return
+    }
+    tx.variables.argsGet.Add(key, value)
+}
+
+func (tx *Transaction) checkArgumentLimit(c *collections.NamedCollection) bool {
+    return c.Len() &amp;gt;= tx.WAF.ArgumentLimit
+}
+```
+
+`AddGetRequestArgument`, `AddPostRequestArgument`, and `AddPathRequestArgument` silently `return` once the per-collection argument count reaches `WAF.ArgumentLimit` (default `1000`, see `internal/corazawaf/waf.go:346`). No error variable is set, no transaction flag is raised…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/security/advisories/GHSA-6r3q-mjv7-xr8m"&gt;https://github.com/corazawaf/coraza/security/advisories/GHSA-6r3q-mjv7-xr8m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/commit/146c2f79f39ad16f13787e7d67ad400f8d8cb9a3"&gt;https://github.com/corazawaf/coraza/commit/146c2f79f39ad16f13787e7d67ad400f8d8cb9a3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/commit/814e1898e083d2ff2ceb644382d0da17e930f93f"&gt;https://github.com/corazawaf/coraza/commit/814e1898e083d2ff2ceb644382d0da17e930f93f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/commit/b98359bb7e7606c95100dcc7ad490d2d624e6dea"&gt;https://github.com/corazawaf/coraza/commit/b98359bb7e7606c95100dcc7ad490d2d624e6dea&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza"&gt;https://github.com/corazawaf/coraza&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/releases/tag/v3.8.1"&gt;https://github.com/corazawaf/coraza/releases/tag/v3.8.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6r3q-mjv7-xr8m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-prpw-wwv7-xjjr: Coraza: Native audit-log format allows CRLF injection and log forgery via request body and header fields</title>
+    <id>https://osv.dev/vulnerability/GHSA-prpw-wwv7-xjjr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-prpw-wwv7-xjjr"/>
+    <published>2026-10-06T20:37:27Z</published>
+    <updated>2026-10-06T20:45:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-41504"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coraza: Native audit-log format allows CRLF injection and log forgery via request body and header fields&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-41504&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/corazawaf/coraza/v3&lt;/code&gt; — fixed in 3.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Root Cause
+
+File: `internal/auditlog/formats.go` — multiple sites write attacker-influenced bytes into the Native audit-log stream without escaping `\r` or `\n`:
+
+```go
+// Part B — request headers (lines 72–80)
+for k, vv := range al.Transaction().Request().Headers() {
+    for _, v := range vv {
+        res.WriteByte(&amp;#x27;\n&amp;#x27;)
+        res.WriteString(k)
+        res.WriteString(&amp;quot;: &amp;quot;)
+        res.WriteString(v)   // ← raw
+    }
+}
+
+// Part C — request body (lines 85–86)
+if body := al.Transaction().Request().Body(); body != &amp;quot;&amp;quot; {
+    res.WriteString(body)    // ← raw
+    res.WriteByte(&amp;#x27;\n&amp;#x27;)
+}
+
+// Part E — response body (lines 93–94)      raw
+// Part F — response headers (lines 111–118) raw
+// Part H — error messages (line 125)        raw
+// Part K — matched-rule raw data (line 151)  raw
+```
+
+The …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/security/advisories/GHSA-prpw-wwv7-xjjr"&gt;https://github.com/corazawaf/coraza/security/advisories/GHSA-prpw-wwv7-xjjr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/commit/a3079325547c7c1e08522aed4d6468f25d080e25"&gt;https://github.com/corazawaf/coraza/commit/a3079325547c7c1e08522aed4d6468f25d080e25&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza"&gt;https://github.com/corazawaf/coraza&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/corazawaf/coraza/releases/tag/v3.8.0"&gt;https://github.com/corazawaf/coraza/releases/tag/v3.8.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-prpw-wwv7-xjjr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vffh-x6r8-xx99: Prometheus has Stored XSS via metric names and label values in Prometheus web UI tooltips and metrics explorer</title>
+    <id>https://osv.dev/vulnerability/GHSA-vffh-x6r8-xx99</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vffh-x6r8-xx99"/>
+    <published>2026-04-13T16:39:16Z</published>
+    <updated>2026-10-06T19:00:43Z</updated>
+    <category term="Go"/>
+    <category term="BIT-prometheus-2026-40179"/>
+    <category term="CVE-2026-40179"/>
+    <category term="GO-2026-5662"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Prometheus has Stored XSS via metric names and label values in Prometheus web UI tooltips and metrics explorer&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-prometheus-2026-40179, CVE-2026-40179, GO-2026-5662&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 3.5.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 3.11.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/prometheus/prometheus&lt;/code&gt; — fixed in 0.311.2-0.20260410083055-07c6232d159b&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Stored cross-site scripting (XSS) via crafted metric names in the Prometheus web UI:
+
+* **Old React UI + New Mantine UI:** When a user hovers over a chart tooltip on the Graph page, metric names containing HTML/JavaScript are injected into `innerHTML` without escaping, causing arbitrary script execution in the user&amp;#x27;s browser.
+* **Old React UI only:** When a user opens the Metric Explorer (globe icon next to the PromQL expression input field), and a metric name containing HTML/JavaScript is rendered in the fuzzy search results, it is injected into `innerHTML` without escaping, causing arbitrary script execution in the user&amp;#x27;s browser.
+* **Old React UI only:** When a user views a heatmap chart and hovers over a cell, the `le` label values of the underlying histogram buckets are in…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99"&gt;https://github.com/prometheus/prometheus/security/advisories/GHSA-vffh-x6r8-xx99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-40179"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-40179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/pull/18506"&gt;https://github.com/prometheus/prometheus/pull/18506&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c"&gt;https://github.com/prometheus/prometheus/commit/07c6232d159bfb474a077788be184d87adcfac3c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/prometheus/prometheus"&gt;https://github.com/prometheus/prometheus&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vffh-x6r8-xx99"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-q7hv-xx6h-q2x8: External Secrets Operator: label enforcement bypass in webhook generator enables secret exfiltration</title>
     <id>https://osv.dev/vulnerability/GHSA-q7hv-xx6h-q2x8</id>
@@ -176,53 +293,5 @@ This vulnerability is relevant only for users who do all three of the following:
     <category term="BIT-golang-2026-33818"/>
     <category term="CVE-2026-33818"/>
     <content type="html">&lt;p&gt;&lt;strong&gt;Enforce maximum recursion depth in encoding/asn1&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-33818, CVE-2026-33818&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.13, 1.26.6, 1.27.0-rc.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Enforce a recursion limit in Unmarshal to prevent stack exhaustion when parsing deeply-nested, recursive structures.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/80405"&gt;https://go.dev/issue/80405&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/94pEornpRlI"&gt;https://groups.google.com/g/golang-announce/c/94pEornpRlI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/814980"&gt;https://go.dev/cl/814980&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5972"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9vm3-r8gq-cr6x: Casdoor arbitrary file write vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-9vm3-r8gq-cr6x</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9vm3-r8gq-cr6x"/>
-    <published>2022-09-10T00:00:23Z</published>
-    <updated>2026-10-04T11:40:56Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2022-38638"/>
-    <category term="GO-2022-1006"/>
-    <category term="PYSEC-2022-43190"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Casdoor arbitrary file write vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2022-38638, GO-2022-1006, PYSEC-2022-43190&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/casdoor/casdoor&lt;/code&gt; — fixed in 1.103.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Casdoor v1.97.3 was discovered to contain an arbitrary file write vulnerability via the fullFilePath parameter at /api/upload-resource.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2022-38638"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-38638&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/issues/1035"&gt;https://github.com/casdoor/casdoor/issues/1035&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/issues/1063"&gt;https://github.com/casdoor/casdoor/issues/1063&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/commit/411d76798d73446fff4a0244f0475f1ea8bf42dc"&gt;https://github.com/casdoor/casdoor/commit/411d76798d73446fff4a0244f0475f1ea8bf42dc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor"&gt;https://github.com/casdoor/casdoor&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/releases/tag/v1.103.1"&gt;https://github.com/casdoor/casdoor/releases/tag/v1.103.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9vm3-r8gq-cr6x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2022-1006: Casdoor arbitrary file write vulnerability in github.com/casdoor/casdoor</title>
-    <id>https://osv.dev/vulnerability/GO-2022-1006</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2022-1006"/>
-    <published>2024-08-21T16:03:24Z</published>
-    <updated>2026-10-04T11:40:56Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2022-38638"/>
-    <category term="GHSA-9vm3-r8gq-cr6x"/>
-    <category term="PYSEC-2022-43190"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Casdoor arbitrary file write vulnerability in github.com/casdoor/casdoor&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2022-38638, GHSA-9vm3-r8gq-cr6x, PYSEC-2022-43190&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/casdoor/casdoor&lt;/code&gt; — fixed in 1.103.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Casdoor arbitrary file write vulnerability in github.com/casdoor/casdoor&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-9vm3-r8gq-cr6x"&gt;https://github.com/advisories/GHSA-9vm3-r8gq-cr6x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2022-38638"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-38638&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/commit/411d76798d73446fff4a0244f0475f1ea8bf42dc"&gt;https://github.com/casdoor/casdoor/commit/411d76798d73446fff4a0244f0475f1ea8bf42dc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/issues/1035"&gt;https://github.com/casdoor/casdoor/issues/1035&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/issues/1063"&gt;https://github.com/casdoor/casdoor/issues/1063&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/releases/tag/v1.103.1"&gt;https://github.com/casdoor/casdoor/releases/tag/v1.103.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2022-1006"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-m358-g4rp-533r: SQL Injection in Casdoor</title>
-    <id>https://osv.dev/vulnerability/GHSA-m358-g4rp-533r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m358-g4rp-533r"/>
-    <published>2022-02-01T00:49:39Z</published>
-    <updated>2026-10-04T11:40:45Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2022-24124"/>
-    <category term="GO-2022-0303"/>
-    <category term="PYSEC-2022-43189"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SQL Injection in Casdoor&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2022-24124, GO-2022-0303, PYSEC-2022-43189&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/casdoor/casdoor&lt;/code&gt; — fixed in 1.13.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The query API in Casdoor before 1.13.1 has a SQL injection vulnerability related to the field and value parameters, as demonstrated by api/get-organizations.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2022-24124"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-24124&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/issues/439"&gt;https://github.com/casdoor/casdoor/issues/439&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/pull/442"&gt;https://github.com/casdoor/casdoor/pull/442&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/commit/5ec0c7a89005819960d8fe07f5ddda13d1371b8c"&gt;https://github.com/casdoor/casdoor/commit/5ec0c7a89005819960d8fe07f5ddda13d1371b8c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor"&gt;https://github.com/casdoor/casdoor&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/compare/v1.13.0...v1.13.1"&gt;https://github.com/casdoor/casdoor/compare/v1.13.0...v1.13.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://packetstormsecurity.com/files/166163/Casdoor-1.13.0-SQL-Injection.html"&gt;http://packetstormsecurity.com/files/166163/Casdoor-1.13.0-SQL-Injection.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m358-g4rp-533r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2022-0303: SQL Injection in Casdoor in github.com/casdoor/casdoor</title>
-    <id>https://osv.dev/vulnerability/GO-2022-0303</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2022-0303"/>
-    <published>2024-08-21T14:30:26Z</published>
-    <updated>2026-10-04T11:40:45Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2022-24124"/>
-    <category term="GHSA-m358-g4rp-533r"/>
-    <category term="PYSEC-2022-43189"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SQL Injection in Casdoor in github.com/casdoor/casdoor&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2022-24124, GHSA-m358-g4rp-533r, PYSEC-2022-43189&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/casdoor/casdoor&lt;/code&gt; — fixed in 1.13.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;SQL Injection in Casdoor in github.com/casdoor/casdoor&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-m358-g4rp-533r"&gt;https://github.com/advisories/GHSA-m358-g4rp-533r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2022-24124"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-24124&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/commit/5ec0c7a89005819960d8fe07f5ddda13d1371b8c"&gt;https://github.com/casdoor/casdoor/commit/5ec0c7a89005819960d8fe07f5ddda13d1371b8c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/pull/442"&gt;https://github.com/casdoor/casdoor/pull/442&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/issues/439"&gt;https://github.com/casdoor/casdoor/issues/439&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://packetstormsecurity.com/files/166163/Casdoor-1.13.0-SQL-Injection.html"&gt;http://packetstormsecurity.com/files/166163/Casdoor-1.13.0-SQL-Injection.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/casdoor/casdoor/compare/v1.13.0...v1.13.1"&gt;https://github.com/casdoor/casdoor/compare/v1.13.0...v1.13.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2022-0303"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

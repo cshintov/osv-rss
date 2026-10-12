@@ -3,12 +3,24 @@
   <title>OSV — new &amp; updated vulnerabilities: NuGet (.NET)</title>
   <subtitle>Open-source vulns affecting NuGet (.NET) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:nuget</id>
-  <updated>2026-10-07T20:30:07Z</updated>
+  <updated>2026-10-12T14:45:06Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/nuget.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-jj3q-cwqj-842r: ImageSharp: CCITT fax decompression (T4/Modified Huffman): unbounded WriteBits overflows strip buffer — heap OOB write in SixLabors.ImageSharp</title>
+    <id>https://osv.dev/vulnerability/GHSA-jj3q-cwqj-842r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jj3q-cwqj-842r"/>
+    <published>2026-10-07T16:18:50Z</published>
+    <updated>2026-10-12T14:45:06Z</updated>
+    <category term="NuGet"/>
+    <category term="CVE-2026-106117"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;ImageSharp: CCITT fax decompression (T4/Modified Huffman): unbounded WriteBits overflows strip buffer — heap OOB write in SixLabors.ImageSharp&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-106117&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ImageSharp&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;ImageSharp&lt;/code&gt; — fixed in 4.1.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+When decoding a fax-compressed strip TIFF (Compression=3 / Group 3 1D, or Compression=2 / Modified Huffman), the CCITT decompressors write decoded runs through `BitWriterUtils.WriteBits/WriteBit/WriteZeroBit`, which advance and write bits via `Unsafe.Add` with read-modify-write semantics — **without ever comparing the write position against the target buffer length**. The strip buffer is sized `ImageWidth × RowsPerStrip` (8 bytes in the PoC), but two independent defects let an attacker write tens of millions of bits past it: (a) T4 only increments `rowsWritten` when an EOL code is read, and one `ReadNextRun` accumulates unlimited makeup codes (+2560 px per 12-bit code) into a single `RunLength` that `WritePixelRun` then writes in one shot; (b) Modified Huffman writes **before**…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/security/advisories/GHSA-jj3q-cwqj-842r"&gt;https://github.com/SixLabors/ImageSharp/security/advisories/GHSA-jj3q-cwqj-842r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-106117"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-106117&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/pull/3176"&gt;https://github.com/SixLabors/ImageSharp/pull/3176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/commit/e8892ecd8a95dee95c4480fda51cfe0b32f3b846"&gt;https://github.com/SixLabors/ImageSharp/commit/e8892ecd8a95dee95c4480fda51cfe0b32f3b846&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp"&gt;https://github.com/SixLabors/ImageSharp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/releases/tag/v3.2.0"&gt;https://github.com/SixLabors/ImageSharp/releases/tag/v3.2.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/releases/tag/v4.1.1"&gt;https://github.com/SixLabors/ImageSharp/releases/tag/v4.1.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jj3q-cwqj-842r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-jjfr-hcj7-qf5w: ImageSharp: TIFF CCITT T6 encoder writes beyond an undersized output buffer</title>
     <id>https://osv.dev/vulnerability/GHSA-jjfr-hcj7-qf5w</id>
@@ -179,18 +191,6 @@ Histogram Equalization or AutoLevel behavior.
 - Package: `SixLabors.ImageSharp` (NuGet)
 - Affected range: `&amp;gt;= 2.0.0, &amp;lt;= 4.1.1`
 - Commit `0815358f9202a78bc7f3b83e19282dc3654b500f` corresponds to release **v4…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/security/advisories/GHSA-j3p4-wp97-rph4"&gt;https://github.com/SixLabors/ImageSharp/security/advisories/GHSA-j3p4-wp97-rph4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-106113"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-106113&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/pull/3187"&gt;https://github.com/SixLabors/ImageSharp/pull/3187&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/commit/c4c4bf292298c026df470db1a17ff826515fd95d"&gt;https://github.com/SixLabors/ImageSharp/commit/c4c4bf292298c026df470db1a17ff826515fd95d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp"&gt;https://github.com/SixLabors/ImageSharp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/releases/tag/v4.1.2"&gt;https://github.com/SixLabors/ImageSharp/releases/tag/v4.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j3p4-wp97-rph4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jj3q-cwqj-842r: ImageSharp: CCITT fax decompression (T4/Modified Huffman): unbounded WriteBits overflows strip buffer — heap OOB write in SixLabors.ImageSharp</title>
-    <id>https://osv.dev/vulnerability/GHSA-jj3q-cwqj-842r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jj3q-cwqj-842r"/>
-    <published>2026-10-07T16:18:50Z</published>
-    <updated>2026-10-07T16:30:04Z</updated>
-    <category term="NuGet"/>
-    <category term="CVE-2026-106117"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;ImageSharp: CCITT fax decompression (T4/Modified Huffman): unbounded WriteBits overflows strip buffer — heap OOB write in SixLabors.ImageSharp&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-106117&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ImageSharp&lt;/code&gt; — fixed in 4.1.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-When decoding a fax-compressed strip TIFF (Compression=3 / Group 3 1D, or Compression=2 / Modified Huffman), the CCITT decompressors write decoded runs through `BitWriterUtils.WriteBits/WriteBit/WriteZeroBit`, which advance and write bits via `Unsafe.Add` with read-modify-write semantics — **without ever comparing the write position against the target buffer length**. The strip buffer is sized `ImageWidth × RowsPerStrip` (8 bytes in the PoC), but two independent defects let an attacker write tens of millions of bits past it: (a) T4 only increments `rowsWritten` when an EOL code is read, and one `ReadNextRun` accumulates unlimited makeup codes (+2560 px per 12-bit code) into a single `RunLength` that `WritePixelRun` then writes in one shot; (b) Modified Huffman writes **before**…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/security/advisories/GHSA-jj3q-cwqj-842r"&gt;https://github.com/SixLabors/ImageSharp/security/advisories/GHSA-jj3q-cwqj-842r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-106117"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-106117&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/pull/3176"&gt;https://github.com/SixLabors/ImageSharp/pull/3176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/commit/e8892ecd8a95dee95c4480fda51cfe0b32f3b846"&gt;https://github.com/SixLabors/ImageSharp/commit/e8892ecd8a95dee95c4480fda51cfe0b32f3b846&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp"&gt;https://github.com/SixLabors/ImageSharp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SixLabors/ImageSharp/releases/tag/v4.1.1"&gt;https://github.com/SixLabors/ImageSharp/releases/tag/v4.1.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jj3q-cwqj-842r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-v76p-62qx-wwq2: ImageSharp: Tiled fax TIFF: tile buffer sized by TileWidth but fax decompressor writes scanlines of ImageWidth — heap OOB write</title>

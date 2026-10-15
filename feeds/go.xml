@@ -3,12 +3,744 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-10-15T14:55:36Z</updated>
+  <updated>2026-10-15T20:30:11Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-rj39-cv6w-8wv7: kin-openapi: YAML NaN/Inf Values Bypass Built-in Guards and Panic via OAS 3.1 Validation Path</title>
+    <id>https://osv.dev/vulnerability/GHSA-rj39-cv6w-8wv7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rj39-cv6w-8wv7"/>
+    <published>2026-10-15T20:20:27Z</published>
+    <updated>2026-10-15T20:30:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-100352"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kin-openapi: YAML NaN/Inf Values Bypass Built-in Guards and Panic via OAS 3.1 Validation Path&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-100352&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.148.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+kin-openapi guards against `NaN` and `Inf` values in its built-in schema visitor (`visitJSON`) by returning `ErrSchemaInputNaN` / `ErrSchemaInputInf` when a `float64` input violates those constraints. For OAS 3.1 specs, however, `Schema.VisitJSON` routes through `useJSONSchema2020`, which hands the value directly to `santhosh-tekuri/jsonschema/v6` v6.0.2 without applying the same guard.
+
+Inside `jsonschema/v6` v6.0.2, `numValidate` builds a `*big.Rat` from the input via `big.Rat.SetString(fmt.Sprintf(&amp;quot;%v&amp;quot;, v))`. For `NaN`/`Inf` this parse fails silently and returns `nil`. `numValidate` then dereferences the nil `*big.Rat` (in `math/big.(*Rat).Cmp`), producing a Go runtime panic.
+
+An attacker delivers this by sending an HTTP request with `Content-Type: application/yaml` (or `app…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-rj39-cv6w-8wv7"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-rj39-cv6w-8wv7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-100352"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-100352&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/4487f198ab8be0c37d6ca72c54f5dca4dc25270e"&gt;https://github.com/getkin/kin-openapi/commit/4487f198ab8be0c37d6ca72c54f5dca4dc25270e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi"&gt;https://github.com/getkin/kin-openapi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.148.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.148.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rj39-cv6w-8wv7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-gfrc-g87h-7h5w: Nginx UI: TOTP / passkey enrolment requires no re-authentication, enabling persistent account takeover</title>
+    <id>https://osv.dev/vulnerability/GHSA-gfrc-g87h-7h5w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gfrc-g87h-7h5w"/>
+    <published>2026-10-15T20:11:32Z</published>
+    <updated>2026-10-15T20:30:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84313"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: TOTP / passkey enrolment requires no re-authentication, enabling persistent account takeover&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84313&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Endpoints that bind a TOTP secret (`POST /api/otp_enroll`) or register a WebAuthn passkey (`POST /api/finish_passkey_register`) for the *current* user require only a valid JWT. There is no current-password re-prompt and the routes are explicitly registered **outside** the `RequireSecureSession()` group. With only a stolen JWT, an attacker can attach their own second factor to the victim&amp;#x27;s account, surviving any subsequent password rotation and locking the legitimate user out.
+
+## Details
+
+`api/user/router.go:34-39` — note the routes registered *before* the secure-session group:
+
+```go
+r.GET(&amp;quot;/otp_secret&amp;quot;, GenerateTOTP)
+r.POST(&amp;quot;/otp_enroll&amp;quot;, EnrollTOTP)                     // ← outside RequireSecureSession
+r.GET(&amp;quot;/begin_passkey_register&amp;quot;, BeginPasskeyRegistration)
+r.POST(&amp;quot;/finis…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-gfrc-g87h-7h5w"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-gfrc-g87h-7h5w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84313"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84313&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gfrc-g87h-7h5w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fh4f-47mf-f2gj: kin-openapi: Unauthenticated panic (DoS) in openapi3filter legacy router via non-canonical/unsupported HTTP method on a static path</title>
+    <id>https://osv.dev/vulnerability/GHSA-fh4f-47mf-f2gj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fh4f-47mf-f2gj"/>
+    <published>2026-10-15T20:15:48Z</published>
+    <updated>2026-10-15T20:30:11Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-100347"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kin-openapi: Unauthenticated panic (DoS) in openapi3filter legacy router via non-canonical/unsupported HTTP method on a static path&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-100347&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.145.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+The `openapi3filter.ValidationHandler` (the exported, documented request-validation middleware) hard-wires the legacy router (`routers/legacy`). That router matches the incoming request method verbatim against a trie built exclusively from upper-cased canonical HTTP methods. A request carrying a method token that is not one of the 9 standard methods — a legitimate-but-unsupported token such as `PROPFIND`, or a non-canonical case variant such as lowercase `get` — misses the trie, leaves `route == nil`, and for an existing **static** path falls through to `PathItem.GetOperation(method)`, whose `default:` case calls `panic(...)`. The panic fires inside route resolution, **before any authentication** runs. This is an unauthenticated, remotely triggerable denial of service (recovered…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-fh4f-47mf-f2gj"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-fh4f-47mf-f2gj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-100347"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-100347&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/f1a5b523b82868d2d9be2e116b4e942892be72c3"&gt;https://github.com/getkin/kin-openapi/commit/f1a5b523b82868d2d9be2e116b4e942892be72c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi"&gt;https://github.com/getkin/kin-openapi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.145.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.145.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fh4f-47mf-f2gj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jrq7-xrjx-pcfw: Nginx UI: Auto backup name allows path traversal outside validated storage path</title>
+    <id>https://osv.dev/vulnerability/GHSA-jrq7-xrjx-pcfw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jrq7-xrjx-pcfw"/>
+    <published>2026-10-15T20:10:56Z</published>
+    <updated>2026-10-15T20:30:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84320"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: Auto backup name allows path traversal outside validated storage path&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84320&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260715121709-f92218e01054&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Nginx UI validates `backup_path` and `storage_path` against the administrator-defined `backup.GrantedAccessPath` boundary, but the final auto-backup output filename is built from the user-controlled auto-backup `name` without stripping path separators or `..` components.
+
+An authenticated user who can create or modify an auto-backup task can set a name such as `task/../../../escaped`. The configured `storage_path` still passes validation because it is inside `GrantedAccessPath`, but the generated backup path escapes that storage directory when `filepath.Join(storage_path, filename)` resolves the embedded traversal sequence.
+
+This bypasses the documented backup path boundary and allows backup archives, and for encrypted configuration backups the adjacent `.key` file, to be writt…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-jrq7-xrjx-pcfw"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-jrq7-xrjx-pcfw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84320"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84320&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/f92218e01054491fc1e6684dc6f7facaf8ab41eb"&gt;https://github.com/0xJacky/nginx-ui/commit/f92218e01054491fc1e6684dc6f7facaf8ab41eb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.3"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jrq7-xrjx-pcfw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5r62-gj48-897x: Nginx UI: MCP configuration tools bypass restricted directive validation and allow secondary authenticated users to execute NJS in Nginx worker context</title>
+    <id>https://osv.dev/vulnerability/GHSA-5r62-gj48-897x</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5r62-gj48-897x"/>
+    <published>2026-10-15T20:10:44Z</published>
+    <updated>2026-10-15T20:30:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84319"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: MCP configuration tools bypass restricted directive validation and allow secondary authenticated users to execute NJS in Nginx worker context&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84319&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The regular HTTP configuration API rejects restricted Nginx directives such as `load_module`, `js_import`, and `js_content`.
+
+However, the MCP configuration interface allows a secondary authenticated user to write and apply equivalent restricted configuration content. In the lab, this allowed the user to load `ngx_http_js_module.so`, import attacker-controlled JavaScript, reload Nginx, and execute NJS in the Nginx worker context.
+
+This is authenticated and is not OS command execution by itself.
+
+## Affected component
+
+- `/mcp`
+- `/mcp_message`
+- MCP tool: `nginx_config_add`
+- Nginx configuration validation
+
+## Impact
+
+A secondary authenticated user can bypass the restricted directive validation enforced by the HTTP API and execute attacker-controlled NJS inside the Nginx worker…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-5r62-gj48-897x"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-5r62-gj48-897x&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84319"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84319&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5r62-gj48-897x"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5v7c-xpfp-p65m: Nginx UI OTP secure-session step-up is missing on sensitive mutation routes</title>
+    <id>https://osv.dev/vulnerability/GHSA-5v7c-xpfp-p65m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5v7c-xpfp-p65m"/>
+    <published>2026-10-15T20:12:42Z</published>
+    <updated>2026-10-15T20:30:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84315"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI OTP secure-session step-up is missing on sensitive mutation routes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84315&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Reporter: Jagadesh Achanta
+
+Target: `0xJacky/nginx-ui`
+
+Affected version / commit tested:
+- App version: `2.3.10`
+- Commit: `4948fba8744e82c3d7003f68ee164e9f49421066`
+- Disclosure channel: GitHub Private Vulnerability Reporting
+- Credential reference: `cred:github-jagstack-gh-cli`
+
+## AI assistance disclosure
+
+This report was prepared by Jagadesh Achanta with assistance from OpenAI/Codex for public source review, local evidence collection, and report drafting.
+
+## Summary
+
+Nginx UI has a short-lived OTP/passkey &amp;quot;secure session&amp;quot; step-up boundary for users with 2FA enabled. `RequireSecureSession()` rejects an OTP-enabled user&amp;#x27;s request unless the request includes a valid `X-Secure-Session-ID` issued after a fresh OTP/passkey verification.
+
+The project already applies this step-up middleware …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-5v7c-xpfp-p65m"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-5v7c-xpfp-p65m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84315"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84315&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5v7c-xpfp-p65m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p7v4-vr35-mj6f: containerd CRI plugin: Checkpoint restore bypasses destination security context</title>
+    <id>https://osv.dev/vulnerability/GHSA-p7v4-vr35-mj6f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p7v4-vr35-mj6f"/>
+    <published>2026-10-15T20:21:57Z</published>
+    <updated>2026-10-15T20:30:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-95837"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;containerd CRI plugin: Checkpoint restore bypasses destination security context&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-95837&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.2.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.3.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A vulnerability in containerd&amp;#x27;s CRI implementation allows a container restored from an untrusted checkpoint via the `CreateContainer` API to bypass the destination security context and execute with elevated privileges. When restoring a container from a checkpoint archive or annotated OCI image, CRIU restores process credentials, Linux capabilities, `no_new_privs`, and seccomp state directly from checkpoint data rather than enforcing the destination CRI `ContainerConfig`. An attacker who can run a container with a crafted checkpoint image can execute processes as root with full capabilities and no enforced seccomp filters despite restrictive security policies requested by the orchestrator. Additionally, containerd&amp;#x27;s CRI status reporting reflects the requested configuration rathe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/security/advisories/GHSA-p7v4-vr35-mj6f"&gt;https://github.com/containerd/containerd/security/advisories/GHSA-p7v4-vr35-mj6f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-95837"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-95837&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/pull/13913"&gt;https://github.com/containerd/containerd/pull/13913&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/commit/928c03c6898cad95f795300281fdff0dbc55a32f"&gt;https://github.com/containerd/containerd/commit/928c03c6898cad95f795300281fdff0dbc55a32f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd"&gt;https://github.com/containerd/containerd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p7v4-vr35-mj6f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qjpp-gffx-2wm9: Nezha Monitoring: Whole-instance DoS in Nezha dashboard: a member can crash the process for every tenant</title>
+    <id>https://osv.dev/vulnerability/GHSA-qjpp-gffx-2wm9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qjpp-gffx-2wm9"/>
+    <published>2026-10-15T20:15:06Z</published>
+    <updated>2026-10-15T20:30:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-100394"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nezha Monitoring: Whole-instance DoS in Nezha dashboard: a member can crash the process for every tenant&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-100394&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/nezhahq/nezha&lt;/code&gt; — fixed in 0.0.0-20260721131105-c893aa57867d&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A single low-privilege `RoleMember` can take the entire Nezha dashboard offline, and with it every tenant&amp;#x27;s web UI, REST API, and agent connections, by racing two ordinary operations on their own service. The crash is a nil pointer dereference in the service-monitor worker at `service/singleton/servicesentinel.go:601`. The worker checks a service exists under one lock and later writes to two pointer-valued status maps under a different lock; a concurrent delete removes the entries in the gap. Because the gRPC server has no recovery interceptor, the worker-goroutine panic kills the whole process. Availability only: nothing is read or modified.
+
+## Affected versions
+
+Confirmed in `v2.2.7` through `v2.2.10`. `service/singleton/servicesentinel.go` has the same vulnerable implementa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/security/advisories/GHSA-qjpp-gffx-2wm9"&gt;https://github.com/nezhahq/nezha/security/advisories/GHSA-qjpp-gffx-2wm9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-100394"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-100394&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/commit/c893aa57867d8a3d608e2f2f16d1594c9766cdf3"&gt;https://github.com/nezhahq/nezha/commit/c893aa57867d8a3d608e2f2f16d1594c9766cdf3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha"&gt;https://github.com/nezhahq/nezha&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/releases/tag/v2.2.11"&gt;https://github.com/nezhahq/nezha/releases/tag/v2.2.11&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nezhahq/nezha/releases/tag/v2.3.0"&gt;https://github.com/nezhahq/nezha/releases/tag/v2.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qjpp-gffx-2wm9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-h4r5-mxv5-8mjc: kin-openapi deepObject query decoding repeatedly compiles an invariant regular expression</title>
+    <id>https://osv.dev/vulnerability/GHSA-h4r5-mxv5-8mjc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h4r5-mxv5-8mjc"/>
+    <published>2026-10-15T20:18:15Z</published>
+    <updated>2026-10-15T20:30:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-100350"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kin-openapi deepObject query decoding repeatedly compiles an invariant regular expression&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-100350&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.146.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`openapi3filter` decodes `deepObject`-style query parameters by looping over **every** key in the request&amp;#x27;s query string. Inside that loop it recompiles a **loop-invariant** regular expression on every iteration. The pattern depends only on the spec-defined parameter name, not on the loop variable, so it is compiled `N` times for `N` query keys instead of once. Because the number of query keys is attacker-controlled and unbounded, a single request with many junk query keys forces a proportional number of `regexp.MustCompile` calls, consuming CPU. A handful of concurrent requests can saturate all cores — an uncontrolled-resource-consumption denial of service.
+
+This is **not** ReDoS: the pattern is fixed (`^&amp;lt;param&amp;gt;\[`) and matches in linear time. The cost is the **repeated compi…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-h4r5-mxv5-8mjc"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-h4r5-mxv5-8mjc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-100350"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-100350&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/d090e36b2f1c42c898ba2a687a8f6e25f5ca727f"&gt;https://github.com/getkin/kin-openapi/commit/d090e36b2f1c42c898ba2a687a8f6e25f5ca727f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi"&gt;https://github.com/getkin/kin-openapi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.146.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.146.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h4r5-mxv5-8mjc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-p6wj-qrr4-pgh5: kin-openapi: Nil-pointer dereference panic in openapi3filter for OpenAPI 3.1 array schemas missing items</title>
+    <id>https://osv.dev/vulnerability/GHSA-p6wj-qrr4-pgh5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p6wj-qrr4-pgh5"/>
+    <published>2026-10-15T20:14:54Z</published>
+    <updated>2026-10-15T20:30:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-97394"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kin-openapi: Nil-pointer dereference panic in openapi3filter for OpenAPI 3.1 array schemas missing items&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-97394&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.143.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A nil-pointer dereference in `openapi3filter` lets any unauthenticated client crash a request handler with a single HTTP request against an OpenAPI **3.1** operation that declares `type: array` **without** `items`. OpenAPI 3.1 (JSON Schema 2020-12) permits omitting `items`, and `doc.Validate()` accepts such schemas with `Schema.Items == nil`. Request/response decoders then dereference `Items` with no nil check. The panic is **deterministic (100%)** on every request to the affected operation. There is no `recover()` in `openapi3filter`; under handlers without per-request recover the process can exit.
+
+### Details
+
+**Spec-validation asymmetry.** OpenAPI 3.0 rejects array schemas that omit `items` ([`openapi3/schema.go`](https://github.com/getkin/kin-openapi/blob/master/openapi3/…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-p6wj-qrr4-pgh5"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-p6wj-qrr4-pgh5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-97394"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-97394&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/30e292371a89ca6d1f91a9553e0aa518b49f838d"&gt;https://github.com/getkin/kin-openapi/commit/30e292371a89ca6d1f91a9553e0aa518b49f838d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi"&gt;https://github.com/getkin/kin-openapi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.143.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.143.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p6wj-qrr4-pgh5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-44xr-mrhh-qm78: Nginx UI: Casdoor SSO callback uses a constant `state` parameter (login CSRF)</title>
+    <id>https://osv.dev/vulnerability/GHSA-44xr-mrhh-qm78</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-44xr-mrhh-qm78"/>
+    <published>2026-10-15T20:12:52Z</published>
+    <updated>2026-10-15T20:30:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84312"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: Casdoor SSO callback uses a constant `state` parameter (login CSRF)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84312&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;Nginx-UI&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+In the Casdoor SSO flow, the OAuth `state` parameter is hard-coded to `settings.CasdoorSettings.Application` — a value identical for every user and every login. The callback handler accepts whatever `state` the client sends without comparing it to anything stored in the user agent, enabling a login-CSRF: an attacker can force the victim&amp;#x27;s browser to authenticate as the *attacker*.
+
+## Details
+
+`api/user/casdoor.go:92-117` (`GetCasdoorUri`):
+
+```go
+func GetCasdoorUri(c *gin.Context) {
+    clientId := settings.CasdoorSettings.ClientId
+    redirectUri := settings.CasdoorSettings.RedirectUri
+    state := settings.CasdoorSettings.Application      // ← constant
+    ...
+    c.JSON(http.StatusOK, gin.H{
+        &amp;quot;uri&amp;quot;: fmt.Sprintf(
+            &amp;quot;%s/login/oauth/authorize?client_id=%s&amp;amp;resp…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-44xr-mrhh-qm78"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-44xr-mrhh-qm78&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84312"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84312&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-44xr-mrhh-qm78"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-637c-6jxx-4rwm: KEDA: Privilege escalation from namespace admin to cluster admin via KEDA TriggerAuthentication</title>
+    <id>https://osv.dev/vulnerability/GHSA-637c-6jxx-4rwm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-637c-6jxx-4rwm"/>
+    <published>2026-10-15T20:19:42Z</published>
+    <updated>2026-10-15T20:30:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-77524"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;KEDA: Privilege escalation from namespace admin to cluster admin via KEDA TriggerAuthentication&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-77524&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/kedacore/keda&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/kedacore/keda/v2&lt;/code&gt; — fixed in 2.21.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A namespace admin who creates a `TriggerAuthentication` and a `ScaledObject` in their own namespace can make the KEDA operator send its own ServiceAccount token to a tenant-controlled URL. That token holds `[&amp;quot;*&amp;quot;]/[&amp;quot;*&amp;quot;] get` cluster-wide, so it reads every Secret in every namespace, plus `batch/jobs` and `horizontalpodautoscalers` create/delete cluster-wide, `*/scale` update on any workload, `validatingwebhookconfigurations` update (rewrite or disable cluster admission), and `apiservices` update (hijack aggregated API routing). This is effectively privilege escalation from namespace admin to cluster admin in real environments: a cluster-wide Secret read alone is enough to find a token for a more privileged ServiceAccount, and the cluster-wide `batch/jobs` create lets the attacke…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/kedacore/keda/security/advisories/GHSA-637c-6jxx-4rwm"&gt;https://github.com/kedacore/keda/security/advisories/GHSA-637c-6jxx-4rwm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-77524"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-77524&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kedacore/keda/commit/1e21cc798dedd079e696cdb45388eddc5e18365d"&gt;https://github.com/kedacore/keda/commit/1e21cc798dedd079e696cdb45388eddc5e18365d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kedacore/keda"&gt;https://github.com/kedacore/keda&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/kedacore/keda/releases/tag/v2.21.0"&gt;https://github.com/kedacore/keda/releases/tag/v2.21.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-637c-6jxx-4rwm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qj98-gp63-54xj: Dgraph: Zero Unauthenticated HTTP Admin removeNode Denial of Service</title>
+    <id>https://osv.dev/vulnerability/GHSA-qj98-gp63-54xj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qj98-gp63-54xj"/>
+    <published>2026-10-15T20:17:22Z</published>
+    <updated>2026-10-15T20:30:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-102748"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Dgraph: Zero Unauthenticated HTTP Admin removeNode Denial of Service&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102748&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:H/SC:N/SI:N/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dgraph-io/dgraph/v25&lt;/code&gt; — fixed in 25.4.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Dgraph `v25.3.8` exposes a Zero HTTP administrative surface that is unauthenticated when port `6080` is reachable.
+
+The exposed routes include:
+
+- `/state`
+- `/assign`
+- `/removeNode`
+- `/moveTablet`
+
+An unauthenticated request to `/removeNode?id=1&amp;amp;group=0` on a single-node standalone deployment breaks the Zero control plane and leaves Alpha repeatedly failing to reconnect to `localhost:5080`.
+
+### Details
+
+The issue exists because Zero administrative HTTP endpoints are registered directly without any authentication or IP-whitelist wrapper.
+
+Relevant code paths:
+
+- `worker/server_state.go:41`
+- `dgraph/cmd/zero/run.go:295-301`
+- `dgraph/cmd/zero/http.go:106-129`
+- `dgraph/cmd/zero/zero.go:475-477`
+
+The relevant behavior is:
+
+- `disable-admin-http=false` by default
+- `/removeNo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/security/advisories/GHSA-qj98-gp63-54xj"&gt;https://github.com/dgraph-io/dgraph/security/advisories/GHSA-qj98-gp63-54xj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102748"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102748&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/commit/c32f6041387fa631dbc057e265b71aec3384ead1"&gt;https://github.com/dgraph-io/dgraph/commit/c32f6041387fa631dbc057e265b71aec3384ead1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph"&gt;https://github.com/dgraph-io/dgraph&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dgraph-io/dgraph/releases/tag/v25.4.0"&gt;https://github.com/dgraph-io/dgraph/releases/tag/v25.4.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qj98-gp63-54xj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mh7x-f8wq-4jhx: kin-openapi spec loader panics on a self-referential additionalProperties $ref (nil-pointer DoS)</title>
+    <id>https://osv.dev/vulnerability/GHSA-mh7x-f8wq-4jhx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mh7x-f8wq-4jhx"/>
+    <published>2026-10-15T20:15:58Z</published>
+    <updated>2026-10-15T20:30:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-100348"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kin-openapi spec loader panics on a self-referential additionalProperties $ref (nil-pointer DoS)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-100348&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.145.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The defect
+----------
+Confirmed at HEAD (f0407d5, v0.144.0). openapi3/loader.go, inside resolveComponent&amp;#x27;s drill closure (around line 455), the case *SchemaRef branch for pathPart == &amp;quot;additionalProperties&amp;quot; dereferences c.Value.AdditionalProperties with no nil-check on c.Value:
+
+    case *SchemaRef:
+        if pathPart == &amp;quot;additionalProperties&amp;quot; {
+            if ap := c.Value.AdditionalProperties.Has; ap != nil {   // c.Value can be nil here
+                cursor = *ap
+            } else {
+                cursor = c.Value.AdditionalProperties.Schema
+            }
+            attempted = true
+        }
+
+When a $ref fragment drills through .../additionalProperties of a schema whose Value is still nil (a pure, not-yet-resolved $ref, or a self-reference resolved before its own Value is set), c.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-mh7x-f8wq-4jhx"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-mh7x-f8wq-4jhx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-100348"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-100348&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/88aa64c7cbd03ecadbb419c473bdcaa8b0124c6b"&gt;https://github.com/getkin/kin-openapi/commit/88aa64c7cbd03ecadbb419c473bdcaa8b0124c6b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi"&gt;https://github.com/getkin/kin-openapi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.145.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.145.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mh7x-f8wq-4jhx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rp3h-jf77-q9p4: containerd: Unpack DoS via repeated opaque whiteouts</title>
+    <id>https://osv.dev/vulnerability/GHSA-rp3h-jf77-q9p4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rp3h-jf77-q9p4"/>
+    <published>2026-10-15T20:22:05Z</published>
+    <updated>2026-10-15T20:30:06Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-95838"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;containerd: Unpack DoS via repeated opaque whiteouts&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-95838&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.0.12&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd&lt;/code&gt; — fixed in 1.7.35&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.2.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/containerd/containerd/v2&lt;/code&gt; — fixed in 2.3.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+A vulnerability exists in containerd&amp;#x27;s layer unpack handler where the processing of certain image layers causes superlinear time complexity. During the unpack operation, specific file configurations within the layer can trigger repeated directory traversals.
+
+Consequently, pulling or importing a maliciously crafted image can result in increased unpack times and a moderate increase in CPU usage. This delays container startup, even if the compressed image layers are small. Additionally, in orchestrators like Kubernetes that apply concurrency limits to image pulls, these excessively long operations can reduce the available concurrency for other pulls, potentially delaying unrelated container deployments.
+
+### Patches
+
+This bug has been fixed in containerd 2.3.5, 2.2.8, 2.0.12, and…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/security/advisories/GHSA-rp3h-jf77-q9p4"&gt;https://github.com/containerd/containerd/security/advisories/GHSA-rp3h-jf77-q9p4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-95838"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-95838&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd/commit/e6ca378dcfa610d06589a3ac96aa992de866e4f0"&gt;https://github.com/containerd/containerd/commit/e6ca378dcfa610d06589a3ac96aa992de866e4f0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/containerd/containerd"&gt;https://github.com/containerd/containerd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rp3h-jf77-q9p4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-685w-q87j-wqw3: Distribution: Client `manifests.Get()` does not verify returned content against requested digest</title>
+    <id>https://osv.dev/vulnerability/GHSA-685w-q87j-wqw3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-685w-q87j-wqw3"/>
+    <published>2026-10-15T20:22:02Z</published>
+    <updated>2026-10-15T20:30:06Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-85747"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Distribution: Client `manifests.Get()` does not verify returned content against requested digest&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-85747&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/docker/distribution&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/distribution/distribution/v3&lt;/code&gt; — fixed in 3.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`registry/client.(*manifests).Get(ctx, dgst, …)` fetches a manifest by digest but never hashes the returned body and compares it against the requested digest. A malicious or compromised registry, or any MITM on the registry connection, can serve arbitrary manifest bytes in response to a digest-pinned request and the client returns the substituted content transparently to the caller. Any application relying on digest pinning for supply-chain integrity — image policy controllers, mirrors, pull-through caches — is silently undermined. The bundled pull-through proxy (`registry/proxy/proxymanifeststore.go`) is itself an unguarded consumer and is directly exploitable.
+
+### Details
+
+**Root cause:** `registry/client/repository.go:488-505` reads the response body and passes it directly…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/distribution/distribution/security/advisories/GHSA-685w-q87j-wqw3"&gt;https://github.com/distribution/distribution/security/advisories/GHSA-685w-q87j-wqw3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-85747"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-85747&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/distribution/distribution/commit/8f91c26c8888a95a36c2357a6e30bc15d4dd76d3"&gt;https://github.com/distribution/distribution/commit/8f91c26c8888a95a36c2357a6e30bc15d4dd76d3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/distribution/distribution/commit/960439b09f342cdeb8f1c0e18e8c7349bdcfbf80"&gt;https://github.com/distribution/distribution/commit/960439b09f342cdeb8f1c0e18e8c7349bdcfbf80&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/distribution/distribution"&gt;https://github.com/distribution/distribution&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/distribution/distribution/releases/tag/v3.1.2"&gt;https://github.com/distribution/distribution/releases/tag/v3.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-685w-q87j-wqw3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q7pc-356p-hggc: SFTPGo: Denial of service via malformed SSH channel request</title>
+    <id>https://osv.dev/vulnerability/GHSA-q7pc-356p-hggc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q7pc-356p-hggc"/>
+    <published>2026-10-15T20:14:20Z</published>
+    <updated>2026-10-15T20:30:06Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-77375"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SFTPGo: Denial of service via malformed SSH channel request&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-77375&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/drakkan/sftpgo/v2&lt;/code&gt; — fixed in 2.7.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A flaw in the SSH service allows an authenticated client to crash the server by sending a malformed protocol message while opening a channel.
+
+### Impact
+
+Any user able to authenticate over SSH can trigger an unhandled error condition that aborts the server process. This results in a denial of service affecting all connected users until the service is restarted. No confidentiality or integrity impact has been identified; the issue is limited to availability.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/drakkan/sftpgo/security/advisories/GHSA-q7pc-356p-hggc"&gt;https://github.com/drakkan/sftpgo/security/advisories/GHSA-q7pc-356p-hggc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-77375"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-77375&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/drakkan/sftpgo/commit/4f751232d7025cf2f7360e01ee8dca81e74b48b0"&gt;https://github.com/drakkan/sftpgo/commit/4f751232d7025cf2f7360e01ee8dca81e74b48b0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/drakkan/sftpgo"&gt;https://github.com/drakkan/sftpgo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/drakkan/sftpgo/releases/tag/v2.7.5"&gt;https://github.com/drakkan/sftpgo/releases/tag/v2.7.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q7pc-356p-hggc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-cf23-7qxj-xmhr: Nginx UI: nginx config directive denylist (ValidateConfigFile) is bypassable via same-line ";" separation → authenticated directive injection (RCE on the official image)</title>
+    <id>https://osv.dev/vulnerability/GHSA-cf23-7qxj-xmhr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cf23-7qxj-xmhr"/>
+    <published>2026-10-15T20:13:52Z</published>
+    <updated>2026-10-15T20:30:06Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84316"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: nginx config directive denylist (ValidateConfigFile) is bypassable via same-line &amp;quot;;&amp;quot; separation → authenticated directive injection (RCE on the official image)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84316&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+`config.ValidateConfigFile` is the security control that blocks dangerous nginx directives
+(`js_*`, `perl_*`, `load_module` of njs/perl modules, `user root`). Its directive scanner is
+bypassable: it splits the config by newlines and inspects only the FIRST token of each line, but
+nginx separates directives with `;`, not newlines. Putting a benign directive first and the blocked
+directive after a `;` on the SAME line defeats every check. The `include` directive is also not on
+the denylist. As a result, an authenticated caller can inject the exact directives the hardening was
+meant to block, through EVERY path that calls the validator — `POST /api/configs` (add), the REST
+config modify endpoint (api/config/modify.go), the MCP `nginx_config_modify` tool, and the
+site/stream save pa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-cf23-7qxj-xmhr"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-cf23-7qxj-xmhr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84316"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84316&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cf23-7qxj-xmhr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-v3ph-cgqh-r8p5: FrankenPHP: Cross-request PHP session ID leak in worker mode when the session extension is a shared module</title>
+    <id>https://osv.dev/vulnerability/GHSA-v3ph-cgqh-r8p5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v3ph-cgqh-r8p5"/>
+    <published>2026-10-15T20:14:29Z</published>
+    <updated>2026-10-15T20:30:06Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-82416"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;FrankenPHP: Cross-request PHP session ID leak in worker mode when the session extension is a shared module&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-82416&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/dunglas/frankenphp&lt;/code&gt; — fixed in 1.12.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+In worker mode under concurrency, FrankenPHP can hand a PHP session id from one request to another when PHP&amp;#x27;s `session` extension is loaded as a shared module instead of being statically linked into the FrankenPHP binary. A request presenting `Cookie: session=A` can have `session_id()` resolve to `B` (a different concurrent client&amp;#x27;s id) or to a stale id from a previous request served by the same worker thread.
+
+## Impact
+- **Security:** cross-user session exposure / session hijacking in worker mode. Same impact class as CVE-2026-24894.
+- **Functional:** users are intermittently logged out; their cookie&amp;#x27;s session is ignored and they receive a foreign or empty session.
+
+## Affected / not affected
+Exposure is determined by how the `session` extension is linked in the PHP build Fran…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp/security/advisories/GHSA-v3ph-cgqh-r8p5"&gt;https://github.com/php/frankenphp/security/advisories/GHSA-v3ph-cgqh-r8p5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-82416"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-82416&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp/pull/2523"&gt;https://github.com/php/frankenphp/pull/2523&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp/commit/be24d82531675f90862b8cde1e9fc7e9ee855aa5"&gt;https://github.com/php/frankenphp/commit/be24d82531675f90862b8cde1e9fc7e9ee855aa5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp"&gt;https://github.com/php/frankenphp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/php/frankenphp/releases/tag/caddy/v1.12.5"&gt;https://github.com/php/frankenphp/releases/tag/caddy/v1.12.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v3ph-cgqh-r8p5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-23vg-4cjm-66q5: kin-openapi: ValidationHandler security-requirement bypass via encoded-path operation confusion</title>
+    <id>https://osv.dev/vulnerability/GHSA-23vg-4cjm-66q5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-23vg-4cjm-66q5"/>
+    <published>2026-10-15T20:19:20Z</published>
+    <updated>2026-10-15T20:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-100351"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kin-openapi: ValidationHandler security-requirement bypass via encoded-path operation confusion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-100351&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.147.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`openapi3filter.ValidationHandler.Middleware` validates requests with kin-openapi&amp;#x27;s
+legacy router, which selects an OpenAPI operation from the decoded `URL.Path`. The
+method is documented as implementing `gorilla/mux.MiddlewareFunc`, but a downstream
+gorilla/mux router configured with `UseEncodedPath()` selects its handler from the
+encoded representation (`URL.RawPath`).
+
+An unauthenticated request such as `/public%2Fstatus` can therefore be validated as an
+intentionally public operation (`/public/status`) and then dispatched to a protected
+operation (`/{id}`). The configured, rejecting `AuthenticationFunc` is never invoked,
+and the protected downstream handler runs.
+
+This is distinct from GHSA-r277-6w6q-xmqw. The behavior below uses an explicit
+authentication callback that rej…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-23vg-4cjm-66q5"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-23vg-4cjm-66q5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-100351"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-100351&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/eda80e2676e9f577ceed2dd80e64f16083edb041"&gt;https://github.com/getkin/kin-openapi/commit/eda80e2676e9f577ceed2dd80e64f16083edb041&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi"&gt;https://github.com/getkin/kin-openapi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.147.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.147.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-23vg-4cjm-66q5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-v75v-6fpf-gvw8: Vitess vttablet /twopcz reflected XSS</title>
+    <id>https://osv.dev/vulnerability/GHSA-v75v-6fpf-gvw8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v75v-6fpf-gvw8"/>
+    <published>2026-10-15T20:16:29Z</published>
+    <updated>2026-10-15T20:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-104252"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vitess vttablet /twopcz reflected XSS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104252&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vitess.io/vitess&lt;/code&gt; — fixed in 0.23.5&lt;/li&gt;&lt;li&gt;&lt;code&gt;vitess.io/vitess&lt;/code&gt; — fixed in 0.24.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;From: xylove21
+To: security@vitess.io
+Subject: [Security Report] Vitess vttablet /twopcz reflected XSS
+Date: Tue, 24 Jun 2026 14:30:00 +0800
+
+## Summary
+
+The `twopczHandler` in
+`go/vt/vttablet/tabletserver/twopcz.go` (line 185) reflects the `Action`
+and `dtid` form values directly into the HTML response body via
+`fmt.Fprintln(w, msg)` — **without HTML escaping**. The response is served
+as `text/html; charset=utf-8`, and Vitess&amp;#x27;s default `acl` policy is
+**allow-all**, so the endpoint is reachable by anyone who can hit the
+vttablet&amp;#x27;s HTTP port (default `15999`, multiplexed with gRPC and MySQL
+wire-protocol ports).
+
+A crafted `Action` or `dtid` value yields a **reflected XSS** that
+executes in the operator&amp;#x27;s browser with same-origin access to the
+vttablet&amp;#x27;s debug endpoints. This includes `/qu…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/security/advisories/GHSA-v75v-6fpf-gvw8"&gt;https://github.com/vitessio/vitess/security/advisories/GHSA-v75v-6fpf-gvw8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-104252"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-104252&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/pull/20255"&gt;https://github.com/vitessio/vitess/pull/20255&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/pull/20273"&gt;https://github.com/vitessio/vitess/pull/20273&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/pull/20274"&gt;https://github.com/vitessio/vitess/pull/20274&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/commit/3140c1846cd120db34f33b2083139b4ab638aed2"&gt;https://github.com/vitessio/vitess/commit/3140c1846cd120db34f33b2083139b4ab638aed2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/commit/976e1e0d78f9d29d02e5e31b4aa7e180648f08af"&gt;https://github.com/vitessio/vitess/commit/976e1e0d78f9d29d02e5e31b4aa7e180648f08af&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vitessio/vitess/commit/c1ed96302e658190168c971afdac730cf70e43f7"&gt;https://github.com/vitessio/vitess/commit/c1ed96302e658190168c971afdac730cf70e43f7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v75v-6fpf-gvw8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7cxh-94cf-mfp6: Talos Linux: Support bundle does not redact registry credentials</title>
+    <id>https://osv.dev/vulnerability/GHSA-7cxh-94cf-mfp6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7cxh-94cf-mfp6"/>
+    <published>2026-10-15T20:20:16Z</published>
+    <updated>2026-10-15T20:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-77564"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Talos Linux: Support bundle does not redact registry credentials&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-77564&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/talos-systems/talos&lt;/code&gt; — fixed in 1.14.0-alpha.0.0.20260513110206-76080416beee&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+When generating a support bundle with `talosctl support` the credentials entered for private registries are included in the bundle.
+
+
+### Details
+
+Within the generated support bundle, inside `resources/registryconfigs.cri.talos.dev.yaml` the `auth` field of the spec is retained.
+The same, potentially sensitive information is present within `etcfilespecs.files.talos.dev.yaml`.
+
+### PoC
+
+Simply run `talosctl -n [...] support` on a cluster with a `RegistryAuthConfig` resource 
+
+### Impact
+
+The problem itself is minor, however, anyone who has ever uploaded a support.zip bundle on a github issue, slack thread or public forum could have potentially leaked their internal authentication parameters for a private registry.
+
+In most situations, if the network and credentials are set corre…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siderolabs/talos/security/advisories/GHSA-7cxh-94cf-mfp6"&gt;https://github.com/siderolabs/talos/security/advisories/GHSA-7cxh-94cf-mfp6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-77564"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-77564&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siderolabs/talos/pull/13345"&gt;https://github.com/siderolabs/talos/pull/13345&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siderolabs/talos/pull/13434"&gt;https://github.com/siderolabs/talos/pull/13434&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siderolabs/talos/pull/13611"&gt;https://github.com/siderolabs/talos/pull/13611&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siderolabs/talos/commit/4c288caf2de1db7f84bba0539ca5ed7d6ecb9142"&gt;https://github.com/siderolabs/talos/commit/4c288caf2de1db7f84bba0539ca5ed7d6ecb9142&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siderolabs/talos/commit/76080416beee6460375c0d0db3cab76cc493ad3e"&gt;https://github.com/siderolabs/talos/commit/76080416beee6460375c0d0db3cab76cc493ad3e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siderolabs/talos/commit/7dc716d850e43373ba8702c702105f4edd68fceb"&gt;https://github.com/siderolabs/talos/commit/7dc716d850e43373ba8702c702105f4edd68fceb&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7cxh-94cf-mfp6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2cvf-wqm6-wr9g: Podman: The `podman run` command can be instructed to disable almost all sandboxing by image annotation</title>
+    <id>https://osv.dev/vulnerability/GHSA-2cvf-wqm6-wr9g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2cvf-wqm6-wr9g"/>
+    <published>2026-10-15T20:22:16Z</published>
+    <updated>2026-10-15T20:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-94603"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Podman: The `podman run` command can be instructed to disable almost all sandboxing by image annotation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-94603&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/containers/podman&lt;/code&gt; — fixed in 5.8.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;go.podman.io/podman/v6&lt;/code&gt; — fixed in 6.1.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+Podman v4.4.0 added a feature where container checkpoints (from the `podman container checkpoint` command) could be distributed via OCI registry, and pulled from that registry and run via the `podman run` command. This allowed easy transfer of checkpoints between systems. However, checkpoints allow complete control of how the container is created - including full control of the container sandbox. When `podman run` detects a checkpoint, it will silently ignore all user input regarding how the container should be created - for example, `podman run --cap-drop=ALL` on an image that is determined to be a checkpoint will ignore `--cap-drop=all` and use the set of capabilities specified by the checkpoint image instead, which could include all capabilities. Podman identifies checkpoint …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/podman/security/advisories/GHSA-2cvf-wqm6-wr9g"&gt;https://github.com/podman-container-tools/podman/security/advisories/GHSA-2cvf-wqm6-wr9g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-94603"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-94603&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/podman/commit/24706290d5c974f078d8ca284026802515f28e92"&gt;https://github.com/podman-container-tools/podman/commit/24706290d5c974f078d8ca284026802515f28e92&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/podman/commit/3721ff82ffb44a4ceeaecc5abd3808e924a6b669"&gt;https://github.com/podman-container-tools/podman/commit/3721ff82ffb44a4ceeaecc5abd3808e924a6b669&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/podman/commit/450c64426dbcff1097d3c7911d791101e3d16f4c"&gt;https://github.com/podman-container-tools/podman/commit/450c64426dbcff1097d3c7911d791101e3d16f4c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/podman/commit/7728ba0a90094408ad9078e36c3622a651d49616"&gt;https://github.com/podman-container-tools/podman/commit/7728ba0a90094408ad9078e36c3622a651d49616&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/podman/commit/c74b1d37b3fb834b0de43e176565d9d8c254b627"&gt;https://github.com/podman-container-tools/podman/commit/c74b1d37b3fb834b0de43e176565d9d8c254b627&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/podman-container-tools/podman/commit/ea9243e04d1db3886dc3a51ee3300ffb547cfc02"&gt;https://github.com/podman-container-tools/podman/commit/ea9243e04d1db3886dc3a51ee3300ffb547cfc02&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2cvf-wqm6-wr9g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2gc7-j998-5xx6: Nginx UI: Account Takeover via Missing `RequireSecureSession` on User Management Endpoint</title>
+    <id>https://osv.dev/vulnerability/GHSA-2gc7-j998-5xx6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2gc7-j998-5xx6"/>
+    <published>2026-10-15T20:11:45Z</published>
+    <updated>2026-10-15T20:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84314"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: Account Takeover via Missing `RequireSecureSession` on User Management Endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84314&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`POST /api/users/:id` allows any authenticated user to change any other user&amp;#x27;s password without `RequireSecureSession` (2FA verification). In contrast, the self password change endpoint `POST /api/user/password` correctly requires `RequireSecureSession`. This inconsistency enables any authenticated user to take over the initial admin account (user ID 1) by simply changing its password.
+
+### Details
+nginx-ui enforces `RequireSecureSession` middleware on sensitive operations such as self password change (`api/user/router.go:55`), self profile update (`api/user/router.go:54`), settings modification (`api/settings/router.go:12`), and config file deletion/rename (`api/config/router.go:16-21`).
+
+However, the user management endpoint registered in `InitManageUserRouter` (`api/user/use…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-2gc7-j998-5xx6"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-2gc7-j998-5xx6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84314"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84314&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2gc7-j998-5xx6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fmxq-cgp8-87wp: Argo CD: AppProject destination-namespace and resource restrictions bypassed by PreDelete/PostDelete resource hooks</title>
+    <id>https://osv.dev/vulnerability/GHSA-fmxq-cgp8-87wp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fmxq-cgp8-87wp"/>
+    <published>2026-10-15T20:19:31Z</published>
+    <updated>2026-10-15T20:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-77459"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Argo CD: AppProject destination-namespace and resource restrictions bypassed by PreDelete/PostDelete resource hooks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-77459&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.3.15&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.4.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.5.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.6.0-rc2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+Argo CD checks an Application&amp;#x27;s AppProject before it creates resources during a sync. That check covers destination namespaces and servers, cluster-scoped resource allow and deny lists, and namespaced resource allow and deny lists, including resource names. PreDelete and PostDelete hooks skip it. When the Application is deleted, Argo CD creates those hooks with the application-controller&amp;#x27;s credentials on the destination cluster.
+
+All versions from v2.10.0 onward are affected, including every currently supported release. v2.9.22 and earlier are not. PostDelete hooks were introduced in [dcc17f70bf](https://github.com/argoproj/argo-cd/commit/dcc17f70bf7db973fe480b8b613189b2c5ac4b4b) (2023-12-18, [#16595](https://github.com/argoproj/argo-cd/pull/16595)) and first released in v2.10.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/security/advisories/GHSA-fmxq-cgp8-87wp"&gt;https://github.com/argoproj/argo-cd/security/advisories/GHSA-fmxq-cgp8-87wp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-77459"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-77459&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/commit/1149cdc6e932208c4402183cc3d7b7485239940c"&gt;https://github.com/argoproj/argo-cd/commit/1149cdc6e932208c4402183cc3d7b7485239940c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/commit/4bc8085b0a6d2296b849539d3d09fc7be7a4a511"&gt;https://github.com/argoproj/argo-cd/commit/4bc8085b0a6d2296b849539d3d09fc7be7a4a511&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/commit/7f0a05834b05103d69d7c150e1ee36541b314696"&gt;https://github.com/argoproj/argo-cd/commit/7f0a05834b05103d69d7c150e1ee36541b314696&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/commit/d5dd7019ee65be8895133fe4df554e28074242c4"&gt;https://github.com/argoproj/argo-cd/commit/d5dd7019ee65be8895133fe4df554e28074242c4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd"&gt;https://github.com/argoproj/argo-cd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/releases/tag/v3.3.15"&gt;https://github.com/argoproj/argo-cd/releases/tag/v3.3.15&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fmxq-cgp8-87wp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-3hcj-9m7p-wwm9: Gotify: Insufficiently Protected Password Change endpoint</title>
+    <id>https://osv.dev/vulnerability/GHSA-3hcj-9m7p-wwm9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3hcj-9m7p-wwm9"/>
+    <published>2026-10-15T20:15:38Z</published>
+    <updated>2026-10-15T20:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-102603"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Gotify: Insufficiently Protected Password Change endpoint&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-102603&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gotify/server/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/gotify/server/v3&lt;/code&gt; — fixed in 3.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The password change endpoint (`POST /current/user/password`) in Gotify versions &amp;lt;= 2.9.1 does not require knowledge of the current password. An attacker in possession of a valid client token can set a new password for the affected user. Recovering the account requires administrator intervention or direct database access.
+
+## PoC
+
+```bash
+# Attacker has obtained a client token
+# No prior password knowledge required
+STOLEN_TOKEN=&amp;quot;Cxxxxxxxxxx&amp;quot;
+
+curl -X POST &amp;quot;http://gotify-host/current/user/password?token=${STOLEN_TOKEN}&amp;quot; \
+  -H &amp;quot;Content-Type: application/json&amp;quot; \
+  -d &amp;#x27;{&amp;quot;pass&amp;quot;:&amp;quot;attacker_controls_this&amp;quot;}&amp;#x27;
+# Expected response:
+# HTTP/1.1 200 OK
+```
+
+## Mitigation
+
+- Upgrade to Gotify 3.0.0, which introduces step-up authentication: changing the  password now requires re-authenticating with the acc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gotify/server/security/advisories/GHSA-3hcj-9m7p-wwm9"&gt;https://github.com/gotify/server/security/advisories/GHSA-3hcj-9m7p-wwm9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-102603"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-102603&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gotify/server/pull/952"&gt;https://github.com/gotify/server/pull/952&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gotify/server/commit/a8744482c668e07a61798573ec8e17bd3f6009f9"&gt;https://github.com/gotify/server/commit/a8744482c668e07a61798573ec8e17bd3f6009f9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gotify/server"&gt;https://github.com/gotify/server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gotify/server/releases/tag/v3.0.0"&gt;https://github.com/gotify/server/releases/tag/v3.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3hcj-9m7p-wwm9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9jww-cxg5-rj9m: Nginx UI: MCP `nginx_config_add` Bypasses Directive Validation — Authenticated RCE</title>
+    <id>https://osv.dev/vulnerability/GHSA-9jww-cxg5-rj9m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9jww-cxg5-rj9m"/>
+    <published>2026-10-15T20:11:18Z</published>
+    <updated>2026-10-15T20:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84318"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: MCP `nginx_config_add` Bypasses Directive Validation — Authenticated RCE&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84318&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The MCP tool `nginx_config_add` writes nginx configuration files to disk and triggers an nginx reload without calling `config.ValidateConfigFile`. The identical flow in the REST API (`POST /api/configs`) does call that function and correctly rejects dangerous directives. An authenticated attacker can exploit this gap to write config files containing any blocked directive (`perl`, `js_import`, `load_module`, `user root`, etc.), bypassing nginx-ui&amp;#x27;s entire security layer. On a server with the nginx Perl, njs, or Lua module loaded, this is post-authentication Remote Code Execution.
+
+### Details
+
+`api/config/add.go` (line 46) calls `config.ValidateConfigFile` before writing:
+
+```go
+err = config.ValidateConfigFile(path, content)  // validates directives, checks blocklist
+if err != …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-9jww-cxg5-rj9m"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-9jww-cxg5-rj9m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84318"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84318&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9jww-cxg5-rj9m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-76pm-mq2q-9gcr: Nginx UI: MCP nginx_config_add skips config directive validation → authenticated nginx directive injection (RCE on the official image)</title>
+    <id>https://osv.dev/vulnerability/GHSA-76pm-mq2q-9gcr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-76pm-mq2q-9gcr"/>
+    <published>2026-10-15T20:11:07Z</published>
+    <updated>2026-10-15T20:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84317"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: MCP nginx_config_add skips config directive validation → authenticated nginx directive injection (RCE on the official image)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84317&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+`internal/config/validation.go` (`ValidateConfigFile`) is a security control that blocks dangerous
+nginx directives — `js_*`, `perl_*`, `load_module` of the njs/perl modules, and `user root`. It is
+enforced on three of the four config-write paths: `api/config/add.go`, `api/config/modify.go`, and
+`mcp/config/config_modify.go`. The fourth path — the MCP tool `nginx_config_add`
+(`mcp/config/config_add.go`) — does NOT call it: it writes the caller-supplied `content` straight to
+disk and reloads nginx. An authenticated MCP caller (or an MCP agent induced via prompt injection)
+can therefore inject exactly the directives the control is meant to block, leading to nginx code
+execution on deployments where the njs/perl module is available (e.g. the official Docker image).
+
+## Root cause —…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-76pm-mq2q-9gcr"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-76pm-mq2q-9gcr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84317"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84317&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-76pm-mq2q-9gcr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-g8cf-rcjf-c8cf: kin-openapi: Uncontrolled Recursion on Circular allOf/anyOf/oneOf Schemas Causes Fatal Process Crash</title>
+    <id>https://osv.dev/vulnerability/GHSA-g8cf-rcjf-c8cf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g8cf-rcjf-c8cf"/>
+    <published>2026-10-15T20:20:37Z</published>
+    <updated>2026-10-15T20:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-100354"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kin-openapi: Uncontrolled Recursion on Circular allOf/anyOf/oneOf Schemas Causes Fatal Process Crash&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-100354&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.149.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+kin-openapi&amp;#x27;s spec loader and spec-time validator both handle circular schema references safely: the loader resolves circular `$ref`s on purpose (to support recursive data structures), and `Schema.validate()` uses stack-based cycle detection. `Validate()` therefore accepts a schema whose `allOf` / `anyOf` / `oneOf` chain refers back to itself, returning no error.
+
+The runtime validators do not have that protection. When such a schema is used for request or response validation, the recursion through the combinator chain is unbounded. In Go this produces a **fatal stack overflow** (`runtime: goroutine stack exceeds ... limit` / `fatal error: stack overflow`), which is **not** a recoverable panic. `recover()` cannot catch it, so `net/http`&amp;#x27;s per-connection recovery does not help. …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-g8cf-rcjf-c8cf"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-g8cf-rcjf-c8cf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-100354"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-100354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/9245cef66c840e27a08409a8a5cd0ee930c5bcff"&gt;https://github.com/getkin/kin-openapi/commit/9245cef66c840e27a08409a8a5cd0ee930c5bcff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi"&gt;https://github.com/getkin/kin-openapi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.149.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.149.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g8cf-rcjf-c8cf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-663m-7x7m-g4fw: Sliver: Unauthenticated Memory Exhaustion Denial of Service in Sliver HTTP(S) Listener PNG Decoder</title>
+    <id>https://osv.dev/vulnerability/GHSA-663m-7x7m-g4fw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-663m-7x7m-g4fw"/>
+    <published>2026-10-15T20:09:33Z</published>
+    <updated>2026-10-15T20:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-77622"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Sliver: Unauthenticated Memory Exhaustion Denial of Service in Sliver HTTP(S) Listener PNG Decoder&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-77622&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/BishopFox/sliver&lt;/code&gt; — fixed in 1.7.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Sliver is vulnerable to a Denial of Service (DOS) attack because there is no cap in the size of a PNG file that can be sent to an open http listener and there is a small amount of possible nonces. This vulnerability lets the attacker completely max out the RAM of the machine running server, leading to a complete loss of availability. 
+### Details
+
+The first vulnerability is that the amount of possible nonces is 65,537. This is found in `server/encoders/encoders.go`
+```go
+const (
+    EncoderModulus = uint64(65537)
+)
+```
+
+The second vulnerability is there is no limit to how many pixels the PNG encoder will accept from an unauthenticated user. This is found in:
+`util/encoders/images.go`
+
+```go
+func (p PNGEncoder) Encode(data []byte) ([]byte, error) {
+    img := imageFromBytes(data…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/BishopFox/sliver/security/advisories/GHSA-663m-7x7m-g4fw"&gt;https://github.com/BishopFox/sliver/security/advisories/GHSA-663m-7x7m-g4fw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BishopFox/sliver/commit/80273462bd8b2a3cd724d2d6d0301a0cabfa977d"&gt;https://github.com/BishopFox/sliver/commit/80273462bd8b2a3cd724d2d6d0301a0cabfa977d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BishopFox/sliver"&gt;https://github.com/BishopFox/sliver&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BishopFox/sliver/releases/tag/v1.7.6"&gt;https://github.com/BishopFox/sliver/releases/tag/v1.7.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-663m-7x7m-g4fw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wq4w-vwvq-q3x9: Nginx UI: Standalone short tokens survive administrative revocation in cache and authenticate again after account re-enable</title>
+    <id>https://osv.dev/vulnerability/GHSA-wq4w-vwvq-q3x9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wq4w-vwvq-q3x9"/>
+    <published>2026-10-15T20:14:01Z</published>
+    <updated>2026-10-15T20:30:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84321"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: Standalone short tokens survive administrative revocation in cache and authenticate again after account re-enable&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84321&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Standalone short tokens issued for WebSocket and explicit-token authentication can survive administrative revocation in cache. If the same account is later re-enabled before the cache entry expires, the deleted short token becomes valid again.
+
+### Details
+`GenerateShortToken()` creates an `AuthToken` row that contains only `ShortToken` and no long `Token`. `DeleteUserTokens()` removes database rows, but when clearing caches it only invalidates entries where `authToken.Token != &amp;quot;&amp;quot;`. This leaves standalone short-token cache entries behind. `GetTokenUserByShortToken()` checks that cache first and then loads the user by ID, so the stale short token becomes usable again if the account status is restored to `true`.
+
+Relevant code paths:
+- [internal/user/user.go](/home/kali/Desktop/b…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-wq4w-vwvq-q3x9"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-wq4w-vwvq-q3x9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84321"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84321&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wq4w-vwvq-q3x9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vrcc-3ch7-hppw: kin-openapi: Incomplete Fix for GHSA-p6wj-qrr4-pgh5: Three Unpatched nil-Items Panic Paths in openapi3filter</title>
+    <id>https://osv.dev/vulnerability/GHSA-vrcc-3ch7-hppw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vrcc-3ch7-hppw"/>
+    <published>2026-10-15T20:20:47Z</published>
+    <updated>2026-10-15T20:30:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-100353"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kin-openapi: Incomplete Fix for GHSA-p6wj-qrr4-pgh5: Three Unpatched nil-Items Panic Paths in openapi3filter&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-100353&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getkin/kin-openapi&lt;/code&gt; — fixed in 0.149.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The fix for GHSA-p6wj-qrr4-pgh5 addressed a nil-pointer dereference that occurs when an OpenAPI 3.1 array schema omits the `items` keyword (which is legal under JSON Schema 2020-12). That fix patched three decoder paths: the standalone `parseArray` function, the top-level array check in `UrlencodedBodyDecoder`, and `MultipartBodyDecoder`.
+
+Three additional crash paths were missed. All of them reach the unguarded `urlValuesDecoder.parseArray` method (`openapi3filter/req_resp_decoder.go:576`) or the unguarded array branch in `buildResObj` (line 1015):
+
+1. **Query parameters** with `type: array` and no `items`.
+2. **deepObject** query parameters containing an array property with no `items`.
+3. **URL-encoded request bodies** where the array lives inside an `allOf` / `anyOf` / `oneO…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/security/advisories/GHSA-vrcc-3ch7-hppw"&gt;https://github.com/getkin/kin-openapi/security/advisories/GHSA-vrcc-3ch7-hppw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-100353"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-100353&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/commit/9814d1f2b212f3508bf52296aa9e248b2122a5a9"&gt;https://github.com/getkin/kin-openapi/commit/9814d1f2b212f3508bf52296aa9e248b2122a5a9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi"&gt;https://github.com/getkin/kin-openapi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getkin/kin-openapi/releases/tag/v0.149.0"&gt;https://github.com/getkin/kin-openapi/releases/tag/v0.149.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vrcc-3ch7-hppw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vc32-4gwf-77xp: Nginx UI: OTP secure-session step-up can be bypassed via MCP configuration tools</title>
+    <id>https://osv.dev/vulnerability/GHSA-vc32-4gwf-77xp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vc32-4gwf-77xp"/>
+    <published>2026-10-15T20:14:10Z</published>
+    <updated>2026-10-15T20:30:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-84360"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Nginx UI: OTP secure-session step-up can be bypassed via MCP configuration tools&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-84360&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/0xJacky/Nginx-UI&lt;/code&gt; — fixed in 1.9.10-0.20260703131214-23d1934099b0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+An OTP-enabled authenticated user who cannot use the HTTP configuration mutation endpoints without a valid secure session can still mutate Nginx configuration through `/mcp` and `/mcp_message` using only ordinary authentication.
+
+### Details
+The HTTP configuration mutation surface is explicitly grouped behind `middleware.RequireSecureSession()`. By contrast, the MCP endpoints are exposed with only `middleware.AuthRequired()`. The MCP server exposes configuration mutation tools including `nginx_config_add` and `nginx_config_modify`, so OTP-enabled users gain an alternate path around the intended step-up requirement.
+
+Relevant code paths:
+- [api/config/router.go](/home/kali/Desktop/bounty/nginx-ui/api/config/router.go:14)
+- [internal/middleware/secure_session.go](/home/kali/Deskt…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-vc32-4gwf-77xp"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-vc32-4gwf-77xp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84360"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84360&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vc32-4gwf-77xp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wwv9-g5x4-966q: SFTPGo source-side file-pattern filter bypass during copy operations</title>
+    <id>https://osv.dev/vulnerability/GHSA-wwv9-g5x4-966q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wwv9-g5x4-966q"/>
+    <published>2026-10-15T20:22:10Z</published>
+    <updated>2026-10-15T20:30:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-103028"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SFTPGo source-side file-pattern filter bypass during copy operations&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-103028&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/drakkan/sftpgo/v2&lt;/code&gt; — fixed in 2.7.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+File pattern filters (`denied_patterns` / `allowed_patterns`) were evaluated on the destination of a copy only. A user holding the copy permission could copy a file denied by the filters to a permitted name and then read it. A recursive directory copy reproduced the contents of a restricted directory under a path where the filters do not deny them, and the hide policy was affected in the same way: a file reported as missing by stat and by directory listings could still be copied.
+
+### Details
+
+An authenticated user can read the contents of files that the file pattern filters are configured to deny them. Nothing else is bypassed: the home directory, the virtual folder layout and the per-directory permissions are all still enforced, and both ends of the copy are paths the accoun…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/drakkan/sftpgo/security/advisories/GHSA-wwv9-g5x4-966q"&gt;https://github.com/drakkan/sftpgo/security/advisories/GHSA-wwv9-g5x4-966q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-103028"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-103028&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/drakkan/sftpgo/commit/dc8886bc079094b4ac2338df683f358b7676b5eb"&gt;https://github.com/drakkan/sftpgo/commit/dc8886bc079094b4ac2338df683f358b7676b5eb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/drakkan/sftpgo"&gt;https://github.com/drakkan/sftpgo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/drakkan/sftpgo/releases/tag/v2.7.6"&gt;https://github.com/drakkan/sftpgo/releases/tag/v2.7.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wwv9-g5x4-966q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-wv6g-x823-wx9m: Terragrunt catalog predictable temp symlink clobber</title>
+    <id>https://osv.dev/vulnerability/GHSA-wv6g-x823-wx9m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wv6g-x823-wx9m"/>
+    <published>2026-10-15T18:21:35Z</published>
+    <updated>2026-10-15T18:30:08Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-64672"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Terragrunt catalog predictable temp symlink clobber&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-64672&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:P/VC:N/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gruntwork-io/terragrunt&lt;/code&gt; — fixed in 1.1.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Terragrunt&amp;#x27;s `terragrunt catalog` command clones each repository referenced in your catalog configuration into a temporary working directory. In affected versions, the clone path it derived was deterministic and sat under the shared system temporary directory, in the form `&amp;lt;tmp&amp;gt;/catalog-&amp;lt;base64 sha1 of the repo URL&amp;gt;`. Because that path was predictable and Terragrunt followed a symlink already present there instead of rejecting it, a local attacker could plant a symlink at that path and cause Terragrunt to delete a directory and re-clone into it outside the intended temporary root.
+
+### Impact
+
+This affected users who ran `terragrunt catalog` on a host they shared with other local users or processes they did not fully trust, such as a multi-user server or a shared CI runner. Th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gruntwork-io/terragrunt/security/advisories/GHSA-wv6g-x823-wx9m"&gt;https://github.com/gruntwork-io/terragrunt/security/advisories/GHSA-wv6g-x823-wx9m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gruntwork-io/terragrunt/pull/6438"&gt;https://github.com/gruntwork-io/terragrunt/pull/6438&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gruntwork-io/terragrunt/commit/668891c5a2ad2996f134bb8b00098754674ea94a"&gt;https://github.com/gruntwork-io/terragrunt/commit/668891c5a2ad2996f134bb8b00098754674ea94a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gruntwork-io/terragrunt"&gt;https://github.com/gruntwork-io/terragrunt&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wv6g-x823-wx9m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4fjg-2h4q-fwg3: GitHub CLI allows path traversal through unescaped request URL components</title>
+    <id>https://osv.dev/vulnerability/GHSA-4fjg-2h4q-fwg3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4fjg-2h4q-fwg3"/>
+    <published>2026-10-15T18:07:14Z</published>
+    <updated>2026-10-15T18:15:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-64653"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitHub CLI allows path traversal through unescaped request URL components&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-64653&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cli/cli/v2&lt;/code&gt; — fixed in 2.97.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A path traversal vulnerability has been identified in the GitHub CLI where some HTTP request URLs, REST API calls in particular, were built without properly escaping their variable path components. A value containing URL path metacharacters can alter the request path and cause `gh` to address a different resource than intended.
+
+### Details
+
+Not all request URLs in the codebase were built with proper escaping of their variable path components. When a component is interpolated into the path without percent encoding, and that component contains URL path metacharacters, it breaks out of its intended segment and changes the effective request path.
+
+In `2.97.0`, request URLs are constructed in a safe manner, so a variable component can no longer escape its intended segment.
+
+### Im…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/security/advisories/GHSA-4fjg-2h4q-fwg3"&gt;https://github.com/cli/cli/security/advisories/GHSA-4fjg-2h4q-fwg3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-64653"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-64653&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/commit/0c2eea6338a2323cfff000160b9b5a56a38d2a06"&gt;https://github.com/cli/cli/commit/0c2eea6338a2323cfff000160b9b5a56a38d2a06&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli"&gt;https://github.com/cli/cli&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/releases/tag/v2.97.0"&gt;https://github.com/cli/cli/releases/tag/v2.97.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4fjg-2h4q-fwg3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mm27-mwq9-fr5g: GitHub CLI allows attestation verification bypass through unescaped regex metacharacters</title>
+    <id>https://osv.dev/vulnerability/GHSA-mm27-mwq9-fr5g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mm27-mwq9-fr5g"/>
+    <published>2026-10-15T18:08:20Z</published>
+    <updated>2026-10-15T18:15:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-64655"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitHub CLI allows attestation verification bypass through unescaped regex metacharacters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-64655&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cli/cli/v2&lt;/code&gt; — fixed in 2.97.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A security vulnerability has been identified in GitHub CLI that could allow attestation verification bypass when using `gh attestation verify` with `--signer-repo` or `--signer-workflow` flags. GitHub CLI builds the certificate matcher from these flag values without escaping regex metacharacters, so a repository or workflow name is treated as a regular expression rather than a literal string. GitHub permits characters such as  `.`  in organization, repository, and workflow path names, and  `.`  is a regex wildcard, so a malicious actor can create a lookalike name that satisfies a matcher intended for a different, trusted signer.
+
+### Details
+
+GitHub CLI constructs a regular expression from the  `--signer-repo`  and  `--signer-workflow`  values and matches it against the signin…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/security/advisories/GHSA-mm27-mwq9-fr5g"&gt;https://github.com/cli/cli/security/advisories/GHSA-mm27-mwq9-fr5g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-64655"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-64655&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/commit/55dbb4dc6b7edb10b48e3d7fc5bccd32318d1b55"&gt;https://github.com/cli/cli/commit/55dbb4dc6b7edb10b48e3d7fc5bccd32318d1b55&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli"&gt;https://github.com/cli/cli&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/releases/tag/v2.97.0"&gt;https://github.com/cli/cli/releases/tag/v2.97.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mm27-mwq9-fr5g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-cg6r-mpgc-h9mm: GitHub CLI partially discloses authentication tokens in `gh auth status` output</title>
+    <id>https://osv.dev/vulnerability/GHSA-cg6r-mpgc-h9mm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cg6r-mpgc-h9mm"/>
+    <published>2026-10-15T18:05:19Z</published>
+    <updated>2026-10-15T18:15:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-64652"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitHub CLI partially discloses authentication tokens in `gh auth status` output&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-64652&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cli/cli/v2&lt;/code&gt; — fixed in 2.97.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A security vulnerability has been identified in GitHub CLI where `gh auth status` could potentially print a portion of the authentication token in plaintext, depending on the lexical structure of the token.
+
+Affected users:
+- Authenticated users who ran `gh auth status` (without the `--show-token` flag) with a token type whose format contains an underscore after the prefix. This includes fine-grained personal access tokens (`github_pat_*`) and GitHub App installation/user access tokens (`ghs_*`, `ghu_*`, e.g., `ghs_&amp;lt;APPID&amp;gt;_&amp;lt;JWT&amp;gt;`), including the Actions `GITHUB_TOKEN`. Classic tokens such as `gho_*` and `ghp_*` have an underscore-free body and are not affected.
+
+### Details
+
+The vulnerability stems from the way GitHub CLI masks the authentication token when reporting authentic…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/security/advisories/GHSA-cg6r-mpgc-h9mm"&gt;https://github.com/cli/cli/security/advisories/GHSA-cg6r-mpgc-h9mm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-64652"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-64652&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/commit/3f6a16a9f8c7fe9676aa8d8f47b399310dd231c3"&gt;https://github.com/cli/cli/commit/3f6a16a9f8c7fe9676aa8d8f47b399310dd231c3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli"&gt;https://github.com/cli/cli&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cli/cli/releases/tag/v2.97.0"&gt;https://github.com/cli/cli/releases/tag/v2.97.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cg6r-mpgc-h9mm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-qqj6-54q6-cxv6: Snowflake drivers writes sensitive information to logs</title>
     <id>https://osv.dev/vulnerability/GHSA-qqj6-54q6-cxv6</id>

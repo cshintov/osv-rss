@@ -3,12 +3,50 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-10-16T20:15:03Z</updated>
+  <updated>2026-10-16T21:30:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-pw5q-rjx4-7f7p: Arcane: Delegated users:update permission allows admin account takeover via password reset (no privilege-hierarchy check)</title>
+    <id>https://osv.dev/vulnerability/GHSA-pw5q-rjx4-7f7p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pw5q-rjx4-7f7p"/>
+    <published>2026-10-16T21:15:03Z</published>
+    <updated>2026-10-16T21:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-96627"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Arcane: Delegated users:update permission allows admin account takeover via password reset (no privilege-hierarchy check)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96627&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getarcaneapp/arcane/backend/v2&lt;/code&gt; — fixed in 2.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+A user holding the delegated `users:update` permission can reset the global administrator&amp;#x27;s password and take over the admin account. `UpdateUser` sets the target user&amp;#x27;s `PasswordHash` from the request body for ANY target with no comparison of caller-vs-target privilege. Because role assignment and role CRUD are deliberately gated by `RequireGlobalAdmin`, `users:update` is intended to sit BELOW admin (profile management); this finding defeats that separation.
+
+## Root Cause
+`UpdateUser` (handler `backend/api/handlers/users.go:317-323`) loads the target by ID and sets `userModel.PasswordHash` from the request body for any user, then `userService.UpdateUser` (`user_service.go:174`) simply `tx.Save`s — with NO actor-vs-target privilege comparison. The only `IsGlobalAdmin` guard (`u…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/security/advisories/GHSA-pw5q-rjx4-7f7p"&gt;https://github.com/getarcaneapp/arcane/security/advisories/GHSA-pw5q-rjx4-7f7p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/pull/3426"&gt;https://github.com/getarcaneapp/arcane/pull/3426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/commit/21ea962f86d967dac8ae02a050f6e5f043d10fa1"&gt;https://github.com/getarcaneapp/arcane/commit/21ea962f86d967dac8ae02a050f6e5f043d10fa1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane"&gt;https://github.com/getarcaneapp/arcane&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/releases/tag/backend/v2.6.0"&gt;https://github.com/getarcaneapp/arcane/releases/tag/backend/v2.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pw5q-rjx4-7f7p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-mp22-58ff-6fhr: Arcane: Environment access token bypasses the admin-required authorization gate on `/api/debug/pprof`</title>
+    <id>https://osv.dev/vulnerability/GHSA-mp22-58ff-6fhr</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mp22-58ff-6fhr"/>
+    <published>2026-10-16T21:12:03Z</published>
+    <updated>2026-10-16T21:15:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-96628"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Arcane: Environment access token bypasses the admin-required authorization gate on `/api/debug/pprof`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96628&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/getarcaneapp/arcane/backend/v2&lt;/code&gt; — fixed in 2.11.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Arcane v2.10.2 contains an authorization inconsistency in `AuthMiddleware.managerAuth`.
+
+When a request supplies a valid environment access token through the `X-Arcane-Agent-Token` header, `managerAuth` resolves the associated environment, installs an environment-scoped permission set, and immediately calls `next(c)`.
+
+This occurs before the middleware evaluates the `AdminRequired` option and verifies that the caller is a global administrator.
+
+As a result, an environment-scoped access token can access routes protected with `WithAdminRequired()`, despite the corresponding `EnvironmentPermissionSet` intentionally containing no global or sudo permissions.
+
+In v2.10.2, the affected admin-only surface is the manager&amp;#x27;s Go `pprof` diagnostic interface under:
+
+`/api/debug/pprof/*`
+
+Th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/security/advisories/GHSA-mp22-58ff-6fhr"&gt;https://github.com/getarcaneapp/arcane/security/advisories/GHSA-mp22-58ff-6fhr&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/pull/3881"&gt;https://github.com/getarcaneapp/arcane/pull/3881&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/commit/4fe4c7ed9483dff7d43e3c4bee6a92037ce886b4"&gt;https://github.com/getarcaneapp/arcane/commit/4fe4c7ed9483dff7d43e3c4bee6a92037ce886b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane"&gt;https://github.com/getarcaneapp/arcane&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/getarcaneapp/arcane/releases/tag/backend/v2.11.0"&gt;https://github.com/getarcaneapp/arcane/releases/tag/backend/v2.11.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mp22-58ff-6fhr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-74vm-87hj-r66f: kin-openapi openapi3filter: nil-pointer panic in ValidateResponse on a response header declared with content</title>
     <id>https://osv.dev/vulnerability/GHSA-74vm-87hj-r66f</id>

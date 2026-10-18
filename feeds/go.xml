@@ -3,12 +3,245 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-10-16T21:30:04Z</updated>
+  <updated>2026-10-18T10:56:09Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-hjx8-qv73-f7cm: Vikunja: Webhooks and link shares survive every revocation path, so a removed collaborator keeps a live feed</title>
+    <id>https://osv.dev/vulnerability/GHSA-hjx8-qv73-f7cm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hjx8-qv73-f7cm"/>
+    <published>2026-10-09T20:57:41Z</published>
+    <updated>2026-10-18T10:56:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111919"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Webhooks and link shares survive every revocation path, so a removed collaborator keeps a live feed&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111919&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A collaborator removed from a project keeps a **live, automatic feed** of that project&amp;#x27;s contents, because nothing on any revocation path deletes the webhook they created while they had access.
+
+Vikunja already has a revocation-cleanup routine that deletes other derived rows for exactly this reason. Its set is `{task_assignees, subscriptions}`. **`webhooks` and `link_shares` — the only two rows that carry a live channel into the project — are not in it**, and the routine is wired to one of four revocation paths.
+
+## Details
+
+`pkg/models/teams.go:411` — `cleanupTaskMembersAfterTeamRemoval`, added in `9358954c9`, whose commit message states the invariant: *&amp;quot;cleanup team memberships, assignments and subscriptions when users lose access to a project&amp;quot;*.
+
+```go
+		canRead, _, permErr …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-hjx8-qv73-f7cm"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-hjx8-qv73-f7cm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hjx8-qv73-f7cm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4hv6-xc92-j86g: Vikunja: WebSocket authentication ignores server-side session state, so revoked sessions keep receiving live pushes</title>
+    <id>https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g"/>
+    <published>2026-10-09T20:57:34Z</published>
+    <updated>2026-10-18T10:56:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111917"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: WebSocket authentication ignores server-side session state, so revoked sessions keep receiving live pushes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111917&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Vikunja v2.6.0 introduced server-side sessions with revocation semantics: `DELETE /api/v2/user/sessions/{id}` documents &amp;quot;Revokes a specific session by its UUID&amp;quot;, and enabling TOTP calls `DeleteAllUserSessions` to invalidate all sessions. The WebSocket endpoint accepts any cryptographically valid user JWT without ever resolving its `sid` (session id) claim against the sessions table. A connection authenticated before revocation stays authenticated and continues to receive live pushes indefinitely, and even brand-new WebSocket connections are accepted with a token whose session was deleted. The revocation feature therefore does not cover the WebSocket boundary at all.
+
+### Details
+
+User access JWTs carry a session reference: `NewUserJWTAuthtoken` (`pkg/modules/auth/auth.go:188`)…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-4hv6-xc92-j86g"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-4hv6-xc92-j86g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-pjr3-86v4-5p7w: Vikunja: Explicit lower-permission share on a sub-project is silently overridden by an inherited parent permission (broken access control / privilege-management regression in v2.6.0)</title>
+    <id>https://osv.dev/vulnerability/GHSA-pjr3-86v4-5p7w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pjr3-86v4-5p7w"/>
+    <published>2026-10-09T20:57:44Z</published>
+    <updated>2026-10-18T10:56:09Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111920"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Explicit lower-permission share on a sub-project is silently overridden by an inherited parent permission (broken access control / privilege-management regression in v2.6.0)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111920&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
+
+### Summary
+
+In Vikunja v2.6.0 the project-permission engine resolves a user&amp;#x27;s effective permission on a project as
+the **MAX over the entire reachable project subtree**. As a result, when a user has been granted a
+**higher** permission on a parent project and the owner *explicitly* shares a **child** project with
+that same user at a **lower** permission (an intended down-restriction), the explicit lower grant is
+**silently ignored** and the user receives the higher, inherited permission on the child. A user
+who was deliberately restricted to **read-only** on a sensitive sub-project can therefore modify it,
+delete it, and re-share it (including granting other users admin) - none of which the owner intended.
+This is a behavior regression from v2.5.0, whose engine used &amp;quot;neare…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-pjr3-86v4-5p7w"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-pjr3-86v4-5p7w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pjr3-86v4-5p7w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-m687-p538-r5hp: Vikunja: Permissive Cross-domain Security Policy trusts every localhost origin which should not be trusted</title>
+    <id>https://osv.dev/vulnerability/GHSA-m687-p538-r5hp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m687-p538-r5hp"/>
+    <published>2026-10-09T20:57:50Z</published>
+    <updated>2026-10-18T10:56:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111922"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Permissive Cross-domain Security Policy trusts every localhost origin which should not be trusted&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111922&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Vikunja ships with `cors.origins` defaulting to `http://127.0.0.1:*` and `http://localhost:*`, and sends `Access-Control-Allow-Credentials: true`, so a page served from any port on the user&amp;#x27;s own machine may make credentialed cross-origin requests to the API and read the responses. The mandatory `service.publicurl` is appended to that default list rather than replacing it, so a fully configured production deployment still trusts every localhost origin. Combined with the token refresh endpoint, which authenticates with the `vikunja_refresh_token` cookie and returns a bearer JWT in the response body, one `fetch()` from such a page yields a working access token for whoever is logged in, and from there the whole account.
+
+## Vulnerability Details
+
+`cors.enable` defaults to true and…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-m687-p538-r5hp"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-m687-p538-r5hp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m687-p538-r5hp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fprf-r6rv-xg99: Vikunja: Saved filter creation with an empty filter string recalculates task positions across all tenants</title>
+    <id>https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99"/>
+    <published>2026-10-09T20:57:38Z</published>
+    <updated>2026-10-18T10:56:07Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111918"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Saved filter creation with an empty filter string recalculates task positions across all tenants&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111918&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+In Vikunja v2.6.0 the task position recalculation that runs when a saved filter view is created fails open when the requesting user has no accessible projects. Instead of aborting, the search that feeds the recalculation loses its project scope entirely and returns every task in the instance. The server then writes one `task_positions` row per task per view (four views per filter) into views owned by the requesting user, including rows that reference tasks of other tenants the user can never see. Any authenticated user can trigger this. The impact is a cross-tenant integrity violation, a single-request write amplification primitive that scales with instance size, and a violation of the invariant stated in the fix for GHSA-w39f-h553-h2mx that position writes are scoped by proje…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fprf-r6rv-xg99"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fprf-r6rv-xg99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fmmf-xq98-g327: Vikunja: Write-level project members can delete admin-tier link shares through an unloaded permission check</title>
+    <id>https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327"/>
+    <published>2026-10-09T20:57:47Z</published>
+    <updated>2026-10-18T10:56:06Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111921"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Write-level project members can delete admin-tier link shares through an unloaded permission check&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111921&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A project member with Write permission can delete an admin-tier link share on that project. The deletion authorization check reads the permission from an object populated only with URL IDs, rather than from the stored share. Its zero value is Read, so the check falls through to project Write permission instead of requiring Admin.
+
+## Details
+
+Affected endpoints:
+
+- `DELETE /api/v1/projects/{project}/shares/{share}`
+- `DELETE /api/v2/projects/{project}/shares/{share}`
+
+Older v1 releases used `/lists/{list}/shares/{share}` before lists were renamed to projects.
+
+In `pkg/routes/api/v2/link_sharing.go:156`, the delete handler passes `&amp;amp;models.LinkSharing{ID: in.ID, ProjectID: in.ProjectID}` to `handler.DoDelete`. The v1 generic handler likewise binds the URL IDs without loading the …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fmmf-xq98-g327"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fmmf-xq98-g327&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3rw9-wmc8-8948: Coder accepts an APIKey beyond the linked OIDC expiry if there is no refresh token</title>
+    <id>https://osv.dev/vulnerability/GHSA-3rw9-wmc8-8948</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3rw9-wmc8-8948"/>
+    <published>2025-08-28T19:36:04Z</published>
+    <updated>2026-10-18T10:55:50Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2025-71435"/>
+    <category term="GO-2025-3921"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder accepts an APIKey beyond the linked OIDC expiry if there is no refresh token&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71435, GO-2025-3921&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.23.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+If users log in to Coder via OIDC, and the OpenID Identity Provider does not return a refresh token, then Coder may allow their web session to continue beyond the expiration of the token returned by the OpenID Identity Provider.
+
+### Details
+When a user logs in via OIDC, Coder stores the OIDC token and refresh token (if any) in its datastore and sets an APIKey in the user&amp;#x27;s cookies. If there is a refresh token, then when the OIDC token is expired and a request is made with the APIKey, we attempt to refresh the OIDC token. If refresh fails, the Coder API request is also failed and the user needs to log in again.
+
+However, if there is no refresh token provided, then affected versions of Coder fail to enforce the expiry of the OIDC token, and allow users to make API requests even …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-3rw9-wmc8-8948"&gt;https://github.com/coder/coder/security/advisories/GHSA-3rw9-wmc8-8948&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/commit/1a4160803589034ce1518e24a78f232c8d08f996"&gt;https://github.com/coder/coder/commit/1a4160803589034ce1518e24a78f232c8d08f996&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3rw9-wmc8-8948"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2025-3921: Coder accepts an APIKey beyond the linked OIDC expiry if there is no refresh token in github.com/coder/coder</title>
+    <id>https://osv.dev/vulnerability/GO-2025-3921</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2025-3921"/>
+    <published>2025-09-08T14:13:10Z</published>
+    <updated>2026-10-18T10:55:50Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2025-71435"/>
+    <category term="GHSA-3rw9-wmc8-8948"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder accepts an APIKey beyond the linked OIDC expiry if there is no refresh token in github.com/coder/coder&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-71435, GHSA-3rw9-wmc8-8948&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.23.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Coder accepts an APIKey beyond the linked OIDC expiry if there is no refresh token in github.com/coder/coder&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-3rw9-wmc8-8948"&gt;https://github.com/coder/coder/security/advisories/GHSA-3rw9-wmc8-8948&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/commit/1a4160803589034ce1518e24a78f232c8d08f996"&gt;https://github.com/coder/coder/commit/1a4160803589034ce1518e24a78f232c8d08f996&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2025-3921"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-wcx9-ccpj-hx3c: Coder vulnerable to post-auth URL redirection to untrusted site ('Open Redirect')</title>
+    <id>https://osv.dev/vulnerability/GHSA-wcx9-ccpj-hx3c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wcx9-ccpj-hx3c"/>
+    <published>2024-10-28T18:31:57Z</published>
+    <updated>2026-10-18T10:55:48Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2024-58398"/>
+    <category term="GO-2024-3228"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder vulnerable to post-auth URL redirection to untrusted site (&amp;#x27;Open Redirect&amp;#x27;)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-58398, GO-2024-3228&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N · CVSS_V4: CVSS:4.0/AV:A/AC:L/AT:N/PR:N/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.16.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.15.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+An issue on Coder&amp;#x27;s login page allows attackers to craft a Coder URL that when clicked by a logged in user could redirect them to a website the attacker controls, e.g. https://google.com.
+
+### Details
+On the login page, Coder checks for the presence of a `redirect` query parameter. On successful login, the user would be redirected to the location of the parameter. Improper sanitization allows attackers to specify a URL outside of the Coder application to redirect users to.
+
+### Impact
+Coder users could potentially be redirected to a untrusted website if tricked into clicking a URL crafted by the attacker. Coder authentication tokens are **not** leaked to the resulting website.
+
+To check if your deployment is vulnerable, visit the following URL for your Coder deployment:
+- `http…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-wcx9-ccpj-hx3c"&gt;https://github.com/coder/coder/security/advisories/GHSA-wcx9-ccpj-hx3c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/commit/69c1d981e3131e50d52b01f6a360abadaad699e6"&gt;https://github.com/coder/coder/commit/69c1d981e3131e50d52b01f6a360abadaad699e6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wcx9-ccpj-hx3c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2024-3228: Coder vulnerable to post-auth URL redirection to untrusted site ('Open Redirect') in github.com/coder/coder</title>
+    <id>https://osv.dev/vulnerability/GO-2024-3228</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2024-3228"/>
+    <published>2024-10-30T16:01:08Z</published>
+    <updated>2026-10-18T10:55:48Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2024-58398"/>
+    <category term="GHSA-wcx9-ccpj-hx3c"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder vulnerable to post-auth URL redirection to untrusted site (&amp;#x27;Open Redirect&amp;#x27;) in github.com/coder/coder&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-58398, GHSA-wcx9-ccpj-hx3c&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.14.4, 2.15.3, 2.16.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Coder vulnerable to post-auth URL redirection to untrusted site (&amp;#x27;Open Redirect&amp;#x27;) in github.com/coder/coder&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-wcx9-ccpj-hx3c"&gt;https://github.com/coder/coder/security/advisories/GHSA-wcx9-ccpj-hx3c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/commit/69c1d981e3131e50d52b01f6a360abadaad699e6"&gt;https://github.com/coder/coder/commit/69c1d981e3131e50d52b01f6a360abadaad699e6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2024-3228"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-h58c-xccx-75m3: Coder: Stored HTML injection via unescaped ApplicationName and LogoURL appearance settings</title>
+    <id>https://osv.dev/vulnerability/GHSA-h58c-xccx-75m3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h58c-xccx-75m3"/>
+    <published>2026-08-20T18:34:26Z</published>
+    <updated>2026-10-18T10:55:43Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111932"/>
+    <category term="GO-2026-6267"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder: Stored HTML injection via unescaped ApplicationName and LogoURL appearance settings&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111932, GO-2026-6267&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The `ApplicationName` and `LogoURL` appearance settings were rendered into HTML output without sufficient escaping which let a highly privileged Owner-role user inject HTML into the Coder dashboard and SMTP notification emails.
+
+&amp;gt; **Note:** Exploitation requires the `Owner` role which already holds full administrative control of the deployment so practical impact is limited.
+
+### Impact
+
+An Owner-role user could store HTML markup in the `ApplicationName` or `LogoURL` appearance settings that later rendered in the dashboard and in SMTP notification emails which results in stored HTML injection against other users of the deployment. Exploitation requires the highly privileged `Owner` role.
+
+### Patches
+
+The fix escapes the `ApplicationName` and `LogoURL` appearance values in HTM…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-h58c-xccx-75m3"&gt;https://github.com/coder/coder/security/advisories/GHSA-h58c-xccx-75m3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25804"&gt;https://github.com/coder/coder/pull/25804&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/commit/ec19bc41d80568c0eb9f74b526e8cc8ffbe3be9a"&gt;https://github.com/coder/coder/commit/ec19bc41d80568c0eb9f74b526e8cc8ffbe3be9a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.29.17"&gt;https://github.com/coder/coder/releases/tag/v2.29.17&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.32.7"&gt;https://github.com/coder/coder/releases/tag/v2.32.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.33.8"&gt;https://github.com/coder/coder/releases/tag/v2.33.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.34.2"&gt;https://github.com/coder/coder/releases/tag/v2.34.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h58c-xccx-75m3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-6267: Coder: Stored HTML injection via unescaped ApplicationName and LogoURL appearance settings in github.com/coder/coder</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6267</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6267"/>
+    <published>2026-08-25T19:43:10Z</published>
+    <updated>2026-10-18T10:55:43Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111932"/>
+    <category term="GHSA-h58c-xccx-75m3"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder: Stored HTML injection via unescaped ApplicationName and LogoURL appearance settings in github.com/coder/coder&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111932, GHSA-h58c-xccx-75m3&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17, 2.32.7, 2.33.8, 2.34.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Coder: Stored HTML injection via unescaped ApplicationName and LogoURL appearance settings in github.com/coder/coder&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-h58c-xccx-75m3"&gt;https://github.com/coder/coder/security/advisories/GHSA-h58c-xccx-75m3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/commit/ec19bc41d80568c0eb9f74b526e8cc8ffbe3be9a"&gt;https://github.com/coder/coder/commit/ec19bc41d80568c0eb9f74b526e8cc8ffbe3be9a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/25804"&gt;https://github.com/coder/coder/pull/25804&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.29.17"&gt;https://github.com/coder/coder/releases/tag/v2.29.17&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.32.7"&gt;https://github.com/coder/coder/releases/tag/v2.32.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.33.8"&gt;https://github.com/coder/coder/releases/tag/v2.33.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.34.2"&gt;https://github.com/coder/coder/releases/tag/v2.34.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6267"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-8fxq-53rx-ph5f: Coder: Login endpoint user enumeration via timing-defense placeholder in password comparison</title>
+    <id>https://osv.dev/vulnerability/GHSA-8fxq-53rx-ph5f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8fxq-53rx-ph5f"/>
+    <published>2026-08-20T18:34:21Z</published>
+    <updated>2026-10-18T10:55:40Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111933"/>
+    <category term="GO-2026-6265"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder: Login endpoint user enumeration via timing-defense placeholder in password comparison&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111933, GO-2026-6265&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.34.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.33.8&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.32.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`userpassword.Compare()` substituted a placeholder hash derived from the well-known string `&amp;quot;hunter2&amp;quot;` when the stored hash was empty. Submitting `&amp;quot;hunter2&amp;quot;` therefore matched accounts with no password hash (nonexistent users and SSO-only users) and a subsequent login-type check returned an HTTP 403 that disclosed the account&amp;#x27;s login type, versus 401 for password users.
+
+&amp;gt; **Note:** Practical exploitation is limited because the timing side channel is noisy and only reveals whether an account exists.
+
+### Impact
+
+An unauthenticated attacker could enumerate valid accounts and their authentication provider by submitting logins with the password `&amp;quot;hunter2&amp;quot;`, distinguishing nonexistent users, SSO users (provider revealed) and password users from the response. This aids credential-s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-8fxq-53rx-ph5f"&gt;https://github.com/coder/coder/security/advisories/GHSA-8fxq-53rx-ph5f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26205"&gt;https://github.com/coder/coder/pull/26205&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/commit/35a7dc8ab9c7f15ce05d963947823ee31224512f"&gt;https://github.com/coder/coder/commit/35a7dc8ab9c7f15ce05d963947823ee31224512f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder"&gt;https://github.com/coder/coder&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.29.17"&gt;https://github.com/coder/coder/releases/tag/v2.29.17&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.32.7"&gt;https://github.com/coder/coder/releases/tag/v2.32.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.33.8"&gt;https://github.com/coder/coder/releases/tag/v2.33.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.34.2"&gt;https://github.com/coder/coder/releases/tag/v2.34.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8fxq-53rx-ph5f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GO-2026-6265: Coder: Login endpoint user enumeration via timing-defense placeholder in password comparison in github.com/coder/coder</title>
+    <id>https://osv.dev/vulnerability/GO-2026-6265</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6265"/>
+    <published>2026-08-25T19:43:10Z</published>
+    <updated>2026-10-18T10:55:40Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111933"/>
+    <category term="GHSA-8fxq-53rx-ph5f"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Coder: Login endpoint user enumeration via timing-defense placeholder in password comparison in github.com/coder/coder&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111933, GHSA-8fxq-53rx-ph5f&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/coder/coder/v2&lt;/code&gt; — fixed in 2.29.17, 2.32.7, 2.33.8, 2.34.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Coder: Login endpoint user enumeration via timing-defense placeholder in password comparison in github.com/coder/coder&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/security/advisories/GHSA-8fxq-53rx-ph5f"&gt;https://github.com/coder/coder/security/advisories/GHSA-8fxq-53rx-ph5f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/commit/35a7dc8ab9c7f15ce05d963947823ee31224512f"&gt;https://github.com/coder/coder/commit/35a7dc8ab9c7f15ce05d963947823ee31224512f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/pull/26205"&gt;https://github.com/coder/coder/pull/26205&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.29.17"&gt;https://github.com/coder/coder/releases/tag/v2.29.17&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.32.7"&gt;https://github.com/coder/coder/releases/tag/v2.32.7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.33.8"&gt;https://github.com/coder/coder/releases/tag/v2.33.8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/coder/coder/releases/tag/v2.34.2"&gt;https://github.com/coder/coder/releases/tag/v2.34.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6265"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-pw5q-rjx4-7f7p: Arcane: Delegated users:update permission allows admin account takeover via password reset (no privilege-hierarchy check)</title>
     <id>https://osv.dev/vulnerability/GHSA-pw5q-rjx4-7f7p</id>
@@ -119,233 +352,5 @@ func IsSafeURL(url []byte) bool {
         if nLink &amp;gt;= nPath &amp;amp;&amp;amp; bytes.Equal(linkPrefix, path) {   // line 790: guard is too late
             ...
 ``…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gomarkdown/markdown/security/advisories/GHSA-cv23-7vc5-jfh7"&gt;https://github.com/gomarkdown/markdown/security/advisories/GHSA-cv23-7vc5-jfh7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gomarkdown/markdown/commit/61af6e1e69710c5ca13cfbaaaa1bc11bc763a8a9"&gt;https://github.com/gomarkdown/markdown/commit/61af6e1e69710c5ca13cfbaaaa1bc11bc763a8a9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gomarkdown/markdown"&gt;https://github.com/gomarkdown/markdown&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cv23-7vc5-jfh7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-4601: Incorrect parsing of IPv6 host literals in net/url</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4601</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4601"/>
-    <published>2026-03-06T21:03:42Z</published>
-    <updated>2026-10-16T10:42:06Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-25679"/>
-    <category term="CVE-2026-25679"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Incorrect parsing of IPv6 host literals in net/url&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-25679, CVE-2026-25679&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.8, 1.26.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;url.Parse insufficiently validated the host/authority component and accepted some invalid URLs.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/752180"&gt;https://go.dev/cl/752180&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/77578"&gt;https://go.dev/issue/77578&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk"&gt;https://groups.google.com/g/golang-announce/c/EdhZqrQ98hk&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4601"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-4918: Infinite loop in HTTP/2 transport when given bad SETTINGS_MAX_FRAME_SIZE in net/http/internal/http2 in golang.org/x/net</title>
-    <id>https://osv.dev/vulnerability/GO-2026-4918</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-4918"/>
-    <published>2026-05-07T19:21:40Z</published>
-    <updated>2026-10-16T10:42:05Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-33814"/>
-    <category term="CVE-2026-33814"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Infinite loop in HTTP/2 transport when given bad SETTINGS_MAX_FRAME_SIZE in net/http/internal/http2 in golang.org/x/net&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-33814, CVE-2026-33814&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.53.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.10, 1.26.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When processing HTTP/2 SETTINGS frames, transport will enter an infinite loop of writing CONTINUATION frames if it receives a SETTINGS_MAX_FRAME_SIZE with a value of 0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/761581"&gt;https://go.dev/cl/761581&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/761640"&gt;https://go.dev/cl/761640&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78476"&gt;https://go.dev/issue/78476&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/qcCIEXso47M"&gt;https://groups.google.com/g/golang-announce/c/qcCIEXso47M&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-4918"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-5026: Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna</title>
-    <id>https://osv.dev/vulnerability/GO-2026-5026</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-5026"/>
-    <published>2026-05-22T02:46:43Z</published>
-    <updated>2026-10-16T10:42:05Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-39821"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Invoking failure to reject ASCII-only Punycode-encoded labels in golang.org/x/net/idna&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-39821&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.25.13, 1.26.6, 1.27.0-rc.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.55.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The ToASCII and ToUnicode functions incorrectly accept Punycode-encoded labels that decode to an ASCII-only label. For example, ToUnicode(&amp;quot;xn--example-.com&amp;quot;) incorrectly returns the name &amp;quot;example.com&amp;quot; rather than an error.
-
-This behavior can lead to privilege escalation in programs using the idna package. For example, a program which performs privilege checks on the ASCII hostname may reject &amp;quot;example.com&amp;quot; but permit &amp;quot;xn--example-.com&amp;quot;. If that program subsequently converts the ASCII hostname to Unicode, it will inadvertently permits access to the Unicode name &amp;quot;example.com&amp;quot;.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/767220"&gt;https://go.dev/cl/767220&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/78760"&gt;https://go.dev/issue/78760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8"&gt;https://groups.google.com/g/golang-announce/c/iI-mYSI0lu8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/94pEornpRlI"&gt;https://groups.google.com/g/golang-announce/c/94pEornpRlI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-5026"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6599: Reset context tracking on consecutive template expressions in html/template</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6599</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6599"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:56:07Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-94448"/>
-    <category term="CVE-2026-94448"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Reset context tracking on consecutive template expressions in html/template&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-94448, CVE-2026-94448&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When a JavaScript template literal contains consecutive expressions, the context tracking state was not properly reset upon entering a new expression.
-
-We now ensure that template-literal expression entries correctly reset context variables so all subsequent regular expression literals are accurately recognized and escaped.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/839866"&gt;https://go.dev/cl/839866&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81821"&gt;https://go.dev/issue/81821&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6599"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6610: HTTP/2 transport accepts malformed framing-related headers in net/http</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6610</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6610"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:56:04Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-78660"/>
-    <category term="CVE-2026-78660"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;HTTP/2 transport accepts malformed framing-related headers in net/http&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-78660, CVE-2026-78660&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.27.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.60.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Historically, we have been rather lax about malformed framing-related headers in our HTTP/2 implementation, as they cannot interfere with HTTP/2 framing. However, this makes it possible for our HTTP/2 implementation to forward responses containing such headers to an HTTP/1 client when acting as a reverse proxy. If the HTTP/1 client also does not behave strictly enough, this can result in response smuggling.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/835145"&gt;https://go.dev/cl/835145&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/836385"&gt;https://go.dev/cl/836385&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81115"&gt;https://go.dev/issue/81115&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6610"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6605: HTTP/1 client connection desynchronization after CONNECT rejection in net/http</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6605</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6605"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:59Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-56866"/>
-    <category term="CVE-2026-56866"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;HTTP/1 client connection desynchronization after CONNECT rejection in net/http&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-56866, CVE-2026-56866&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When http.Transport sends an HTTP/1 CONNECT request with a non-empty Request.Body, it writes the body directly to the connection without framing after the request headers. If the server rejects the CONNECT request with a non-2xx keep-alive response, Transport returns the connection to the idle pool. Because CONNECT requests do not have a request body, the server may interpret the trailing body bytes as a subsequent pipelined HTTP/1.1 request on the connection, leaving the pooled connection desynchronized and causing the next caller that reuses it to read the response to the injected request. In reverse proxies (including httputil.ReverseProxy) that forward CONNECT requests through a shared Transport, this can lead to cross-user response poisoning.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847306"&gt;https://go.dev/cl/847306&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81740"&gt;https://go.dev/issue/81740&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6605"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6617: HTTP/2 server crash due to HPACK encoder race in net/http</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6617</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6617"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:57Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-97032"/>
-    <category term="CVE-2026-97032"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;HTTP/2 server crash due to HPACK encoder race in net/http&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-97032, CVE-2026-97032&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.27.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.60.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;HTTP/2 servers could end up crashing due to inadvertently modifying its HPACK encoder concurrently. This happens because the server modifies the HPACK encoder from two goroutines without synchronization: one uses the encoder to encode a HEADERS frame as part of a response sent to a client and the other modifies the encoder&amp;#x27;s table size when handling a SETTINGS frame containing SETTINGS_HEADER_TABLE_SIZE that a client sends. A malicious client can repeatedly send a request while changing the header table size to crash the server.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847188"&gt;https://go.dev/cl/847188&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847313"&gt;https://go.dev/cl/847313&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81867"&gt;https://go.dev/issue/81867&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/ZPwCyRUuGBs"&gt;https://groups.google.com/g/golang-announce/c/ZPwCyRUuGBs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6617"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6608: Memory limit bypass when parsing MIME headers in net/textproto, mime/multipart</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6608</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6608"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:56Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-94440"/>
-    <category term="CVE-2026-94440"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Memory limit bypass when parsing MIME headers in net/textproto, mime/multipart&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-94440, CVE-2026-94440&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Parsing a multipart form can bypass memory limits and read an arbitrarily long line into memory when the remaining limit at the start of a part is less than 400 bytes.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847307"&gt;https://go.dev/cl/847307&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81741"&gt;https://go.dev/issue/81741&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6608"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6612: Double flow control refund on HTTP/2 server streams in net/http</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6612</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6612"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:54Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-78663"/>
-    <category term="CVE-2026-78663"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Double flow control refund on HTTP/2 server streams in net/http&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-78663, CVE-2026-78663&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.27.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.60.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The HTTP/2 server can refund connection-level flow control twice for the same data: Once when a client resets a stream (refunding data for any sent-but-unread portion of the stream), and again when a request handler reads the buffered data. A malicious client can exploit this to bypass the configured connection-level flow control limit (MaxReceiveBufferPerConnection). Total buffered data is still limited by the concurrent stream limit and stream-level flow control.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847187"&gt;https://go.dev/cl/847187&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847310"&gt;https://go.dev/cl/847310&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81743"&gt;https://go.dev/issue/81743&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/ZPwCyRUuGBs"&gt;https://groups.google.com/g/golang-announce/c/ZPwCyRUuGBs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6612"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6609: Lack of limit on size of parsed Range headers in net/http</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6609</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6609"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:48Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-78667"/>
-    <category term="CVE-2026-78667"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Lack of limit on size of parsed Range headers in net/http&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-78667, CVE-2026-78667&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When parsing a Range header containing a large number of small ranges, FileServer(FS), ServeContent, and ServeFile(FS) can consume an excessive amount of CPU.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847309"&gt;https://go.dev/cl/847309&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81858"&gt;https://go.dev/issue/81858&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6609"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6603: HTTP/2 server memory exhaustion due to Trailer headers in net/http</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6603</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6603"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:47Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-78659"/>
-    <category term="CVE-2026-78659"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;HTTP/2 server memory exhaustion due to Trailer headers in net/http&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-78659, CVE-2026-78659&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.27.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.60.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When &amp;quot;Trailer&amp;quot; headers are sent by a client, the HTTP server internally uses the header values to populate the Request.Trailer map passed to the server handler. Because Request.Trailer is a map, each entry incurs memory overhead. For HTTP/2 servers, a malicious client can exploit this by sending a &amp;quot;Trailer&amp;quot; header that declares a large number of fields, causing the server to allocate a disproportionate amount of memory while bypassing Server.MaxHeaderValueCount and Server.MaxHeaderBytes limits. This exploit is not applicable for HTTP/1 servers, which do not support multiplexing a large number of requests over one TCP connection, and whose Server.MaxHeaderBytes are calculated differently.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847185"&gt;https://go.dev/cl/847185&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847314"&gt;https://go.dev/cl/847314&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81857"&gt;https://go.dev/issue/81857&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/ZPwCyRUuGBs"&gt;https://groups.google.com/g/golang-announce/c/ZPwCyRUuGBs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6603"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6602: Checksum database bypass for golang.org/toolchain in cmd/go</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6602</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6602"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:44Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-94447"/>
-    <category term="CVE-2026-94447"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Checksum database bypass for golang.org/toolchain in cmd/go&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-94447, CVE-2026-94447&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;toolchain&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Previously, a user operating inside of a malicious Go project that defines a bogus golang.org/toolchain go.sum entry and operates a malicious GOMODPROXY the user chooses to use can bypass the intended checksum.
-
-We now ensure that golang.org/toolchain always goes to the network for the canonical checksum.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/840785"&gt;https://go.dev/cl/840785&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81834"&gt;https://go.dev/issue/81834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6602"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6613: HTTP/1 server connection desynchronization after 2xx CONNECT response in net/http</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6613</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6613"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:43Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-94439"/>
-    <category term="CVE-2026-94439"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;HTTP/1 server connection desynchronization after 2xx CONNECT response in net/http&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-94439, CVE-2026-94439&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When an HTTP server handler sends a 2xx response to an HTTP/1 CONNECT request and returns without hijacking the connection, the server improperly continues to read and serve requests from the connection. Since a 2xx response to an HTTP/1 CONNECT converts the connection into a tunnel, the server should not treat the connection as continuing to contain HTTP.
-
-The impact of this misbehavior is mostly limited to potential request smuggling, where an intermediate proxy considers the data on the connection to be tunneled and the server considers it to be HTTP.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847311"&gt;https://go.dev/cl/847311&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81744"&gt;https://go.dev/issue/81744&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6613"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-j6cw-g6p4-7hch: Argo CD repo-server command injection via crafted SSH repository SOCKS5 proxy URL</title>
-    <id>https://osv.dev/vulnerability/GHSA-j6cw-g6p4-7hch</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j6cw-g6p4-7hch"/>
-    <published>2026-10-09T16:37:24Z</published>
-    <updated>2026-10-16T09:55:43Z</updated>
-    <category term="Go"/>
-    <category term="BIT-argo-cd-2026-55797"/>
-    <category term="CVE-2026-55797"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Argo CD repo-server command injection via crafted SSH repository SOCKS5 proxy URL&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-argo-cd-2026-55797, CVE-2026-55797&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v2&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.3.15&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.4.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.5.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/argoproj/argo-cd/v3&lt;/code&gt; — fixed in 3.6.0-rc2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-Argo CD runs a shell command in the repo-server when it clones or fetches an SSH Git repository that has a proxy URL. The proxy host and port are copied into an SSH `ProxyCommand`. A host that contains shell metacharacters breaks out of that command and runs in the repo-server.
-
-All versions from v2.11.0 onward are affected, including every currently supported release. v2.10.20 and earlier are not. The behavior was introduced in [9b27aeb1a4](https://github.com/argoproj/argo-cd/commit/9b27aeb1a4fb15d11a0f01cad65dea1fdfc60205) (2024-01-09, [#15864](https://github.com/argoproj/argo-cd/pull/15864)), the change that added SOCKS5 proxy support for SSH Git URLs, and was first released in v2.11.0.
-
-The repository must use SSH. `http`, `https`, and `socks5` proxy URLs all take this path…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/security/advisories/GHSA-j6cw-g6p4-7hch"&gt;https://github.com/argoproj/argo-cd/security/advisories/GHSA-j6cw-g6p4-7hch&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd/commit/1e3ddd0b7250aa23f489956b5fab8c13d0493a9f"&gt;https://github.com/argoproj/argo-cd/commit/1e3ddd0b7250aa23f489956b5fab8c13d0493a9f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/argoproj/argo-cd"&gt;https://github.com/argoproj/argo-cd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j6cw-g6p4-7hch"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6604: Root.Mkdir(All) can follow junctions out of the root on Windows in os</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6604</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6604"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:42Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-56857"/>
-    <category term="CVE-2026-56857"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Root.Mkdir(All) can follow junctions out of the root on Windows in os&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-56857, CVE-2026-56857&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;On Windows, when the target of Root.Mkdir or Root.MkdirAll is a junction pointing to an empty location, the operation can create a directory at the junction target even when that target is located outside the root. This only applies to operations where the last path component is a junction (path/to/junction, but not path/junction/target).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847305"&gt;https://go.dev/cl/847305&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81739"&gt;https://go.dev/issue/81739&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6604"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6601: Checksum bypass for golang.org/fips140 in cmd/go</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6601</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6601"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:40Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-94444"/>
-    <category term="CVE-2026-94444"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Checksum bypass for golang.org/fips140 in cmd/go&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-94444, CVE-2026-94444&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;toolchain&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Previously, a user operating inside of a malicious Go project that defines a bogus golang.org/fips140 and operates a malicious GOMODPROXY the user chooses to connect to can serve an arbitrary module in its place.
-
-We now unpack the trusted ziphash for the bundled golang.org/fips140 module and construct its entry in the GOMODCACHE such that it can be verified by the toolchain.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/840685"&gt;https://go.dev/cl/840685&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81833"&gt;https://go.dev/issue/81833&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6601"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6611: Excessive CPU consumption from repeated initial window changes in net/http</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6611</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6611"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:38Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-78669"/>
-    <category term="CVE-2026-78669"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Excessive CPU consumption from repeated initial window changes in net/http&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-78669, CVE-2026-78669&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.27.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.60.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A malicious HTTP/2 peer can cause excessive CPU consumption in the client or server by opening a large number of streams and then sending many small SETTINGS frames containing SETTINGS_INITIAL_WINDOW_SIZE values.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847186"&gt;https://go.dev/cl/847186&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847308"&gt;https://go.dev/cl/847308&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81742"&gt;https://go.dev/issue/81742&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/ZPwCyRUuGBs"&gt;https://groups.google.com/g/golang-announce/c/ZPwCyRUuGBs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6611"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6607: Reject malformed ECH outer extension references in crypto/tls</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6607</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6607"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:33Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-97031"/>
-    <category term="CVE-2026-97031"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Reject malformed ECH outer extension references in crypto/tls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-97031, CVE-2026-97031&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Multiple ECH outer extension references are not permitted under RFC 9849; previously, a client could send a well-crafted packet that could trigger memory exhaustion in the server process by specifying multiple references.
-
-We now reject these as malformed and curb the memory amplification vector as a result.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/847312"&gt;https://go.dev/cl/847312&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81855"&gt;https://go.dev/issue/81855&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6607"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GO-2026-6600: Recognize yield as regexp preceder keyword in html/template</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6600</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6600"/>
-    <published>2026-10-08T22:31:09Z</published>
-    <updated>2026-10-16T09:55:33Z</updated>
-    <category term="Go"/>
-    <category term="BIT-golang-2026-97030"/>
-    <category term="CVE-2026-97030"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Recognize yield as regexp preceder keyword in html/template&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-golang-2026-97030, CVE-2026-97030&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;stdlib&lt;/code&gt; — fixed in 1.26.9, 1.27.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A trusted template author may have previously written a valid template wherein the use of the &amp;#x27;yield&amp;#x27; keyword would not be correctly escaped.
-
-We now ensure that valid keyword uses are escaped and non-keyword uses are not escaped.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/840925"&gt;https://go.dev/cl/840925&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/81823"&gt;https://go.dev/issue/81823&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/U2fTuyDJznI"&gt;https://groups.google.com/g/golang-announce/c/U2fTuyDJznI&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6600"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

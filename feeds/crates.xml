@@ -3,12 +3,44 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-10-17T15:30:02Z</updated>
+  <updated>2026-10-19T17:15:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-j7h2-66j4-ghjf: A russh SSH server accepts a publickey authentication whose signature uses a different algorithm than the one named in the request</title>
+    <id>https://osv.dev/vulnerability/GHSA-j7h2-66j4-ghjf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j7h2-66j4-ghjf"/>
+    <published>2026-10-19T17:06:29Z</published>
+    <updated>2026-10-19T17:15:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-111062"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;A russh SSH server accepts a publickey authentication whose signature uses a different algorithm than the one named in the request&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111062&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.64.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Details
+
+In `russh/src/server/encrypted.rs`, `server_read_auth_request_pk` (0.63.3, around lines 880-990):
+
+* The requested algorithm name (`pubkey_algo`) is read and only used to decode the key: `PublicKeyOrCertificate::decode(&amp;amp;pubkey_algo, &amp;amp;pubkey_key)`. The derived `hash_alg` is then dropped (`PublicKeyOrCertificate::PublicKey { ref key, .. }`).
+* The signature blob is decoded (`Signature::decode`) and verified with `Verifier::verify(&amp;amp;pubkey, &amp;amp;buf, &amp;amp;sig)`. `ssh-key` picks the hash from **the signature&amp;#x27;s own algorithm** (`sig.algorithm()`).
+* `pubkey_algo` and `sig.algorithm()` are never compared.
+
+So for an RSA key, the request can say `rsa-sha2-512` while the signature is `ssh-rsa`. The signature is valid for SHA-1, verification succeeds, and `Handler::auth_publickey` is called.
+
+*…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-j7h2-66j4-ghjf"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-j7h2-66j4-ghjf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/a0ded76bdc352f8fbeaaeb175fb2a0c586fbc8f2"&gt;https://github.com/Eugeny/russh/commit/a0ded76bdc352f8fbeaaeb175fb2a0c586fbc8f2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.64.0"&gt;https://github.com/Eugeny/russh/releases/tag/v0.64.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j7h2-66j4-ghjf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4wc5-f2rc-q74m: russh: Unbounded memory allocation in agent protocol server via crafted constraint records</title>
+    <id>https://osv.dev/vulnerability/GHSA-4wc5-f2rc-q74m</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4wc5-f2rc-q74m"/>
+    <published>2026-10-19T17:06:46Z</published>
+    <updated>2026-10-19T17:15:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-111061"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;russh: Unbounded memory allocation in agent protocol server via crafted constraint records&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111061&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.64.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`russh_keys::agent::server::add_key` (`russh/src/keys/agent/server.rs:271-319`) spawns a dedicated tokio task for every 5-byte `SSH_AGENT_CONSTRAIN_LIFETIME` record attached to an added key, each cloning the key blob and sleeping for the declared lifetime (up to ~136 years). The loop has no per-request task budget, and spawned tasks are not rolled back when the overall request fails. Repeating one constrained add-key message over an agent connection converts wire bytes into resident tasks and heap at roughly 141x amplification: in our measurement 10.2 MiB of protocol traffic produced ~2,096,120 live tasks and +1,447,856 KiB RSS, while the same traffic sent as unconstrained add-key requests cost +268 KiB. An attacker reaching the agent socket (a local process, or a remote SSH s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-4wc5-f2rc-q74m"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-4wc5-f2rc-q74m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/4c305033d72f8e5dd21a3fd4c53a6c291a16ebd1"&gt;https://github.com/Eugeny/russh/commit/4c305033d72f8e5dd21a3fd4c53a6c291a16ebd1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.64.1"&gt;https://github.com/Eugeny/russh/releases/tag/v0.64.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4wc5-f2rc-q74m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0371: `zbus_names` is unmaintained</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0371</id>
@@ -240,43 +272,5 @@ Untrusted local .mise.toml [settings] can set the shell interpreter args (unix/w
 ## The defect
 
 CVE-2026-55448 and CVE-2026-35533 fixed the fact that a local project [settings] table is harvested by the settings preloader independent of the trust store (an untrusted .mise.toml sets settings without the user ever trusting it). The remediation is a per-field global_only denylist: settings marked globa…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise/security/advisories/GHSA-g74g-rg72-j2p3"&gt;https://github.com/jdx/mise/security/advisories/GHSA-g74g-rg72-j2p3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-103929"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-103929&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise/pull/11293"&gt;https://github.com/jdx/mise/pull/11293&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise/commit/c6cd7a9a2ca580918562566126646e5d04317895"&gt;https://github.com/jdx/mise/commit/c6cd7a9a2ca580918562566126646e5d04317895&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise"&gt;https://github.com/jdx/mise&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/jdx/mise/releases/tag/v2026.7.14"&gt;https://github.com/jdx/mise/releases/tag/v2026.7.14&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g74g-rg72-j2p3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2cv4-cqwr-gwf7: uv: Path traversal on Windows through wheel extraction</title>
-    <id>https://osv.dev/vulnerability/GHSA-2cv4-cqwr-gwf7</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2cv4-cqwr-gwf7"/>
-    <published>2026-10-05T23:42:09Z</published>
-    <updated>2026-10-15T14:55:34Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-104843"/>
-    <category term="PYSEC-2026-4305"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;uv: Path traversal on Windows through wheel extraction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-104843, PYSEC-2026-4305&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;uv&lt;/code&gt; — fixed in 0.12.18&lt;/li&gt;&lt;li&gt;&lt;code&gt;uv&lt;/code&gt; — fixed in 0.12.18&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-In versions of uv from 0.12.7 to 0.12.18 on Windows, uv could be induced into writing a file outside of the installation prefix during wheel installation.
-
-A malicious wheel could use this to place an executable outside of the intended environment, including in a directory already present on the user&amp;#x27;s PATH. 
-
-This vulnerability only affects Windows hosts; no other platforms are affected.
-
-### Patches
-
-uv 0.12.18 and newer address this vulnerability. Users are encouraged to upgrade to 0.12.18.
-
-### Workarounds
-
-There is no workaround other than upgrading to uv 0.12.18.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/astral-sh/uv/security/advisories/GHSA-2cv4-cqwr-gwf7"&gt;https://github.com/astral-sh/uv/security/advisories/GHSA-2cv4-cqwr-gwf7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-104843"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-104843&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/astral-sh/uv/pull/21923"&gt;https://github.com/astral-sh/uv/pull/21923&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/astral-sh/uv/commit/67169645278ce082638d619beefa6d062540843b"&gt;https://github.com/astral-sh/uv/commit/67169645278ce082638d619beefa6d062540843b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/astral-sh/uv"&gt;https://github.com/astral-sh/uv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/astral-sh/uv/releases/tag/0.12.18"&gt;https://github.com/astral-sh/uv/releases/tag/0.12.18&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2cv4-cqwr-gwf7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0354: Host panic when component `call_async` is cancelled under some conditions</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0354</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0354"/>
-    <published>2026-10-14T12:00:00Z</published>
-    <updated>2026-10-14T20:30:03Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-3r89-v5mq-j5xf"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Host panic when component `call_async` is cancelled under some conditions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-3r89-v5mq-j5xf&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 48.0.6, 49.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-3r89-v5mq-j5xf
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0354.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0354.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14741"&gt;https://github.com/bytecodealliance/wasmtime/pull/14741&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0354"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

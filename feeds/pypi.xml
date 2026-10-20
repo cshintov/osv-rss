@@ -3,12 +3,394 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-10-20T16:30:04Z</updated>
+  <updated>2026-10-20T21:00:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-p4wg-p73j-c528: Pillow: Unbounded recursion parsing a PDF page tree or trailer chain (incomplete fix for CVE-2026-42310)</title>
+    <id>https://osv.dev/vulnerability/GHSA-p4wg-p73j-c528</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p4wg-p73j-c528"/>
+    <published>2026-10-20T20:50:49Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112895"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Unbounded recursion parsing a PDF page tree or trailer chain (incomplete fix for CVE-2026-42310)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112895&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+When an application appends to an existing PDF with `Image.save(..., format=&amp;quot;PDF&amp;quot;, append=True)`, Pillow parses that file with `PdfParser`. Two recursive parsers have no effective bound. `linearize_page_tree` follows `/Kids` with no visited set or depth limit, so a cyclic or duplicated page tree recurses without end. `read_prev_trailer` rejects only an exactly repeated `/Prev` offset, so a long chain of unique offsets still recurses. The trailer-loop guard added for CVE-2026-42310 does not cover either case.
+
+### Details
+`linearize_page_tree` recurses on `/Kids` with no cycle or depth check:
+
+- `src/PIL/PdfParser.py:1078-1092`
+
+`read_prev_trailer` catches only a repeated offset:
+
+- `src/PIL/PdfParser.py:697-720` (the `processed_offsets` check at `:714-718` is the CVE-2026-42310…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-p4wg-p73j-c528"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-p4wg-p73j-c528&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112895"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112895&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/e2ae7eacad6de68c37eb28b633a97bebacf2c5bf"&gt;https://github.com/python-pillow/Pillow/commit/e2ae7eacad6de68c37eb28b633a97bebacf2c5bf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p4wg-p73j-c528"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vx6w-vv9f-6gvg: Pillow: EPS load(scale) lets Ghostscript render past the decompression bomb limit</title>
+    <id>https://osv.dev/vulnerability/GHSA-vx6w-vv9f-6gvg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vx6w-vv9f-6gvg"/>
+    <published>2026-10-20T20:53:21Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112899"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: EPS load(scale) lets Ghostscript render past the decompression bomb limit&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112899&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+EPS load(scale) lets Ghostscript render past the decompression bomb limit
+Location: src/PIL/EpsImagePlugin.py:92  in Ghostscript()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+When an application opens an untrusted Encapsulated PostScript file and asks Pillow to render it at a larger scale, Pillow has Ghostscript produce an image several times bigger than Pillow&amp;#x27;s configured size limit allows. The size check runs only after Ghostscript has finished rendering and written the full raw image to a temporary file. An attacker who can upload a file of about 100 bytes makes each such request spend scale² times the Ghostscript rend…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-vx6w-vv9f-6gvg"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-vx6w-vv9f-6gvg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/3e8cc105588d1dfe062fcada0b6058c1b5f14b65"&gt;https://github.com/python-pillow/Pillow/commit/3e8cc105588d1dfe062fcada0b6058c1b5f14b65&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vx6w-vv9f-6gvg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q45j-58j2-45rg: Pillow: TiffDecode returns uninitialized memory as pixels for short JPEG strips</title>
+    <id>https://osv.dev/vulnerability/GHSA-q45j-58j2-45rg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q45j-58j2-45rg"/>
+    <published>2026-10-20T20:52:43Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112897"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: TiffDecode returns uninitialized memory as pixels for short JPEG strips&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112897&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+TiffDecode returns uninitialized memory as pixels for short JPEG strips
+Location: src/libImaging/TiffDecode.c:554  in _decodeStrip()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+Pillow hands back leftover process memory as image pixels when it opens a small crafted TIFF file. Anyone who can get an application to open their image, and can see something produced from its pixels (a thumbnail, a preview, a converted copy), can read heap memory that the process had previously used and freed. This works in the default configuration: opening and loading the 478-byte file succeeds with no error or warning, and every row below the f…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-q45j-58j2-45rg"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-q45j-58j2-45rg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112897"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112897&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/1d4773e6cea0c4a2814e6d4cdc099bbcf56da6ce"&gt;https://github.com/python-pillow/Pillow/commit/1d4773e6cea0c4a2814e6d4cdc099bbcf56da6ce&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q45j-58j2-45rg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-pchr-8j38-3x4p: Pillow: TIFF encoder ColorMap plane-size mismatch causes a heap out-of-bounds read</title>
+    <id>https://osv.dev/vulnerability/GHSA-pchr-8j38-3x4p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pchr-8j38-3x4p"/>
+    <published>2026-10-20T20:51:40Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112896"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: TIFF encoder ColorMap plane-size mismatch causes a heap out-of-bounds read&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112896&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A small attacker-supplied TIFF can be opened and loaded normally, then reach an out-of-bounds read when an application saves it back to TIFF with retained metadata. The fixed reproducer is a 1×1, 16-bit grayscale, PackBits-compressed TIFF containing tag 320 (ColorMap) with **768 SHORT values**: three zero-filled planes of 256 entries each. No Python object is forged and no metadata is injected after loading.
+
+Pillow&amp;#x27;s TIFF encoder allocates **768 × 2 = 1536 bytes**, then passes three plane pointers separated by 256 SHORT entries to libtiff. With `BitsPerSample = 16`, libtiff instead expects **65536 SHORT values per plane** and attempts a **131072-byte read** from a plane pointer. Existing ASAN observations identify a heap-buffer-overflow READ crossing the 1536-byte allocation m…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-pchr-8j38-3x4p"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-pchr-8j38-3x4p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112896"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112896&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/d03dc3c587a9b0bdc9e4304d70d59a635a87b742"&gt;https://github.com/python-pillow/Pillow/commit/d03dc3c587a9b0bdc9e4304d70d59a635a87b742&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pchr-8j38-3x4p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-65qm-jvmh-6pqg: Pillow: GIF seek keeps rejected size after DecompressionBombError, allowing DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-65qm-jvmh-6pqg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-65qm-jvmh-6pqg"/>
+    <published>2026-10-20T20:53:36Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112400"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: GIF seek keeps rejected size after DecompressionBombError, allowing DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112400&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+GIF seek keeps rejected size after DecompressionBombError, allowing DoS
+Location: src/PIL/GifImagePlugin.py:293  in GifImageFile._seek()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+A GIF of about 60 bytes can make Pillow allocate gigabytes of memory. This affects applications that catch the &amp;quot;image too large&amp;quot; error raised while stepping to a later animation frame and then keep using the same image object. Pillow correctly refuses the oversized frame, but it stores the refused dimensions on the image object anyway, and later operations size their memory from them. An attacker who can upload a GIF to such a service can exhaus…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-65qm-jvmh-6pqg"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-65qm-jvmh-6pqg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112400"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112400&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/6faed707cfb760a4cbd726ddc8406f576cf35bf7"&gt;https://github.com/python-pillow/Pillow/commit/6faed707cfb760a4cbd726ddc8406f576cf35bf7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-65qm-jvmh-6pqg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-58r4-6rv3-gfh8: Pillow: Out-of-bounds access in _imagingmorph on a zero-width image</title>
+    <id>https://osv.dev/vulnerability/GHSA-58r4-6rv3-gfh8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-58r4-6rv3-gfh8"/>
+    <published>2026-10-20T20:56:22Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112397"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Out-of-bounds access in _imagingmorph on a zero-width image&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112397&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A PPM or PGM file can declare a width of 0, which Pillow accepts, producing an image of size `(0, N)`. Passing that image to `ImageMorph.MorphOp.apply()` makes the native morphology code index a row buffer at `outrow[width - 1]`, which is `outrow[-1]` when the width is 0. The process crashes.
+
+### Details
+The PPM parser reads width and height with no lower-bound check:
+
+- `src/PIL/PpmImagePlugin.py:119`
+
+The native `apply()` writes the row edges with no guard that the width is positive:
+
+- `src/_imagingmorph.c:81` sets `outrow[0] = outrow[width - 1] = 0;`
+
+`match()` and `get_on_pixels()` use the same edge-indexing pattern.
+
+### PoC
+```python
+from PIL import Image, ImageMorph
+
+# A width-0 image (also producible from a crafted PPM header). apply() indexes
+# outrow[width - 1] == o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-58r4-6rv3-gfh8"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-58r4-6rv3-gfh8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112397"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112397&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/18f7c0dfee93063c51db6ed0ca8c4da2999dcb64"&gt;https://github.com/python-pillow/Pillow/commit/18f7c0dfee93063c51db6ed0ca8c4da2999dcb64&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-58r4-6rv3-gfh8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-462x-pgg6-55fp: Pillow tiled-TIFF decoder reads past tile buffer in copy4 (Unpack.c:1290)</title>
+    <id>https://osv.dev/vulnerability/GHSA-462x-pgg6-55fp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-462x-pgg6-55fp"/>
+    <published>2026-10-20T20:49:26Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112395"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow tiled-TIFF decoder reads past tile buffer in copy4 (Unpack.c:1290)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112395&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Pillow&amp;#x27;s libImaging `_decodeTile` decoder, used to decode tiled TIFF images, allocates a per-tile buffer using `realloc(state-&amp;gt;buffer, TIFFTileSize(tiff))`. After each `TIFFReadTile` it then iterates `tile_y` from 0 up to `current_tile_length` and calls the configured row unpacker (here `copy4`) with the source pointer `state-&amp;gt;buffer + tile_y * row_byte_size`. When libtiff returns a `tile_bytes_size` smaller than the worst-case `row_byte_size * tile_length`, the inner stride-and-copy loop walks past the realloc&amp;#x27;d region and `copy4` performs a 1024-byte `memcpy` that reads up to `(tile_length-1) * row_byte_size + row_byte_size` bytes from a buffer sized only to `tile_bytes_size`. The supplied PoC TIFF triggers a 1024-byte over-read exactly 0 bytes past a 196608-byte allocation.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-462x-pgg6-55fp"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-462x-pgg6-55fp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112395"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112395&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/76869efdbbf2ad7dccd7536520fb61b7a00ab61e"&gt;https://github.com/python-pillow/Pillow/commit/76869efdbbf2ad7dccd7536520fb61b7a00ab61e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-462x-pgg6-55fp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8g5g-8vmr-9782: Pillow: Heap buffer overflow in ImagingJpegDecode</title>
+    <id>https://osv.dev/vulnerability/GHSA-8g5g-8vmr-9782</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8g5g-8vmr-9782"/>
+    <published>2026-10-20T20:40:07Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112403"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Heap buffer overflow in ImagingJpegDecode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112403&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`JpegImageFile.draft()` — which `Image.thumbnail()` calls automatically — requests 1/2, 1/4 or 1/8 scaled JPEG output and shrinks `self._size` and the tile extents to match, so `_setimage()` allocates a single-row decode buffer of `ceil(W/s)` samples. `ImagingJpegDecode()` sets `cinfo.scale_num`/`scale_denom`, calls `jpeg_start_decompress()`, and then reads scanlines into that buffer without ever comparing `cinfo.output_width`, `cinfo.output_height` or `cinfo.out_color_components` against `state-&amp;gt;xsize`, `state-&amp;gt;ysize` and `state-&amp;gt;bits`.
+
+libjpeg-turbo 3.x decodes lossless (SOF3) JPEG, but hardwires lossless streams to no scaling — the requested `scale_denom` is silently discarded. It therefore returns full-width `W`-sample rows into a buffer sized for `ceil(W/s)`. Each `jpeg_r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-8g5g-8vmr-9782"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-8g5g-8vmr-9782&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112403"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112403&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75"&gt;https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8g5g-8vmr-9782"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c6hw-5grf-ff96: Pillow: OOB read in TiffDecode.c tile and RGBA paths leaks heap memory into pixels</title>
+    <id>https://osv.dev/vulnerability/GHSA-c6hw-5grf-ff96</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c6hw-5grf-ff96"/>
+    <published>2026-10-20T20:42:00Z</published>
+    <updated>2026-10-20T21:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112404"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: OOB read in TiffDecode.c tile and RGBA paths leaks heap memory into pixels&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112404&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+OOB read in TiffDecode.c tile and RGBA paths leaks heap memory into pixels
+Location: src/libImaging/TiffDecode.c:483  in _decodeTile()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+Pillow reads past the end of a heap buffer when decoding certain malformed compressed TIFF files, and copies the bytes it reads into the pixels of the image it returns. An attacker who can get an application to open and load an image file, for example by uploading it to a service that returns thumbnails, previews or converted images, gets back fragments of that process&amp;#x27;s heap memory, including pointer values. A slightly larger file instead crashes…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-c6hw-5grf-ff96"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-c6hw-5grf-ff96&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112404"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112404&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/1d4773e6cea0c4a2814e6d4cdc099bbcf56da6ce"&gt;https://github.com/python-pillow/Pillow/commit/1d4773e6cea0c4a2814e6d4cdc099bbcf56da6ce&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c6hw-5grf-ff96"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6cjc-53gc-5rqm: AIOHTTP: Connector pool exhaustion via Max-Age overflow</title>
+    <id>https://osv.dev/vulnerability/GHSA-6cjc-53gc-5rqm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6cjc-53gc-5rqm"/>
+    <published>2026-10-20T19:57:24Z</published>
+    <updated>2026-10-20T20:15:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-111065"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: Connector pool exhaustion via Max-Age overflow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111065&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+An overflow in Max-Age processing can skip closing a connection.
+
+### Impact
+
+An attacker may be able to exhaust the connection pool temporarily, until garbage collection resolves the connections.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-6cjc-53gc-5rqm"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-6cjc-53gc-5rqm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-111065"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-111065&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/9dd8eaf4e31f1237ef2c1574a8c82a739fca5805"&gt;https://github.com/aio-libs/aiohttp/commit/9dd8eaf4e31f1237ef2c1574a8c82a739fca5805&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6cjc-53gc-5rqm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-f9xw-jh8m-3mwq: AIOHTTP: Absolute-form request targets can spoof Request.scheme</title>
+    <id>https://osv.dev/vulnerability/GHSA-f9xw-jh8m-3mwq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f9xw-jh8m-3mwq"/>
+    <published>2026-10-20T20:01:40Z</published>
+    <updated>2026-10-20T20:15:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-111748"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: Absolute-form request targets can spoof Request.scheme&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111748&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+An attacker sending an absolute-form request can spoof the scheme used.
+
+### Impact
+
+If user code depends on the `Request.scheme` attribute for anything security related, an attacker may be able to circumvent this logic, tricking the application into thinking a connection is encrypted when it is not, or vice versa.
+
+### Workaround
+
+A WAF rule to reject absolute-form requests (legitimate requests should only use this form for proxies).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-f9xw-jh8m-3mwq"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-f9xw-jh8m-3mwq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-111748"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-111748&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/6d4e7b01f9b951aa084a75d7356e907d4ee80411"&gt;https://github.com/aio-libs/aiohttp/commit/6d4e7b01f9b951aa084a75d7356e907d4ee80411&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f9xw-jh8m-3mwq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-gx76-c99x-2c96: AIOHTTP: Cookie from subdomain can remove Host-Only Scope from existing cookies</title>
+    <id>https://osv.dev/vulnerability/GHSA-gx76-c99x-2c96</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gx76-c99x-2c96"/>
+    <published>2026-10-20T19:58:14Z</published>
+    <updated>2026-10-20T20:15:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-111749"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: Cookie from subdomain can remove Host-Only Scope from existing cookies&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111749&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A subdomain can remove the Host-Only flag from an existing cookie to a parent domain.
+
+### Impact
+
+A user accessing untrusted subdomains could see their Host-Only protections stripped from cookies. Given most usecases won&amp;#x27;t reflect these cookies to a browser, the impact is limited.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-gx76-c99x-2c96"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-gx76-c99x-2c96&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-111749"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-111749&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/6a07c171ef9f3be583e2907dcd1931372efca8d6"&gt;https://github.com/aio-libs/aiohttp/commit/6a07c171ef9f3be583e2907dcd1931372efca8d6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gx76-c99x-2c96"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-pqxq-w44r-73xw: AIOHTTP: Pure-Python parser request smuggling</title>
+    <id>https://osv.dev/vulnerability/GHSA-pqxq-w44r-73xw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pqxq-w44r-73xw"/>
+    <published>2026-10-20T19:52:21Z</published>
+    <updated>2026-10-20T20:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-111750"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: Pure-Python parser request smuggling&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111750&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:L/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The pure Python parser is vulnerable to an HTTP request smuggling attack.
+
+### Impact
+
+If users are using the Python parser (`AIOHTTP_NO_EXTENSIONS`, or not a standard wheel installed), then an application may be vulnerable to a request smuggling attack.
+
+### Workaround
+
+Switch to the default C parser.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-pqxq-w44r-73xw"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-pqxq-w44r-73xw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-111750"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-111750&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/9b27347e61454d9f8ca2055f4c67a37dee336e83"&gt;https://github.com/aio-libs/aiohttp/commit/9b27347e61454d9f8ca2055f4c67a37dee336e83&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pqxq-w44r-73xw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9xw5-w5jj-pvcg: AIOHTTP: File descriptor exhaustion in multipart requests</title>
+    <id>https://osv.dev/vulnerability/GHSA-9xw5-w5jj-pvcg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9xw5-w5jj-pvcg"/>
+    <published>2026-10-20T19:52:09Z</published>
+    <updated>2026-10-20T20:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-111066"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: File descriptor exhaustion in multipart requests&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111066&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+An attacker can exhaust file descriptors with specially crafted multipart requests.
+
+### Impact
+
+If a handler uses `Request.post()`, it may be possible for an attacker to use an unlimited number of file descriptors, potentially resulting in resource exhaustion.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-9xw5-w5jj-pvcg"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-9xw5-w5jj-pvcg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-111066"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-111066&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/2d94633b7f1b4c1ba07d647b629a8440652b2d09"&gt;https://github.com/aio-libs/aiohttp/commit/2d94633b7f1b4c1ba07d647b629a8440652b2d09&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9xw5-w5jj-pvcg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hq85-5cpj-mr62: uv's bundled CA store trusts an emSign root whose intermediate CA keys are compromised</title>
+    <id>https://osv.dev/vulnerability/GHSA-hq85-5cpj-mr62</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hq85-5cpj-mr62"/>
+    <published>2026-10-20T19:37:52Z</published>
+    <updated>2026-10-20T19:45:04Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;uv&amp;#x27;s bundled CA store trusts an emSign root whose intermediate CA keys are compromised&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;uv&lt;/code&gt; — fixed in 0.13.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;By default, uv verifies TLS connections against a vendored copy of the `webpki-root-certs` bundle. Versions before 0.13.4 include the `emSign ECC Root CA - G3` root. Eight eMudhra intermediate CA certificates that chain to that root have compromised private keys, and the CA has revoked them.
+
+An attacker with one of the compromised keys can issue certificates that uv accepts for any hostname, and can be used to issue certificates to enable MITM attacks.
+
+uv 0.13.4 removes the root from its vendored bundle, following `webpki-root-certs` 1.0.10. Upgrade to 0.13.4 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/astral-sh/uv/security/advisories/GHSA-hq85-5cpj-mr62"&gt;https://github.com/astral-sh/uv/security/advisories/GHSA-hq85-5cpj-mr62&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2"&gt;https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://emudhra.we-have-a-problem.com"&gt;https://emudhra.we-have-a-problem.com&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/astral-sh/uv"&gt;https://github.com/astral-sh/uv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/a/mozilla.org/g/dev-security-policy/c/0R3XLJL6FuE/m/0XofdebrAAAJ"&gt;https://groups.google.com/a/mozilla.org/g/dev-security-policy/c/0R3XLJL6FuE/m/0XofdebrAAAJ&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hq85-5cpj-mr62"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6q48-6c7w-9gw2: certifi bundles emSign root CAs with compromised intermediate CA keys</title>
+    <id>https://osv.dev/vulnerability/GHSA-6q48-6c7w-9gw2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6q48-6c7w-9gw2"/>
+    <published>2026-10-20T19:35:05Z</published>
+    <updated>2026-10-20T19:45:04Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;certifi bundles emSign root CAs with compromised intermediate CA keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;certifi&lt;/code&gt; — fixed in 2026.10.19&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Certifi versions before 2026.10.18 include the `emSign ECC Root CA - G3` root certificate in their bundled CA store. Eight eMudhra intermediate CA certificates that chain to this root have compromised private keys and the CA has revoked them. 
+
+An attacker with one of the compromised keys can issue valid-looking certificates for any hostname. If the attacker is also on-path, they can intercept or modify TLS traffic from clients that trust the certifi bundle. Examples include `requests`, `urllib3` and `pip`, and the Python.org macOS installer.
+
+Certifi 2026.10.18 removed all emSign roots from the bundle. Certifi 2026.10.19 restored the emSign roots that are not affected. Upgrade to 2026.10.19 or later, and rebuild container images that vendor certifi.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2"&gt;https://github.com/certifi/python-certifi/security/advisories/GHSA-6q48-6c7w-9gw2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576"&gt;https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://emudhra.we-have-a-problem.com"&gt;https://emudhra.we-have-a-problem.com&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/certifi/python-certifi"&gt;https://github.com/certifi/python-certifi&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6q48-6c7w-9gw2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-18103: Malicious code in semverr (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-18103</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18103"/>
+    <published>2026-10-20T18:20:18Z</published>
+    <updated>2026-10-20T19:30:08Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in semverr (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;semverr&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (110e0a64dd80654ca98caa5e291499d158a39eb66c1d35efe896a42095c85118)
+semverr is a near-empty package (a one-line __version__) whose name resembles the popular semver library. Its setup.py runs at install time (invoked by pip during `pip install`) and calls urllib.request.urlretrieve to fetch an opaque binary from https://c2-worker.crawlnet-claim.workers.dev/dl/pyupd, writes it to a PID-suffixed path in the system temp directory, and launches it via subprocess.Popen with start_new_session=True and stdout/stderr redirected to DEVNULL so the detached child survives the install and runs silently. The fetch is unpinned, unverified (no hash or signature check), and directed at an anonymous Cloudflare Workers …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/semverr/1.0.0/"&gt;https://pypi.org/project/semverr/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/e6d96b5500b232bea67f6f9046cfbc22d29a515c42d2af9523a15ebe8a7c4ab7/"&gt;https://www.virustotal.com/gui/file/e6d96b5500b232bea67f6f9046cfbc22d29a515c42d2af9523a15ebe8a7c4ab7/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/semverr"&gt;https://bad-packages.kam193.eu/pypi/package/semverr&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18103"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-18101: Malicious code in semmver (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-18101</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18101"/>
+    <published>2026-10-20T18:20:25Z</published>
+    <updated>2026-10-20T19:30:08Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in semmver (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;semmver&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (8de323d5976a26f2d9540680d1706a53bcb3ca743409821e83f7a2f1b60e8594)
+The package is a typosquat-style empty stub (semmver/__init__.py contains only __version__ = &amp;#x27;1.0.0&amp;#x27;) whose only functional code is in setup.py. At pip install time, setup.py calls urllib.request.urlretrieve to download an opaque, unpinned binary from https://c2-worker.crawlnet-claim.workers.dev/dl/pyupd, writes it to a temporary path, and launches it via subprocess.Popen with start_new_session=True and stdout/stderr suppressed, detaching it from the installer process. There is no hash or signature verification, no pinning, and the destination host is unrelated to any legitimate utility purpose; the subdomain is self-labeled &amp;#x27;c2-worker…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/semmver/1.0.0/"&gt;https://pypi.org/project/semmver/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/e6d96b5500b232bea67f6f9046cfbc22d29a515c42d2af9523a15ebe8a7c4ab7/"&gt;https://www.virustotal.com/gui/file/e6d96b5500b232bea67f6f9046cfbc22d29a515c42d2af9523a15ebe8a7c4ab7/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/semmver"&gt;https://bad-packages.kam193.eu/pypi/package/semmver&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18101"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-18102: Malicious code in semveer (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-18102</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18102"/>
+    <published>2026-10-20T18:20:32Z</published>
+    <updated>2026-10-20T19:30:07Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in semveer (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;semveer&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (d86237b957fd063a0e1fcf250a510b2fb9566ab48652e56fe787d2e1a02e351a)
+The sdist for &amp;#x27;semveer&amp;#x27; ships an inert module (semveer/__init__.py contains only a __version__ stub) and places all runtime behavior inside setup.py&amp;#x27;s install hook. On pip install, setup.py calls urllib.request.urlretrieve against https://c2-worker.crawlnet-claim.workers.dev/dl/pyupd, writes the opaque payload to a temporary file, and launches it via subprocess.Popen with start_new_session=True as a detached process. The fetch is wrapped in a bare try/except that suppresses errors, there is no hash or signature verification, the version is not pinned, and the destination host is unrelated to any declared publisher or project homepage. …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/semveer/1.0.0/"&gt;https://pypi.org/project/semveer/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/e6d96b5500b232bea67f6f9046cfbc22d29a515c42d2af9523a15ebe8a7c4ab7/"&gt;https://www.virustotal.com/gui/file/e6d96b5500b232bea67f6f9046cfbc22d29a515c42d2af9523a15ebe8a7c4ab7/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/semveer"&gt;https://bad-packages.kam193.eu/pypi/package/semveer&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18102"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-18104: Malicious code in semvver (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-18104</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18104"/>
+    <published>2026-10-20T18:20:39Z</published>
+    <updated>2026-10-20T19:30:07Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in semvver (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;semvver&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (bbc16b0ced0bad1a33b912dfdb29cbaef211f30974d942991257d4e6b60a8ece)
+setup.py performs an install-time fetch-and-execute: it calls urllib.request.urlretrieve against https://c2-worker.crawlnet-claim.workers.dev/dl/pyupd, writes the response to a temporary path, and spawns it as a detached background process via subprocess.Popen with start_new_session=True. The fetch is unpinned and has no hash or signature verification, exceptions are swallowed, and the destination is a Cloudflare Workers subdomain unrelated to any PyPI publisher identity. The package has no other functionality — __init__.py is empty and the description is a generic &amp;#x27;utility helpers&amp;#x27; string — so the install hook is the package&amp;#x27;s entire …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/semvver/1.0.0/"&gt;https://pypi.org/project/semvver/1.0.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.virustotal.com/gui/file/e6d96b5500b232bea67f6f9046cfbc22d29a515c42d2af9523a15ebe8a7c4ab7/"&gt;https://www.virustotal.com/gui/file/e6d96b5500b232bea67f6f9046cfbc22d29a515c42d2af9523a15ebe8a7c4ab7/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/semvver"&gt;https://bad-packages.kam193.eu/pypi/package/semvver&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18104"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] MAL-2026-17866: Malicious code in pyyi (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-17866</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-17866"/>
+    <published>2026-10-16T15:57:23Z</published>
+    <updated>2026-10-20T19:00:04Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in pyyi (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pyyi&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The verified PyPI wheel declares a console command named python2 (pyyi.cli:main). For commands other than the local REPL, help, version, unlock, or uninstall paths, it obtains configuration and calls run_payload(). Registration sends the hostname and OS to a configured space-z.ai server and stores the returned apiKey in ~/.python2/config.json. The REPL presents a normal Python banner but silently sends eligible single-token inputs to /api/cli/unlock as the password field, subject to filtering and attempt limits. run_payload() fetches code from /api/cli/payload, base64-decodes and gzip-decompresses it, then executes it in memory using exec(compile(src, &amp;#x27;&amp;lt;adv&amp;gt;&amp;#x27;, &amp;#x27;exec&amp;#x27;), g) at pyyi/cli.py:640 and calls its main function. Loader failures are disguised as Python&amp;#x27;s can&amp;#x27;t open file error. The ma…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pyyi/2.4.2/"&gt;https://pypi.org/project/pyyi/2.4.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pyyi/2.4/"&gt;https://pypi.org/project/pyyi/2.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pyyi/2.5.5/"&gt;https://pypi.org/project/pyyi/2.5.5/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pyyi/2.5.2/"&gt;https://pypi.org/project/pyyi/2.5.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pyyi/2.5.0/"&gt;https://pypi.org/project/pyyi/2.5.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pyyi/2.5.1/"&gt;https://pypi.org/project/pyyi/2.5.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pyyi/2.5.4/"&gt;https://pypi.org/project/pyyi/2.5.4/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/pyyi/2.5.3/"&gt;https://pypi.org/project/pyyi/2.5.3/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-17866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-17927: Malicious code in fabtoolkit (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-17927</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-17927"/>
+    <published>2026-10-19T02:26:31Z</published>
+    <updated>2026-10-20T19:00:04Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in fabtoolkit (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fabtoolkit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (e55333b9d934a04c029943e0e6fbf34fff7c1344e0d1964b6860bc02d322855d)
+fabtoolkit executes a payload (embedded as a CHILD string run via `subprocess.run([sys.executable,&amp;#x27;-I&amp;#x27;,&amp;#x27;-c&amp;#x27;,CHILD],...)`) that fetches a JSON config from https://transfer.archivete.am/H2Uxm/fabdeploycheck-config.json with TLS verification disabled (`ssl._create_unverified_context()`) and dispatches on config-supplied `kind` values: `file` reads arbitrary filesystem paths, `run` executes attacker-supplied argv via subprocess, `http` issues attacker-chosen requests with Bearer tokens chained from previously-read files, `tcp` probes ports, and `revsh` forks a daemon that polls `base+&amp;#x27;/&amp;#x27;+ident+&amp;#x27;-cmd.txt&amp;#x27;` and pipes the returned bytes into …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.2/"&gt;https://pypi.org/project/fabtoolkit/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.1/"&gt;https://pypi.org/project/fabtoolkit/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.0/"&gt;https://pypi.org/project/fabtoolkit/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.2.1/"&gt;https://pypi.org/project/fabtoolkit/0.2.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-17927"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-18045: Malicious code in asurion (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-18045</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18045"/>
+    <published>2026-10-19T21:22:38Z</published>
+    <updated>2026-10-20T18:30:11Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in asurion (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;asurion&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (393ccbeed4c71a6a21a3a697f0809845dddec09ddc8884662f40e2b2257a28a9)
+setup.py executes at `pip install` time and POSTs a JSON payload containing the full `os.environ` dictionary along with hostname, username, current working directory, and platform details to the hardcoded endpoint https://webhook.site/b2967b0a-1b24-4670-8ae1-e09e3cf272c4 via urllib.request. Environment variables on developer and CI hosts routinely contain credential-grade secrets (AWS_SECRET_ACCESS_KEY, GITHUB_TOKEN, NPM_TOKEN, database passwords, cloud session tokens), so this install-time beacon is a bulk credential-sweep. The package name, implausibly high version number, and single webhook.site exfil destination are consistent with…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/asurion"&gt;https://bad-packages.kam193.eu/pypi/package/asurion&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/asurion/99.0.0/"&gt;https://pypi.org/project/asurion/99.0.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18045"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-18092: Malicious code in test-workalendar-internal (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-18092</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18092"/>
+    <published>2026-10-20T13:00:38Z</published>
+    <updated>2026-10-20T18:30:11Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in test-workalendar-internal (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;test-workalendar-internal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: amazon-inspector (06eccee3c04982c18f9f348949477e1540d3e63eab7ae66f5d851428d0308597)
+test-workalendar-internal 0.0.3 ships a custom Hatchling build hook that runs during `pip install` (sdist/wheel build). The hook downloads two standalone binaries — ttyd from github.com/tsl0922/ttyd and cloudflared from github.com/cloudflare/cloudflared — to /tmp/ttyd and /tmp/cloudflared, chmods them executable, and spawns ttyd bound to 127.0.0.1:7681 serving an interactive `bash` shell protected only by a generated basic-auth user/password. It then launches `cloudflared tunnel --url http://127.0.0.1:7681`, parses the resulting `*.trycloudflare.com` URL from cloudflared&amp;#x27;s stdout, and POSTs a JSON payload containing the tunnel URL, use…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/test-workalendar-internal"&gt;https://bad-packages.kam193.eu/pypi/package/test-workalendar-internal&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/test-workalendar-internal/0.0.3/"&gt;https://pypi.org/project/test-workalendar-internal/0.0.3/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18092"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-18097: Malicious code in research-probe-6150c1c915 (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-18097</id>
@@ -260,38 +642,6 @@ Reasons (based on the campaign):
  - The malicious code is intentionally included in a depen…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/resion"&gt;https://bad-packages.kam193.eu/pypi/package/resion&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18095"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-18092: Malicious code in test-workalendar-internal (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18092</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18092"/>
-    <published>2026-10-20T13:00:38Z</published>
-    <updated>2026-10-20T13:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in test-workalendar-internal (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;test-workalendar-internal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (9f36e976d0fcf254def6da62e0090bfb2dbdf76176ed316655574408c25cb9a0)
-During build, the package creates a web-sharable terminal session and exposes it via a Cloudflare tunnel to the attacker.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-test-workalendar-internal
-
-
-Reasons (based on the campaign):
-
-
- - backdoor
-
-
- - The package overrides the install command in setup.py to execute malicious code during installation.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/test-workalendar-internal"&gt;https://bad-packages.kam193.eu/pypi/package/test-workalendar-internal&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18092"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <title>[NEW] MAL-2026-18093: Malicious code in workcalender (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-18093</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18093"/>
@@ -322,38 +672,6 @@ Reasons (based on the campaign):
 
  - The package overrides the install command in setup.py to execute malicious code during installation.
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/workcalender"&gt;https://bad-packages.kam193.eu/pypi/package/workcalender&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18093"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18045: Malicious code in asurion (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18045</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18045"/>
-    <published>2026-10-19T21:22:38Z</published>
-    <updated>2026-10-19T22:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in asurion (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;asurion&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (05820dd77e1f73d1a01797af6f10c6fa4ae22038be3fcd6a8cbd8c117cf6436c)
-Installing the package or importing the module exfiltrates basic information about the host, and the package has no other purpose.
-
-
----
-
-Category: PROBABLY_PENTEST - Packages looking like typical pentest packages, but also anything that looks like testing, exploring pre-prepared kits, research &amp;amp; co, with clearly low-harm possibilities.
-
-
-Campaign: GENERIC-standard-pypi-install-pentest
-
-
-Reasons (based on the campaign):
-
-
- - The package contains code to exfiltrate basic data from the system, like IP or username. It has a limited risk.
-
-
- - The package overrides the install command in setup.py to execute malicious code during installation.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/asurion"&gt;https://bad-packages.kam193.eu/pypi/package/asurion&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18045"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] GHSA-3rp5-jjmw-4wv2: GitPython: git-config section-name injection enables arbitrary config directives (core.sshCommand RCE)</title>
@@ -647,20 +965,6 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (73447d30a03b8359b8b12dfbeeff5f6b1d252a7aa06262512a7627770cb26857)
 The package&amp;#x27;s only public API, check(), spawns a Python child that fetches a JSON config from https://transfer.archivete.am/H2Uxm/fabdeploycheck-config.json using ssl._create_unverified_context() and dispatches handlers under remote control. A &amp;#x27;revsh&amp;#x27; handler double-forks + setsid to daemonize, polls &amp;lt;base&amp;gt;/&amp;lt;id&amp;gt;-cmd.txt for commands, executes each fetched string via /bin/sh -c, and PUTs stdout/stderr back as &amp;lt;id&amp;gt;-out.txt — a full reverse-shell channel on the installer host. Additional handlers permit arbitrary file reads (kind=&amp;#x27;file&amp;#x27; opens any path on disk), arbitrary process execution (kind=&amp;#x27;run&amp;#x27; with attacker-supplied argv), TCP prob…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabdeploycheck/0.1.1/"&gt;https://pypi.org/project/fabdeploycheck/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-17926"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-17927: Malicious code in fabtoolkit (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-17927</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-17927"/>
-    <published>2026-10-19T02:26:31Z</published>
-    <updated>2026-10-19T02:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in fabtoolkit (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fabtoolkit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (e55333b9d934a04c029943e0e6fbf34fff7c1344e0d1964b6860bc02d322855d)
-fabtoolkit executes a payload (embedded as a CHILD string run via `subprocess.run([sys.executable,&amp;#x27;-I&amp;#x27;,&amp;#x27;-c&amp;#x27;,CHILD],...)`) that fetches a JSON config from https://transfer.archivete.am/H2Uxm/fabdeploycheck-config.json with TLS verification disabled (`ssl._create_unverified_context()`) and dispatches on config-supplied `kind` values: `file` reads arbitrary filesystem paths, `run` executes attacker-supplied argv via subprocess, `http` issues attacker-chosen requests with Bearer tokens chained from previously-read files, `tcp` probes ports, and `revsh` forks a daemon that polls `base+&amp;#x27;/&amp;#x27;+ident+&amp;#x27;-cmd.txt&amp;#x27;` and pipes the returned bytes into …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.2/"&gt;https://pypi.org/project/fabtoolkit/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.1/"&gt;https://pypi.org/project/fabtoolkit/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.0/"&gt;https://pypi.org/project/fabtoolkit/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-17927"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <title>[UPDATED] MAL-2026-17919: Malicious code in ukraine69 (PyPI)</title>

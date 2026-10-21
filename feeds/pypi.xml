@@ -3,12 +3,568 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-10-21T12:30:33Z</updated>
+  <updated>2026-10-21T21:30:27Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-f2g6-542v-9j58: Pillow: Infinite loop in PdfParser.rewrite_pages on page tree Parent cycle</title>
+    <id>https://osv.dev/vulnerability/GHSA-f2g6-542v-9j58</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f2g6-542v-9j58"/>
+    <published>2026-10-21T21:21:07Z</published>
+    <updated>2026-10-21T21:30:27Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112406"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Infinite loop in PdfParser.rewrite_pages on page tree Parent cycle&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112406&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+Infinite loop in PdfParser.rewrite_pages on page tree Parent cycle
+Location: src/PIL/PdfParser.py:505  in PdfParser.rewrite_pages()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+A PDF file of a few hundred bytes makes Pillow hang forever, holding one processor core at 100%, when an application tries to append an image to it. Anyone who can supply the existing PDF to an application that calls `im.save(fp, &amp;quot;PDF&amp;quot;, append=True)` (or `save_all=True, append=True`) can tie up that worker indefinitely. Memory use stays flat, so only an external timeout stops it.
+
+The bug is in `PdfParser.rewrite_pages()` in `src/PIL/PdfParser.py` (t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-f2g6-542v-9j58"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-f2g6-542v-9j58&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112406"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/b3ebf20c694f2f12537a629c30229a1d5a53f777"&gt;https://github.com/python-pillow/Pillow/commit/b3ebf20c694f2f12537a629c30229a1d5a53f777&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f2g6-542v-9j58"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-gg2r-wvfm-q9rx: Pillow: MSP RLE decoder expands a tiny file into unbounded memory</title>
+    <id>https://osv.dev/vulnerability/GHSA-gg2r-wvfm-q9rx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gg2r-wvfm-q9rx"/>
+    <published>2026-10-21T21:12:56Z</published>
+    <updated>2026-10-21T21:30:26Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112892"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: MSP RLE decoder expands a tiny file into unbounded memory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112892&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+The MSP RLE decoder expands run-length data into an in-memory buffer with no cap tied to the declared image size. A small file that passes the pixel-count check can force hundreds of megabytes or more of allocation when the application loads pixels.
+
+### Details
+The MSP decoder writes each run into an unbounded `io.BytesIO` and can expand roughly 85x per run:
+
+- `src/PIL/MspImagePlugin.py:144-146`
+
+### Impact
+Memory-exhaustion denial of service from a tiny crafted image in any application that loads pixels. The expansion is decoupled from the declared pixel count, so `MAX_IMAGE_PIXELS` does not bound it.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-gg2r-wvfm-q9rx"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-gg2r-wvfm-q9rx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112892"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112892&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/5dcb630b9798efd91929cb873d677aeee6ed0bb3"&gt;https://github.com/python-pillow/Pillow/commit/5dcb630b9798efd91929cb873d677aeee6ed0bb3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gg2r-wvfm-q9rx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jg86-v3jv-hrpm: Pillow: Quadratic-time DoS in PDF save_all (PdfParser.next_object_id)</title>
+    <id>https://osv.dev/vulnerability/GHSA-jg86-v3jv-hrpm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jg86-v3jv-hrpm"/>
+    <published>2026-10-21T21:11:44Z</published>
+    <updated>2026-10-21T21:30:26Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112894"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Quadratic-time DoS in PDF save_all (PdfParser.next_object_id)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112894&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+Quadratic-time DoS in PDF save_all (PdfParser.next_object_id)
+Location: src/PIL/PdfParser.py:629  in next_object_id()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+Pillow&amp;#x27;s PDF writer takes time proportional to the square of the number of frames when it saves a multi-frame image as a multi-page PDF. Anyone who can get an application to convert their uploaded image this way can tie up a worker at full CPU for minutes with a small file. A 240 KB animated image takes about 70 seconds, a 720 KB one an estimated 10 minutes, and a 125-byte animated PNG that merely *declares* a large frame count triggers the same slowdown with no u…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-jg86-v3jv-hrpm"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-jg86-v3jv-hrpm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112894"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112894&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/f6a852555f1a1bdff7781abf25f1a3b8bd6ce6cb"&gt;https://github.com/python-pillow/Pillow/commit/f6a852555f1a1bdff7781abf25f1a3b8bd6ce6cb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jg86-v3jv-hrpm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-254f-3936-288h: Pillow: PdfParser can recurse without limit in get_value() and linearize_page_tree()</title>
+    <id>https://osv.dev/vulnerability/GHSA-254f-3936-288h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-254f-3936-288h"/>
+    <published>2026-10-21T21:11:07Z</published>
+    <updated>2026-10-21T21:15:08Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112391"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: PdfParser can recurse without limit in get_value() and linearize_page_tree()&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112391&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`PdfParser`&amp;#x27;s `get_value()` can recurse without any limit and crash with an uncaught `RecursionError`. It is reachable through `Image.save(im, fp=&amp;lt;pdf&amp;gt;, format=&amp;quot;PDF&amp;quot;, append=True)` when the existing PDF file is attacker-controlled. This is the same class of bug as https://github.com/advisories/GHSA-r73j-pqj5-w3x7 (the /Prev trailer chain loop, fixed earlier this year), in the same file, but in two different functions that fix did not touch.
+
+### Details
+**`get_value()` in `src/PIL/PdfParser.py`**
+
+This is a classmethod that takes `max_nesting: int = -1` and has a guard:
+
+```python
+if max_nesting == 0:
+    return None, None
+```
+
+Every recursive call (nested arrays, dictionaries, indirect object definitions) passes `max_nesting=max_nesting - 1`. Since the default and every call s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-254f-3936-288h"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-254f-3936-288h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112391"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112391&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/94cb11c44ff7345414da17ebfea1598a529ad9cd"&gt;https://github.com/python-pillow/Pillow/commit/94cb11c44ff7345414da17ebfea1598a529ad9cd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-254f-3936-288h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rfgq-q3w2-pmv2: Pillow: Image.quantize() with empty palette leaks uninitialized stack memory</title>
+    <id>https://osv.dev/vulnerability/GHSA-rfgq-q3w2-pmv2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rfgq-q3w2-pmv2"/>
+    <published>2026-10-21T20:44:07Z</published>
+    <updated>2026-10-21T21:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112898"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Image.quantize() with empty palette leaks uninitialized stack memory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112898&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+Image.quantize() with empty palette leaks uninitialized stack memory
+Location: src/libImaging/Palette.c:216  in ImagingPaletteCacheUpdate()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+When an application lets a user supply the palette image for Pillow&amp;#x27;s `Image.quantize(palette=...)`, the user can get back 512 bytes of the server process&amp;#x27;s stack memory in the pixels of the returned image. An 80-byte PNG with an empty palette is enough, and the leaked bytes survive saving to PNG or GIF. In the runs examined, those bytes included memory addresses inside the stack, heap, libc, libpython and Pillow&amp;#x27;s own C module, along with th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-rfgq-q3w2-pmv2"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-rfgq-q3w2-pmv2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112898"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112898&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/13943c8f857b22f073d30f0ef9b725a0d255f1a4"&gt;https://github.com/python-pillow/Pillow/commit/13943c8f857b22f073d30f0ef9b725a0d255f1a4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rfgq-q3w2-pmv2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-74r2-7ff9-mjj2: Pillow: Quadratic GIF comment concatenation allows DoS in Image.open()</title>
+    <id>https://osv.dev/vulnerability/GHSA-74r2-7ff9-mjj2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-74r2-7ff9-mjj2"/>
+    <published>2026-10-21T20:42:11Z</published>
+    <updated>2026-10-21T21:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112401"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Quadratic GIF comment concatenation allows DoS in Image.open()&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112401&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+Quadratic GIF comment concatenation allows DoS in Image.open()
+Location: src/PIL/GifImagePlugin.py:266  in GifImageFile._seek()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+Opening a crafted GIF file with `Image.open()` takes time that grows with the square of the file&amp;#x27;s size, so anyone who can submit an image to a service that uses Pillow can keep one worker busy at full processor load for a long time with a small file. A 2 MB file takes about 5 seconds to open, a 4 MB file about 35 seconds, and an 8 MB file about 3 minutes. An ordinary GIF of the same size opens in well under a second. The cost is paid inside `Image.open(…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-74r2-7ff9-mjj2"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-74r2-7ff9-mjj2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112401"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112401&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/68a3fe957d8a4d552e8c69d96066d749f0614c7e"&gt;https://github.com/python-pillow/Pillow/commit/68a3fe957d8a4d552e8c69d96066d749f0614c7e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-74r2-7ff9-mjj2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xgh8-jp6q-p5x8: Pillow: ReDoS in XbmImagePlugin: 512-byte file stalls Image.open() for minutes</title>
+    <id>https://osv.dev/vulnerability/GHSA-xgh8-jp6q-p5x8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xgh8-jp6q-p5x8"/>
+    <published>2026-10-21T20:45:06Z</published>
+    <updated>2026-10-21T21:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112901"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: ReDoS in XbmImagePlugin: 512-byte file stalls Image.open() for minutes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112901&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+ReDoS in XbmImagePlugin: 512-byte file stalls Image.open() for minutes
+Location: src/PIL/XbmImagePlugin.py:58  in XbmImageFile._open()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+A crafted 512-byte file makes Pillow&amp;#x27;s `Image.open()` spend about six minutes of processor time on one core before it gives up with `UnidentifiedImageError`. Anyone who can hand bytes to an application that opens images with Pillow&amp;#x27;s default settings can trigger this, for example through an upload form, a thumbnailer, or a service that checks whether a blob is an image. A few such files sent at once can tie up a typical pool of worker processes.
+
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-xgh8-jp6q-p5x8"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-xgh8-jp6q-p5x8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112901"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112901&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/2852a3e3d568997ddec745fc800991f138878f4b"&gt;https://github.com/python-pillow/Pillow/commit/2852a3e3d568997ddec745fc800991f138878f4b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xgh8-jp6q-p5x8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-27h8-gf7j-v5hc: Pillow: NULL dereference in ImagingExpand via rank filters on zero-size images</title>
+    <id>https://osv.dev/vulnerability/GHSA-27h8-gf7j-v5hc</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-27h8-gf7j-v5hc"/>
+    <published>2026-10-21T20:32:37Z</published>
+    <updated>2026-10-21T20:45:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112392"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: NULL dereference in ImagingExpand via rank filters on zero-size images&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112392&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+NULL dereference in ImagingExpand via rank filters on zero-size images
+Location: src/libImaging/Filter.c:79  in ImagingExpand()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+Applying Pillow&amp;#x27;s median, minimum, maximum or rank filter to an image with zero width or zero height crashes the whole Python process instead of raising an error. Empty images like this are easy to produce with ordinary calls, for example a crop box whose left and right edges (or top and bottom edges) are equal, or the second page of a crafted multi-page image file. An attacker who can supply crop coordinates or an uploaded file to an application that ru…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-27h8-gf7j-v5hc"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-27h8-gf7j-v5hc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112392"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112392&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/443e3130a8c11594fd0e296afad497e11e678961"&gt;https://github.com/python-pillow/Pillow/commit/443e3130a8c11594fd0e296afad497e11e678961&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-27h8-gf7j-v5hc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-22hg-r758-rrw9: Pillow: Infinite loop in MIC n_frames when the embedded TIFF</title>
+    <id>https://osv.dev/vulnerability/GHSA-22hg-r758-rrw9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-22hg-r758-rrw9"/>
+    <published>2026-10-21T20:39:49Z</published>
+    <updated>2026-10-21T20:45:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112390"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Infinite loop in MIC n_frames when the embedded TIFF&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112390&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+Infinite loop in MIC n_frames when the embedded TIFF has 3+ IFDs
+Location: src/PIL/MicImagePlugin.py:86  in MicImageFile.tell()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+A crafted 5.6 KB image file makes Pillow loop forever at 100% CPU when an application asks how many frames the image has. This only affects installations that have the optional `olefile` package. Any application that opens an untrusted image and then reads `im.n_frames` can have one worker tied up indefinitely. That includes the common &amp;quot;is this image animated?&amp;quot; check and re-saving with `save_all=True` to TIFF, PDF or WebP. The call never returns, raises …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-22hg-r758-rrw9"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-22hg-r758-rrw9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112390"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112390&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/26cb3ed061173b817b9ee4b6f507cb0e1e293218"&gt;https://github.com/python-pillow/Pillow/commit/26cb3ed061173b817b9ee4b6f507cb0e1e293218&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-22hg-r758-rrw9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-cp9v-662q-vvx9: Pillow: NULL pointer dereference in Image.merge via an unvalidated band 0</title>
+    <id>https://osv.dev/vulnerability/GHSA-cp9v-662q-vvx9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cp9v-662q-vvx9"/>
+    <published>2026-10-21T20:30:25Z</published>
+    <updated>2026-10-21T20:45:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112405"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: NULL pointer dereference in Image.merge via an unvalidated band 0&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112405&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`Image.merge()` checks the mode of every input band except band 0. If band 0 is a single-band `I` or `F` image, the native merge routine reads a pixel pointer that is NULL for those modes and the process crashes. The IPTC plugin reaches this from a plain `Image.open()` followed by a load, and IPTC has no magic-byte prefilter, so a crafted file with no recognizable header can drive it.
+
+### Details
+The validation loop skips band 0:
+
+- `src/PIL/Image.py:3795` iterates `for band in bands[1:]` and checks mode and size only for those.
+
+For an `I` or `F` image the 8-bit plane `image8` is NULL (only `image32` is set). `ImagingMerge` dereferences `bands[0]-&amp;gt;image8[y]` for the multi-band output modes:
+
+- `src/libImaging/Bands.c:302`, `:311`, `:321`
+
+The IPTC loader builds the band list …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-cp9v-662q-vvx9"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-cp9v-662q-vvx9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112405"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112405&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/b6ee66e8b2c2c0932bdf65f963268d9f2927ef86"&gt;https://github.com/python-pillow/Pillow/commit/b6ee66e8b2c2c0932bdf65f963268d9f2927ef86&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cp9v-662q-vvx9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fc9g-5qg7-mf45: Pillow: Quadratic GIF comment copying during save</title>
+    <id>https://osv.dev/vulnerability/GHSA-fc9g-5qg7-mf45</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fc9g-5qg7-mf45"/>
+    <published>2026-10-21T20:38:43Z</published>
+    <updated>2026-10-21T20:45:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112891"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Quadratic GIF comment copying during save&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112891&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;On Pillow 12.3.0 and upstream `main` (`ad277e2761b489681e71b51e91367d46b0ceabb9`), a GIF with a long comment makes `_get_global_header()` copy portions of the comment repeatedly when saving, including comments carried over from untrusted images. I suggest provisional **Moderate** severity for crafted-image CPU denial of service, with CVSS-B 6.9 assuming a network service automatically opens unauthenticated uploads and they are resaved as GIFs; impact depends on input-size, concurrency, and worker CPU limits.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-fc9g-5qg7-mf45"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-fc9g-5qg7-mf45&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112891"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112891&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/68a3fe957d8a4d552e8c69d96066d749f0614c7e"&gt;https://github.com/python-pillow/Pillow/commit/68a3fe957d8a4d552e8c69d96066d749f0614c7e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fc9g-5qg7-mf45"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-w889-685w-c8fh: Pillow: Argument Injection in Ghostscript call, potentially leading into RCE</title>
+    <id>https://osv.dev/vulnerability/GHSA-w889-685w-c8fh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w889-685w-c8fh"/>
+    <published>2026-10-21T19:58:44Z</published>
+    <updated>2026-10-21T20:15:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112900"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Argument Injection in Ghostscript call, potentially leading into RCE&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112900&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`PIL.EpsImagePlugin.Ghostscript()` builds the Ghostscript command line using the input file path (`fp.name`) **without sanitization**, placing it at `-f &amp;lt;infile&amp;gt;`. A filename beginning with `-` is interpreted by Ghostscript as an option, giving command-line argument injection; chainable to RCE (see Impact). Reproduces with Pillow&amp;#x27;s default invocation (with `-dSAFER` enabled).
+
+### Details
+_Give all details on the vulnerability. Pointing to the incriminated source code is very helpful for the maintainer._
+
+#### Type
+CWE-88 (Argument Injection) (→ CWE-78 (OS Command Injection) optionally, with attacker controlled text file)
+
+#### Vulnerable Codes
+
+```python
+infile_temp = None
+if hasattr(fp, &amp;quot;name&amp;quot;) and os.path.exists(fp.name):
+    infile = fp.name                      # user-cont…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-w889-685w-c8fh"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-w889-685w-c8fh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112900"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112900&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/a2c363141da31a265dd536c945677db4b64f3ec9"&gt;https://github.com/python-pillow/Pillow/commit/a2c363141da31a265dd536c945677db4b64f3ec9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w889-685w-c8fh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-j4m9-6w36-pw47: Pillow: Invalid free in FreeType glyph rendering when a stroker is active</title>
+    <id>https://osv.dev/vulnerability/GHSA-j4m9-6w36-pw47</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j4m9-6w36-pw47"/>
+    <published>2026-10-21T20:06:34Z</published>
+    <updated>2026-10-21T20:15:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112893"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Invalid free in FreeType glyph rendering when a stroker is active&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112893&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+When text is drawn with a non-zero stroke width, Pillow creates a FreeType stroker and then loads each glyph. If `FT_Load_Glyph` fails for a glyph, the cleanup path calls `FT_Done_Glyph` on the `glyph` variable. That variable is not initialized before the first measurement loop, and in the render loop it is not reset to NULL after each glyph is freed. A malformed font loaded from untrusted bytes can force the load error and reach this free. This is a latent memory-safety defect; whether it crashes depends on the value in the uninitialized or stale pointer.
+
+### Details
+`glyph` is declared without a NULL initializer:
+
+- `src/_imagingft.c:848`
+
+The first measurement loop can jump to `glyph_error` before `glyph` is ever assigned:
+
+- `src/_imagingft.c:1010-1013`
+
+In the render loop…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-j4m9-6w36-pw47"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-j4m9-6w36-pw47&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112893"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112893&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/a7416de7f3a43128179d2cf68df3240ea8dafe13"&gt;https://github.com/python-pillow/Pillow/commit/a7416de7f3a43128179d2cf68df3240ea8dafe13&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j4m9-6w36-pw47"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4558-3h8r-v8xp: Pillow: P;2L and P;4L decoders may read 1 to 3 bytes past the passed buffer size</title>
+    <id>https://osv.dev/vulnerability/GHSA-4558-3h8r-v8xp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4558-3h8r-v8xp"/>
+    <published>2026-10-21T20:00:32Z</published>
+    <updated>2026-10-21T20:15:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112394"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: P;2L and P;4L decoders may read 1 to 3 bytes past the passed buffer size&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112394&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+On `main`, even with the guard in #9725, it&amp;#x27;s possible to have these decoders read 1 to 3 bytes past the end of the passed buffer with a suitable width/height.
+
+### Details
+
+`ImagingRawDecode` and the `P;2L` / `P;4L` unpackers disagree about how many bytes a line of data occupies.
+
+The raw decoder derives the line size from the bits per pixel
+
+```c
+state-&amp;gt;bytes = (state-&amp;gt;xsize * state-&amp;gt;bits + 7) / 8;
+```
+
+and uses it both for the bounds check and to advance to the next line. For `P;2L` and `P;4L`, `bits` is 2 and 4 respectively.
+
+But these two rawmodes are not packed pixels but 2 or 4 *bit planes*, each padded to a whole number of bytes. `unpackP2L` computes `s = (pixels + 7) / 8` and reads plane *k* at offset `k * s`, and `unpackP4L` does the same across four planes. Their re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-4558-3h8r-v8xp"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-4558-3h8r-v8xp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112394"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112394&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/9723"&gt;https://github.com/python-pillow/Pillow/pull/9723&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/392ee6f0d19a4adb766a63e9a99f3c28193b8d31"&gt;https://github.com/python-pillow/Pillow/commit/392ee6f0d19a4adb766a63e9a99f3c28193b8d31&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4558-3h8r-v8xp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7mwm-ghpf-9vrm: Pillow: Double free in ImagingScaleAffine on calloc failure via Image.transform</title>
+    <id>https://osv.dev/vulnerability/GHSA-7mwm-ghpf-9vrm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7mwm-ghpf-9vrm"/>
+    <published>2026-10-21T20:03:56Z</published>
+    <updated>2026-10-21T20:15:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112402"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Double free in ImagingScaleAffine on calloc failure via Image.transform&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112402&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+Double free in ImagingScaleAffine on calloc failure via Image.transform
+Location: src/libImaging/Geometry.c:866  in ImagingScaleAffine()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+There is a double free in Pillow&amp;#x27;s `Image.transform()` that crashes the process when an oversized transform runs out of memory. Instead of only raising `MemoryError`, Pillow frees the output image&amp;#x27;s memory once while handling the error and then again when the Python object is cleaned up. Anyone who can choose the output size of `Image.transform()` can trigger it, but only on a worker with a memory limit (a common hardening for image workers) or …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-7mwm-ghpf-9vrm"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-7mwm-ghpf-9vrm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112402"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112402&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/aafa6c75f7cdabb9f409a8aac7c780bea31d08d9"&gt;https://github.com/python-pillow/Pillow/commit/aafa6c75f7cdabb9f409a8aac7c780bea31d08d9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7mwm-ghpf-9vrm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5hx5-vpf9-5wcv: pypdf: Unvalidated JPEG image data loading</title>
+    <id>https://osv.dev/vulnerability/GHSA-5hx5-vpf9-5wcv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5hx5-vpf9-5wcv"/>
+    <published>2026-10-21T19:58:10Z</published>
+    <updated>2026-10-21T20:15:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113786"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;pypdf: Unvalidated JPEG image data loading&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113786&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pypdf&lt;/code&gt; — fixed in 6.21.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+An attacker who uses this vulnerability can craft a PDF which leads to arbitrary image parsers being called. This requires loading an image which claims to use the `/DCTDecode` filter (JPEG data).
+
+Users which do not have the optional *Pillow* dependency installed in their environment are not affected.
+
+### Patches
+
+This has been fixed in [pypdf==6.21.1](https://github.com/py-pdf/pypdf/releases/tag/6.21.1).
+
+### Workarounds
+
+If you cannot upgrade yet, consider applying the changes from PR [#4222](https://github.com/py-pdf/pypdf/pull/4222).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/security/advisories/GHSA-5hx5-vpf9-5wcv"&gt;https://github.com/py-pdf/pypdf/security/advisories/GHSA-5hx5-vpf9-5wcv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113786"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113786&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/pull/4222"&gt;https://github.com/py-pdf/pypdf/pull/4222&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/commit/512d8eb94eb04be1d1c90504e6da2dcef8679e07"&gt;https://github.com/py-pdf/pypdf/commit/512d8eb94eb04be1d1c90504e6da2dcef8679e07&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf"&gt;https://github.com/py-pdf/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/releases/tag/6.21.1"&gt;https://github.com/py-pdf/pypdf/releases/tag/6.21.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5hx5-vpf9-5wcv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] MAL-2026-18124: Malicious code in journey-test-helloshell (PyPI)</title>
+    <id>https://osv.dev/vulnerability/MAL-2026-18124</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18124"/>
+    <published>2026-10-21T18:30:25Z</published>
+    <updated>2026-10-21T19:30:03Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in journey-test-helloshell (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;journey-test-helloshell&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
+---
+_-= Per source details. Do not edit below this line.=-_
+
+## Source: kam193 (bdf4549e34df1c1c7dfd704454011cf0a26ea5807948e917d7bc65f130182fc9)
+In specific environments, package starts a reverse shell during installation.
+
+
+---
+
+Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
+
+
+Campaign: 2026-10-journey-test-helloshell
+
+
+Reasons (based on the campaign):
+
+
+ - The package contains code to create a reverse shell, allowing an attacker to execute any commands on the victim&amp;#x27;s machine.
+
+
+ - The package overrides the install command in setup.py to execute malicious code during installation.
+
+
+ - targetted-attack
+&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/journey-test-helloshell"&gt;https://bad-packages.kam193.eu/pypi/package/journey-test-helloshell&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18124"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-r57g-mc79-8hj2: djust: Arbitrary absolute-path file read in the find_handlers_for_template MCP tool</title>
+    <id>https://osv.dev/vulnerability/GHSA-r57g-mc79-8hj2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r57g-mc79-8hj2"/>
+    <published>2026-10-21T17:21:15Z</published>
+    <updated>2026-10-21T17:35:19Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113731"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;djust: Arbitrary absolute-path file read in the find_handlers_for_template MCP tool&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113731&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;djust&lt;/code&gt; — fixed in 1.0.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;djust&lt;/code&gt; — fixed in 1.1.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;djust&lt;/code&gt; — fixed in 1.2.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;djust&lt;/code&gt; — fixed in 1.3.0rc8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Affected version / file / line
+Version: djust v1.1.4 (latest release, published 2026-09-23). File: python/djust/mcp/server.py:354-433 (MCP tool find_handlers_for_template). Confirmed identical on the commit used for triage, a7e4fafd1667b4db0b1465652d4a63cb17117a07.
+
+### Description
+```
+@mcp.tool()
+def find_handlers_for_template(template_path: str) -&amp;gt; str:
+    &amp;quot;&amp;quot;&amp;quot;
+    Args:
+        template_path: Either a logical template name (e.g.
+            &amp;#x27;demos/counter.html&amp;#x27; — what you&amp;#x27;d pass to `render`) OR
+            an absolute filesystem path. Both are searched.
+    &amp;quot;&amp;quot;&amp;quot;
+    ...
+    resolved_path: str | None = None
+    if os.path.isabs(template_path) and os.path.isfile(template_path):
+        resolved_path = template_path
+    else:
+        ...  # logical-name resolution via Django&amp;#x27;s template …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/security/advisories/GHSA-r57g-mc79-8hj2"&gt;https://github.com/djust-org/djust/security/advisories/GHSA-r57g-mc79-8hj2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113731"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113731&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/commit/45a5045793ebe7c9c2df86b0ad34275af6822619"&gt;https://github.com/djust-org/djust/commit/45a5045793ebe7c9c2df86b0ad34275af6822619&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/commit/744bccf699c65c815d9379b36236a7c5592a339b"&gt;https://github.com/djust-org/djust/commit/744bccf699c65c815d9379b36236a7c5592a339b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/commit/85eed7caaf620bdb08986f2f3bb79432c0d3d715"&gt;https://github.com/djust-org/djust/commit/85eed7caaf620bdb08986f2f3bb79432c0d3d715&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/commit/a62caf6b4ef540ad688d4dfdfa407ff914c78728"&gt;https://github.com/djust-org/djust/commit/a62caf6b4ef540ad688d4dfdfa407ff914c78728&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust"&gt;https://github.com/djust-org/djust&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/djust-org/djust/releases/tag/v1.0.10"&gt;https://github.com/djust-org/djust/releases/tag/v1.0.10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r57g-mc79-8hj2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-39mj-jf6j-2qj3: pypdf: Possible infinite loop when hitting EOF in standard xref table</title>
+    <id>https://osv.dev/vulnerability/GHSA-39mj-jf6j-2qj3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-39mj-jf6j-2qj3"/>
+    <published>2026-10-21T16:54:44Z</published>
+    <updated>2026-10-21T17:00:26Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113794"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;pypdf: Possible infinite loop when hitting EOF in standard xref table&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113794&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pypdf&lt;/code&gt; — fixed in 6.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+An attacker who uses this vulnerability can craft a PDF which leads to an infinite loop. This requires an incomplete file which ends inside the xref table.
+
+### Patches
+
+This has been fixed in [pypdf==6.20.0](https://github.com/py-pdf/pypdf/releases/tag/6.20.0).
+
+### Workarounds
+
+If you cannot upgrade yet, consider applying the changes from PR [#4170](https://github.com/py-pdf/pypdf/pull/4170).
+
+### Notes
+
+This has been reported through both the secure channel and as a public issue at [#4169](https://github.com/py-pdf/pypdf/issues/4169).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/security/advisories/GHSA-39mj-jf6j-2qj3"&gt;https://github.com/py-pdf/pypdf/security/advisories/GHSA-39mj-jf6j-2qj3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/issues/4169"&gt;https://github.com/py-pdf/pypdf/issues/4169&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/pull/4170"&gt;https://github.com/py-pdf/pypdf/pull/4170&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/commit/37e1cd681744bac38b159f7e1c614eee8d639c58"&gt;https://github.com/py-pdf/pypdf/commit/37e1cd681744bac38b159f7e1c614eee8d639c58&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf"&gt;https://github.com/py-pdf/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/releases/tag/6.20.0"&gt;https://github.com/py-pdf/pypdf/releases/tag/6.20.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-39mj-jf6j-2qj3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vxj4-q4g9-crj7: virtualenv bash activate runs commands from an environment name with a backslash before $</title>
+    <id>https://osv.dev/vulnerability/GHSA-vxj4-q4g9-crj7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vxj4-q4g9-crj7"/>
+    <published>2026-10-21T16:49:01Z</published>
+    <updated>2026-10-21T17:00:07Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113725"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv bash activate runs commands from an environment name with a backslash before $&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113725&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The bash `activate` script escapes the environment name for only one of the two passes bash makes over `PS1`, so a
+backslash in the name undoes the escaping and a name containing `\$(...)` runs as commands in the user&amp;#x27;s shell each
+time bash draws the prompt.
+
+### Affected area
+
+`src/virtualenv/activation/bash/activate.sh`, the block that prepends the environment name to `PS1`.
+
+### Attacker-controlled input
+
+The environment name: the environment directory&amp;#x27;s name, or the `--prompt` or `VIRTUALENV_PROMPT` value. An attacker
+needs to influence it, for example through a CI job or wrapper tool that passes a branch, project or job name through,
+or a directory in a cloned repository or unpacked archive. `--prompt .` takes the current directory&amp;#x27;s name.
+
+### Details
+
+bash handles `PS1`…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-vxj4-q4g9-crj7"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-vxj4-q4g9-crj7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113725"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113725&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/c3104e02474b652832a9bbaae79f6e1696296932"&gt;https://github.com/pypa/virtualenv/commit/c3104e02474b652832a9bbaae79f6e1696296932&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.7"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vxj4-q4g9-crj7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c947-3pg5-gm8q: virtualenv activate.fish runs commands from a path or prompt with a backslash before a quote</title>
+    <id>https://osv.dev/vulnerability/GHSA-c947-3pg5-gm8q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c947-3pg5-gm8q"/>
+    <published>2026-10-21T16:39:58Z</published>
+    <updated>2026-10-21T17:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113732"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv activate.fish runs commands from a path or prompt with a backslash before a quote&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113732&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+`FishActivator` defines no `quote()`, so it inherits `ViaTemplateActivator.quote`, which returns `shlex.quote(string)`. That function follows POSIX `sh` rules, where a backslash inside single quotes stays a literal character. fish reads `\&amp;#x27;` inside single quotes as an escaped quote and `\\` as an escaped backslash. A value with a backslash before a quote therefore ends the literal somewhere other than where `shlex.quote` put the end, and fish expands the command substitution that follows.
+
+The environment path reaches `set -gx VIRTUAL_ENV`, and `--prompt` or `VIRTUALENV_PROMPT` reaches `set -gx VIRTUAL_ENV_PROMPT`. For `--prompt &amp;quot;x\&amp;#x27;\$(touch PWNED)&amp;#x27;\&amp;#x27;&amp;quot;`, the generated `activate.fish` contains:
+
+```fish
+set -gx VIRTUAL_ENV_PROMPT &amp;#x27;x\&amp;#x27;&amp;quot;&amp;#x27;&amp;quot;&amp;#x27;$(touch PWNED)&amp;#x27;&amp;quot;&amp;#x27;&amp;quot;&amp;#x27;\&amp;#x27;&amp;quot;&amp;#x27;&amp;quot;&amp;#x27;&amp;#x27;
+```
+
+`source b…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-c947-3pg5-gm8q"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-c947-3pg5-gm8q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113732"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113732&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/3bddeaf8d02c3ee7f576503efb082f8f494cfcab"&gt;https://github.com/pypa/virtualenv/commit/3bddeaf8d02c3ee7f576503efb082f8f494cfcab&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.2"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c947-3pg5-gm8q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9mx8-4j7g-633p: pypdf: Possible infinite loop when removing tree items</title>
+    <id>https://osv.dev/vulnerability/GHSA-9mx8-4j7g-633p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9mx8-4j7g-633p"/>
+    <published>2026-10-21T16:55:10Z</published>
+    <updated>2026-10-21T17:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113793"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;pypdf: Possible infinite loop when removing tree items&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113793&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pypdf&lt;/code&gt; — fixed in 6.20.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+An attacker who uses this vulnerability can craft a PDF which leads to an infinite loop. This requires removing an object from a tree, for example an outline item.
+
+### Patches
+
+This has been fixed in [pypdf==6.20.1](https://github.com/py-pdf/pypdf/releases/tag/6.20.1).
+
+### Workarounds
+
+If you cannot upgrade yet, consider applying the changes from PR [#4188](https://github.com/py-pdf/pypdf/pull/4188).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/security/advisories/GHSA-9mx8-4j7g-633p"&gt;https://github.com/py-pdf/pypdf/security/advisories/GHSA-9mx8-4j7g-633p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/pull/4188"&gt;https://github.com/py-pdf/pypdf/pull/4188&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/commit/c9c35b4471c2eb5fe078094f6c816e69d4ed25a0"&gt;https://github.com/py-pdf/pypdf/commit/c9c35b4471c2eb5fe078094f6c816e69d4ed25a0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf"&gt;https://github.com/py-pdf/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/releases/tag/6.20.1"&gt;https://github.com/py-pdf/pypdf/releases/tag/6.20.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9mx8-4j7g-633p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qfv9-64jg-mh7p: pypdf: Possible infinite loop in PdfWriter.find_outline_item</title>
+    <id>https://osv.dev/vulnerability/GHSA-qfv9-64jg-mh7p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qfv9-64jg-mh7p"/>
+    <published>2026-10-21T16:55:35Z</published>
+    <updated>2026-10-21T17:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113792"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;pypdf: Possible infinite loop in PdfWriter.find_outline_item&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113792&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pypdf&lt;/code&gt; — fixed in 6.20.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+An attacker who uses this vulnerability can craft a PDF which leads to an infinite loop. This requires calling `find_outline_item` on a `PdfWriter`.
+
+### Patches
+
+This has been fixed in [pypdf==6.20.1](https://github.com/py-pdf/pypdf/releases/tag/6.20.1).
+
+### Workarounds
+
+If you cannot upgrade yet, consider applying the changes from PR [#4188](https://github.com/py-pdf/pypdf/pull/4188).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/security/advisories/GHSA-qfv9-64jg-mh7p"&gt;https://github.com/py-pdf/pypdf/security/advisories/GHSA-qfv9-64jg-mh7p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/pull/4188"&gt;https://github.com/py-pdf/pypdf/pull/4188&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/commit/c9c35b4471c2eb5fe078094f6c816e69d4ed25a0"&gt;https://github.com/py-pdf/pypdf/commit/c9c35b4471c2eb5fe078094f6c816e69d4ed25a0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf"&gt;https://github.com/py-pdf/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/releases/tag/6.20.1"&gt;https://github.com/py-pdf/pypdf/releases/tag/6.20.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qfv9-64jg-mh7p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5vjq-rrrf-7h2q: virtualenv activate runs commands from the environment name in zsh with PROMPT_SUBST</title>
+    <id>https://osv.dev/vulnerability/GHSA-5vjq-rrrf-7h2q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5vjq-rrrf-7h2q"/>
+    <published>2026-10-21T16:46:23Z</published>
+    <updated>2026-10-21T17:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113726"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv activate runs commands from the environment name in zsh with PROMPT_SUBST&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113726&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+zsh users activate an environment with the bash `activate` script, which puts the environment name into `PS1`. Since
+21.13.0 the script escapes backslashes, dollar signs and backticks in that name, but only when `BASH_VERSION` is set, so
+zsh gets the raw value. With the `PROMPT_SUBST` option set, zsh runs parameter expansion, command substitution and
+arithmetic expansion on `PS1` each time it draws the prompt. A name that contains `$(...)`, backticks or `${...}` then
+runs as commands in the user&amp;#x27;s shell, once per prompt.
+
+The name comes from the environment directory, or from `--prompt` or `VIRTUALENV_PROMPT`. After you create an
+environment with:
+
+```console
+$ virtualenv &amp;#x27;x$(touch PWNED)y&amp;#x27;
+```
+
+`source &amp;#x27;x$(touch PWNED)y/bin/activate&amp;#x27;` in a zsh session with `PROMPT_SUBST` set c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-5vjq-rrrf-7h2q"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-5vjq-rrrf-7h2q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113726"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113726&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/5b915367da82bd024b2a0d28d2f98007034b4aa2"&gt;https://github.com/pypa/virtualenv/commit/5b915367da82bd024b2a0d28d2f98007034b4aa2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.4"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5vjq-rrrf-7h2q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8rjx-v5ww-45pp: virtualenv activation scripts run code from a path that contains a placeholder name</title>
+    <id>https://osv.dev/vulnerability/GHSA-8rjx-v5ww-45pp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8rjx-v5ww-45pp"/>
+    <published>2026-10-21T16:39:38Z</published>
+    <updated>2026-10-21T17:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113776"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv activation scripts run code from a path that contains a placeholder name&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113776&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+`ViaTemplateActivator.instantiate_template` replaces the placeholders in an activation template one key at a time, each across the whole text. When a value that it already substituted and quoted contains the name of a later placeholder, the later pass rewrites that name inside the quoted literal. The inserted value brings its own quotes, which close the outer literal, and the rest of the path runs as code when a user activates the environment.
+
+`__VIRTUAL_NAME__` holds the environment&amp;#x27;s directory name, so a destination such as `A__VIRTUAL_NAME__B/x&amp;#x27;$(touch PWNED)&amp;#x27;y` is enough. In the default `activate` for bash, the `VIRTUAL_ENV` line renders as:
+
+```sh
+VIRTUAL_ENV=&amp;#x27;/tmp/t/A&amp;#x27;x&amp;#x27;&amp;quot;&amp;#x27;&amp;quot;&amp;#x27;$(touch PWNED)&amp;#x27;&amp;quot;&amp;#x27;&amp;quot;&amp;#x27;y&amp;#x27;B/x&amp;#x27;&amp;quot;&amp;#x27;&amp;quot;&amp;#x27;$(touch PWNED)&amp;#x27;&amp;quot;&amp;#x27;&amp;quot;&amp;#x27;y&amp;#x27;
+```
+
+Sourcing that script runs `touch PWNED`. T…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-8rjx-v5ww-45pp"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-8rjx-v5ww-45pp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113776"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113776&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/602b26623a724827ff171bf11fef4ad186d01f74"&gt;https://github.com/pypa/virtualenv/commit/602b26623a724827ff171bf11fef4ad186d01f74&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.2"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8rjx-v5ww-45pp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7mh2-4gg2-979f: pypdf: Possible large memory usage for streams with multiple filters</title>
+    <id>https://osv.dev/vulnerability/GHSA-7mh2-4gg2-979f</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7mh2-4gg2-979f"/>
+    <published>2026-10-21T16:48:30Z</published>
+    <updated>2026-10-21T17:00:06Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113795"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;pypdf: Possible large memory usage for streams with multiple filters&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113795&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pypdf&lt;/code&gt; — fixed in 6.20.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+
+An attacker who uses this vulnerability can craft a PDF which leads to large memory consumption. This requires accessing any stream with a large amount of filters or multiple filters which pass around large amounts of data.
+
+### Patches
+
+This has been fixed in [pypdf==6.20.0](https://github.com/py-pdf/pypdf/releases/tag/6.20.0).
+
+### Workarounds
+
+If you cannot upgrade yet, consider applying the changes from PR [#4173](https://github.com/py-pdf/pypdf/pull/4173).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/security/advisories/GHSA-7mh2-4gg2-979f"&gt;https://github.com/py-pdf/pypdf/security/advisories/GHSA-7mh2-4gg2-979f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/pull/4173"&gt;https://github.com/py-pdf/pypdf/pull/4173&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/commit/80a84d4be6022d910874ccb0d2365400f3f0e185"&gt;https://github.com/py-pdf/pypdf/commit/80a84d4be6022d910874ccb0d2365400f3f0e185&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf"&gt;https://github.com/py-pdf/pypdf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/pypdf/releases/tag/6.20.0"&gt;https://github.com/py-pdf/pypdf/releases/tag/6.20.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7mh2-4gg2-979f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-18122: Malicious code in moveworks-capi-starter (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-18122</id>
@@ -905,7 +1461,7 @@ _-= Per source details. Do not edit below this line.=-_
 fabtoolkit executes a payload (embedded as a CHILD string run via `subprocess.run([sys.executable,&amp;#x27;-I&amp;#x27;,&amp;#x27;-c&amp;#x27;,CHILD],...)`) that fetches a JSON config from https://transfer.archivete.am/H2Uxm/fabdeploycheck-config.json with TLS verification disabled (`ssl._create_unverified_context()`) and dispatches on config-supplied `kind` values: `file` reads arbitrary filesystem paths, `run` executes attacker-supplied argv via subprocess, `http` issues attacker-chosen requests with Bearer tokens chained from previously-read files, `tcp` probes ports, and `revsh` forks a daemon that polls `base+&amp;#x27;/&amp;#x27;+ident+&amp;#x27;-cmd.txt&amp;#x27;` and pipes the returned bytes into …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.2/"&gt;https://pypi.org/project/fabtoolkit/0.1.2/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.1/"&gt;https://pypi.org/project/fabtoolkit/0.1.1/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.1.0/"&gt;https://pypi.org/project/fabtoolkit/0.1.0/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/fabtoolkit/0.2.1/"&gt;https://pypi.org/project/fabtoolkit/0.2.1/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-17927"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <title>[NEW] MAL-2026-18045: Malicious code in asurion (PyPI)</title>
+    <title>[UPDATED] MAL-2026-18045: Malicious code in asurion (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-18045</id>
     <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18045"/>
     <published>2026-10-19T21:22:38Z</published>
@@ -1213,176 +1769,5 @@ Reasons (based on the campaign):
 
  - The package overrides the install command in setup.py to execute malicious code during installation.
 &lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/workcalender"&gt;https://bad-packages.kam193.eu/pypi/package/workcalender&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18093"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-3rp5-jjmw-4wv2: GitPython: git-config section-name injection enables arbitrary config directives (core.sshCommand RCE)</title>
-    <id>https://osv.dev/vulnerability/GHSA-3rp5-jjmw-4wv2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3rp5-jjmw-4wv2"/>
-    <published>2026-07-24T16:22:02Z</published>
-    <updated>2026-10-19T20:15:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-69097"/>
-    <category term="PYSEC-2026-3981"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: git-config section-name injection enables arbitrary config directives (core.sshCommand RCE)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69097, PYSEC-2026-3981&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.53&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-In GitPython `&amp;lt;= 3.1.52`, the config writer neutralizes only CR, LF, and NUL in configuration **names**, but writes section names into the `[...]` header with no other escaping. A section/subsection name that contains `] [ &amp;quot;` closes the intended header and opens a second same-line section, injecting an arbitrary config directive — with no newline required. Because a submodule **name** is attacker-controlled data (it comes from a repository&amp;#x27;s `.gitmodules`, or from an application that lets a user name a submodule) and is written verbatim into the parent repository&amp;#x27;s trusted `.git/config`, an attacker can set `core.sshCommand` (or `alias.*`, `core.pager`, `core.fsmonitor`) and achieve remote code execution on the victim&amp;#x27;s next git operation. Likely **CWE-74 (Injection)**.
-
-This …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3rp5-jjmw-4wv2"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3rp5-jjmw-4wv2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2176"&gt;https://github.com/gitpython-developers/GitPython/pull/2176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/1ed1b924f4e2d2ee7bab296df77b978af21853f1"&gt;https://github.com/gitpython-developers/GitPython/commit/1ed1b924f4e2d2ee7bab296df77b978af21853f1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.53"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.53&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/gitpython/PYSEC-2026-3981.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/gitpython/PYSEC-2026-3981.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/gitpython-before-config-injection-via-submodule-names"&gt;https://www.vulncheck.com/advisories/gitpython-before-config-injection-via-submodule-names&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3rp5-jjmw-4wv2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-q29v-xc37-wh5m: Docling: Unsafe URI and Path Handling in HTML Backend</title>
-    <id>https://osv.dev/vulnerability/GHSA-q29v-xc37-wh5m</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q29v-xc37-wh5m"/>
-    <published>2026-06-03T21:15:02Z</published>
-    <updated>2026-10-19T20:00:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-47214"/>
-    <category term="PYSEC-2026-2146"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Docling: Unsafe URI and Path Handling in HTML Backend&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-47214, PYSEC-2026-2146&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;docling&lt;/code&gt; — fixed in 2.94.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-The HTML backend did not perform sufficient validation during resource handling:
-- Accepted `file://` URIs enabling local file system access when `enable_local_fetch=True`
-- Path resolution allowed traversal outside intended directories via `../` sequences and absolute paths
-- Did not block internal network resources under `enable_remote_fetch=True`
-- HTTP redirects were not validated, potentially redirecting to unintended schemes
-- No resource limits for remote image downloads and `data:` URIs
-
-### Patches
-Fixed in versions 2.91.0 (initial fixes) and 2.94.0 (additional improvements). The fixes implement:
-- Updated local path treatment: absolute files always blocked, relative paths require `enable_local_fetch=True` (default: False) and containment within configured `base_path` f…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/docling-project/docling/security/advisories/GHSA-q29v-xc37-wh5m"&gt;https://github.com/docling-project/docling/security/advisories/GHSA-q29v-xc37-wh5m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-47214"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-47214&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/docling-project/docling/pull/3400"&gt;https://github.com/docling-project/docling/pull/3400&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/docling-project/docling/pull/3407"&gt;https://github.com/docling-project/docling/pull/3407&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/docling-project/docling"&gt;https://github.com/docling-project/docling&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/docling-project/docling/releases/tag/v2.91.0"&gt;https://github.com/docling-project/docling/releases/tag/v2.91.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/docling-project/docling/releases/tag/v2.94.0"&gt;https://github.com/docling-project/docling/releases/tag/v2.94.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/docling/PYSEC-2026-2146.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/docling/PYSEC-2026-2146.yaml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q29v-xc37-wh5m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9hjg-9r4m-mvj7: Requests vulnerable to .netrc credentials leak via malicious URLs</title>
-    <id>https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7"/>
-    <published>2025-06-09T19:06:08Z</published>
-    <updated>2026-10-19T20:00:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2024-47081"/>
-    <category term="PYSEC-2026-1872"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Requests vulnerable to .netrc credentials leak via malicious URLs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-47081, PYSEC-2026-1872&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;requests&lt;/code&gt; — fixed in 2.32.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-Due to a URL parsing issue, Requests releases prior to 2.32.4 may leak .netrc credentials to third parties for specific maliciously-crafted URLs.
-
-### Workarounds
-For older versions of Requests, use of the .netrc file can be disabled with `trust_env=False` on your Requests Session ([docs](https://requests.readthedocs.io/en/latest/api/#requests.Session.trust_env)).
-
-### References
-https://github.com/psf/requests/pull/6965
-https://seclists.org/fulldisclosure/2025/Jun/2&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/psf/requests/security/advisories/GHSA-9hjg-9r4m-mvj7"&gt;https://github.com/psf/requests/security/advisories/GHSA-9hjg-9r4m-mvj7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-47081"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-47081&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/psf/requests/pull/6965"&gt;https://github.com/psf/requests/pull/6965&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/psf/requests/commit/96ba401c1296ab1dda74a2365ef36d88f7d144ef"&gt;https://github.com/psf/requests/commit/96ba401c1296ab1dda74a2365ef36d88f7d144ef&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-9hjg-9r4m-mvj7"&gt;https://github.com/advisories/GHSA-9hjg-9r4m-mvj7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/psf/requests"&gt;https://github.com/psf/requests&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/psf/requests/releases/tag/v2.32.4"&gt;https://github.com/psf/requests/releases/tag/v2.32.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/requests/PYSEC-2026-1872.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/requests/PYSEC-2026-1872.yaml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5xmw-vc9v-4wf2: Pillow has a heap buffer overflow with nested list coordinates</title>
-    <id>https://osv.dev/vulnerability/GHSA-5xmw-vc9v-4wf2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5xmw-vc9v-4wf2"/>
-    <published>2026-05-04T20:18:27Z</published>
-    <updated>2026-10-19T20:00:04Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-pillow-2026-42309"/>
-    <category term="CVE-2026-42309"/>
-    <category term="PYSEC-2026-2251"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow has a heap buffer overflow with nested list coordinates&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-42309, CVE-2026-42309, PYSEC-2026-2251&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H · CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 12.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Passing nested lists as coordinates to APIs that accept coordinates such as `ImagePath.Path`, `ImageDraw.ImageDraw.polygon` and `ImageDraw.ImageDraw.line` could cause a heap buffer overflow, as nested lists were recursively unpacked beyond the allocated buffer. Coordinate lists are now validated to contain exactly two numeric coordinates. This was introduced in Pillow 11.2.1.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-5xmw-vc9v-4wf2"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-5xmw-vc9v-4wf2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-42309"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-42309&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/designcomputer/mysql_mcp_server/commit/a96549f4a4d65443fd6e9c7f2324fba9a5c80a82"&gt;https://github.com/designcomputer/mysql_mcp_server/commit/a96549f4a4d65443fd6e9c7f2324fba9a5c80a82&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/cf6de8ca9b23e714aa5310e1c791eda66fc0b670"&gt;https://github.com/python-pillow/Pillow/commit/cf6de8ca9b23e714aa5310e1c791eda66fc0b670&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/pillow/PYSEC-2026-2251.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/pillow/PYSEC-2026-2251.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/12.2.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/12.2.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5xmw-vc9v-4wf2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5wr8-gcqf-gqf3: aiohttp server lacks an initial request/header timeout</title>
-    <id>https://osv.dev/vulnerability/GHSA-5wr8-gcqf-gqf3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5wr8-gcqf-gqf3"/>
-    <published>2026-10-19T17:08:04Z</published>
-    <updated>2026-10-19T17:15:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-111064"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;aiohttp server lacks an initial request/header timeout&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111064&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The keepalive timeout was not used during the initial portion of a request.
-
-### Impact
-
-An attacker could keep an idle connection open indefinitely before sending any data.
-
-### Workaround
-
-Use a reverse proxy (as recommended for all production deployments) with sensible keepalive limits.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-5wr8-gcqf-gqf3"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-5wr8-gcqf-gqf3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/be846822b4b3a5a54b6163e794b42dc06fba54a3"&gt;https://github.com/aio-libs/aiohttp/commit/be846822b4b3a5a54b6163e794b42dc06fba54a3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5wr8-gcqf-gqf3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-494j-54xm-rwp3: AIOHTTP: Secure attribute not enforced for shared cookie</title>
-    <id>https://osv.dev/vulnerability/GHSA-494j-54xm-rwp3</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-494j-54xm-rwp3"/>
-    <published>2026-10-19T17:07:47Z</published>
-    <updated>2026-10-19T17:15:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-111063"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;AIOHTTP: Secure attribute not enforced for shared cookie&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111063&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The Secure attribute was not being enforced for the shared cookie.
-
-### Impact
-
-It may be possible to send a shared cookie marked Secure through an unencrypted request.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-494j-54xm-rwp3"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-494j-54xm-rwp3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/999c356d61e966faffa97b06ab0d0455226d36c5"&gt;https://github.com/aio-libs/aiohttp/commit/999c356d61e966faffa97b06ab0d0455226d36c5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp"&gt;https://github.com/aio-libs/aiohttp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4"&gt;https://github.com/aio-libs/aiohttp/releases/tag/v3.14.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-494j-54xm-rwp3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2g87-pp6c-29x5: aiohttp: Multiple instances of excessive or unbounded memory/CPU use</title>
-    <id>https://osv.dev/vulnerability/GHSA-2g87-pp6c-29x5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2g87-pp6c-29x5"/>
-    <published>2026-10-19T17:07:23Z</published>
-    <updated>2026-10-19T17:15:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;aiohttp: Multiple instances of excessive or unbounded memory/CPU use&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aiohttp&lt;/code&gt; — fixed in 3.14.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Multiple cases were found where aiohttp could use excessive or unbounded memory, or excessive CPU consumption on attacker controlled requests.
-
-### Impact
-
-An attacker could cause resource exhaustion through specially crafted requests.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/security/advisories/GHSA-2g87-pp6c-29x5"&gt;https://github.com/aio-libs/aiohttp/security/advisories/GHSA-2g87-pp6c-29x5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/09bcaa73ff084a0c539bbf16a0a78743acb7141f"&gt;https://github.com/aio-libs/aiohttp/commit/09bcaa73ff084a0c539bbf16a0a78743acb7141f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/0ae507423f681161efa77d20052b4054397c7fb6"&gt;https://github.com/aio-libs/aiohttp/commit/0ae507423f681161efa77d20052b4054397c7fb6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/3d850ee9b92573c7e913821cbcb96005beb3f4df"&gt;https://github.com/aio-libs/aiohttp/commit/3d850ee9b92573c7e913821cbcb96005beb3f4df&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/47babd8c23ca79e2bae6cc8dcb5752b61e369fc7"&gt;https://github.com/aio-libs/aiohttp/commit/47babd8c23ca79e2bae6cc8dcb5752b61e369fc7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/615fec3d4f088f30d2ee72cad760152e92aa1c53"&gt;https://github.com/aio-libs/aiohttp/commit/615fec3d4f088f30d2ee72cad760152e92aa1c53&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/6963ee0befec1502b6bb7b4db6c72d044c08f4fa"&gt;https://github.com/aio-libs/aiohttp/commit/6963ee0befec1502b6bb7b4db6c72d044c08f4fa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aio-libs/aiohttp/commit/6a4f6682817839313b04b8e5cea2b39c1a88ab4f"&gt;https://github.com/aio-libs/aiohttp/commit/6a4f6682817839313b04b8e5cea2b39c1a88ab4f&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2g87-pp6c-29x5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f8c7-rwf9-fmgm: Mercury: Unauthenticated Remote Code Execution in /api/terminals - access control bypass</title>
-    <id>https://osv.dev/vulnerability/GHSA-f8c7-rwf9-fmgm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f8c7-rwf9-fmgm"/>
-    <published>2026-10-19T17:00:54Z</published>
-    <updated>2026-10-19T17:15:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-111057"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Mercury: Unauthenticated Remote Code Execution in /api/terminals - access control bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111057&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mercury&lt;/code&gt; — fixed in 3.2.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-A missing comma in `mercury_app/block_handler.py`&amp;#x27;s `BLOCKED_PATTERNS` list causes the blocklist to fail to cover the `/api/terminals` endpoint. As a result, any unauthenticated attacker can spawn a full, interactive OS-level shell on the host running Mercury.
-
-### Details
-The blocklist in `mercury_app/block_handler.py` is defined as:
-```
-BLOCKED_PATTERNS = [
-    # JupyterLab UI + API
-    r&amp;quot;/lab(?!/(?:extensions/|api/settings(?:/|$)|api/translations(?:/|$)))(?:/.*)?&amp;quot;
-    r&amp;quot;/api/terminals(?:/.*)?&amp;quot;,
-    r&amp;quot;/api/shutdown(?:/.*)?&amp;quot;,
-    r&amp;quot;/files(?:/.*)?&amp;quot;,
-]
-```
-The missing comma between the first and the second line causes Python to merge the rules, therefore the actual list that is blocked looks like this:
-
-/lab...(?:/.`*`)?/api/terminals(?:/.`*`)? (the first two lines joined togeth…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mljar/mercury/security/advisories/GHSA-f8c7-rwf9-fmgm"&gt;https://github.com/mljar/mercury/security/advisories/GHSA-f8c7-rwf9-fmgm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mljar/mercury/commit/8c467129037ee9df269d543ac217ffd33b97bf3f"&gt;https://github.com/mljar/mercury/commit/8c467129037ee9df269d543ac217ffd33b97bf3f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mljar/mercury"&gt;https://github.com/mljar/mercury&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mljar/mercury/releases/tag/v3.2.4"&gt;https://github.com/mljar/mercury/releases/tag/v3.2.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f8c7-rwf9-fmgm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2658-85cv-9wwq: Mercury: Stored / DOM Cross-Site Scripting (XSS): mr.Markdown renders untrusted content as raw, unsanitized HTML</title>
-    <id>https://osv.dev/vulnerability/GHSA-2658-85cv-9wwq</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2658-85cv-9wwq"/>
-    <published>2026-10-19T17:01:20Z</published>
-    <updated>2026-10-19T17:15:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-111059"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Mercury: Stored / DOM Cross-Site Scripting (XSS): mr.Markdown renders untrusted content as raw, unsanitized HTML&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111059&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mercury&lt;/code&gt; — fixed in 3.2.11&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Mercury turns Jupyter notebooks into shared web apps/dashboards. The `mr.Markdown`
-widget converts its input to HTML with **python-markdown and no sanitization
-step**. `MarkdownWidget` is an `ipywidgets.HTML` widget, whose value is written to
-the page as **raw HTML (via `innerHTML`) with no sanitization**, so the result
-reaches the DOM verbatim. When an app passes **untrusted data** (database rows,
-user submissions, uploaded file contents, or an external/LLM API response) to
-`mr.Markdown`, HTML/JS in that data executes in the browser of **whoever views the
-app** — a data-driven stored/DOM-based XSS.
-
-This is a library-provided rendering sink that fails to neutralize output; it is
-triggered by ordinary, reasonable application code, not by an author mistake.
-
-## Root cause
-
-`merc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mljar/mercury/security/advisories/GHSA-2658-85cv-9wwq"&gt;https://github.com/mljar/mercury/security/advisories/GHSA-2658-85cv-9wwq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mljar/mercury/commit/c798a85924e6614c6fea7afe5a560e4554a1d09b"&gt;https://github.com/mljar/mercury/commit/c798a85924e6614c6fea7afe5a560e4554a1d09b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mljar/mercury"&gt;https://github.com/mljar/mercury&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mljar/mercury/releases/tag/v3.2.11"&gt;https://github.com/mljar/mercury/releases/tag/v3.2.11&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2658-85cv-9wwq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

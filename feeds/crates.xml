@@ -3,12 +3,28 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-10-21T10:57:22Z</updated>
+  <updated>2026-10-21T16:45:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-26w4-8w32-4x3v: Slack Morphism verifier errors disclose valid HMACs in the logs</title>
+    <id>https://osv.dev/vulnerability/GHSA-26w4-8w32-4x3v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-26w4-8w32-4x3v"/>
+    <published>2026-10-21T16:38:47Z</published>
+    <updated>2026-10-21T16:45:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-113799"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Slack Morphism verifier errors disclose valid HMACs in the logs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113799&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;slack-morphism&lt;/code&gt; — fixed in 2.28.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Slack Morphism exposes the correct Slack request HMAC when signature verification fails.
+
+For an invalid request, `slack-morphism` computes the correct signature for the attacker-controlled timestamp and request body and stores it in `SlackEventWrongSignatureError.generated_hash`. The error&amp;#x27;s `Debug` and `Display` representations expose that value, and the default Axum listener error handler logs it at error level.
+
+An attacker who can both reach the application&amp;#x27;s Slack callback endpoint and read its application/service logs can therefore use the verifier as a chosen-message HMAC oracle. The attacker can send an arbitrary request with an invalid signature, recover the correct signature from the resulting log entry, and resend the same request within the five-minute freshness w…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/abdolence/slack-morphism-rust/security/advisories/GHSA-26w4-8w32-4x3v"&gt;https://github.com/abdolence/slack-morphism-rust/security/advisories/GHSA-26w4-8w32-4x3v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/abdolence/slack-morphism-rust/pull/387"&gt;https://github.com/abdolence/slack-morphism-rust/pull/387&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/abdolence/slack-morphism-rust/commit/ac95d0d4539d0eac548a8db99c51c0c1ae832756"&gt;https://github.com/abdolence/slack-morphism-rust/commit/ac95d0d4539d0eac548a8db99c51c0c1ae832756&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/abdolence/slack-morphism-rust"&gt;https://github.com/abdolence/slack-morphism-rust&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/abdolence/slack-morphism-rust/releases/tag/v2.28.0"&gt;https://github.com/abdolence/slack-morphism-rust/releases/tag/v2.28.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-26w4-8w32-4x3v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-4gg8-gxpx-9rph: uv is vulnerable to arbitrary file write through entry point names</title>
     <id>https://osv.dev/vulnerability/GHSA-4gg8-gxpx-9rph</id>
@@ -233,18 +249,5 @@ So for an RSA key, the request can say `rsa-sha2-512` while the signature is `ss
     <content type="html">&lt;p&gt;&lt;strong&gt;russh: Unbounded memory allocation in agent protocol server via crafted constraint records&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111061&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;russh&lt;/code&gt; — fixed in 0.64.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
 
 `russh_keys::agent::server::add_key` (`russh/src/keys/agent/server.rs:271-319`) spawns a dedicated tokio task for every 5-byte `SSH_AGENT_CONSTRAIN_LIFETIME` record attached to an added key, each cloning the key blob and sleeping for the declared lifetime (up to ~136 years). The loop has no per-request task budget, and spawned tasks are not rolled back when the overall request fails. Repeating one constrained add-key message over an agent connection converts wire bytes into resident tasks and heap at roughly 141x amplification: in our measurement 10.2 MiB of protocol traffic produced ~2,096,120 live tasks and +1,447,856 KiB RSS, while the same traffic sent as unconstrained add-key requests cost +268 KiB. An attacker reaching the agent socket (a local process, or a remote SSH s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/security/advisories/GHSA-4wc5-f2rc-q74m"&gt;https://github.com/Eugeny/russh/security/advisories/GHSA-4wc5-f2rc-q74m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/commit/4c305033d72f8e5dd21a3fd4c53a6c291a16ebd1"&gt;https://github.com/Eugeny/russh/commit/4c305033d72f8e5dd21a3fd4c53a6c291a16ebd1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh"&gt;https://github.com/Eugeny/russh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Eugeny/russh/releases/tag/v0.64.1"&gt;https://github.com/Eugeny/russh/releases/tag/v0.64.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4wc5-f2rc-q74m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0371: `zbus_names` is unmaintained</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0371</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0371"/>
-    <published>2026-10-16T12:00:00Z</published>
-    <updated>2026-10-17T15:30:02Z</updated>
-    <category term="crates.io"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`zbus_names` is unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zbus_names&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `zbus_names` crate is no longer maintained as a standalone crate.
-
-It has been merged into [`zbus`](https://crates.io/crates/zbus) starting with version `6.0.0`, as its `names` module.
-
-Users should migrate to [`zbus`](https://crates.io/crates/zbus), with its default features disabled if they only need the D-Bus name types.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zbus_names"&gt;https://crates.io/crates/zbus_names&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0371.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0371.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/z-galaxy/zbus/issues/2043"&gt;https://github.com/z-galaxy/zbus/issues/2043&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0371"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

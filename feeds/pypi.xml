@@ -3,12 +3,654 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-10-23T21:15:03Z</updated>
+  <updated>2026-10-24T02:56:14Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-2r3x-4mrv-mcxf: Vyper: Memory corruption using function calls within tuples / nested calls</title>
+    <id>https://osv.dev/vulnerability/GHSA-2r3x-4mrv-mcxf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2r3x-4mrv-mcxf"/>
+    <published>2026-10-06T15:22:29Z</published>
+    <updated>2026-10-24T02:56:14Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2020-37286"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vyper: Memory corruption using function calls within tuples / nested calls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2020-37286&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vyper&lt;/code&gt; — fixed in 0.2.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+When performing a function call inside a tuple or as an argument inside another function call, there is a memory corruption issue that occurs because of an incorrect pointer to the the tip of the stack.
+
+Example code:
+```python
+@internal
+def _foo(a: uint256, b: uint256, c: uint256) -&amp;gt; (uint256, uint256, uint256, uint256, uint256):
+    return 1, a, b, c, 5
+
+@internal
+def _foo2() -&amp;gt; uint256:
+    a: uint256[10] = [6,7,8,9,10,11,12,13,15,16]
+    return 4
+
+@external
+def foo() -&amp;gt; (uint256, uint256, uint256, uint256, uint256):
+    return self._foo(2, 3, self._foo2())
+```
+
+Please see #2186 for further information
+
+### Patches
+This problem was fixed in #2186, and released as a part of [`v0.2.6`](https://github.com/vyperlang/vyper/releases/tag/v0.2.6).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/security/advisories/GHSA-2r3x-4mrv-mcxf"&gt;https://github.com/vyperlang/vyper/security/advisories/GHSA-2r3x-4mrv-mcxf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/pull/2186"&gt;https://github.com/vyperlang/vyper/pull/2186&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/commit/74ba67d4bec5f8be4f05759e37d2bfb1463e0441"&gt;https://github.com/vyperlang/vyper/commit/74ba67d4bec5f8be4f05759e37d2bfb1463e0441&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper"&gt;https://github.com/vyperlang/vyper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/releases/tag/v0.2.6"&gt;https://github.com/vyperlang/vyper/releases/tag/v0.2.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2r3x-4mrv-mcxf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4v7v-gqf9-ww2g: Vyper: Call stack corruption when passing complex type containing non-base type members as argument</title>
+    <id>https://osv.dev/vulnerability/GHSA-4v7v-gqf9-ww2g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4v7v-gqf9-ww2g"/>
+    <published>2026-10-06T15:22:23Z</published>
+    <updated>2026-10-24T02:56:14Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2020-37287"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vyper: Call stack corruption when passing complex type containing non-base type members as argument&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2020-37287&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vyper&lt;/code&gt; — fixed in 0.2.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+When we pass a multi-dimensional array (like `[[1, 2], [3, 4]]`) as an argument to internal/external functions we get incorrect output. This is due to a stack management issue, because it was assumed that the size of each subtype of an array/struct is 32, which is not always correct.
+
+Example code:
+```python
+@internal
+def test_input(arr: int128[2][1], i: int128) -&amp;gt; (int128[2][1], int128):
+    return arr, i
+
+@external
+def test_values(arr: int128[2][1], i: int128) -&amp;gt; (int128[2][1], int128):
+    return self.test_input(arr, i)
+```
+
+Please see #2183 for further information
+
+### Patches
+This problem was fixed in #2184, and released as a part of [`v0.2.6`](https://github.com/vyperlang/vyper/releases/tag/v0.2.6).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/security/advisories/GHSA-4v7v-gqf9-ww2g"&gt;https://github.com/vyperlang/vyper/security/advisories/GHSA-4v7v-gqf9-ww2g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/issues/2183"&gt;https://github.com/vyperlang/vyper/issues/2183&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/pull/2184"&gt;https://github.com/vyperlang/vyper/pull/2184&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/commit/0be02b7331e8febe79d5a4218829c72e30417a29"&gt;https://github.com/vyperlang/vyper/commit/0be02b7331e8febe79d5a4218829c72e30417a29&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper"&gt;https://github.com/vyperlang/vyper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/releases/tag/v0.2.6"&gt;https://github.com/vyperlang/vyper/releases/tag/v0.2.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4v7v-gqf9-ww2g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-22wc-c9wj-6q2v: VVE-2021-0001: Memory corruption using function calls within arrays</title>
+    <id>https://osv.dev/vulnerability/GHSA-22wc-c9wj-6q2v</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-22wc-c9wj-6q2v"/>
+    <published>2021-04-19T15:12:05Z</published>
+    <updated>2026-10-24T02:56:12Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2021-48020"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;VVE-2021-0001: Memory corruption using function calls within arrays&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-48020&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vyper&lt;/code&gt; — fixed in 0.2.12&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+When performing a function call inside an array, there is a memory corruption issue that occurs because of an incorrect pointer to the the tip of the stack.
+
+### Patches
+This issue was partially fixed in [VVE-2020-0004](https://github.com/vyperlang/vyper/security/advisories/GHSA-2r3x-4mrv-mcxf), however the fix did not update similar code for arrays, which had a similar issue. The issue is fully fixed in https://github.com/vyperlang/vyper/pull/2345&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/security/advisories/GHSA-22wc-c9wj-6q2v"&gt;https://github.com/vyperlang/vyper/security/advisories/GHSA-22wc-c9wj-6q2v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/pull/2345"&gt;https://github.com/vyperlang/vyper/pull/2345&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/commit/11b7b5b7e59bc9dc859d51cd41a924b59fe47c9e"&gt;https://github.com/vyperlang/vyper/commit/11b7b5b7e59bc9dc859d51cd41a924b59fe47c9e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/vyper"&gt;https://pypi.org/project/vyper&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-22wc-c9wj-6q2v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7f92-rr6w-cq64: Storage corruption due to variables overwritten by re-entrancy locks</title>
+    <id>https://osv.dev/vulnerability/GHSA-7f92-rr6w-cq64</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7f92-rr6w-cq64"/>
+    <published>2021-08-05T16:57:42Z</published>
+    <updated>2026-10-24T02:56:11Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2021-48018"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Storage corruption due to variables overwritten by re-entrancy locks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-48018&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vyper&lt;/code&gt; — fixed in 0.2.15&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Background
+When attempting to use the v0.2.14 release, @pandadefi discovered an issue using the `@nonreentrant` decorator.
+
+### Impact
+Reentrancy protection storage slots get allocated to the same slots as storage variables, leading to the corruption of storage variables when using the `@nonreentrant` decorator.
+
+### Patches
+This issue was fixed in v0.2.15 in #2391, #2379
+
+### Workarounds
+Don&amp;#x27;t use the `@nonreentrant` decorator in these versions.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/security/advisories/GHSA-7f92-rr6w-cq64"&gt;https://github.com/vyperlang/vyper/security/advisories/GHSA-7f92-rr6w-cq64&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/pull/2379"&gt;https://github.com/vyperlang/vyper/pull/2379&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/pull/2391"&gt;https://github.com/vyperlang/vyper/pull/2391&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7f92-rr6w-cq64"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-mr6r-mvw4-736g: Vyper interfaces returning integer types less than 256 bits can be manipulated if uint256 is used</title>
+    <id>https://osv.dev/vulnerability/GHSA-mr6r-mvw4-736g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mr6r-mvw4-736g"/>
+    <published>2020-03-25T18:20:19Z</published>
+    <updated>2026-10-24T02:56:09Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2020-37289"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vyper interfaces returning integer types less than 256 bits can be manipulated if uint256 is used&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2020-37289&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vyper&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# VVE-2020-0001
+
+Earlier today, we received a responsible disclosure of a potential issue from @montyly (security researcher at @trailofbits) for Vyper users who make assumptions about what values certain interface types can return.
+
+### Impact
+We determined the issue to be mild and unlikely to be exploited, with an easy workaround while the correct resolution is in process. The issue stems from a number of things, which we will detail here.
+
+(1) The ABI Specification is under-defined such that function return type is not always reflected in how you use it
+
+This means that a function which returns `uint8` under the hood actually returns a 32 byte integer, making it identical to a function that returns `uint256`. This allows users to read an interface that returns a `uint8` value to be stor…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/security/advisories/GHSA-mr6r-mvw4-736g"&gt;https://github.com/vyperlang/vyper/security/advisories/GHSA-mr6r-mvw4-736g&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mr6r-mvw4-736g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-vg88-3v92-rjx2: Vyper: Return inside for loop more than 1 level deep</title>
+    <id>https://osv.dev/vulnerability/GHSA-vg88-3v92-rjx2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vg88-3v92-rjx2"/>
+    <published>2026-10-06T15:20:10Z</published>
+    <updated>2026-10-24T02:56:09Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2020-37288"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vyper: Return inside for loop more than 1 level deep&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2020-37288&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vyper&lt;/code&gt; — fixed in 0.2.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# VVE-2020-0002
+Earlier today, we received a responsible disclosure of a potential issue from @michwill (developer of @curvefi) for Vyper users who use return statements inside for loops of nested internal calls. Returning inside a for loop causes an invalid jump dest, reverting the transaction unnecessarily.
+
+MWE:
+```python
+@internal
+def _baz():
+    for i in range(1):
+        return  # Stack underflow happens here
+
+@internal
+def _bar():
+    self._baz()
+
+@external
+def foo():
+    self._bar()
+```
+
+### Impact
+Impact is minor, it is unlikely a user would encounter this problem unless they were working with nested calls, and return statements inside calls. Even in that scenario, you would encounter a revert which should be noticeable with adequate testing. In limited circumstances, this could c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/security/advisories/GHSA-vg88-3v92-rjx2"&gt;https://github.com/vyperlang/vyper/security/advisories/GHSA-vg88-3v92-rjx2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/pull/2110"&gt;https://github.com/vyperlang/vyper/pull/2110&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/commit/a1d92e5eb968a34a23850359656aee23334adb90"&gt;https://github.com/vyperlang/vyper/commit/a1d92e5eb968a34a23850359656aee23334adb90&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper"&gt;https://github.com/vyperlang/vyper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/releases/tag/v0.2.3"&gt;https://github.com/vyperlang/vyper/releases/tag/v0.2.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vg88-3v92-rjx2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-375m-5fvv-xq23: VVE-2021-0002: Incorrect `returndatasize` when using simple forwarder proxies deployed prior to EIP-1167 adoption</title>
+    <id>https://osv.dev/vulnerability/GHSA-375m-5fvv-xq23</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-375m-5fvv-xq23"/>
+    <published>2021-04-19T15:11:54Z</published>
+    <updated>2026-10-24T02:56:08Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2021-48019"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;VVE-2021-0002: Incorrect `returndatasize` when using simple forwarder proxies deployed prior to EIP-1167 adoption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2021-48019&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vyper&lt;/code&gt; — fixed in 0.2.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Background
+
+@tjayrush reported a data handling issue with certain Web3 libraries using Vyper-deploy forwarder proxy contracts using our Vyper&amp;#x27;s built-in `create_forwarder_to` function prior to our change to support EIP-1167 style forwarder proxies.
+
+### Impact
+If you are an end user of a forwarder-style proxy deployed using Vyper&amp;#x27;s built-in `create_forwarder_to` function AND you have a function that returns &amp;gt;4096 bytes AND you do no return data sanitation on the value returned, you could potentially see a data corruption issue.
+
+Otherwise, if you are handling the result of a return call AND you expect a specific `RETURNDATASIZE` that is less than 4096 (such as `SafeERC20.safeTransfer`) then the call will fail that check.
+
+### Patches
+The issue was patched when we upgraded to EIP-1167 st…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/security/advisories/GHSA-375m-5fvv-xq23"&gt;https://github.com/vyperlang/vyper/security/advisories/GHSA-375m-5fvv-xq23&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vyperlang/vyper/pull/2281"&gt;https://github.com/vyperlang/vyper/pull/2281&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/vyper"&gt;https://pypi.org/project/vyper&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-375m-5fvv-xq23"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-567q-5qvw-pf92: filelock: On Windows an oplock on a soft lock's marker holds SoftFileLock.acquire() past its timeout and blocks the stale break</title>
+    <id>https://osv.dev/vulnerability/GHSA-567q-5qvw-pf92</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-567q-5qvw-pf92"/>
+    <published>2026-10-23T22:27:32Z</published>
+    <updated>2026-10-23T22:45:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112907"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;filelock: On Windows an oplock on a soft lock&amp;#x27;s marker holds SoftFileLock.acquire() past its timeout and blocks the stale break&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112907&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;filelock&lt;/code&gt; — fixed in 4.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;On Windows the soft locks (`SoftFileLock`, `MarkerSoftFileLock`, `SoftFileLease`, their async forms, and a `FileLock` that fell back to a soft lock) read their marker by path. The marker is the lock file whose presence says a process holds the lock. Each `acquire()` attempt that finds a marker opens it with `os.open` to read the holder&amp;#x27;s process id, and the lock renames and deletes a marker it judges stale, by path. On Windows each of these calls waits for an oplock. An oplock (opportunistic lock) is a request by a process that holds a handle on a file to be told before another process opens, renames or deletes that file; the other process waits until the holder answers the break or closes its handle.
+
+Another local account that can open the marker for reading can take a Level 1 oplock on …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/security/advisories/GHSA-567q-5qvw-pf92"&gt;https://github.com/tox-dev/filelock/security/advisories/GHSA-567q-5qvw-pf92&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/pull/835"&gt;https://github.com/tox-dev/filelock/pull/835&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/commit/e1e825b1992f69fb6b346dc395d5ae4893536c0a"&gt;https://github.com/tox-dev/filelock/commit/e1e825b1992f69fb6b346dc395d5ae4893536c0a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock"&gt;https://github.com/tox-dev/filelock&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/releases/tag/4.2.1"&gt;https://github.com/tox-dev/filelock/releases/tag/4.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-567q-5qvw-pf92"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-4f8h-vr72-p32c: virtualenv: Temporary app-data can leave dangling seed package links</title>
+    <id>https://osv.dev/vulnerability/GHSA-4f8h-vr72-p32c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4f8h-vr72-p32c"/>
+    <published>2026-10-23T22:26:57Z</published>
+    <updated>2026-10-23T22:45:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113713"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Temporary app-data can leave dangling seed package links&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113713&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:P/VC:L/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The app-data seeder can leave an environment linked to temporary package files that virtualenv deletes when creation
+finishes. The environment-variable and configuration-file forms of `symlink_app_data` can enable this state even though
+the command-line flag is disabled for temporary app-data. The resulting environment depends on a cache pathname that its
+owner no longer controls.
+
+Anthropic&amp;#x27;s OSS Scanner reported this as `ANT-2026-ZOE2GEPC` in `virtualenv-20261015-005`, received on 15 October 2026.
+This draft records source review and functional remediation checks. The reporter&amp;#x27;s cross-account code-execution claim
+has not been independently reproduced.
+
+## Affected area
+
+Integrity of app-data references after temporary cache cleanup.
+
+## Attacker-controlled input
+
+Symlink seed…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-4f8h-vr72-p32c"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-4f8h-vr72-p32c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113713"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113713&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3437"&gt;https://github.com/pypa/virtualenv/pull/3437&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/b81995c3feab9e1edb453c75ffc6616e1a77335e"&gt;https://github.com/pypa/virtualenv/commit/b81995c3feab9e1edb453c75ffc6616e1a77335e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.10"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.10&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4f8h-vr72-p32c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-jqc4-5cvw-7w85: filelock: ReadWriteLock on the hard-link route deletes any directory another user renames onto its .filelock-* link directory name</title>
+    <id>https://osv.dev/vulnerability/GHSA-jqc4-5cvw-7w85</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jqc4-5cvw-7w85"/>
+    <published>2026-10-23T22:28:41Z</published>
+    <updated>2026-10-23T22:45:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112937"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;filelock: ReadWriteLock on the hard-link route deletes any directory another user renames onto its .filelock-* link directory name&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112937&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;filelock&lt;/code&gt; — fixed in 4.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`ReadWriteLock` and `AsyncReadWriteLock` (the SQLite-backed reader/writer lock) remove their private `.filelock-*` link directories with `shutil.rmtree` (a recursive delete) on a remembered path. They do not check that the path still names the directory they created. This happens on the hard-link route (a hard link is a second name for the same file). That route is every connection on macOS since 4.1.1 and any POSIX process without a usable `/proc/self/fd` (a Linux path that names the process&amp;#x27;s own open files), such as a chroot or container that does not mount `/proc`.
+
+Another local user who can rename entries in the directory that holds the lock database can rename one of the directories of the user running the lock (below: the lock user) onto the link directory&amp;#x27;s name, or onto a forged …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/security/advisories/GHSA-jqc4-5cvw-7w85"&gt;https://github.com/tox-dev/filelock/security/advisories/GHSA-jqc4-5cvw-7w85&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112937"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112937&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/pull/834"&gt;https://github.com/tox-dev/filelock/pull/834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d"&gt;https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock"&gt;https://github.com/tox-dev/filelock&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/releases/tag/4.2.1"&gt;https://github.com/tox-dev/filelock/releases/tag/4.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jqc4-5cvw-7w85"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9vhv-jxww-xfm5: filelock: ReadWriteLock on Windows acts on SQLite side files another local user places beside its database</title>
+    <id>https://osv.dev/vulnerability/GHSA-9vhv-jxww-xfm5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9vhv-jxww-xfm5"/>
+    <published>2026-10-23T22:28:19Z</published>
+    <updated>2026-10-23T22:45:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112913"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;filelock: ReadWriteLock on Windows acts on SQLite side files another local user places beside its database&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112913&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;filelock&lt;/code&gt; — fixed in 4.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;On Windows, `ReadWriteLock` and `AsyncReadWriteLock` (the SQLite-backed reader/writer lock) connect SQLite to the lock database by its path, in every directory. SQLite derives three side files from that path: `&amp;lt;database&amp;gt;-journal`, the rollback journal (pages saved to undo an interrupted write); `&amp;lt;database&amp;gt;-wal`, the write-ahead log (changes kept outside the main file); and `&amp;lt;database&amp;gt;-shm`, the shared-memory index of the WAL. SQLite acts on whichever of these it finds beside the database before the lock runs any statement. Another local account that can create files in the database&amp;#x27;s directory, but not delete files of other accounts there, places such a side file beside the database and denies everyone `DELETE` on it, which a file&amp;#x27;s creator may do. `C:\Windows\Temp` (the temporary director…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/security/advisories/GHSA-9vhv-jxww-xfm5"&gt;https://github.com/tox-dev/filelock/security/advisories/GHSA-9vhv-jxww-xfm5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/pull/834"&gt;https://github.com/tox-dev/filelock/pull/834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d"&gt;https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock"&gt;https://github.com/tox-dev/filelock&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/releases/tag/4.2.1"&gt;https://github.com/tox-dev/filelock/releases/tag/4.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9vhv-jxww-xfm5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-494p-63j8-28p3: virtualenv: Downloaded wheel selection and caching precede verification</title>
+    <id>https://osv.dev/vulnerability/GHSA-494p-63j8-28p3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-494p-63j8-28p3"/>
+    <published>2026-10-23T22:25:22Z</published>
+    <updated>2026-10-23T22:30:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113714"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Downloaded wheel selection and caching precede verification&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113714&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:P/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Wheel downloads go directly into the reusable wheelhouse, while the verification target is selected from pip&amp;#x27;s textual
+output. A verification failure does not remove the downloaded file from that cache.
+
+Anthropic&amp;#x27;s OSS Scanner reported this as `ANT-2026-ST00DRO3` in `virtualenv-20261015-005`, received on 15 October 2026.
+
+## Affected area
+
+Download selection and promotion into the reusable wheel cache.
+
+## Attacker-controlled input
+
+A download must fail verification, or the archive selected from pip output must differ from the file later reused.
+Default-index digest verification must be enabled. Existing custom-index exceptions are outside the promised PyPI
+comparison.
+
+## Affected code
+
+The relevant 21.14.8 source is in
+[wheel download and digest check](https://github.com/pyp…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-494p-63j8-28p3"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-494p-63j8-28p3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113714"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113714&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3430"&gt;https://github.com/pypa/virtualenv/pull/3430&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/7babec66e043e1cc8bc66869a063653898719d96"&gt;https://github.com/pypa/virtualenv/commit/7babec66e043e1cc8bc66869a063653898719d96&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-494p-63j8-28p3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-fc2g-4w5p-6whm: virtualenv: Seeded files retain permissions from an older cache</title>
+    <id>https://osv.dev/vulnerability/GHSA-fc2g-4w5p-6whm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fc2g-4w5p-6whm"/>
+    <published>2026-10-23T22:23:11Z</published>
+    <updated>2026-10-23T22:30:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113720"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Seeded files retain permissions from an older cache&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113720&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:P/VC:L/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The app-data copy seeder uses shutil.copy, which preserves cached file modes independently of the current umask. A cache
+populated under permissive permissions can therefore produce files with wider access in later environments.
+
+Anthropic&amp;#x27;s OSS Scanner reported this as `ANT-2026-487MH6OW` in `virtualenv-20261015-005`, received on 15 October 2026.
+
+## Affected area
+
+Permissions of files copied from app-data into a new environment.
+
+## Attacker-controlled input
+
+The cache must contain files created with broader permissions than the current environment creator intends. Another
+account must also be able to traverse the new environment and reach those files. A private parent directory prevents
+that access. No control of a private live cache is assumed.
+
+## Affected code
+
+The releva…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-fc2g-4w5p-6whm"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-fc2g-4w5p-6whm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113720"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113720&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3425"&gt;https://github.com/pypa/virtualenv/pull/3425&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/35f0b33562790176dd186d0a3c517af3acc7a0e1"&gt;https://github.com/pypa/virtualenv/commit/35f0b33562790176dd186d0a3c517af3acc7a0e1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fc2g-4w5p-6whm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6w3r-xr62-4xcp: virtualenv: Bash prompt values can change meaning under older compatibility modes</title>
+    <id>https://osv.dev/vulnerability/GHSA-6w3r-xr62-4xcp</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6w3r-xr62-4xcp"/>
+    <published>2026-10-23T22:21:57Z</published>
+    <updated>2026-10-23T22:30:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113723"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Bash prompt values can change meaning under older compatibility modes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113723&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:N/UI:A/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Caller-supplied prompt text can become executable syntax in the bash activation prompt. An attacker must influence the
+value passed to virtualenv, and a user must subsequently activate the environment and draw the prompt.
+
+## Affected area
+
+Bash runs with compatibility level 4.2 and draws the environment prompt. Its replacement-string behavior differs from
+newer compatibility modes, leaving prompt text subject to a second interpretation. The report concerns POSIX activation.
+It does not establish exposure through unrelated activators.
+
+## Attacker-controlled input
+
+The attacker controls prompt or destination data passed as a virtualenv argument. The user later sources the generated
+activation script.
+
+## Affected code
+
+The relevant 21.14.8 source is in
+[bash prompt assembly](ht…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-6w3r-xr62-4xcp"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-6w3r-xr62-4xcp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113723"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113723&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3418"&gt;https://github.com/pypa/virtualenv/pull/3418&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/5f48d711731311428aebfae61d46957762155b22"&gt;https://github.com/pypa/virtualenv/commit/5f48d711731311428aebfae61d46957762155b22&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6w3r-xr62-4xcp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hhxq-47xx-j5xx: virtualenv: Seed replacement does not contain metadata deletion paths</title>
+    <id>https://osv.dev/vulnerability/GHSA-hhxq-47xx-j5xx</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hhxq-47xx-j5xx"/>
+    <published>2026-10-23T22:19:15Z</published>
+    <updated>2026-10-23T22:30:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113719"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Seed replacement does not contain metadata deletion paths&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113719&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The app-data seeder joins paths from existing distribution metadata to site-packages and deletes the resulting paths
+without checking containment within the environment.
+
+Anthropic&amp;#x27;s OSS Scanner reported this as `ANT-2026-SXOEHWP7` in `virtualenv-20261015-005`, received on 15 October 2026.
+
+## Affected area
+
+Removal of a previously installed seed package.
+
+## Attacker-controlled input
+
+An environment being reused must contain distribution metadata influenced by another account. The invoking user must
+have deletion rights over the paths named by that metadata. Installing a new environment without existing package
+metadata does not enter this cleanup path.
+
+## Affected code
+
+The relevant 21.14.8 source is in
+[seed uninstall](https://github.com/pypa/virtualenv/blob/a795ab116356afd…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-hhxq-47xx-j5xx"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-hhxq-47xx-j5xx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113719"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113719&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3428"&gt;https://github.com/pypa/virtualenv/pull/3428&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/e3cea6fa10a50fa29cf1fdddd772458fba076d5f"&gt;https://github.com/pypa/virtualenv/commit/e3cea6fa10a50fa29cf1fdddd772458fba076d5f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hhxq-47xx-j5xx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-394h-qwmc-48pf: virtualenv: Xonsh activation literals depend on the script decoding codec</title>
+    <id>https://osv.dev/vulnerability/GHSA-394h-qwmc-48pf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-394h-qwmc-48pf"/>
+    <published>2026-10-23T22:24:43Z</published>
+    <updated>2026-10-23T22:30:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113718"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Xonsh activation literals depend on the script decoding codec&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113718&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:N/UI:A/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+Caller-supplied prompt text can become executable syntax in the xonsh activation script. An attacker must influence the
+value passed to virtualenv, and a user must subsequently activate the environment.
+
+## Affected area
+
+Xonsh reads a UTF-8 activation script using a legacy multibyte encoding such as GBK. Printable non-ASCII bytes can
+change how the reader recognizes an adjacent quote. The report concerns POSIX activation. It does not establish exposure
+through unrelated activators.
+
+## Attacker-controlled input
+
+The attacker controls prompt or destination data passed as a virtualenv argument. The user later sources the generated
+activation script.
+
+## Affected code
+
+The relevant 21.14.8 source is in
+[xonsh quote()](https://github.com/pypa/virtualenv/blob/a795ab116356afde11039c…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-394h-qwmc-48pf"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-394h-qwmc-48pf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113718"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113718&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3432"&gt;https://github.com/pypa/virtualenv/pull/3432&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/e5fc2e6e189a877ff559af288919e3525d13e5e0"&gt;https://github.com/pypa/virtualenv/commit/e5fc2e6e189a877ff559af288919e3525d13e5e0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-394h-qwmc-48pf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-cx28-75q4-x26q: virtualenv: Pip seeding with download omits wheel digest verification</title>
+    <id>https://osv.dev/vulnerability/GHSA-cx28-75q4-x26q</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cx28-75q4-x26q"/>
+    <published>2026-10-23T22:26:04Z</published>
+    <updated>2026-10-23T22:30:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113717"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Pip seeding with download omits wheel digest verification&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113717&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:P/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The pip seeder acquires bundled wheels with download=False and lets pip access the index when --download is selected.
+Index candidates on that path do not pass through virtualenv&amp;#x27;s wheel digest verification.
+
+Anthropic&amp;#x27;s OSS Scanner reported this as `ANT-2026-74ALJBUF` in `virtualenv-20261015-005`, received on 15 October 2026.
+
+## Affected area
+
+Wheel selection by the pip seeder when downloads are enabled.
+
+## Attacker-controlled input
+
+The pip seeder and download option must be selected. The finding concerns the default-index digest-verification policy.
+Explicit custom-index settings already opt out of comparison against PyPI metadata; this patch retains that policy.
+
+## Affected code
+
+The relevant 21.14.8 source is in
+[pip seeder](https://github.com/pypa/virtualenv/blob/a795a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-cx28-75q4-x26q"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-cx28-75q4-x26q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113717"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113717&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3430"&gt;https://github.com/pypa/virtualenv/pull/3430&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/7babec66e043e1cc8bc66869a063653898719d96"&gt;https://github.com/pypa/virtualenv/commit/7babec66e043e1cc8bc66869a063653898719d96&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cx28-75q4-x26q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-qmx5-4p3x-wvqf: virtualenv: Venv configuration readback can reinterpret path boundaries</title>
+    <id>https://osv.dev/vulnerability/GHSA-qmx5-4p3x-wvqf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qmx5-4p3x-wvqf"/>
+    <published>2026-10-23T22:20:43Z</published>
+    <updated>2026-10-23T22:30:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-113715"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Venv configuration readback can reinterpret path boundaries&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113715&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:N/UI:P/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+The venv creator reads the standard library&amp;#x27;s generated pyvenv.cfg with splitlines() and merges all resulting keys over
+virtualenv&amp;#x27;s configuration. Line-boundary characters from destination data can therefore become configuration structure
+before output sanitization.
+
+Anthropic&amp;#x27;s OSS Scanner reported this as `ANT-2026-6ZQHJ6VI` in `virtualenv-20261015-005`, received on 15 October 2026.
+
+## Affected area
+
+Configuration readback by the stdlib venv creator.
+
+## Attacker-controlled input
+
+An untrusted caller must influence the destination pathname passed to the venv creator. That pathname must contain a
+character that Python treats as a line boundary. The builtin creator follows a different configuration-writing path.
+
+## Affected code
+
+The relevant 21.14.8 source is in
+[venv readb…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-qmx5-4p3x-wvqf"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-qmx5-4p3x-wvqf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113715"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113715&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3426"&gt;https://github.com/pypa/virtualenv/pull/3426&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/b0008a58885ded9227faf8f910c6c402712c750a"&gt;https://github.com/pypa/virtualenv/commit/b0008a58885ded9227faf8f910c6c402712c750a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qmx5-4p3x-wvqf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-crv4-6mhj-j5jh: filelock: SoftFileLock stale-break restore follows a swapped-in symbolic link and hard-links a file of the user running the lock into the lock directory</title>
+    <id>https://osv.dev/vulnerability/GHSA-crv4-6mhj-j5jh</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-crv4-6mhj-j5jh"/>
+    <published>2026-10-23T22:00:11Z</published>
+    <updated>2026-10-23T22:15:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112914"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;filelock: SoftFileLock stale-break restore follows a swapped-in symbolic link and hard-links a file of the user running the lock into the lock directory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112914&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;filelock&lt;/code&gt; — fixed in 4.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When a soft-lock stale break finds that the marker (the lock file at `&amp;lt;path&amp;gt;`) it renamed aside was a live one recreated by a successor, the restore branch of `break_lock_file()` checks the break name with `lstat` (a check that reads a name without following a symbolic link) and then calls `os.link(break_path, lock_file)` by name. On CPython 3.12 and later on Linux (and on macOS) that call follows a symbolic link (a file that redirects to another path). A local user (the other user below) who can write a shared lock directory without the sticky bit (a directory flag that lets only a file&amp;#x27;s owner rename or remove it) replaces the break name with a symbolic link between those two calls.
+
+The `SoftFileLock`, `MarkerSoftFileLock`, `SoftFileLease` or `lifetime` break of the user running the loc…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/security/advisories/GHSA-crv4-6mhj-j5jh"&gt;https://github.com/tox-dev/filelock/security/advisories/GHSA-crv4-6mhj-j5jh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112914"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112914&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/pull/843"&gt;https://github.com/tox-dev/filelock/pull/843&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/commit/740ff666b62a88496c8d7394e4e6230605e4d62b"&gt;https://github.com/tox-dev/filelock/commit/740ff666b62a88496c8d7394e4e6230605e4d62b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock"&gt;https://github.com/tox-dev/filelock&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/releases/tag/4.2.1"&gt;https://github.com/tox-dev/filelock/releases/tag/4.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-crv4-6mhj-j5jh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-v4x8-3wr5-3wq8: filelock ReadWriteLock: SQLite reopens the lock database by name, so a planted symlink or journal file makes the lock user's process overwrite or unlink its own files</title>
+    <id>https://osv.dev/vulnerability/GHSA-v4x8-3wr5-3wq8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v4x8-3wr5-3wq8"/>
+    <published>2026-10-23T21:59:08Z</published>
+    <updated>2026-10-23T22:15:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112940"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;filelock ReadWriteLock: SQLite reopens the lock database by name, so a planted symlink or journal file makes the lock user&amp;#x27;s process overwrite or unlink its own files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112940&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;filelock&lt;/code&gt; — fixed in 4.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`ReadWriteLock` and `AsyncReadWriteLock` (the SQLite-backed reader/writer lock) hand SQLite a name they do not control. On Linux the lock validates its database through a descriptor (the number the kernel gives a process for an open file). It then connects SQLite to `/proc/self/fd/&amp;lt;n&amp;gt;`, a Linux path that names the process&amp;#x27;s own open file `n`. SQLite turns that path back into a plain path and reopens it by name, following symlinks (a symlink is a file that points at another path). On every POSIX route SQLite also acts on `-journal`, `-wal` and `-shm` files it finds beside that name. Those are SQLite&amp;#x27;s side files: the rollback journal (pages saved to undo an interrupted write), the write-ahead log or WAL (changes kept outside the main file), and the shared-memory index for the WAL.
+
+Another …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/security/advisories/GHSA-v4x8-3wr5-3wq8"&gt;https://github.com/tox-dev/filelock/security/advisories/GHSA-v4x8-3wr5-3wq8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112940"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112940&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/pull/834"&gt;https://github.com/tox-dev/filelock/pull/834&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d"&gt;https://github.com/tox-dev/filelock/commit/5e3f2ec0c5fb17cb2635b60b2b68bc63ab81ca2d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock"&gt;https://github.com/tox-dev/filelock&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/releases/tag/4.2.1"&gt;https://github.com/tox-dev/filelock/releases/tag/4.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v4x8-3wr5-3wq8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-6hmw-9432-67qq: LangGraph: Namespace labels containing `.` reach other namespaces in Postgres and SQLite stores</title>
+    <id>https://osv.dev/vulnerability/GHSA-6hmw-9432-67qq</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6hmw-9432-67qq"/>
+    <published>2026-10-23T22:06:44Z</published>
+    <updated>2026-10-23T22:15:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-115883"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;LangGraph: Namespace labels containing `.` reach other namespaces in Postgres and SQLite stores&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115883&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;langgraph-checkpoint-postgres&lt;/code&gt; — fixed in 3.1.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;langgraph-checkpoint-sqlite&lt;/code&gt; — fixed in 3.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The Postgres and SQLite stores save a namespace as its labels joined with `.`, so `(&amp;quot;tenant&amp;quot;, &amp;quot;bob&amp;quot;)` and `(&amp;quot;tenant.bob&amp;quot;,)` map to the same stored namespace. `put` rejected labels containing `.`, but `get`, `search`, `delete`, `list_namespaces`, their async versions, and ops passed directly to `batch`/`abatch` did not. A caller that could pass such a label could read, overwrite or delete items in another namespace.
+
+### Details
+
+`BaseStore` checked namespace labels only in `put`/`aput`. The other methods passed the namespace on unchecked, and `batch`/`abatch` checked nothing, including the `PutOp` items inside them. `PostgresStore`, `AsyncPostgresStore`, `SqliteStore` and `AsyncSqliteStore` turn a namespace into text with `&amp;quot;.&amp;quot;.join(namespace)`, so a label containing `.` resolv…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langgraph/security/advisories/GHSA-6hmw-9432-67qq"&gt;https://github.com/langchain-ai/langgraph/security/advisories/GHSA-6hmw-9432-67qq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langgraph/pull/9217"&gt;https://github.com/langchain-ai/langgraph/pull/9217&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langgraph/commit/bfcfea554ed5c7f7be562cebf8825e911b493ab1"&gt;https://github.com/langchain-ai/langgraph/commit/bfcfea554ed5c7f7be562cebf8825e911b493ab1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langgraph"&gt;https://github.com/langchain-ai/langgraph&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langgraph/releases/tag/checkpointpostgres%3D%3D3.1.3"&gt;https://github.com/langchain-ai/langgraph/releases/tag/checkpointpostgres%3D%3D3.1.3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/langchain-ai/langgraph/releases/tag/checkpointsqlite%3D%3D3.1.2"&gt;https://github.com/langchain-ai/langgraph/releases/tag/checkpointsqlite%3D%3D3.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6hmw-9432-67qq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2wqp-q3c6-ccj5: MLflow: SSRF on unauthenticated MLflow servers via third-party scorer kwargs in the scorer invoke, register, and GenAI evaluate endpoints</title>
+    <id>https://osv.dev/vulnerability/GHSA-2wqp-q3c6-ccj5</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2wqp-q3c6-ccj5"/>
+    <published>2026-10-23T22:07:26Z</published>
+    <updated>2026-10-23T22:15:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-115886"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MLflow: SSRF on unauthenticated MLflow servers via third-party scorer kwargs in the scorer invoke, register, and GenAI evaluate endpoints&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115886&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mlflow&lt;/code&gt; — fixed in 3.17.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+MLflow&amp;#x27;s tracking server exposes `POST /ajax-api/3.0/mlflow/scorer/invoke` with **no authentication**, and the handler reflectively instantiates an attacker-named class from attacker-supplied JSON with unconstrained constructor kwargs. With the optional `trulens` + `trulens-providers-litellm` packages installed, an unauthenticated attacker can force the server to make an outbound HTTP request to an arbitrary host of their choosing, carrying attacker-controlled headers (SSRF).
+
+### Details
+`Scorer.model_validate_json()` reflects a class name from a JSON payload behind an import-path allowlist that never constrains the reflected attribute or its kwargs, in `mlflow/genai/scorers/base.py:549-604`:
+
+```python
+data = serialized.third_party_scorer_data          # attacker JSON
+module_…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/security/advisories/GHSA-2wqp-q3c6-ccj5"&gt;https://github.com/mlflow/mlflow/security/advisories/GHSA-2wqp-q3c6-ccj5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/pull/25890"&gt;https://github.com/mlflow/mlflow/pull/25890&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/commit/bac30b4148c4f40045b4d4db07ae60ab3838803f"&gt;https://github.com/mlflow/mlflow/commit/bac30b4148c4f40045b4d4db07ae60ab3838803f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow"&gt;https://github.com/mlflow/mlflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/releases/tag/v3.17.0"&gt;https://github.com/mlflow/mlflow/releases/tag/v3.17.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2wqp-q3c6-ccj5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-2g95-wg33-c5x2: filelock: SoftFileLock evicts a fresh lock file whose watched age another local user's pre-dated file passed on through inode reuse</title>
+    <id>https://osv.dev/vulnerability/GHSA-2g95-wg33-c5x2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2g95-wg33-c5x2"/>
+    <published>2026-10-23T22:00:33Z</published>
+    <updated>2026-10-23T22:15:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112906"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;filelock: SoftFileLock evicts a fresh lock file whose watched age another local user&amp;#x27;s pre-dated file passed on through inode reuse&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112906&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;filelock&lt;/code&gt; — fixed in 4.2.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`SoftFileLock` and `MarkerSoftFileLock` evict an unparsable marker (the lock file at `&amp;lt;path&amp;gt;`, whose presence says a process holds the lock) once a waiting contender has watched it unchanged for two seconds. `SoftFileLease` expires a lease the same way. The watch tells two looks apart by the marker&amp;#x27;s modification time (mtime) and inode number (the kernel&amp;#x27;s identity for a file, independent of its name) alone.
+
+Another local user (the other user below) who can create files in the lock&amp;#x27;s directory, a sticky `/tmp` included (the sticky bit is a directory flag that lets only a file&amp;#x27;s owner remove it), parks an empty file of its own at the lock path. It dates that file to a future tick of the kernel&amp;#x27;s coarse clock (a clock that advances in steps of 4 ms), lets the waiters of the user running the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/security/advisories/GHSA-2g95-wg33-c5x2"&gt;https://github.com/tox-dev/filelock/security/advisories/GHSA-2g95-wg33-c5x2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112906"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112906&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/pull/843"&gt;https://github.com/tox-dev/filelock/pull/843&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/commit/740ff666b62a88496c8d7394e4e6230605e4d62b"&gt;https://github.com/tox-dev/filelock/commit/740ff666b62a88496c8d7394e4e6230605e4d62b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock"&gt;https://github.com/tox-dev/filelock&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tox-dev/filelock/releases/tag/4.2.1"&gt;https://github.com/tox-dev/filelock/releases/tag/4.2.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2g95-wg33-c5x2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5x8w-8jj5-q52h: Pillow: Heap buffer overflow in FlashPix (FPX) JPEG decoding leads to code execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-5x8w-8jj5-q52h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5x8w-8jj5-q52h"/>
+    <published>2026-10-23T21:55:21Z</published>
+    <updated>2026-10-23T22:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-112398"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Heap buffer overflow in FlashPix (FPX) JPEG decoding leads to code execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112398&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Credits
+
+**Researcher**: Alex Bouffard (mixbo@pebwalker.com)
+
+### Summary
+
+A heap buffer overflow in Pillow&amp;#x27;s FlashPix (FPX) JPEG-tile decoder lets an attacker achieve arbitrary code execution by getting an application to open a single crafted file with `Image.open()`. The file is recognized by content (the OLE2 magic), not by extension, so any service that opens or thumbnails untrusted uploads with the optional `olefile` dependency installed is reachable with no user interaction. In the PoC below, opening one crafted file executes an attacker-chosen command on stock Pillow 12.2.0 (x86_64 Ubuntu 24.04, glibc 2.39).
+
+### Details
+
+`FpxImagePlugin` decodes FlashPix (FPX) files, which are OLE2/CFBF compound documents.
+
+`Image.open()` auto-detects them from the OLE2 magic `D0CF11E0...` when…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-5x8w-8jj5-q52h"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-5x8w-8jj5-q52h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112398"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112398&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75"&gt;https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5x8w-8jj5-q52h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-654x-cwwv-5j9c: Pillow: Arrow export leaks stale heap memory when PILLOW_ALIGNMENT &gt; 1</title>
+    <id>https://osv.dev/vulnerability/GHSA-654x-cwwv-5j9c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-654x-cwwv-5j9c"/>
+    <published>2026-10-23T21:53:21Z</published>
+    <updated>2026-10-23T22:00:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-114501"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Arrow export leaks stale heap memory when PILLOW_ALIGNMENT &amp;gt; 1&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114501&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When [`PILLOW_ALIGNMENT`](https://pillow.readthedocs.io/en/stable/reference/block_allocator.html#memory-pools) is set above 1, exporting an image to Arrow returns uninitialized heap memory mixed in with the pixel data. That memory can include pixels from images the process freed earlier. 
+
+### Details
+
+With an alignment above 1, the default allocator pads each row up to `aligned_linesize` and starts the first row at an aligned offset into the block. It then exports `im-&amp;gt;blocks[0].ptr` as `xsize * ysize` tightly packed pixels, so exported data includes the padding bytes, and can include a few bytes from before the first row.
+
+Tested vulnerable on 11.2.1, 12.3.0, 4c1ed27a5.
+
+### PoC
+
+Whether things leak may depend on allocator configuration. This does show a leak on my Mac.
+
+```…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-654x-cwwv-5j9c"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-654x-cwwv-5j9c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114501"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114501&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10172"&gt;https://github.com/python-pillow/Pillow/pull/10172&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/19f64946eb247b973dd4560be7dea3bf979d2e6a"&gt;https://github.com/python-pillow/Pillow/commit/19f64946eb247b973dd4560be7dea3bf979d2e6a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-654x-cwwv-5j9c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-xmj3-9gf7-h52w: setuptools: Windows path escape via namespace_packages.txt during legacy wheel installation  Description</title>
+    <id>https://osv.dev/vulnerability/GHSA-xmj3-9gf7-h52w</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xmj3-9gf7-h52w"/>
+    <published>2026-10-23T21:44:11Z</published>
+    <updated>2026-10-23T22:00:03Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;setuptools: Windows path escape via namespace_packages.txt during legacy wheel installation  Description&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:A/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;setuptools&lt;/code&gt; — fixed in 84.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+On Windows, attacker-controlled content in a wheel&amp;#x27;s
+`.dist-info/namespace_packages.txt` can cause setuptools&amp;#x27; legacy wheel
+installation path to create an `__init__.py` outside the requested
+`destination_eggdir`.
+
+The attacker can influence the destination path, but not the contents of
+the created file.
+
+### Details
+
+Tested setuptools commit:
+
+`6ead555c5fb29bc57fe6105b1bffc163f56fd558`
+
+Relevant source:
+
+`setuptools/wheel.py`
+
+SHA-256:
+
+`359b7e0d5dd8c3135653abe08a8ed5dc0352eadfd7df22cb5e2b5303b7c3cafd`
+
+The relevant call path is:
+
+`Wheel(wheel_path).install_as_egg(destination)`
+→ `_install_as_egg`
+→ `_convert_metadata`
+→ `_fix_namespace_packages`
+
+A wheel can provide attacker-controlled content in:
+
+`&amp;lt;distribution&amp;gt;.dist-info/namespace_packages.txt`
+
+The namespace value is even…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/setuptools/security/advisories/GHSA-xmj3-9gf7-h52w"&gt;https://github.com/pypa/setuptools/security/advisories/GHSA-xmj3-9gf7-h52w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/setuptools/pull/5329"&gt;https://github.com/pypa/setuptools/pull/5329&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/setuptools/commit/6d07b8d17890dda58d944ac51e58f54af92d52af"&gt;https://github.com/pypa/setuptools/commit/6d07b8d17890dda58d944ac51e58f54af92d52af&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/setuptools"&gt;https://github.com/pypa/setuptools&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/setuptools/releases/tag/v84.1.0"&gt;https://github.com/pypa/setuptools/releases/tag/v84.1.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xmj3-9gf7-h52w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3rp5-jjmw-4wv2: GitPython: git-config section-name injection enables arbitrary config directives (core.sshCommand RCE)</title>
+    <id>https://osv.dev/vulnerability/GHSA-3rp5-jjmw-4wv2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3rp5-jjmw-4wv2"/>
+    <published>2026-07-24T16:22:02Z</published>
+    <updated>2026-10-23T21:47:05Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-69097"/>
+    <category term="PYSEC-2026-3981"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;GitPython: git-config section-name injection enables arbitrary config directives (core.sshCommand RCE)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-69097, PYSEC-2026-3981&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;gitpython&lt;/code&gt; — fixed in 3.1.53&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+In GitPython `&amp;lt;= 3.1.52`, the config writer neutralizes only CR, LF, and NUL in configuration **names**, but writes section names into the `[...]` header with no other escaping. A section/subsection name that contains `] [ &amp;quot;` closes the intended header and opens a second same-line section, injecting an arbitrary config directive — with no newline required. Because a submodule **name** is attacker-controlled data (it comes from a repository&amp;#x27;s `.gitmodules`, or from an application that lets a user name a submodule) and is written verbatim into the parent repository&amp;#x27;s trusted `.git/config`, an attacker can set `core.sshCommand` (or `alias.*`, `core.pager`, `core.fsmonitor`) and achieve remote code execution on the victim&amp;#x27;s next git operation. Likely **CWE-74 (Injection)**.
+
+This …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3rp5-jjmw-4wv2"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-3rp5-jjmw-4wv2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2176"&gt;https://github.com/gitpython-developers/GitPython/pull/2176&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/1ed1b924f4e2d2ee7bab296df77b978af21853f1"&gt;https://github.com/gitpython-developers/GitPython/commit/1ed1b924f4e2d2ee7bab296df77b978af21853f1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.1.53"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.1.53&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/gitpython/PYSEC-2026-3981.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/gitpython/PYSEC-2026-3981.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/gitpython-before-config-injection-via-submodule-names"&gt;https://www.vulncheck.com/advisories/gitpython-before-config-injection-via-submodule-names&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3rp5-jjmw-4wv2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-7xgj-8392-5q4r: FastMCP: Post-transform component authorization is skipped on direct calls</title>
+    <id>https://osv.dev/vulnerability/GHSA-7xgj-8392-5q4r</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7xgj-8392-5q4r"/>
+    <published>2026-10-23T21:32:06Z</published>
+    <updated>2026-10-23T21:45:04Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;FastMCP: Post-transform component authorization is skipped on direct calls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fastmcp&lt;/code&gt; — fixed in 3.4.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;fastmcp&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;fastmcp-slim&lt;/code&gt; — fixed in 3.4.10&lt;/li&gt;&lt;li&gt;&lt;code&gt;fastmcp-slim&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Maintainer assessment and remediation
+
+This report is accepted as a FastMCP authorization vulnerability. In supported configurations, a server transform can change the metadata used by a component&amp;#x27;s authorization policy. Direct lookups previously checked the original component but returned the transformed component without rechecking its policy. A client that knows the component identifier can invoke a tool or retrieve a resource or prompt that the configured policy denies.
+
+The fixes authorize the final transformed tools, resources, templates, and prompts. A denied concrete resource also shadows a matching resource template at its URI, preventing proxy templates from retrieving the same protected resource upstream. Authorized callers, authorized component versions, and templates for ge…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/security/advisories/GHSA-7xgj-8392-5q4r"&gt;https://github.com/PrefectHQ/fastmcp/security/advisories/GHSA-7xgj-8392-5q4r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/pull/5933"&gt;https://github.com/PrefectHQ/fastmcp/pull/5933&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/pull/5934"&gt;https://github.com/PrefectHQ/fastmcp/pull/5934&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/commit/85df42fbf2aa631cc81e0f986718b314128e91df"&gt;https://github.com/PrefectHQ/fastmcp/commit/85df42fbf2aa631cc81e0f986718b314128e91df&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/commit/8649ba5fc91a68568a69729497edeb804a064332"&gt;https://github.com/PrefectHQ/fastmcp/commit/8649ba5fc91a68568a69729497edeb804a064332&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp"&gt;https://github.com/PrefectHQ/fastmcp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/releases/tag/v3.4.10"&gt;https://github.com/PrefectHQ/fastmcp/releases/tag/v3.4.10&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.2"&gt;https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7xgj-8392-5q4r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-vqqp-x5qm-5qp4: FastMCP MCP client wrappers construct M2M OAuth providers without issuer binding — client secret redirectable to attacker-advertised authorization server</title>
+    <id>https://osv.dev/vulnerability/GHSA-vqqp-x5qm-5qp4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vqqp-x5qm-5qp4"/>
+    <published>2026-10-23T21:31:30Z</published>
+    <updated>2026-10-23T21:45:04Z</updated>
+    <category term="PyPI"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;FastMCP MCP client wrappers construct M2M OAuth providers without issuer binding — client secret redirectable to attacker-advertised authorization server&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fastmcp&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;fastmcp-slim&lt;/code&gt; — fixed in 4.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Maintainer assessment and remediation
+
+This report is accepted as a FastMCP credential-binding vulnerability. Affected versions of the OAuth client credentials providers do not expose the authorization-server issuer that owns pre-registered credentials. An untrusted or compromised MCP server can therefore advertise a different authorization server and receive the client secret or a signed assertion. Signing keys themselves remain local; assertion replayability depends on the assertion source and audience policy.
+
+Affected stable versions are 4.0.0–4.1.1 of `fastmcp` and `fastmcp-slim`. The wrappers were introduced in 4.0.0a1; 3.x does not include them.
+
+The 4.1.2 fix adds `issuer` to `ClientCredentialsOAuthProvider` and `PrivateKeyJWTOAuthProvider` and requires MCP SDK 2.2.0. It also di…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/security/advisories/GHSA-vqqp-x5qm-5qp4"&gt;https://github.com/PrefectHQ/fastmcp/security/advisories/GHSA-vqqp-x5qm-5qp4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/pull/5933"&gt;https://github.com/PrefectHQ/fastmcp/pull/5933&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/commit/85df42fbf2aa631cc81e0f986718b314128e91df"&gt;https://github.com/PrefectHQ/fastmcp/commit/85df42fbf2aa631cc81e0f986718b314128e91df&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp"&gt;https://github.com/PrefectHQ/fastmcp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.2"&gt;https://github.com/PrefectHQ/fastmcp/releases/tag/v4.1.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vqqp-x5qm-5qp4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-wqmh-qccw-pqwf: MLflow FileStore trace IDs allow path traversal and arbitrary file writes</title>
+    <id>https://osv.dev/vulnerability/GHSA-wqmh-qccw-pqwf</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wqmh-qccw-pqwf"/>
+    <published>2026-10-20T00:31:59Z</published>
+    <updated>2026-10-23T21:45:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-53995"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MLflow FileStore trace IDs allow path traversal and arbitrary file writes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53995&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mlflow&lt;/code&gt; — fixed in 3.17.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;MLflow 3.17.1 and earlier contains a path traversal vulnerability in the FileStore tracking backend that allows unauthenticated attackers to control filesystem paths by submitting a crafted trace ID containing traversal sequences to the POST /api/3.0/mlflow/traces endpoint. Attackers can exploit FileStore.start_trace() to write trace_info.yaml, request_metadata, and tag files with attacker-controlled metadata outside the intended experiment trace directory, subject to the server process&amp;#x27;s filesystem permissions. FileStore is the default tracking backend before MLflow 3.7.0 and opt-in thereafter (the default changed to a SQLite database), so deployments in the earlier part of the affected range are vulnerable without special configuration while later ones are affected only when FileStore is…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53995"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53995&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/issues/26979"&gt;https://github.com/mlflow/mlflow/issues/26979&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/pull/26842"&gt;https://github.com/mlflow/mlflow/pull/26842&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/commit/31ff9e56f5038d61ec75344518912945f60dffec"&gt;https://github.com/mlflow/mlflow/commit/31ff9e56f5038d61ec75344518912945f60dffec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/SaiTeja-Erukude/CVE-2026-53995-mlflow-path-traversal"&gt;https://github.com/SaiTeja-Erukude/CVE-2026-53995-mlflow-path-traversal&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/releases/tag/v3.17.2"&gt;https://github.com/mlflow/mlflow/releases/tag/v3.17.2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/mlflow-path-traversal-via-trace-id-api"&gt;https://www.vulncheck.com/advisories/mlflow-path-traversal-via-trace-id-api&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wqmh-qccw-pqwf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-pjjw-68hj-v9mw: uv vulnerable to arbitrary file deletion through RECORD entries</title>
     <id>https://osv.dev/vulnerability/GHSA-pjjw-68hj-v9mw</id>
@@ -2072,1729 +2714,5 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (afcd41ab1e378f4c7d767acb2b9e9199a4276e125d6e84aba3627bf37c879f24)
 facewareretargeter 9.9.9 ships a 2-line stub module and a setup.py whose install_requires declares a single dependency, `tracer-batch-stream-chain`, sourced from a direct https URL (`https://artifacts.vacsdk.com/pypi/tracer_batch_stream_chain-9.9.9.tar.gz`) rather than a PyPI version range. On `pip install facewareretargeter`, pip fetches that tarball from the non-PyPI host and executes its setup.py / build backend on the installer&amp;#x27;s machine, with no version pin, no hash, and no integrity check. The host is not a known Python index and is unrelated to any declared repository or homepage, so whoever controls `artifacts.vacsdk.com` can d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/facewareretargeter"&gt;https://bad-packages.kam193.eu/pypi/package/facewareretargeter&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/facewareretargeter/9.9.9/"&gt;https://pypi.org/project/facewareretargeter/9.9.9/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18110"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18168: Malicious code in speechprobe (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18168</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18168"/>
-    <published>2026-10-22T00:45:25Z</published>
-    <updated>2026-10-22T01:30:07Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in speechprobe (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;speechprobe&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (d32ccbe0ed7b8e97acb3670d4e50b774d36520ddd91c34367170b7c5e88337e3)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/speechprobe"&gt;https://bad-packages.kam193.eu/pypi/package/speechprobe&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18168"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18171: Malicious code in ttsprobe (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18171</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18171"/>
-    <published>2026-10-22T00:31:59Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ttsprobe (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ttsprobe&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (d041a8df49e0f66f27d5f26370aa9bfee89b0ede347cb57f201f3359713e8c2d)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/ttsprobe"&gt;https://bad-packages.kam193.eu/pypi/package/ttsprobe&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18171"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18151: Malicious code in zennittts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18151</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18151"/>
-    <published>2026-10-21T23:05:10Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in zennittts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zennittts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (8a405494d56b12c5eabd44355e1b97dd09406522e9e2211193e6df2123592dda)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/zennittts"&gt;https://bad-packages.kam193.eu/pypi/package/zennittts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18151"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18142: Malicious code in orchestril (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18142</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18142"/>
-    <published>2026-10-21T23:09:08Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in orchestril (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;orchestril&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (0bda956d0ba9b9905171793e59d4105ec06f8f0aadaa3508b66ad19bdaa10d18)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/orchestril"&gt;https://bad-packages.kam193.eu/pypi/package/orchestril&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18142"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18144: Malicious code in prosodinetts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18144</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18144"/>
-    <published>2026-10-21T23:08:55Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in prosodinetts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;prosodinetts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (8f39f72745f4cfbe04c6dd887e7fd8ac45dd9aef3e9892a41f6f7491997f901e)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/prosodinetts"&gt;https://bad-packages.kam193.eu/pypi/package/prosodinetts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18144"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18161: Malicious code in evalstream (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18161</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18161"/>
-    <published>2026-10-22T00:57:19Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in evalstream (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;evalstream&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (00f8be270be4392f91ab130c7e77583408a4e24e858b22522158a61116c0a0d4)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/evalstream"&gt;https://bad-packages.kam193.eu/pypi/package/evalstream&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18161"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18174: Malicious code in vocabblend (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18174</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18174"/>
-    <published>2026-10-22T00:34:53Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in vocabblend (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vocabblend&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (f512985b20dc469ed3bd4e8e382b358fdbffa1153f5fcadb3d6dfeeaeeac84a0)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/vocabblend"&gt;https://bad-packages.kam193.eu/pypi/package/vocabblend&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18174"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18163: Malicious code in phonemeforge (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18163</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18163"/>
-    <published>2026-10-22T00:56:00Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in phonemeforge (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;phonemeforge&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (d8393ec235ace6b8639b9d6c2ee4f6ae74e3311970c073259aa43c39bb36154d)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/phonemeforge"&gt;https://bad-packages.kam193.eu/pypi/package/phonemeforge&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18163"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18139: Malicious code in dictanovaasr (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18139</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18139"/>
-    <published>2026-10-21T23:09:26Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in dictanovaasr (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dictanovaasr&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (afc8d83a420096900bdccd11b4ed6f45011c624cbc47c25a486576418203f4dd)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/dictanovaasr"&gt;https://bad-packages.kam193.eu/pypi/package/dictanovaasr&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18139"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18140: Malicious code in grommatts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18140</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18140"/>
-    <published>2026-10-21T23:05:14Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in grommatts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;grommatts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (19b2f82a5bea773c2f47efa91e029f047a508d4c8d117eb102728056d0ac5bc3)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/grommatts"&gt;https://bad-packages.kam193.eu/pypi/package/grommatts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18140"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18147: Malicious code in solivoxtts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18147</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18147"/>
-    <published>2026-10-21T23:05:54Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in solivoxtts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;solivoxtts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (c512c506dd4828aef5dd993cce389de4500f6c2e3c1906f1440e71cf455c64e7)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/solivoxtts"&gt;https://bad-packages.kam193.eu/pypi/package/solivoxtts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18147"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18170: Malicious code in ttsflow (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18170</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18170"/>
-    <published>2026-10-22T00:57:40Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ttsflow (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ttsflow&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (ca06c0d356aef80eb13ae19e8a7e17cacdb0e1d3b1ba0f250387d8b18d110395)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/ttsflow"&gt;https://bad-packages.kam193.eu/pypi/package/ttsflow&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18170"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18164: Malicious code in phonemeprobe (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18164</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18164"/>
-    <published>2026-10-22T00:58:01Z</published>
-    <updated>2026-10-22T01:30:06Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in phonemeprobe (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;phonemeprobe&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (e734952ed1638d020205fd4c071007902fd7b0b6671f1aa8eeb0b583efa75a08)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/phonemeprobe"&gt;https://bad-packages.kam193.eu/pypi/package/phonemeprobe&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18164"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18155: Malicious code in acoustichub (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18155</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18155"/>
-    <published>2026-10-22T00:58:24Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in acoustichub (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;acoustichub&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (8aa748656a3a49ab77d0532727632bbdcb820ac353745ee09b05a7e873d34a34)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/acoustichub"&gt;https://bad-packages.kam193.eu/pypi/package/acoustichub&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18155"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18176: Malicious code in voxweaver (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18176</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18176"/>
-    <published>2026-10-22T00:30:04Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in voxweaver (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;voxweaver&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (98de0e1f12e0c4b69583e08c1cd46876975b49c6803d93483c136ee2f6e62f68)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/voxweaver"&gt;https://bad-packages.kam193.eu/pypi/package/voxweaver&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18176"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18138: Malicious code in crenelatts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18138</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18138"/>
-    <published>2026-10-21T23:01:56Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in crenelatts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;crenelatts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (4ccd88fc743d2fd427510543af873fff8780bb4ec4916a565afb729315f28068)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/crenelatts"&gt;https://bad-packages.kam193.eu/pypi/package/crenelatts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18138"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18157: Malicious code in asrloom (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18157</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18157"/>
-    <published>2026-10-22T00:55:11Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in asrloom (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;asrloom&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (cd20eda3837d1f9497fcbd0cdf6826a2bff936766bac7e8d0a3f8b11ecaf15d3)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/asrloom"&gt;https://bad-packages.kam193.eu/pypi/package/asrloom&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18157"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18137: Malicious code in codecraze (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18137</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18137"/>
-    <published>2026-10-21T23:08:42Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in codecraze (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;codecraze&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (1811daf51a786c7fc7dfea9a979a5f53626825eca9d18b61220b6366617ecb33)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/codecraze"&gt;https://bad-packages.kam193.eu/pypi/package/codecraze&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18137"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18141: Malicious code in melcuratts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18141</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18141"/>
-    <published>2026-10-21T23:04:07Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in melcuratts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;melcuratts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (8bd7e6eda0ded5ef0e82eac489faca560422a8b8e46fd9c8d9b8215d9e89e6ba)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/melcuratts"&gt;https://bad-packages.kam193.eu/pypi/package/melcuratts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18141"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18152: Malicious code in acousticpack (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18152</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18152"/>
-    <published>2026-10-22T00:20:52Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in acousticpack (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;acousticpack&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (e9796cf3d8fa108f7e354640578e92abd850a9b899dbc8e0e22f14e40bcd4a02)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/acousticpack"&gt;https://bad-packages.kam193.eu/pypi/package/acousticpack&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18152"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18143: Malicious code in phonoviatts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18143</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18143"/>
-    <published>2026-10-21T23:04:35Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in phonoviatts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;phonoviatts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (0ad248ff66471a497d4c3a6d16384648636101a927c384cd4870adf920eced97)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/phonoviatts"&gt;https://bad-packages.kam193.eu/pypi/package/phonoviatts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18143"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18158: Malicious code in audiokit (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18158</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18158"/>
-    <published>2026-10-22T00:56:23Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in audiokit (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;audiokit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (ae10fa65b7a9cd16dbfc93eae72c57da03db18821aacd99a38e4bfa054df6e16)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/audiokit"&gt;https://bad-packages.kam193.eu/pypi/package/audiokit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18158"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18135: Malicious code in batchspar (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18135</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18135"/>
-    <published>2026-10-21T23:02:49Z</published>
-    <updated>2026-10-22T01:30:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in batchspar (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;batchspar&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (76a342534dec5ecb047459f9123ae99c1b91ef8e84305854529a260b8d2a3acd)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/batchspar"&gt;https://bad-packages.kam193.eu/pypi/package/batchspar&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18135"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18153: Malicious code in hookgantry (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18153</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18153"/>
-    <published>2026-10-22T00:21:46Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in hookgantry (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;hookgantry&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (8f2adef4202c047248aedfecfea60e5c71798b9a9f15999a7f9c76e6a5471dab)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/hookgantry"&gt;https://bad-packages.kam193.eu/pypi/package/hookgantry&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18153"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18175: Malicious code in voicekit (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18175</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18175"/>
-    <published>2026-10-22T00:33:57Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in voicekit (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;voicekit&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (963d403cf4d9c68ae8a3047dba639793fc4669e0953662c923c9a1eacb5f5402)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/voicekit"&gt;https://bad-packages.kam193.eu/pypi/package/voicekit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18175"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18154: Malicious code in pipegrip (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18154</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18154"/>
-    <published>2026-10-22T00:22:15Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in pipegrip (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pipegrip&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (69da6e2696ea51627e314534617b3a5507896dd6375f600ae4a71d84ace79609)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/pipegrip"&gt;https://bad-packages.kam193.eu/pypi/package/pipegrip&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18154"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18173: Malicious code in vocabbench (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18173</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18173"/>
-    <published>2026-10-22T00:55:35Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in vocabbench (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vocabbench&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (dc5566e2e9fb4803c51425e840aa5d7979e11fc4263d12dc29fedbd472acb5cc)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/vocabbench"&gt;https://bad-packages.kam193.eu/pypi/package/vocabbench&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18173"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18165: Malicious code in soundsocket (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18165</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18165"/>
-    <published>2026-10-22T00:36:40Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in soundsocket (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;soundsocket&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (9b50b12b54ecdc99f678332cf4a8e2d333ce5398c1c545eb994d2f368843cb03)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/soundsocket"&gt;https://bad-packages.kam193.eu/pypi/package/soundsocket&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18165"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18150: Malicious code in voxilaratts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18150</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18150"/>
-    <published>2026-10-21T23:04:23Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in voxilaratts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;voxilaratts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (39377b8b4c1d6d3243cb82f3e86bdc38869bf56e3800bf02ae817a1555ddb11b)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/voxilaratts"&gt;https://bad-packages.kam193.eu/pypi/package/voxilaratts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18150"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18160: Malicious code in benchworks (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18160</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18160"/>
-    <published>2026-10-22T00:54:40Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in benchworks (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;benchworks&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (606e74602d9241e80622f42ed81f9040fe733889abd2003a862704c1d2d72595)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/benchworks"&gt;https://bad-packages.kam193.eu/pypi/package/benchworks&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18160"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18169: Malicious code in ttsdock (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18169</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18169"/>
-    <published>2026-10-22T00:30:55Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ttsdock (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ttsdock&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (cd67309a16135e30efc3aad2f8d234cc48fed3ffdaa4d32b6345cc368963e775)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/ttsdock"&gt;https://bad-packages.kam193.eu/pypi/package/ttsdock&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18169"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18172: Malicious code in ttsweaver (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18172</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18172"/>
-    <published>2026-10-22T00:33:24Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in ttsweaver (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ttsweaver&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (cf25be0936bf389bd4c150fdda0e6801d5916e7d3c386695ece9360dbb39c085)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/ttsweaver"&gt;https://bad-packages.kam193.eu/pypi/package/ttsweaver&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18172"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18159: Malicious code in benchbridge (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18159</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18159"/>
-    <published>2026-10-22T00:46:59Z</published>
-    <updated>2026-10-22T01:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in benchbridge (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;benchbridge&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (7e329737ae059eda6e9d4d0e57c74c937cc38746b707cc5dbbceac5387fb6926)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/benchbridge"&gt;https://bad-packages.kam193.eu/pypi/package/benchbridge&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18159"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18156: Malicious code in asrdock (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18156</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18156"/>
-    <published>2026-10-22T00:28:12Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in asrdock (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;asrdock&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (f6bd33cecc5263c6ff8d666d61c33ddbe5b487331c1f2edd13873c1eef145b5c)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/asrdock"&gt;https://bad-packages.kam193.eu/pypi/package/asrdock&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18156"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18134: Malicious code in aurenatts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18134</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18134"/>
-    <published>2026-10-21T23:05:04Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in aurenatts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aurenatts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (ecc8915a04d9fbab4ecc0437f5eb05357d2e63bc3d30f629d67c7b3eb2c98eeb)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/aurenatts"&gt;https://bad-packages.kam193.eu/pypi/package/aurenatts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18134"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18166: Malicious code in speakbench (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18166</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18166"/>
-    <published>2026-10-22T00:56:57Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in speakbench (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;speakbench&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (5261cd9950cdef43aa82af72e1a479d8668a37b06d1fce0a6b8ff869e0620ed2)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/speakbench"&gt;https://bad-packages.kam193.eu/pypi/package/speakbench&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18166"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18167: Malicious code in speaksocket (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18167</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18167"/>
-    <published>2026-10-22T00:29:19Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in speaksocket (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;speaksocket&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (5045a2695255c6340f6e69b58b13605a27756ccbab63280fb415e755d95be1cd)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/speaksocket"&gt;https://bad-packages.kam193.eu/pypi/package/speaksocket&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18167"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18162: Malicious code in modelworks (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18162</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18162"/>
-    <published>2026-10-22T00:35:53Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in modelworks (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;modelworks&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (cd8881d21166c1b1d9e519b92d85228a8df0520e31bd5a3d6a3606513b66047a)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - other
-
-
- - Downloads and executes a remote malicious script.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/modelworks"&gt;https://bad-packages.kam193.eu/pypi/package/modelworks&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18162"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18136: Malicious code in brummatts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18136</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18136"/>
-    <published>2026-10-21T23:04:14Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in brummatts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;brummatts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (605ea05e6c6344e7ddfb713297d7689ee050288b74ecbf0821039603dc3cdd45)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/brummatts"&gt;https://bad-packages.kam193.eu/pypi/package/brummatts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18136"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18145: Malicious code in quillonatts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18145</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18145"/>
-    <published>2026-10-21T23:03:57Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in quillonatts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;quillonatts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (6297f0fae1c96dd5abefc4dd7f67a51ee7a737d1bb437fcffaed067d44d637a4)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/quillonatts"&gt;https://bad-packages.kam193.eu/pypi/package/quillonatts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18145"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18149: Malicious code in vellutts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18149</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18149"/>
-    <published>2026-10-21T23:05:45Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in vellutts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vellutts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (a36ed984afc7ca3475fe4852ef18158dc5569b049a35f4a23fd9260dc342c795)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/vellutts"&gt;https://bad-packages.kam193.eu/pypi/package/vellutts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18149"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18146: Malicious code in shellgrip (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18146</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18146"/>
-    <published>2026-10-21T23:03:04Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in shellgrip (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;shellgrip&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (9e23472f83d676f848fc137b96283dd8819ee900b3f371400aa8263bb4f70339)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/shellgrip"&gt;https://bad-packages.kam193.eu/pypi/package/shellgrip&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18146"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18148: Malicious code in tessivatts (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18148</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18148"/>
-    <published>2026-10-21T23:05:49Z</published>
-    <updated>2026-10-22T01:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in tessivatts (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tessivatts&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (2d8e0f874c40346588bbb4f025cb9be6ac29dc2fc6b95de5b662ac2126a628a1)
-This campaign consists of similar loader packages, which provide executing code from a given URL. While they do not contain the malicious payload and the usage remains unknown, they are clearly a coordinated campaign to place multiple deceptive ways to load malicious code.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-voice-synthesis-profiles
-
-
-Reasons (based on the campaign):
-
-
- - Downloads and executes a remote malicious script.
-
-
- - other
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/tessivatts"&gt;https://bad-packages.kam193.eu/pypi/package/tessivatts&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18148"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18133: Malicious code in journey-test-hellospy (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18133</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18133"/>
-    <published>2026-10-21T22:40:42Z</published>
-    <updated>2026-10-21T23:30:04Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in journey-test-hellospy (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;journey-test-hellospy&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (418fea1fe789e9a44c77c08c9135b3da66b773882c9fb2757094c3f55b04321b)
-During installation, package exfiltrates potentially sensitive environmental variables
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-journey-test-helloshell
-
-
-Reasons (based on the campaign):
-
-
- - The package contains code to create a reverse shell, allowing an attacker to execute any commands on the victim&amp;#x27;s machine.
-
-
- - The package overrides the install command in setup.py to execute malicious code during installation.
-
-
- - targetted-attack
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/journey-test-hellospy"&gt;https://bad-packages.kam193.eu/pypi/package/journey-test-hellospy&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18133"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18131: Malicious code in iterquarry (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18131</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18131"/>
-    <published>2026-10-21T22:01:58Z</published>
-    <updated>2026-10-21T22:45:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in iterquarry (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;iterquarry&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (229de224c9319ae50283d0c8fb0f76e351d82327ac204193b7dd2d62026ee41d)
-In this campaign, one package (iterquarry) holds an encrypted payload, while another one (libseal) provides algorithms to decrypt and execute it. In earlier versions, the code used an embedded key and the payload was contacting a Discord bot. Starting with iterquarry 2.2.0, the key to the encrypted payload is not embedded and the payload remains unknown.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-iterquarry
-
-
-Reasons (based on the campaign):
-
-
- - obfuscation
-
-
- - The malicious code is intentionally included in a dependency of the package
-
-
- - action-hidden-in-lib-usage
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/iterquarry"&gt;https://bad-packages.kam193.eu/pypi/package/iterquarry&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18131"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18132: Malicious code in libseal (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18132</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18132"/>
-    <published>2026-10-21T22:02:05Z</published>
-    <updated>2026-10-21T22:45:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in libseal (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;libseal&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (7e6d706d49a7fce89545d12c5bd5a0cab0a4919a95ff89150b28cb838967bb09)
-In this campaign, one package (iterquarry) holds an encrypted payload, while another one (libseal) provides algorithms to decrypt and execute it. In earlier versions, the code used an embedded key and the payload was contacting a Discord bot. Starting with iterquarry 2.2.0, the key to the encrypted payload is not embedded and the payload remains unknown.
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-iterquarry
-
-
-Reasons (based on the campaign):
-
-
- - obfuscation
-
-
- - The malicious code is intentionally included in a dependency of the package
-
-
- - action-hidden-in-lib-usage
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/libseal"&gt;https://bad-packages.kam193.eu/pypi/package/libseal&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18132"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-18124: Malicious code in journey-test-helloshell (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18124</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18124"/>
-    <published>2026-10-21T18:30:25Z</published>
-    <updated>2026-10-21T22:45:05Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in journey-test-helloshell (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;journey-test-helloshell&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (0203fffc73ebe748d6defab0472b648408b29c959a9c6813f966df48cfafb21b)
-setup.py registers a custom install command (cmdclass install hook) and also fires at module import that connects to the hardcoded bare-IP endpoint 137.131.233.62:8080 and bridges a /bin/bash -i subprocess over the socket, giving the operator interactive shell access on the installer&amp;#x27;s host. Before opening the shell, the code POSTs host identifiers (hostname, uid, JCX_ENVIRONMENT) over plaintext HTTP to http://137.131.233.62:443/shell-beacon. The install hook double-forks, calls setsid, redirects stdio to /dev/null, and enters an infinite reconnect loop with a 60-second sleep, persisting the backdoor beyond the pip install process. A /…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/journey-test-helloshell"&gt;https://bad-packages.kam193.eu/pypi/package/journey-test-helloshell&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/journey-test-helloshell/0.2.0/"&gt;https://pypi.org/project/journey-test-helloshell/0.2.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18124"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-2144: Malicious code in litellm (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-2144</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-2144"/>
-    <published>2026-03-24T11:15:14Z</published>
-    <updated>2026-10-21T22:01:01Z</updated>
-    <category term="PyPI"/>
-    <category term="PYSEC-2026-2"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in litellm (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: PYSEC-2026-2&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;litellm&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;litellm 1.107.0, uploaded to PyPI on 2026-10-21 between 11:39 and 11:40 UTC, contains a credential stealer and a remote code execution backdoor that are not in the upstream source (the v1.107.0 git tag of BerriAI/litellm does not contain them): they were injected at build or upload time. Every wheel ships three extra files under litellm-1.107.0.data/purelib/, which pip installs at the site-packages root, so the payload is triggered at every Python interpreter start, without importing litellm.
-
-- cook.pth contains `import cook`.
-- cook.py runs `exec(zlib.decompress(base64.b64decode(...)))`, an info stealer (self-named &amp;quot;privcollect&amp;quot;) that collects browser passwords and history, SSH keys, shell history, AWS/GCP/Azure credentials and cloud instance metadata (169.254.169.254, 169.254.170.2), Ku…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/issues/24518"&gt;https://github.com/BerriAI/litellm/issues/24518&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/issues/24512"&gt;https://github.com/BerriAI/litellm/issues/24512&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://news.ycombinator.com/item?id=47501729"&gt;https://news.ycombinator.com/item?id=47501729&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.wiz.io/blog/threes-a-crowd-teampcp-trojanizes-litellm-in-continuation-of-campaign"&gt;https://www.wiz.io/blog/threes-a-crowd-teampcp-trojanizes-litellm-in-continuation-of-campaign&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://futuresearch.ai/blog/litellm-pypi-supply-chain-attack/"&gt;https://futuresearch.ai/blog/litellm-pypi-supply-chain-attack/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/issues/47826"&gt;https://github.com/BerriAI/litellm/issues/47826&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/litellm/1.107.0/"&gt;https://pypi.org/project/litellm/1.107.0/&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-2144"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-332p-7hrc-92wf: Pillow: Heap buffer overflow in _tiffWriteProc when saving TIFF to BytesIO</title>
-    <id>https://osv.dev/vulnerability/GHSA-332p-7hrc-92wf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-332p-7hrc-92wf"/>
-    <published>2026-10-21T21:28:09Z</published>
-    <updated>2026-10-21T21:45:08Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-112393"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Heap buffer overflow in _tiffWriteProc when saving TIFF to BytesIO&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112393&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
-============================================================================
-Heap buffer overflow in _tiffWriteProc when saving TIFF to BytesIO
-Location: src/libImaging/TiffDecode.c:94  in _tiffWriteProc()
-Commit:   a707c6b21c313880d0771e54965d142dd42358b6
-============================================================================
-```
-
-Pillow can write attacker-chosen data past the end of a heap buffer when it saves a TIFF image to an in-memory destination such as `io.BytesIO` rather than to a file. The same code also copies leftover heap memory from the process into the saved file. Anyone who can supply an image to a service that opens it and re-saves it as TIFF this way can trigger this with default settings. The attached reproducer crashes the process, and the overflow could potent…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-332p-7hrc-92wf"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-332p-7hrc-92wf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112393"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112393&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/11582e5ffbdceb973d5ee593f3105af5a9852b40"&gt;https://github.com/python-pillow/Pillow/commit/11582e5ffbdceb973d5ee593f3105af5a9852b40&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-332p-7hrc-92wf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-4rr5-89j8-mwwm: Pillow: Heap use-after-free when encoding TIFF to an in-memory buffer</title>
-    <id>https://osv.dev/vulnerability/GHSA-4rr5-89j8-mwwm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4rr5-89j8-mwwm"/>
-    <published>2026-10-21T21:24:19Z</published>
-    <updated>2026-10-21T21:45:08Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-112396"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Heap use-after-free when encoding TIFF to an in-memory buffer&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112396&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-Saving an image as TIFF to an in-memory buffer can trigger a heap use-after-free if libtiff rejects a tag at encode time. When `TIFFWriteScanline` fails, the encoder frees its output buffer but leaves the libtiff handle open. Later, when the encoder object is torn down, `TIFFClose` flushes buffered bytes through the write callback and writes into the freed buffer. An application that re-encodes attacker-influenced images to TIFF in memory can be crashed and is a candidate for remote code execution.
-
-### Details
-The failure path in `ImagingLibTiffEncode` frees `clientstate-&amp;gt;data` for the in-memory case but does not close the TIFF or null `clientstate-&amp;gt;tiff` (the file-descriptor branch just above it does set `tiff = NULL`):
-
-- `src/libImaging/TiffDecode.c:1041-1046`
-
-Teardown the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rr5-89j8-mwwm"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rr5-89j8-mwwm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112396"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112396&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/dc95da20207827a062cfbf551ee9f6031465a8bb"&gt;https://github.com/python-pillow/Pillow/commit/dc95da20207827a062cfbf551ee9f6031465a8bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4rr5-89j8-mwwm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-xvh5-g6gv-559v:  Pillow: Memory disclosure and segfault in libtiff encoder via crafted TIFF tags</title>
-    <id>https://osv.dev/vulnerability/GHSA-xvh5-g6gv-559v</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xvh5-g6gv-559v"/>
-    <published>2026-10-21T21:29:16Z</published>
-    <updated>2026-10-21T21:45:08Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-112902"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt; Pillow: Memory disclosure and segfault in libtiff encoder via crafted TIFF tags&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112902&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
-============================================================================
-Memory disclosure and segfault in libtiff encoder via crafted TIFF tags
-Location: src/encode.c:1014  in PyImaging_LibTiffEncoderNew()
-Commit:   a707c6b21c313880d0771e54965d142dd42358b6
-============================================================================
-```
-
-A crafted TIFF file of a few hundred bytes makes Pillow copy an attacker-chosen amount of its own process memory into the TIFF it writes back out, or crash the process outright. The trigger is an ordinary `Image.open()` followed by a bare `im.save(fp, &amp;quot;TIFF&amp;quot;)`. The only precondition is that the application re-saves images as TIFF. When the uploaded file is compressed, Pillow routes that save through libtiff automatically, with no options from the a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-xvh5-g6gv-559v"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-xvh5-g6gv-559v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/af56ace297b0991d02988fcc2ea933e4824b4fb3"&gt;https://github.com/python-pillow/Pillow/commit/af56ace297b0991d02988fcc2ea933e4824b4fb3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xvh5-g6gv-559v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-c978-59m8-c77v: virtualenv: Generated POSIX console launchers interpret destination paths as shell syntax</title>
-    <id>https://osv.dev/vulnerability/GHSA-c978-59m8-c77v</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c978-59m8-c77v"/>
-    <published>2026-10-21T21:30:12Z</published>
-    <updated>2026-10-21T21:45:08Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-113722"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Generated POSIX console launchers interpret destination paths as shell syntax&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113722&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-A destination path supplied to virtualenv can be interpreted as shell syntax by a generated POSIX console launcher. The
-app-data seeder and pip delegate launcher generation to distlib but supply the interpreter path in a form that does not
-preserve it as literal data in the shell wrapper.
-
-## Affected area
-
-POSIX console scripts generated by the app-data seeder or pip when the interpreter path requires a shell wrapper.
-Windows executable launchers are not affected by this path.
-
-## Attacker-controlled input
-
-An attacker must influence the environment destination passed to virtualenv, and the user must subsequently run a
-generated launcher. The attacker does not need to modify an installed executable or control the user&amp;#x27;s app-data cache.
-
-## Affected code
-
-The relevant 21.14.8 s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-c978-59m8-c77v"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-c978-59m8-c77v&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113722"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113722&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3417"&gt;https://github.com/pypa/virtualenv/pull/3417&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/2519941bed33ee0d3ac99277f67913e439e476a9"&gt;https://github.com/pypa/virtualenv/commit/2519941bed33ee0d3ac99277f67913e439e476a9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c978-59m8-c77v"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-43mp-35q3-x3fq: virtualenv: Deletion recovery can change a symlink target's mode</title>
-    <id>https://osv.dev/vulnerability/GHSA-43mp-35q3-x3fq</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-43mp-35q3-x3fq"/>
-    <published>2026-10-21T21:31:34Z</published>
-    <updated>2026-10-21T21:45:08Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-113724"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Deletion recovery can change a symlink target&amp;#x27;s mode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113724&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The deletion error handler obtains permission bits with lstat() but applies them through chmod(), which follows
-symlinks. On an eligible unlink failure this can change permissions outside the destination.
-
-Anthropic&amp;#x27;s OSS Scanner reported this as `ANT-2026-UK90QC27` in `virtualenv-20261015-005`, received on 15 October 2026.
-
-## Affected area
-
-Permission recovery after a filesystem deletion error.
-
-## Attacker-controlled input
-
-A deletion must fail on a symbolic-link entry and enter the permission-recovery branch. The invoking user must have
-permission to change the target mode. This is conditional error handling, not the normal successful unlink path.
-
-## Affected code
-
-The relevant 21.14.8 source is in
-[safe_delete()](https://github.com/pypa/virtualenv/blob/a795ab116356afde110…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-43mp-35q3-x3fq"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-43mp-35q3-x3fq&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113724"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113724&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3427"&gt;https://github.com/pypa/virtualenv/pull/3427&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/2bfdc0230d1b2685fedfcfe66c835b9a2ec7c440"&gt;https://github.com/pypa/virtualenv/commit/2bfdc0230d1b2685fedfcfe66c835b9a2ec7c440&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-43mp-35q3-x3fq"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-cw65-gx24-rc82: virtualenv: Builtin creation follows linked environment directories</title>
-    <id>https://osv.dev/vulnerability/GHSA-cw65-gx24-rc82</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cw65-gx24-rc82"/>
-    <published>2026-10-21T21:35:56Z</published>
-    <updated>2026-10-21T21:45:08Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-113716"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;virtualenv: Builtin creation follows linked environment directories&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-113716&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;virtualenv&lt;/code&gt; — fixed in 21.14.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The builtin creator accepts existing directory symlinks through ensure_dir() and writes environment files through those
-directories. This permits writes outside the requested destination.
-
-Anthropic&amp;#x27;s OSS Scanner reported this as `ANT-2026-MUFJEG11` in `virtualenv-20261015-005`, received on 15 October 2026.
-
-## Affected area
-
-Directory preparation before environment files are created.
-
-## Attacker-controlled input
-
-Another account must be able to prepare linked entries below the chosen destination before creation. The invoking user
-must have access to the linked destination. This does not require write access to the target itself under the other
-account.
-
-## Affected code
-
-The relevant 21.14.8 source is in
-[builtin creator](https://github.com/pypa/virtualenv/blob/a795ab116356af…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/security/advisories/GHSA-cw65-gx24-rc82"&gt;https://github.com/pypa/virtualenv/security/advisories/GHSA-cw65-gx24-rc82&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-113716"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-113716&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/pull/3429"&gt;https://github.com/pypa/virtualenv/pull/3429&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/commit/554d9f9d4f7758f5cf53f993031e29787f1f74c5"&gt;https://github.com/pypa/virtualenv/commit/554d9f9d4f7758f5cf53f993031e29787f1f74c5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv"&gt;https://github.com/pypa/virtualenv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/virtualenv/releases/tag/21.14.9"&gt;https://github.com/pypa/virtualenv/releases/tag/21.14.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cw65-gx24-rc82"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f2g6-542v-9j58: Pillow: Infinite loop in PdfParser.rewrite_pages on page tree Parent cycle</title>
-    <id>https://osv.dev/vulnerability/GHSA-f2g6-542v-9j58</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f2g6-542v-9j58"/>
-    <published>2026-10-21T21:21:07Z</published>
-    <updated>2026-10-21T21:30:27Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-112406"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Infinite loop in PdfParser.rewrite_pages on page tree Parent cycle&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112406&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
-============================================================================
-Infinite loop in PdfParser.rewrite_pages on page tree Parent cycle
-Location: src/PIL/PdfParser.py:505  in PdfParser.rewrite_pages()
-Commit:   a707c6b21c313880d0771e54965d142dd42358b6
-============================================================================
-```
-
-A PDF file of a few hundred bytes makes Pillow hang forever, holding one processor core at 100%, when an application tries to append an image to it. Anyone who can supply the existing PDF to an application that calls `im.save(fp, &amp;quot;PDF&amp;quot;, append=True)` (or `save_all=True, append=True`) can tie up that worker indefinitely. Memory use stays flat, so only an external timeout stops it.
-
-The bug is in `PdfParser.rewrite_pages()` in `src/PIL/PdfParser.py` (t…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-f2g6-542v-9j58"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-f2g6-542v-9j58&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112406"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112406&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/b3ebf20c694f2f12537a629c30229a1d5a53f777"&gt;https://github.com/python-pillow/Pillow/commit/b3ebf20c694f2f12537a629c30229a1d5a53f777&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f2g6-542v-9j58"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-gg2r-wvfm-q9rx: Pillow: MSP RLE decoder expands a tiny file into unbounded memory</title>
-    <id>https://osv.dev/vulnerability/GHSA-gg2r-wvfm-q9rx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-gg2r-wvfm-q9rx"/>
-    <published>2026-10-21T21:12:56Z</published>
-    <updated>2026-10-21T21:30:26Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-112892"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: MSP RLE decoder expands a tiny file into unbounded memory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112892&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-The MSP RLE decoder expands run-length data into an in-memory buffer with no cap tied to the declared image size. A small file that passes the pixel-count check can force hundreds of megabytes or more of allocation when the application loads pixels.
-
-### Details
-The MSP decoder writes each run into an unbounded `io.BytesIO` and can expand roughly 85x per run:
-
-- `src/PIL/MspImagePlugin.py:144-146`
-
-### Impact
-Memory-exhaustion denial of service from a tiny crafted image in any application that loads pixels. The expansion is decoupled from the declared pixel count, so `MAX_IMAGE_PIXELS` does not bound it.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-gg2r-wvfm-q9rx"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-gg2r-wvfm-q9rx&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112892"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112892&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/5dcb630b9798efd91929cb873d677aeee6ed0bb3"&gt;https://github.com/python-pillow/Pillow/commit/5dcb630b9798efd91929cb873d677aeee6ed0bb3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gg2r-wvfm-q9rx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jg86-v3jv-hrpm: Pillow: Quadratic-time DoS in PDF save_all (PdfParser.next_object_id)</title>
-    <id>https://osv.dev/vulnerability/GHSA-jg86-v3jv-hrpm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jg86-v3jv-hrpm"/>
-    <published>2026-10-21T21:11:44Z</published>
-    <updated>2026-10-21T21:30:26Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-112894"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Quadratic-time DoS in PDF save_all (PdfParser.next_object_id)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112894&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
-============================================================================
-Quadratic-time DoS in PDF save_all (PdfParser.next_object_id)
-Location: src/PIL/PdfParser.py:629  in next_object_id()
-Commit:   a707c6b21c313880d0771e54965d142dd42358b6
-============================================================================
-```
-
-Pillow&amp;#x27;s PDF writer takes time proportional to the square of the number of frames when it saves a multi-frame image as a multi-page PDF. Anyone who can get an application to convert their uploaded image this way can tie up a worker at full CPU for minutes with a small file. A 240 KB animated image takes about 70 seconds, a 720 KB one an estimated 10 minutes, and a 125-byte animated PNG that merely *declares* a large frame count triggers the same slowdown with no u…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-jg86-v3jv-hrpm"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-jg86-v3jv-hrpm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112894"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112894&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/f6a852555f1a1bdff7781abf25f1a3b8bd6ce6cb"&gt;https://github.com/python-pillow/Pillow/commit/f6a852555f1a1bdff7781abf25f1a3b8bd6ce6cb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jg86-v3jv-hrpm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5xm2-6676-qcp9: Pillow: APNG background disposal allocates full canvas before decompression bomb check</title>
-    <id>https://osv.dev/vulnerability/GHSA-5xm2-6676-qcp9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5xm2-6676-qcp9"/>
-    <published>2026-10-21T21:17:56Z</published>
-    <updated>2026-10-21T21:30:26Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-112399"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: APNG background disposal allocates full canvas before decompression bomb check&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-112399&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
-============================================================================
-APNG background disposal allocates full canvas before decompression bomb check
-Location: src/PIL/PngImagePlugin.py:1000  in PngImageFile._seek()
-Commit:   a707c6b21c313880d0771e54965d142dd42358b6
-============================================================================
-```
-
-A 126-byte animated PNG file makes Pillow&amp;#x27;s `Image.open()` allocate and fill memory sized by the image dimensions the file claims, before Pillow&amp;#x27;s built-in check for oversized images runs. A file claiming 22000×22000 pixels costs about 1.9 GB. Anyone who can get an application to open an image they supply, with default settings and no further calls such as `load()`, can cause a multi-gigabyte memory spike per file. If the claimed size ex…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-5xm2-6676-qcp9"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-5xm2-6676-qcp9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112399"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112399&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/f1acfc54c53502948d0d14121872061df931db48"&gt;https://github.com/python-pillow/Pillow/commit/f1acfc54c53502948d0d14121872061df931db48&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5xm2-6676-qcp9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

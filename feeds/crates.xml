@@ -3,12 +3,465 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-10-26T11:15:11Z</updated>
+  <updated>2026-10-26T14:00:06Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0395: Use-after-free with `CParameter::StableInBuffer`</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0395</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0395"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:06Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Use-after-free with `CParameter::StableInBuffer`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;With `CParameter::StableInBuffer(true)` (`experimental` feature), the C
+library keeps a pointer to the input of one streaming call and reads from it
+in later calls, including `flush_stream` and `end_stream`, which take no
+input. An `InBuffer` only borrows its slice for one call, so safe code could
+free it in between, and freed memory was compressed into the frame. The C
+library behaves this way since zstd 1.5.4, whether bundled or linked from the
+system.
+
+The flaw was corrected by refusing to enable the parameter.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0395.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0395.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/53a8a290d8cfb52ff5b29fb6e04a40b5a174cc65"&gt;https://github.com/gyscos/zstd-rs/commit/53a8a290d8cfb52ff5b29fb6e04a40b5a174cc65&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0395"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0392: Uninitialized memory exposed by `write::Decoder` on a corrupt legacy frame</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0392</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0392"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Uninitialized memory exposed by `write::Decoder` on a corrupt legacy frame&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd&lt;/code&gt; — fixed in 0.8.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;From 0.4.22 to 0.7.x, the writer behind `zstd::stream::write::Decoder` set
+its output buffer&amp;#x27;s length to its full capacity before each decompression
+call, then to the position the call reported, and only checked for an error
+afterwards. When decompression fails inside a legacy (zstd v0.4 to v0.7)
+frame, the bundled zstd library reports the output as fully written although
+nothing was written, so stale heap memory, up to the buffer size (32 KiB by
+default), was passed to the wrapped writer.
+
+Legacy support is enabled by default, and a few bytes of corrupt legacy
+frame are enough. Whether this reaches an attacker depends on where the
+application sends the decompressed output.
+
+From 0.8.0, the writer uses zstd-safe&amp;#x27;s buffers, and the same flaw there is
+covered by the zstd-safe advisory for it…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd"&gt;https://crates.io/crates/zstd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0392.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0392.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/006e1d1ad1eeaf6b5d4c28329e70217adabcec43"&gt;https://github.com/gyscos/zstd-rs/commit/006e1d1ad1eeaf6b5d4c28329e70217adabcec43&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0392"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0399: Use-after-free through `init_using_cdict` and `init_using_ddict`</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0399</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0399"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Use-after-free through `init_using_cdict` and `init_using_ddict`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`CCtx::init_using_cdict` and `DCtx::init_using_ddict` (`experimental`
+feature, deprecated) took the dictionary as `&amp;amp;CDict&amp;lt;&amp;#x27;b&amp;gt;` and `&amp;amp;DDict&amp;lt;&amp;#x27;b&amp;gt;`
+with only `&amp;#x27;b: &amp;#x27;a`, so the dictionary itself could be dropped while the
+context still pointed at it. The same mistake in other constructors was
+fixed earlier (&amp;lt;https://github.com/gyscos/zstd-rs/issues/365&amp;gt;).
+
+The flaw was corrected by taking `&amp;amp;&amp;#x27;a CDict&amp;lt;&amp;#x27;b&amp;gt;` and `&amp;amp;&amp;#x27;a DDict&amp;lt;&amp;#x27;b&amp;gt;`.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0399.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0399.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/e00e7928e3e98953fc43418af6d73f6aae2378fb"&gt;https://github.com/gyscos/zstd-rs/commit/e00e7928e3e98953fc43418af6d73f6aae2378fb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0399"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0396: `Seekable` reads a NULL or out-of-bounds seek table</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0396</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0396"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`Seekable` reads a NULL or out-of-bounds seek table&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`Seekable` did not record whether it was initialized. On a fresh `Seekable`,
+or one whose `init_buff()` failed, `decompress`, `offset_to_frame_index` and
+`frame_decompressed_size` made the C library read a NULL seek table. After a
+failed re-initialization, `decompress` returned data from the refused buffer
+using the previous seek table.
+
+Separately, `frame_decompressed_size(num_frames())`, on `Seekable` and
+`SeekTable`, read one entry past the end of the seek table.
+
+The flaw was corrected by refusing to use a `Seekable` until an
+initialization succeeded, and by checking the frame index.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0396.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0396.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/a9626069d6f2e90b782b8f627f57a361cfe8ef85"&gt;https://github.com/gyscos/zstd-rs/commit/a9626069d6f2e90b782b8f627f57a361cfe8ef85&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0396"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0410: WebAssembly allocator shim corrupts memory on allocation failure</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0410</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0410"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;WebAssembly allocator shim corrupts memory on allocation failure&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-sys&lt;/code&gt; — fixed in 2.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;On wasm32, zstd-sys provides `malloc` and `free` to the C library through a
+shim over Rust&amp;#x27;s allocator. The shim did not check for allocation failure:
+it wrote its size header to address 0 and returned address 4, which the C
+library used as a valid buffer. `free(NULL)` also read below address 0.
+
+Whenever the instance cannot grow its memory by what a frame asks for, a
+small crafted frame (a 9-byte header declaring a 128 MiB window is enough)
+made decompression write decoded data over the bottom of the module&amp;#x27;s
+linear memory, instead of failing. The corruption stays within the wasm
+sandbox.
+
+The flaw was corrected by returning NULL on allocation failure or size
+overflow, and by making `free(NULL)` a no-op.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-sys"&gt;https://crates.io/crates/zstd-sys&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0410.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0410.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/165d1625553c236b9700ca794b8a7c51f5d98314"&gt;https://github.com/gyscos/zstd-rs/commit/165d1625553c236b9700ca794b8a7c51f5d98314&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0410"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0408: Aliasing violations in splice, mutable iteration and cursors</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0408</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0408"/>
+    <published>2026-10-24T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-924w-mwc9-86m8"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Aliasing violations in splice, mutable iteration and cursors&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-924w-mwc9-86m8&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;skiplist&lt;/code&gt; — fixed in 1.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Four code paths create a pointer whose permission is later revoked, then
+write through it. Miri reports each as undefined behaviour under both the
+Tree Borrows and Stacked Borrows aliasing models (CWE-758). All four are
+reachable from safe code with standard `Ord` types.
+
+1. **Splice back-pointer.** `split_off`, `split_off_index` and `append` stored
+   the first spliced node&amp;#x27;s `prev` pointer from a reference to the head, then
+   wrote through that same reference, invalidating the stored pointer. A later
+   `pop_first` or `pop_front` writes through it. This affects all four
+   collections.
+2. **`SkipMap::range_mut` back pointer.** With an `Included` or `Excluded`
+   upper bound, the back pointer came from a shared reference. `next_back`
+   hands out `&amp;amp;mut V` through it, and writing to that …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/skiplist"&gt;https://crates.io/crates/skiplist&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0408.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0408.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/JP-Ellis/rust-skiplist/pull/407"&gt;https://github.com/JP-Ellis/rust-skiplist/pull/407&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0408"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0403: Uninitialized memory exposed when streaming decompression of a legacy frame fails</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0403</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0403"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Uninitialized memory exposed when streaming decompression of a legacy frame fails&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When decompression fails inside a legacy (zstd v0.4 to v0.7) frame, the
+bundled zstd library reports the output buffer as fully written although
+nothing was written. `DCtx::decompress_stream` committed that position even
+on error, and for a `Vec&amp;lt;u8&amp;gt;` destination this extended the vector&amp;#x27;s length
+over uninitialized memory.
+
+Legacy support is enabled by default. A 5- or 6-byte corrupt legacy frame is
+enough: through `zstd::stream::write::Decoder`, up to 32 KiB of stale heap
+memory is then passed to the wrapped writer on the next `write()` or
+`flush()`, or when an `auto_flush()`/`on_flush()` decoder is dropped. Whether
+this reaches an attacker depends on where the application sends the
+decompressed output. `zstd::stream::read::Decoder`, `zstd::decode_all` and
+the bulk API are not affected.
+
+B…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0403.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0403.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/006e1d1ad1eeaf6b5d4c28329e70217adabcec43"&gt;https://github.com/gyscos/zstd-rs/commit/006e1d1ad1eeaf6b5d4c28329e70217adabcec43&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0403"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0400: Use-after-free of a dictionary after a one-shot call on a context with an open stream</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0400</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0400"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Use-after-free of a dictionary after a one-shot call on a context with an open stream&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The one-shot `DCtx` and `CCtx` methods assumed the C library resets the
+context, but it leaves an open stream as it is. When a stream was left
+unfinished on a context, a one-shot call such as `decompress_using_dict`
+could leave the context pointing at the dictionary borrowed for that call,
+and the next streaming call resumed the stream against it after it was
+freed: decompressed output then contained freed heap memory. On the
+compression side, the stream resumed against the one-shot call&amp;#x27;s buffers.
+
+This requires an application to use one context for both streaming and
+one-shot calls without a reset in between. The flaw was corrected by
+resetting the session after one-shot calls whenever a stream may be open.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0400.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0400.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/d34502a0ed07f80ab2aa4c65059578e0466f2467"&gt;https://github.com/gyscos/zstd-rs/commit/d34502a0ed07f80ab2aa4c65059578e0466f2467&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0400"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0394: Build environment compiled into the library and readable at runtime</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0394</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0394"/>
+    <published>2026-09-23T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Build environment compiled into the library and readable at runtime&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rustpython-vm&lt;/code&gt; — fixed in 0.6.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The build script of `rustpython-vm` 0.3.0 through 0.5.0 writes every
+environment variable of the build into `$OUT_DIR/env_vars.rs`. The crate
+compiles that file into `_sysconfigdata`&amp;#x27;s `build_time_vars`. That module is
+always compiled.
+
+A binary built in CI with secrets in the environment carries those secrets
+in clear text. Registry tokens, cloud credentials and API keys are the usual
+ones. Anyone with the binary can read them with `strings` or from Python.
+
+Version 0.6.0 removes the dump and the include. Users of earlier versions
+should upgrade, rebuild, and ship new binaries. Every secret that was in the
+environment of a past build whose output left the build machine should be
+treated as exposed.
+
+Jacob Finkelman first reported the issue in
+[#8802](https://github.com/RustPython/RustPyth…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/rustpython-vm"&gt;https://crates.io/crates/rustpython-vm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0394.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0394.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustPython/RustPython/pull/8813"&gt;https://github.com/RustPython/RustPython/pull/8813&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustPython/RustPython/issues/8802"&gt;https://github.com/RustPython/RustPython/issues/8802&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustPython/RustPython/issues/9236"&gt;https://github.com/RustPython/RustPython/issues/9236&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/rustpython-vm/0.6.0"&gt;https://crates.io/crates/rustpython-vm/0.6.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://registry.bitbison.io/cargo/rustpython-vm"&gt;https://registry.bitbison.io/cargo/rustpython-vm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0394"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0402: Heap buffer overflow in `CCtx::try_clone` on a multithreaded context</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0402</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0402"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Heap buffer overflow in `CCtx::try_clone` on a multithreaded context&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`CCtx::try_clone` (`experimental` feature, deprecated) copies tables sized
+from the context&amp;#x27;s applied parameters. Starting a multithreaded frame
+(`zstdmt` feature) replaces those parameters with the workers&amp;#x27; without
+resizing the context&amp;#x27;s own tables, so after an abandoned single-threaded
+frame, the copy wrote up to 512 KiB past a heap allocation, or read past
+one. This became reachable with the bundled zstd 1.5.6.
+
+The flaw was corrected by refusing `try_clone` (and the unsafe
+`compress_block`) once `NbWorkers` was set on the context.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0402.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0402.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/682b8b2967cf4aba5cfe2d940d1e381a3e23211a"&gt;https://github.com/gyscos/zstd-rs/commit/682b8b2967cf4aba5cfe2d940d1e381a3e23211a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0402"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0405: Out-of-bounds read with an out-of-range `InBuffer::pos`</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0405</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0405"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Out-of-bounds read with an out-of-range `InBuffer::pos`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`InBuffer`&amp;#x27;s fields are public, so safe code can set `pos` past the end of
+`src`. The position was passed to the C library unchecked, and
+`ZSTD_seekable_compressStream`, unlike the other streaming functions, does
+not validate it: it read past the end of the input slice, by up to the
+frame size, and compressed that memory into the output.
+
+The flaw was corrected by checking the position before every call into the
+C library.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0405.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0405.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/20d397c0d68d8b4300c5493875ebfa10e355fcdd"&gt;https://github.com/gyscos/zstd-rs/commit/20d397c0d68d8b4300c5493875ebfa10e355fcdd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0405"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0406: Use-after-free when changing a multithreaded context with an unfinished frame</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0406</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0406"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Use-after-free when changing a multithreaded context with an unfinished frame&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When a multithreaded frame (`zstdmt` feature, `CParameter::NbWorkers`) is
+left unfinished, its jobs may still be running on the worker threads: the C
+library only waits for them when the next frame starts, or when the context
+is freed. A session reset makes the context accept changes again in the
+meantime, so:
+
+- unloading the dictionary (`load_dictionary`, `ref_cdict`, `ref_prefix`,
+  `disable_dictionary`, `init*`, or `reset` with parameters) freed the
+  dictionary a worker was still compressing against;
+- changing `NbWorkers` made the next frame resize the job table before
+  waiting for the old jobs.
+
+The flaw was corrected by refusing these calls while a multithreaded frame
+is unfinished. The new `CCtx::wait_for_workers()` waits for the workers
+first.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0406.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0406.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/e224018a2389915d68ed17f30109bebad36e9734"&gt;https://github.com/gyscos/zstd-rs/commit/e224018a2389915d68ed17f30109bebad36e9734&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0406"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0404: Double free in `DCtx::try_clone`</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0404</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0404"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Double free in `DCtx::try_clone`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`DCtx::try_clone` (`experimental` feature, deprecated) is a plain copy of the
+C context. A context owning a dictionary (from `load_dictionary`,
+`ref_prefix` or `init_using_dict`) or a dictionary table (`ref_ddict` with
+`RefMultipleDDicts`) ended up with both copies freeing it. A context cloned
+mid-frame resumed on uninitialized stream state. The clone also silently lost
+the `WindowLogMax` limit.
+
+The flaw was corrected by refusing to clone such contexts, and by carrying
+over the parameters the copy leaves out.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0404.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0404.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/cee6529b553ec600a8e152aaca15a91598820ecf"&gt;https://github.com/gyscos/zstd-rs/commit/cee6529b553ec600a8e152aaca15a91598820ecf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0404"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0398: `Seekable::decompress` sets a `Vec` length beyond its capacity for offsets past the end</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0398</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0398"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`Seekable::decompress` sets a `Vec` length beyond its capacity for offsets past the end&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`ZSTD_seekable_decompress` shortens the requested length to the end of the
+data without checking that the offset is before it. For an offset past the
+end, it returns a wrapped-around length without writing anything, and
+`Seekable::decompress` passed that length to `Vec::set_len`.
+
+With the `seekable` feature, whoever supplies the archive, or chooses the
+offset, can leave the caller&amp;#x27;s `Vec&amp;lt;u8&amp;gt;` with a length far beyond its
+capacity. Reading it then discloses neighbouring heap memory, and appending
+to it corrupts memory. Offsets near `u64::MAX` can also hang the call.
+
+The flaw was corrected by clamping requests to the end of the data, and by
+checking every count reported by the C library against the buffer capacity.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0398.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0398.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/80506be743fae2ed0c2fe8b21c374c6a2eab0be7"&gt;https://github.com/gyscos/zstd-rs/commit/80506be743fae2ed0c2fe8b21c374c6a2eab0be7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0398"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0411: Out-of-bounds read in `Log2Cache::nlog2n()`, `nlog2n_difference()` and `plog2p()`</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0411</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0411"/>
+    <published>2026-10-22T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Out-of-bounds read in `Log2Cache::nlog2n()`, `nlog2n_difference()` and `plog2p()`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dahl-salso&lt;/code&gt; — fixed in 0.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`Log2Cache::new(n)` fills its three tables with entries for `0..=n`, but the
+three accessor methods index those tables with `get_unchecked` on a value the
+caller supplies. Nothing bounds the argument and nothing documents a bound, so
+any value above the `n` the cache was built with reads past the end of the
+vector. `CountType` is `u32`, so the read can land up to `u32::MAX` elements
+away, and `plog2p()` returns the value it read, disclosing whatever lies there.
+
+For example, `Log2Cache::new(4)` builds tables holding 5 entries (indices
+0,1,2,3,4). Then `cache.nlog2n(60000)` reads index 60000, far outside the
+allocation. Under AddressSanitizer this faults with `SEGV`; Miri reports it as
+undefined behavior at `src/log2cache.rs:42`.
+
+`nlog2n_difference()` is off by one further: in the affected…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/dahl-salso"&gt;https://crates.io/crates/dahl-salso&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0411.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0411.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/dbdahl/rust-dahl-salso/issues/2"&gt;https://github.com/dbdahl/rust-dahl-salso/issues/2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0411"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0397: `OutBuffer::around_pos` exposes uninitialized memory</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0397</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0397"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`OutBuffer::around_pos` exposes uninitialized memory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`OutBuffer::around_pos` accepted a position past the initialized length of a
+`Vec&amp;lt;u8&amp;gt;`. The next streaming call then marked everything before the
+position as initialized, so safe code could read stale heap memory between
+the vector&amp;#x27;s previous length and that position.
+
+The flaw was corrected by zero-filling that gap.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0397.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0397.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/5827de2459b8ac430e87e860f00c7f3c13023833"&gt;https://github.com/gyscos/zstd-rs/commit/5827de2459b8ac430e87e860f00c7f3c13023833&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0397"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2016-0007: jwt appears to be unmaintained</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2016-0007</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2016-0007"/>
+    <published>2016-10-09T12:00:00Z</published>
+    <updated>2026-10-26T14:00:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;jwt appears to be unmaintained&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;jwt&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `jwt` crate appears to be unmaintained.
+
+Alternatives:
+
+- [jsonwebtoken](https://crates.io/crates/jsonwebtoken/)
+- [jwt-simple](https://crates.io/crates/jwt-simple)&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/jwt"&gt;https://crates.io/crates/jwt&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2016-0007.html"&gt;https://rustsec.org/advisories/RUSTSEC-2016-0007.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mikkyang/rust-jwt/issues/106"&gt;https://github.com/mikkyang/rust-jwt/issues/106&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2016-0007"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0391: Data from an abandoned stream leaks into the next stream on a reused context</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0391</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0391"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:04Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Data from an abandoned stream leaks into the next stream on a reused context&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd&lt;/code&gt; — fixed in 0.14.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `with_context` constructors of the stream encoders and decoders used the
+borrowed context as it was. When a stream was abandoned on a context, for
+example an encoder dropped before `finish()` after an error, whatever it
+left there was carried into the next stream: the input buffered by the
+previous encoder (up to 128 KiB, or all of it with `zstdmt`) became the
+start of the next frame, and a decoder returned undelivered output of the
+previous stream.
+
+An application reusing one context for data that must stay separate, such
+as different users&amp;#x27; requests, could disclose one user&amp;#x27;s plaintext to
+another. Whoever supplies the data can cause the abandonment with invalid
+input.
+
+The flaw was corrected by resetting the context&amp;#x27;s session in
+`with_context`.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd"&gt;https://crates.io/crates/zstd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0391.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0391.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/74ace2dcdca62a2ce0f034895d6079458311e003"&gt;https://github.com/gyscos/zstd-rs/commit/74ace2dcdca62a2ce0f034895d6079458311e003&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0391"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0393: Out-of-bounds read when training a dictionary from inconsistent sample sizes</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0393</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0393"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:04Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Out-of-bounds read when training a dictionary from inconsistent sample sizes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd&lt;/code&gt; — fixed in 0.4.10&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`ZDICT_trainFromBuffer` is never told the length of the samples buffer.
+Before 0.4.10, `zstd::dict::from_continuous` (initially `train_dict`) called
+it directly: up to 0.2.1 without checking the sample sizes against the
+buffer at all, and from 0.3.0 with a sum that wraps around when overflow
+checks are off, as in release builds. Sizes that do not describe the buffer
+made the trainer read past its end.
+
+This requires the sample sizes to come from an untrusted source. From
+0.4.10, training goes through zstd-safe, where the same flaw is covered by
+the zstd-safe advisory for it, fixed in zstd-safe 8.2.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd"&gt;https://crates.io/crates/zstd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0393.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0393.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/781ea454191dbf178d09c1daf6fc896d15fbaa2f"&gt;https://github.com/gyscos/zstd-rs/commit/781ea454191dbf178d09c1daf6fc896d15fbaa2f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0393"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0407: SSRF and local file disclosure via unvalidated URLs</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0407</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0407"/>
+    <published>2026-10-22T12:00:00Z</published>
+    <updated>2026-10-26T14:00:04Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-23hp-j76v-pcwj"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SSRF and local file disclosure via unvalidated URLs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-23hp-j76v-pcwj&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;webpage&lt;/code&gt; — fixed in 2.1.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Applications that pass attacker-controlled URLs to `webpage` versions before
+2.1.0 may be vulnerable to server-side request forgery (SSRF) or local file
+disclosure.
+
+`HTTP::fetch` and `Webpage::from_url` passed URLs to libcurl without
+restricting the URL scheme or validating the resolved destination IP address.
+Redirects were followed without checking whether the new destination was
+internal. Depending on how the application uses the response, an attacker
+could:
+
+- Read local files accessible to the application process using `file://` URLs.
+- Cause requests to internal or link-local services (e.g. cloud metadata
+  endpoints at `http://169.254.169.254`) via direct private-IP URLs or by
+  chaining HTTP redirects through an attacker-controlled server.
+
+Starting in 2.1.0, `HTTP::fetch` and `We…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/webpage"&gt;https://crates.io/crates/webpage&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0407.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0407.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/orottier/webpage-rs/commit/5742fbee437c04170d101e10df3534e87730f36d"&gt;https://github.com/orottier/webpage-rs/commit/5742fbee437c04170d101e10df3534e87730f36d&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0407"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0409: Use-after-free from a comparator that answers inconsistently</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0409</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0409"/>
+    <published>2026-10-24T12:00:00Z</published>
+    <updated>2026-10-26T14:00:04Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-cc53-p78w-23w9"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Use-after-free from a comparator that answers inconsistently&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-cc53-p78w-23w9&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;skiplist&lt;/code&gt; — fixed in 1.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`OrderedSkipList`, `SkipSet` and `SkipMap` can free a node that is still
+linked when a `Comparator` or `Ord` implementation gives different answers for
+the same pair of values during one mutating call. A later call reads the freed
+memory (CWE-416). A safe `impl Ord` with the default comparator is enough to
+reach it.
+
+The mutating traversals record a precursor at each level: the last node whose
+link points at a node comparing not-`Less` than the target. The splice code
+assumes every recorded precursor&amp;#x27;s link points at or past the final position.
+If a later comparison reports one of those nodes as `Less`, the walk steps
+past it and the assumption breaks. Removals such as `take_first`, `take` and
+`remove` then rewire the wrong link and free the target while its real
+predecessor still points a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/skiplist"&gt;https://crates.io/crates/skiplist&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0409.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0409.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/JP-Ellis/rust-skiplist/issues/401"&gt;https://github.com/JP-Ellis/rust-skiplist/issues/401&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/JP-Ellis/rust-skiplist/pull/407"&gt;https://github.com/JP-Ellis/rust-skiplist/pull/407&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0409"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2025-0173: `PamHandle::get_user` can cause an authentication bypass</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2025-0173</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2025-0173"/>
+    <published>2025-06-02T12:00:00Z</published>
+    <updated>2026-10-26T14:00:04Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;`PamHandle::get_user` can cause an authentication bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pam-bindings&lt;/code&gt; — fixed in 0.1.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In affected versions, `PamHandle::get_user` can return `Err(PAM_SUCCESS)` after it gets the username successfully.
+PAM modules that return this &amp;quot;error&amp;quot; code from `sm_authenticate` or `sm_acct_mgmt` early-return a success code to PAM without doing any further verification.
+This means a user could log in when they shouldn&amp;#x27;t be able to (e.g., if the module is `sufficient`).
+
+The `pam_try!` macro of this crate early-returns the code in this exact way:
+
+```rust
+fn sm_authenticate(pamh: &amp;amp;mut PamHandle, args: Vec&amp;lt;&amp;amp;CStr&amp;gt;, flags: PamFlag) -&amp;gt; PamResultCode {
+    let user = pam_try!(pamh.get_user(None)); // Can return PAM_SUCCESS here.
+    // If it does, the module does not get to this line.
+}
+```
+
+The root cause is an [incorrect FFI declaration][ffi-decl] for [`pam_get_user(3)`][pam-get-user].
+This …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pam-bindings"&gt;https://crates.io/crates/pam-bindings&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2025-0173.html"&gt;https://rustsec.org/advisories/RUSTSEC-2025-0173.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/lvkv/pam-rs/issues/16"&gt;https://github.com/lvkv/pam-rs/issues/16&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2025-0173"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] RUSTSEC-2026-0401: Out-of-bounds read in `train_from_buffer` when sample sizes overflow</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0401</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0401"/>
+    <published>2026-10-16T12:00:00Z</published>
+    <updated>2026-10-26T14:00:04Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Out-of-bounds read in `train_from_buffer` when sample sizes overflow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zstd-safe&lt;/code&gt; — fixed in 8.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;`ZDICT_trainFromBuffer` is never told the length of the samples buffer, so
+`train_from_buffer` checked that the sample sizes add up to it. With
+overflow checks off, as in release builds, that sum wrapped around: sizes
+totalling 2^64 plus the buffer length passed the check, and the trainer read
+past the end of the buffer. `zstd::dict::from_continuous` relies on this
+check from zstd 0.4.10; older versions of zstd had their own, covered by a
+separate advisory.
+
+This requires the sample sizes to come from an untrusted source. The flaw
+was corrected by summing the sizes with overflow checks.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/zstd-safe"&gt;https://crates.io/crates/zstd-safe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0401.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0401.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/commit/781ea454191dbf178d09c1daf6fc896d15fbaa2f"&gt;https://github.com/gyscos/zstd-rs/commit/781ea454191dbf178d09c1daf6fc896d15fbaa2f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gyscos/zstd-rs/pull/384"&gt;https://github.com/gyscos/zstd-rs/pull/384&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0401"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0388: Pingora HTTP/2 :authority and Host header mismatch enables cache poisoning and host-based access control bypass</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0388</id>
@@ -49,184 +502,5 @@ This specifically affects chained deployments where an HTTP/1 intermediary betwe
 This affects any Pingora service that terminates HTTP/2 (h2 or h2c) without explicitly setting `max_header_list_size` and `max_concurrent_streams`. The reporter showed that a single connection could get a Pingora process with a 2 GiB memory limit OOM-killed.
 
 T…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pingora-core"&gt;https://crates.io/crates/pingora-core&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0389.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0389.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cloudflare/pingora/commit/d193c8d49b8b7c1c1ede93183759caa4f6906bbd"&gt;https://github.com/cloudflare/pingora/commit/d193c8d49b8b7c1c1ede93183759caa4f6906bbd&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0389"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0384: Race condition in `tokio::time::Interval` on Tokio v1.54.0</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0384</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0384"/>
-    <published>2026-10-21T12:00:00Z</published>
-    <updated>2026-10-24T08:30:13Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115567"/>
-    <category term="GHSA-5wjr-9356-4wc8"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Race condition in `tokio::time::Interval` on Tokio v1.54.0&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115567, GHSA-5wjr-9356-4wc8&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tokio&lt;/code&gt; — fixed in 1.54.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-On the multi-threaded runtime, there is a race condition between `Interval::poll_tick` and the runtime&amp;#x27;s time driver.
-
-This affects `Interval` only. `Sleep` and `Timeout` are **not** affected.
-
-## Details
-
-In Tokio v1.54.0, a race condition between `tokio::time::Interval::poll_tick` (including `.tick().await`) and the runtime time driver can drop an internal timer entry without synchronizing with the driver thread that is firing it. This causes a data race and use-after-free on the timer&amp;#x27;s waker and task state in safe Rust, leading to assertion panics, task reference-count corruption, or heap memory corruption.
-
-This bug was introduced by https://github.com/tokio-rs/tokio/pull/8458, and it was fixed by https://github.com/tokio-rs/tokio/pull/8692.
-
-## Impact
-
-This may lead to cr…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/tokio"&gt;https://crates.io/crates/tokio&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0384.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0384.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tokio-rs/tokio/pull/8692"&gt;https://github.com/tokio-rs/tokio/pull/8692&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0384"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0379: Cranelift backend on aarch64 can jump to incorrect target on large Wasm `br_table` instruction</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0379</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0379"/>
-    <published>2026-10-19T12:00:00Z</published>
-    <updated>2026-10-24T06:40:59Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115893"/>
-    <category term="GHSA-mghf-wjfp-p5xm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Cranelift backend on aarch64 can jump to incorrect target on large Wasm `br_table` instruction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115893, GHSA-mghf-wjfp-p5xm&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 36.0.19, 48.0.7, 49.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-mghf-wjfp-p5xm
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0379.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0379.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14826"&gt;https://github.com/bytecodealliance/wasmtime/pull/14826&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0379"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0222: Stores can mix up type indices between engines</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0222</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0222"/>
-    <published>2026-07-31T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115393"/>
-    <category term="GHSA-hgjw-h833-99q9"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Stores can mix up type indices between engines&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115393, GHSA-hgjw-h833-99q9&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:L/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 24.0.12, 36.0.13, 46.0.2, 47.0.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-hgjw-h833-99q9
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0222.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0222.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14044"&gt;https://github.com/bytecodealliance/wasmtime/pull/14044&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0222"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0268: Guest controlled-size host heap allocation through WASIp3 streams</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0268</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0268"/>
-    <published>2026-08-20T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115391"/>
-    <category term="GHSA-x84v-gj2h-g759"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Guest controlled-size host heap allocation through WASIp3 streams&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115391, GHSA-x84v-gj2h-g759&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 46.0.3, 47.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-x84v-gj2h-g759
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0268.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0268.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14181"&gt;https://github.com/bytecodealliance/wasmtime/pull/14181&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0268"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0269: Filesystem sandbox escape when paths or symlinks contain trailing slashes</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0269</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0269"/>
-    <published>2026-08-20T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115392"/>
-    <category term="GHSA-vqjp-4c8c-hfgg"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Filesystem sandbox escape when paths or symlinks contain trailing slashes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115392, GHSA-vqjp-4c8c-hfgg&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:H/VI:H/VA:L/SC:H/SI:H/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 24.0.13, 36.0.14, 46.0.3, 47.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-vqjp-4c8c-hfgg
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0269.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0269.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14182"&gt;https://github.com/bytecodealliance/wasmtime/pull/14182&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0269"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0313: Outgoing HTTP body write allows guest-driven host memory exhaustion</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0313</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0313"/>
-    <published>2026-09-24T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115388"/>
-    <category term="GHSA-c9gc-w9vx-w86p"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Outgoing HTTP body write allows guest-driven host memory exhaustion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115388, GHSA-c9gc-w9vx-w86p&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi-http&lt;/code&gt; — fixed in 36.0.16, 48.0.3, 49.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-c9gc-w9vx-w86p
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime-wasi-http"&gt;https://crates.io/crates/wasmtime-wasi-http&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0313.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0313.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14408"&gt;https://github.com/bytecodealliance/wasmtime/pull/14408&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0313"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0314: Guest can panic host through filesystem datetime overflow</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0314</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0314"/>
-    <published>2026-09-24T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115387"/>
-    <category term="GHSA-j2g9-4prp-pf6h"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Guest can panic host through filesystem datetime overflow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115387, GHSA-j2g9-4prp-pf6h&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 36.0.16, 48.0.3, 49.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-j2g9-4prp-pf6h
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime-wasi"&gt;https://crates.io/crates/wasmtime-wasi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0314.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0314.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14403"&gt;https://github.com/bytecodealliance/wasmtime/pull/14403&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0314"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0315: `call_ref` and exception `catch` can drop some fuel accounting, leading to exponential fuel amplification</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0315</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0315"/>
-    <published>2026-09-24T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115390"/>
-    <category term="GHSA-m63x-6p34-q65x"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;`call_ref` and exception `catch` can drop some fuel accounting, leading to exponential fuel amplification&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115390, GHSA-m63x-6p34-q65x&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 48.0.3, 49.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-m63x-6p34-q65x
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0315.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0315.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14407"&gt;https://github.com/bytecodealliance/wasmtime/pull/14407&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0315"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0316: Dynamic record lifting can allocate beyond the hostcall fuel limit</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0316</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0316"/>
-    <published>2026-09-24T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115389"/>
-    <category term="GHSA-jqpg-j7w6-42pr"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Dynamic record lifting can allocate beyond the hostcall fuel limit&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115389, GHSA-jqpg-j7w6-42pr&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:A/AC:H/AT:P/PR:L/UI:P/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 36.0.16, 48.0.3, 49.0.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-jqpg-j7w6-42pr
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime"&gt;https://crates.io/crates/wasmtime&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0316.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0316.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14415"&gt;https://github.com/bytecodealliance/wasmtime/pull/14415&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0316"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0320: Wasmtime wasi:http implementation panics with a zero timeout supplied</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0320</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0320"/>
-    <published>2026-10-02T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115382"/>
-    <category term="GHSA-w4qr-p94g-mjhv"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Wasmtime wasi:http implementation panics with a zero timeout supplied&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115382, GHSA-w4qr-p94g-mjhv&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi-http&lt;/code&gt; — fixed in 48.0.4, 49.0.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-w4qr-p94g-mjhv
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime-wasi-http"&gt;https://crates.io/crates/wasmtime-wasi-http&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0320.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0320.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14483"&gt;https://github.com/bytecodealliance/wasmtime/pull/14483&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0320"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0321: WASI preview 0 implementation of `poll_oneoff` circumvents fuel consumption</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0321</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0321"/>
-    <published>2026-10-02T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115380"/>
-    <category term="GHSA-j366-h8gg-77pm"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;WASI preview 0 implementation of `poll_oneoff` circumvents fuel consumption&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115380, GHSA-j366-h8gg-77pm&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 36.0.17, 48.0.4, 49.0.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-j366-h8gg-77pm
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime-wasi"&gt;https://crates.io/crates/wasmtime-wasi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0321.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0321.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14481"&gt;https://github.com/bytecodealliance/wasmtime/pull/14481&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0321"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0322: Excessive allocated memory on the host when guests don't have stdio</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0322</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0322"/>
-    <published>2026-10-02T12:00:00Z</published>
-    <updated>2026-10-24T06:25:41Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115381"/>
-    <category term="GHSA-gqmc-89g8-p25r"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Excessive allocated memory on the host when guests don&amp;#x27;t have stdio&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115381, GHSA-gqmc-89g8-p25r&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime-wasi&lt;/code&gt; — fixed in 36.0.17, 48.0.4, 49.0.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This is an entry in the RustSec database for the Wasmtime security advisory
-located at
-https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-gqmc-89g8-p25r
-For more information see the GitHub-hosted security advisory.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/wasmtime-wasi"&gt;https://crates.io/crates/wasmtime-wasi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0322.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0322.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14482"&gt;https://github.com/bytecodealliance/wasmtime/pull/14482&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0322"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

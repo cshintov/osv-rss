@@ -3,12 +3,40 @@
   <title>OSV — new &amp; updated vulnerabilities: RubyGems</title>
   <subtitle>Open-source vulns affecting RubyGems packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:rubygems</id>
-  <updated>2026-10-21T22:30:06Z</updated>
+  <updated>2026-10-26T15:00:05Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/rubygems.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-7pwq-q9jf-539h: kobako Sandbox Escape: guest eval reaches host RCE via method_missing → public_send (any bound Service)</title>
+    <id>https://osv.dev/vulnerability/GHSA-7pwq-q9jf-539h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7pwq-q9jf-539h"/>
+    <published>2026-08-18T20:09:59Z</published>
+    <updated>2026-10-26T15:00:05Z</updated>
+    <category term="RubyGems"/>
+    <category term="CVE-2026-55107"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;kobako Sandbox Escape: guest eval reaches host RCE via method_missing → public_send (any bound Service)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-55107&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;kobako&lt;/code&gt; — fixed in 0.9.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A guest mruby script running inside the Kobako sandbox can execute arbitrary
+Ruby in the host process, fully escaping the sandbox.
+
+### Details
+A host embeds bound &amp;quot;Service&amp;quot; objects that guest scripts call across the wasm
+boundary through the transport dispatcher. The dispatcher passed the
+guest-supplied method name straight to `Object#public_send` on the bound
+object, with no restriction to the object&amp;#x27;s own methods:
+
+```ruby
+target.public_send(method.to_sym, *args, **kwargs, &amp;amp;block)
+```
+
+`public_send` can invoke any public method, including Ruby&amp;#x27;s ambient
+reflection surface. A guest pivots through the public `send` into otherwise
+private Kernel methods: a dispatch request with `method = &amp;quot;send&amp;quot;` and
+`args = [:eval, &amp;quot;&amp;lt;ruby&amp;gt;&amp;quot;]` evaluates to `target.send(:eval, &amp;quot;&amp;lt;ruby&amp;gt;&amp;quot;)`,
+running…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/elct9620/kobako/security/advisories/GHSA-7pwq-q9jf-539h"&gt;https://github.com/elct9620/kobako/security/advisories/GHSA-7pwq-q9jf-539h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-55107"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-55107&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/elct9620/kobako/commit/64f84700c81f44902bed9211318d5362f44987b3"&gt;https://github.com/elct9620/kobako/commit/64f84700c81f44902bed9211318d5362f44987b3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/elct9620/kobako"&gt;https://github.com/elct9620/kobako&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/elct9620/kobako/releases/tag/v0.9.1"&gt;https://github.com/elct9620/kobako/releases/tag/v0.9.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rubysec/ruby-advisory-db/blob/master/gems/kobako/GHSA-7pwq-q9jf-539h.yml"&gt;https://github.com/rubysec/ruby-advisory-db/blob/master/gems/kobako/GHSA-7pwq-q9jf-539h.yml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7pwq-q9jf-539h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] MAL-2026-18126: Malicious code in zzhelloworld_socktest (RubyGems)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-18126</id>
@@ -207,19 +235,5 @@ _-= Per source details. Do not edit below this line.=-_
 
 ## Source: amazon-inspector (123418539e0264e9d58c8b51976723aff3eceec10520c231d7bc847edd51d691)
 The gem&amp;#x27;s native-extension script ext/perp_funding_rates/extconf.rb contains no real build logic: it declares create_makefile(&amp;#x27;bitcoin_rpc_lite_native&amp;#x27;) but ships no C/C++/Rust sources, and the gemspec/library name (perp-funding-rates / PerpFundingRates) does not match the README (bitcoin-rpc-lite) — the extension exists solely to execute code at install time. During `gem install`, extconf.rb base64-decodes a Ruby payload and eval()s it inside a double-forked, detached, delayed child process. The decoded payload opens a TCP socket to the hardcoded bare-IP C2 at 45.138.12.177:8089 and bridges it to /bin/sh, giving the operator an intera…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://rubygems.org/gems/perp-funding-rates/versions/0.9.1"&gt;https://rubygems.org/gems/perp-funding-rates/versions/0.9.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-17793"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] MAL-2026-17802: Malicious code in xrp-ledger-utils (RubyGems)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-17802</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-17802"/>
-    <published>2026-10-11T06:55:27Z</published>
-    <updated>2026-10-13T23:30:05Z</updated>
-    <category term="RubyGems"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in xrp-ledger-utils (RubyGems)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;xrp-ledger-utils&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: amazon-inspector (1d8cf595b60954811e6adfd0c4a241c696d326b42baf1ed2e7b163e720db44c4)
-The gem&amp;#x27;s native extension builder ext/extconf.rb decodes a base64-embedded Ruby payload and eval()s it inside a double-forked, detached child after a randomized 20-40 minute sleep. The payload opens a TCP connection to the hardcoded bare-IP C2 at 45.138.12.177:8089, pipes the socket to /bin/sh, and reconnects in a loop, providing an interactive remote shell on the installer&amp;#x27;s host. Execution is gated by anti-analysis checks that skip CI runners, sandboxed/ephemeral hosts, synthetic usernames, and fresh VMs, and only fires when developer-workstation indicators are present (~/.ssh, ~/.gitconfig, ~/.npmrc, ~/.gem/credentials, ~/.bundle).…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://rubygems.org/gems/xrp-ledger-utils/versions/0.9.1"&gt;https://rubygems.org/gems/xrp-ledger-utils/versions/0.9.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-17802"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

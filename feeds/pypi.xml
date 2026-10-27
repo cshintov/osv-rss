@@ -3,12 +3,146 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-10-27T17:45:04Z</updated>
+  <updated>2026-10-27T21:45:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-m65p-9j7q-6w33: MLflow vulnerable to arbitrary file read on unauthenticated servers via prompt model version source</title>
+    <id>https://osv.dev/vulnerability/GHSA-m65p-9j7q-6w33</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m65p-9j7q-6w33"/>
+    <published>2026-10-27T21:26:56Z</published>
+    <updated>2026-10-27T21:45:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116690"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MLflow vulnerable to arbitrary file read on unauthenticated servers via prompt model version source&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116690&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mlflow&lt;/code&gt; — fixed in 3.17.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+On MLflow tracking servers running without authentication, which is the default for mlflow server, a remote attacker can read arbitrary files from the server’s filesystem by creating a model version tagged as a prompt whose source is a schemeless local path.
+
+The fix for CVE-2026-2614 in 3.10.0 added a prompt-specific branch to the `CreateModelVersion` handler that rejects `file://` URIs and absolute paths but runs path validation only when the source carries a URL scheme. A schemeless value such as `../../etc`, a plain relative name, `.`, a percent-encoded path, or a Windows drive-letter path is therefore stored unchanged as the model version’s artifact location, and the `model-versions/get-artifact endpoint` later serves files from it with the privileges of the server process…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/security/advisories/GHSA-m65p-9j7q-6w33"&gt;https://github.com/mlflow/mlflow/security/advisories/GHSA-m65p-9j7q-6w33&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/pull/25870"&gt;https://github.com/mlflow/mlflow/pull/25870&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/commit/81730a2ce4ebcd60d5d18f68c96f422ad7e30772"&gt;https://github.com/mlflow/mlflow/commit/81730a2ce4ebcd60d5d18f68c96f422ad7e30772&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow"&gt;https://github.com/mlflow/mlflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/releases/tag/v3.17.0"&gt;https://github.com/mlflow/mlflow/releases/tag/v3.17.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m65p-9j7q-6w33"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-j7qq-vr8c-xvw3: MLflow CrewAI autologging records LLM provider API keys in logged trace spans</title>
+    <id>https://osv.dev/vulnerability/GHSA-j7qq-vr8c-xvw3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j7qq-vr8c-xvw3"/>
+    <published>2026-10-27T21:26:39Z</published>
+    <updated>2026-10-27T21:45:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116691"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MLflow CrewAI autologging records LLM provider API keys in logged trace spans&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116691&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mlflow&lt;/code&gt; — fixed in 3.17.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`mlflow.crewai.autolog()` leaks CrewAI LLM provider API keys into MLflow trace telemetry.
+
+When a CrewAI `Agent` is instrumented with MLflow autologging, MLflow serializes the agent&amp;#x27;s `__dict__` and converts its fields to strings. The `llm` field contains the CrewAI LLM object, whose string representation includes its `api_key` in plaintext.
+
+As a result, an application that calls `mlflow.crewai.autolog()` can unintentionally send its LLM provider API key to the MLflow trace backend or configured OTLP destination.
+
+The application does not need to explicitly log the credential or place it in a span attribute. The credential is extracted automatically by MLflow&amp;#x27;s instrumentation.
+
+This was verified on **MLflow 3.16.0** with **CrewAI 1.15.18** using MLflow&amp;#x27;s own OTLP exporter. T…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/security/advisories/GHSA-j7qq-vr8c-xvw3"&gt;https://github.com/mlflow/mlflow/security/advisories/GHSA-j7qq-vr8c-xvw3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/pull/25845"&gt;https://github.com/mlflow/mlflow/pull/25845&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/commit/20927930d27f0072fcfeb7f024f24ad8c5e77c47"&gt;https://github.com/mlflow/mlflow/commit/20927930d27f0072fcfeb7f024f24ad8c5e77c47&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow"&gt;https://github.com/mlflow/mlflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/releases/tag/v3.17.0"&gt;https://github.com/mlflow/mlflow/releases/tag/v3.17.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j7qq-vr8c-xvw3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-26p8-2jq9-3vq9: MLflow vulnerable to remote code execution on unauthenticated servers via third-party scorer deserialization importing caller-placed artifact modules</title>
+    <id>https://osv.dev/vulnerability/GHSA-26p8-2jq9-3vq9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-26p8-2jq9-3vq9"/>
+    <published>2026-10-27T21:26:32Z</published>
+    <updated>2026-10-27T21:30:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116692"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;MLflow vulnerable to remote code execution on unauthenticated servers via third-party scorer deserialization importing caller-placed artifact modules&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116692&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mlflow&lt;/code&gt; — fixed in 3.17.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+MLflow 3.12.0 introduced registration and deserialization support for third-party scorers in OSS MLflow. During scorer deserialization, the server accepts a request-controlled Python module path beneath one of four allowed package prefixes, imports that module, obtains a request-controlled class, and instantiates it synchronously.
+
+An HTTP caller can combine this behavior with MLflow&amp;#x27;s built-in experiment, run, and artifact-upload endpoints:
+
+1. Create an experiment whose local artifact location points to a writable allowed scorer package.
+2. Create a run, causing MLflow to allocate `&amp;lt;artifact_location&amp;gt;/&amp;lt;run_id&amp;gt;/artifacts/`.
+3. Upload a Python module into that run artifact directory.
+4. Submit a serialized third-party scorer whose module path resolves to the uploaded file.
+5. T…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/security/advisories/GHSA-26p8-2jq9-3vq9"&gt;https://github.com/mlflow/mlflow/security/advisories/GHSA-26p8-2jq9-3vq9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/pull/25906"&gt;https://github.com/mlflow/mlflow/pull/25906&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/commit/a732443e695c3c677680c54320efc394c81654ab"&gt;https://github.com/mlflow/mlflow/commit/a732443e695c3c677680c54320efc394c81654ab&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow"&gt;https://github.com/mlflow/mlflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/mlflow/mlflow/releases/tag/v3.17.0"&gt;https://github.com/mlflow/mlflow/releases/tag/v3.17.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-26p8-2jq9-3vq9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-rwrf-2pqf-9j8j: Model Context Protocol Python SDK: Client fetched server-chosen $ref URLs while validating tool results against output schemas</title>
+    <id>https://osv.dev/vulnerability/GHSA-rwrf-2pqf-9j8j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rwrf-2pqf-9j8j"/>
+    <published>2026-10-27T21:05:29Z</published>
+    <updated>2026-10-27T21:15:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116686"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Model Context Protocol Python SDK: Client fetched server-chosen $ref URLs while validating tool results against output schemas&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116686&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mcp&lt;/code&gt; — fixed in 2.2.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;mcp&lt;/code&gt; — fixed in 1.30.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+In affected versions, when a connected MCP server declared an `outputSchema` for a tool, the SDK&amp;#x27;s client validated each `call_tool` result with `jsonschema`&amp;#x27;s default resolver, which fetches any `$ref` it cannot resolve locally by opening the URL. A server could therefore put an `http://`, `https://` or `file://` reference in a tool&amp;#x27;s output schema and make the client:
+
+- request that URL, or read that local file, from the client&amp;#x27;s own network position on every call of the tool (the content was used only as a schema and never sent back to the server), and
+- stall: the fetch ran synchronously on the event loop with no timeout, so a target that accepted the connection and then went quiet froze every session in the process for as long as it held the connection.
+
+### Am I affected…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-rwrf-2pqf-9j8j"&gt;https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-rwrf-2pqf-9j8j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/pull/3394"&gt;https://github.com/modelcontextprotocol/python-sdk/pull/3394&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/pull/3396"&gt;https://github.com/modelcontextprotocol/python-sdk/pull/3396&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/commit/5ebdfed4060d8e5b11b8e2348f86bad4d1fb8836"&gt;https://github.com/modelcontextprotocol/python-sdk/commit/5ebdfed4060d8e5b11b8e2348f86bad4d1fb8836&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/commit/6705402e246dc4eb1fcdf4d9902b78d3c9c36e1b"&gt;https://github.com/modelcontextprotocol/python-sdk/commit/6705402e246dc4eb1fcdf4d9902b78d3c9c36e1b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk"&gt;https://github.com/modelcontextprotocol/python-sdk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/releases/tag/v1.30.0"&gt;https://github.com/modelcontextprotocol/python-sdk/releases/tag/v1.30.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.2.0"&gt;https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.2.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rwrf-2pqf-9j8j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-w4fh-qvv9-3v23: Model Context Protocol Python SDK: Server bearer-token authentication accepts tokens issued for a different resource server</title>
+    <id>https://osv.dev/vulnerability/GHSA-w4fh-qvv9-3v23</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w4fh-qvv9-3v23"/>
+    <published>2026-10-27T21:06:59Z</published>
+    <updated>2026-10-27T21:15:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116684"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Model Context Protocol Python SDK: Server bearer-token authentication accepts tokens issued for a different resource server&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116684&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mcp&lt;/code&gt; — fixed in 2.2.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;mcp&lt;/code&gt; — fixed in 1.30.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+In affected versions, the SDK&amp;#x27;s server-side bearer authentication had no way to check that a token was issued for your server (its audience). Where one authorization server issues tokens for several services, a valid token for another service was also accepted by your MCP server.
+
+### Am I affected?
+Yes, if your HTTP server uses the SDK&amp;#x27;s bearer authentication (`auth=AuthSettings(...)` with `token_verifier=`), its authorization server also issues tokens for other services, and your `TokenVerifier` does not check the token&amp;#x27;s audience (`aud`) itself.
+
+Affected versions:
+
+- `mcp` 1.10.0 through 1.29.1
+- `mcp` 2.0.0 through 2.1.1
+
+### Fix
+Upgrade to:
+
+- 1.x: `mcp` 1.30.0 or later
+- 2.x: `mcp` 2.2.0 or later
+
+**Upgrading alone changes nothing.** The patched versions add a `validate_…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-w4fh-qvv9-3v23"&gt;https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-w4fh-qvv9-3v23&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/pull/3447"&gt;https://github.com/modelcontextprotocol/python-sdk/pull/3447&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/pull/3451"&gt;https://github.com/modelcontextprotocol/python-sdk/pull/3451&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/commit/0c9136841ff092987a20700ff9c2c9789bda2f40"&gt;https://github.com/modelcontextprotocol/python-sdk/commit/0c9136841ff092987a20700ff9c2c9789bda2f40&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/commit/8c2fa6eabacde869d75568e33b9d466b58c2f512"&gt;https://github.com/modelcontextprotocol/python-sdk/commit/8c2fa6eabacde869d75568e33b9d466b58c2f512&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk"&gt;https://github.com/modelcontextprotocol/python-sdk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/releases/tag/v1.30.0"&gt;https://github.com/modelcontextprotocol/python-sdk/releases/tag/v1.30.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.2.0"&gt;https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.2.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w4fh-qvv9-3v23"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-5h93-6whr-6q8j: Model Context Protocol Python SDK: HTTP client transports followed cross-origin redirects carrying custom headers and bodies</title>
+    <id>https://osv.dev/vulnerability/GHSA-5h93-6whr-6q8j</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5h93-6whr-6q8j"/>
+    <published>2026-10-27T21:05:34Z</published>
+    <updated>2026-10-27T21:15:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116685"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Model Context Protocol Python SDK: HTTP client transports followed cross-origin redirects carrying custom headers and bodies&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116685&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;mcp&lt;/code&gt; — fixed in 2.2.0&lt;/li&gt;&lt;li&gt;&lt;code&gt;mcp&lt;/code&gt; — fixed in 1.30.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+In affected versions, the SDK&amp;#x27;s Streamable HTTP and SSE client transports followed HTTP redirects to any host. If the configured MCP endpoint answered with a redirect to a different origin:
+
+- custom headers set on the client (for example an `X-API-Key` credential) were sent to that origin, and
+- on a `307` or `308` redirect the request body was re-sent there too.
+
+The SDK&amp;#x27;s OAuth client providers followed redirects on their own discovery, registration and token requests in the same way.
+
+A lone `Authorization` bearer header was not exposed; the HTTP library already drops it on cross-origin redirects.
+
+Anyone able to make an endpoint you trust redirect elsewhere (a stale redirect to a lapsed domain, a misrouted proxy rule, redirect logic an attacker can influence) could capture…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-5h93-6whr-6q8j"&gt;https://github.com/modelcontextprotocol/python-sdk/security/advisories/GHSA-5h93-6whr-6q8j&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/pull/3397"&gt;https://github.com/modelcontextprotocol/python-sdk/pull/3397&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/pull/3448"&gt;https://github.com/modelcontextprotocol/python-sdk/pull/3448&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/commit/2106335745563b2321b8c73fef2c12903d00aa6e"&gt;https://github.com/modelcontextprotocol/python-sdk/commit/2106335745563b2321b8c73fef2c12903d00aa6e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/commit/c6762e821c527925f0b617db216d00fbd1d0bf99"&gt;https://github.com/modelcontextprotocol/python-sdk/commit/c6762e821c527925f0b617db216d00fbd1d0bf99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk"&gt;https://github.com/modelcontextprotocol/python-sdk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/releases/tag/v1.30.0"&gt;https://github.com/modelcontextprotocol/python-sdk/releases/tag/v1.30.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.2.0"&gt;https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.2.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5h93-6whr-6q8j"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-f5m9-jfrj-jjj7: OpenTelemetry Python: Unbounded memory allocation in Jaeger baggage propagation</title>
+    <id>https://osv.dev/vulnerability/GHSA-f5m9-jfrj-jjj7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f5m9-jfrj-jjj7"/>
+    <published>2026-10-27T21:06:54Z</published>
+    <updated>2026-10-27T21:15:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116694"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;OpenTelemetry Python: Unbounded memory allocation in Jaeger baggage propagation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116694&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;opentelemetry-propagator-jaeger&lt;/code&gt; — fixed in 1.45.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`JaegerPropagator.extract()` in `opentelemetry-propagator-jaeger` did not enforce limits when extracting inbound `uberctx-*` baggage headers. Attacker-controlled baggage could cause unnecessary CPU work and short-lived heap allocations while processing more data than the propagator should accept.
+
+## Impact
+
+Services that enable the optional Jaeger propagator and accept untrusted inbound propagation headers may experience increased per-request resource usage. This can contribute to denial-of-service risk when transport-level limits are absent or configured above the baggage limits.
+
+The practical impact for most Python web deployments is limited. The package must be installed separately, and the Jaeger propagator is not enabled by the default OpenTelemetry Python configuration.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-f5m9-jfrj-jjj7"&gt;https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-f5m9-jfrj-jjj7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-python/pull/5556"&gt;https://github.com/open-telemetry/opentelemetry-python/pull/5556&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-python/commit/65c4eeb87cd3815dc795d3b5485e9ea0d5affcc7"&gt;https://github.com/open-telemetry/opentelemetry-python/commit/65c4eeb87cd3815dc795d3b5485e9ea0d5affcc7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-python"&gt;https://github.com/open-telemetry/opentelemetry-python&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/open-telemetry/opentelemetry-python/releases/tag/v1.45.0"&gt;https://github.com/open-telemetry/opentelemetry-python/releases/tag/v1.45.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f5m9-jfrj-jjj7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-hrmc-jmp7-mpm2: H2O.ai H2O vulnerable to deserialization attacks via a JDBC Connection URL</title>
     <id>https://osv.dev/vulnerability/GHSA-hrmc-jmp7-mpm2</id>
@@ -2327,106 +2461,5 @@ This issue affects Apache Airflow Providers Edge3: before 2.0.0 - and only if pr
 The Edge3 provider support in Airflow 2 has been always development-only and not officially released, however if projects installed and configured Edge3 provider in Airflow 2, it implicitly enabled non-public (normally) API which was used to test Edge Provider in Airflow 2 during the development. This API allowed Dag author to perform Remote Code Execution in the webserver context, which Dag Author was not supposed to be able to do.
 
 If projects installed and configured Edge3 provider for Airflow 2, they should uninstall it and migrate to Airflow 3. The new Edge3 provider versions (&amp;gt;=2.0.0) has a minimum version of Airflow set…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-67895"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-67895&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/59143"&gt;https://github.com/apache/airflow/pull/59143&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-edge3/PYSEC-2026-276.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-edge3/PYSEC-2026-276.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2025-87.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2025-87.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/hhnmmzkj5qx5gbk6pdkh8tcsx5oj1nqs"&gt;https://lists.apache.org/thread/hhnmmzkj5qx5gbk6pdkh8tcsx5oj1nqs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow-providers-edge3"&gt;https://pypi.org/project/apache-airflow-providers-edge3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2025/12/16/3"&gt;http://www.openwall.com/lists/oss-security/2025/12/16/3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-66h8-3g48-6hx8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-c92r-g8j5-vhcx: Apache Airflow: JWT token still valid after logout</title>
-    <id>https://osv.dev/vulnerability/GHSA-c92r-g8j5-vhcx</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c92r-g8j5-vhcx"/>
-    <published>2026-04-09T12:31:11Z</published>
-    <updated>2026-10-26T21:30:05Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-airflow-2025-57735"/>
-    <category term="CVE-2025-57735"/>
-    <category term="PYSEC-2026-269"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Airflow: JWT token still valid after logout&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-airflow-2025-57735, CVE-2025-57735, PYSEC-2026-269&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow&lt;/code&gt; — fixed in 3.2.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When user logged out, the JWT token the user had authtenticated with was not invalidated, which could lead to reuse of that token in case it was intercepted. In Airflow 3.2 we implemented the mechanism that implements token invalidation at logout. Users who are concerned about the logout scenario and possibility of intercepting the tokens, should upgrade to Airflow 3.2+
-
-
-
-Users are recommended to upgrade to version 3.2.0, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-57735"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-57735&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/56633"&gt;https://github.com/apache/airflow/pull/56633&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/61339"&gt;https://github.com/apache/airflow/pull/61339&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2026-269.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2026-269.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/ovn8mpd8zkc604hojt7x3wsw3kc60x98"&gt;https://lists.apache.org/thread/ovn8mpd8zkc604hojt7x3wsw3kc60x98&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow"&gt;https://pypi.org/project/apache-airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2026/04/09/16"&gt;http://www.openwall.com/lists/oss-security/2026/04/09/16&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c92r-g8j5-vhcx"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-j69x-v4wc-3fpf: Apache Airflow Sqoop Provider Improper Input Validation vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-j69x-v4wc-3fpf</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j69x-v4wc-3fpf"/>
-    <published>2023-02-24T12:31:20Z</published>
-    <updated>2026-10-26T21:30:05Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2023-25693"/>
-    <category term="PYSEC-2023-314"/>
-    <category term="PYSEC-2026-275"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Airflow Sqoop Provider Improper Input Validation vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-25693, PYSEC-2023-314, PYSEC-2026-275&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow-providers-apache-sqoop&lt;/code&gt; — fixed in 3.1.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper Input Validation vulnerability in the Apache Airflow Sqoop Provider. This issue affects Apache Airflow Sqoop Provider versions before 3.1.1.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-25693"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-25693&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/29500"&gt;https://github.com/apache/airflow/pull/29500&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-apache-sqoop/PYSEC-2026-275.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-apache-sqoop/PYSEC-2026-275.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2023-314.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2023-314.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/79qn8g5xbq036f8crb115obvr22l52q4"&gt;https://lists.apache.org/thread/79qn8g5xbq036f8crb115obvr22l52q4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow-providers-apache-sqoop"&gt;https://pypi.org/project/apache-airflow-providers-apache-sqoop&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j69x-v4wc-3fpf"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jqff-8g2v-642h: NASA AIT-Core vulnerable to remote code execution</title>
-    <id>https://osv.dev/vulnerability/GHSA-jqff-8g2v-642h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jqff-8g2v-642h"/>
-    <published>2024-05-21T21:30:27Z</published>
-    <updated>2026-10-26T21:30:05Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2024-35059"/>
-    <category term="PYSEC-2026-264"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;NASA AIT-Core vulnerable to remote code execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-35059, PYSEC-2026-264&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ait-core&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An issue in the Pickle Python library of NASA AIT-Core v2.5.2 allows attackers to execute arbitrary commands.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-35059"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-35059&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NASA-AMMOS/AIT-Core"&gt;https://github.com/NASA-AMMOS/AIT-Core&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/ait-core/PYSEC-2026-264.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/ait-core/PYSEC-2026-264.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/ait-core"&gt;https://pypi.org/project/ait-core&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.linkedin.com/pulse/remote-code-execution-via-man-in-the-middle-more-ujkze"&gt;https://www.linkedin.com/pulse/remote-code-execution-via-man-in-the-middle-more-ujkze&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jqff-8g2v-642h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-75px-35p4-qq6h: Aim External Control of File Name or Path vulnerability</title>
-    <id>https://osv.dev/vulnerability/GHSA-75px-35p4-qq6h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-75px-35p4-qq6h"/>
-    <published>2025-03-20T12:32:45Z</published>
-    <updated>2026-10-26T21:30:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2024-6829"/>
-    <category term="PYSEC-2026-259"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Aim External Control of File Name or Path vulnerability&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-6829, PYSEC-2026-259&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aim&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A vulnerability in aimhubio/aim version 3.19.3 allows an attacker to exploit the `tarfile.extractall()` function to extract the contents of a maliciously crafted tarfile to arbitrary locations on the host server. The attacker can control `repo.path` and `run_hash` to bypass directory existence checks and extract files to unintended locations, potentially overwriting critical files. This can lead to arbitrary data being written to arbitrary locations on the remote tracking server, which could be used for further attacks such as writing a new SSH key to the target server.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-6829"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-6829&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/aimhubio/aim"&gt;https://github.com/aimhubio/aim&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/aim/PYSEC-2026-259.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/aim/PYSEC-2026-259.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://huntr.com/bounties/7c97065c-1b63-4982-82c1-8038be0ed570"&gt;https://huntr.com/bounties/7c97065c-1b63-4982-82c1-8038be0ed570&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/aim"&gt;https://pypi.org/project/aim&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-75px-35p4-qq6h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-7wqf-h36w-47mc: OS Command Injection in Apache Airflow</title>
-    <id>https://osv.dev/vulnerability/GHSA-7wqf-h36w-47mc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7wqf-h36w-47mc"/>
-    <published>2022-11-22T12:30:22Z</published>
-    <updated>2026-10-26T21:30:04Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-airflow-2022-38649"/>
-    <category term="CVE-2022-38649"/>
-    <category term="PYSEC-2026-267"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OS Command Injection in Apache Airflow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-airflow-2022-38649, CVE-2022-38649, PYSEC-2026-267&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow&lt;/code&gt; — fixed in 2.3.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper Neutralization of Special Elements used in an OS Command (&amp;#x27;OS Command Injection&amp;#x27;) vulnerability in Apache Airflow Pinot Provider, Apache Airflow allows an attacker to control commands executed in the task execution context, without write access to DAG files. This issue affects Apache Airflow Pinot Provider versions prior to 4.0.0. It also impacts any Apache Airflow versions prior to 2.3.0 in case Apache Airflow Pinot Provider is installed (Apache Airflow Pinot Provider 4.0.0 can only be installed for Airflow 2.3.0+). Note that you need to manually install the Pinot Provider version 4.0.0 in order to get rid of the vulnerability on top of Airflow 2.3.0+ version.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2022-38649"&gt;https://nvd.nist.gov/vuln/detail/CVE-2022-38649&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/27641"&gt;https://github.com/apache/airflow/pull/27641&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/commit/1d4fd5c6eacab0b88f8660f9d780174434393f1a"&gt;https://github.com/apache/airflow/commit/1d4fd5c6eacab0b88f8660f9d780174434393f1a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2026-267.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow/PYSEC-2026-267.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/033o1gbc4ly6dpd2xf1o201v56fbl4dz"&gt;https://lists.apache.org/thread/033o1gbc4ly6dpd2xf1o201v56fbl4dz&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow"&gt;https://pypi.org/project/apache-airflow&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7wqf-h36w-47mc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-5cvg-9pp5-mxcj: Apache Airflow Hive Provider vulnerable to code injection</title>
-    <id>https://osv.dev/vulnerability/GHSA-5cvg-9pp5-mxcj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5cvg-9pp5-mxcj"/>
-    <published>2023-04-07T15:30:38Z</published>
-    <updated>2026-10-26T21:30:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2023-28706"/>
-    <category term="PYSEC-2026-271"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Airflow Hive Provider vulnerable to code injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-28706, PYSEC-2026-271&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow-providers-apache-hive&lt;/code&gt; — fixed in 6.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Apache Software Foundation&amp;#x27;s Apache Airflow Hive Provider before 6.0.0 is vulnerable to improper control of generation of code.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-28706"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-28706&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/30212"&gt;https://github.com/apache/airflow/pull/30212&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-apache-hive/PYSEC-2026-271.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-apache-hive/PYSEC-2026-271.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/dl20xxd51xvlx0zzc0wzgxfjwgtbbxo3"&gt;https://lists.apache.org/thread/dl20xxd51xvlx0zzc0wzgxfjwgtbbxo3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow-providers-apache-hive"&gt;https://pypi.org/project/apache-airflow-providers-apache-hive&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2023/04/07/2"&gt;http://www.openwall.com/lists/oss-security/2023/04/07/2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5cvg-9pp5-mxcj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-jf28-v5f6-cvpr: NASA AIT-Core vulnerable to remote code execution</title>
-    <id>https://osv.dev/vulnerability/GHSA-jf28-v5f6-cvpr</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jf28-v5f6-cvpr"/>
-    <published>2024-05-21T18:31:24Z</published>
-    <updated>2026-10-26T21:30:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2024-35057"/>
-    <category term="PYSEC-2026-263"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;NASA AIT-Core vulnerable to remote code execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-35057, PYSEC-2026-263&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ait-core&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;An issue in NASA AIT-Core v2.5.2 allows attackers to execute arbitrary code via a crafted packet.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-35057"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-35057&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NASA-AMMOS/AIT-Core/issues/528"&gt;https://github.com/NASA-AMMOS/AIT-Core/issues/528&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/NASA-AMMOS/AIT-Core"&gt;https://github.com/NASA-AMMOS/AIT-Core&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/ait-core/PYSEC-2026-263.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/ait-core/PYSEC-2026-263.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/ait-core"&gt;https://pypi.org/project/ait-core&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.linkedin.com/pulse/remote-code-execution-via-man-in-the-middle-more-ujkze"&gt;https://www.linkedin.com/pulse/remote-code-execution-via-man-in-the-middle-more-ujkze&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jf28-v5f6-cvpr"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-hg6c-qqcm-r79r: Apache Airflow Hive Provider Beeline remote code execution with Principal</title>
-    <id>https://osv.dev/vulnerability/GHSA-hg6c-qqcm-r79r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hg6c-qqcm-r79r"/>
-    <published>2023-07-03T12:30:34Z</published>
-    <updated>2026-10-26T21:30:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2023-35797"/>
-    <category term="PYSEC-2026-273"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Apache Airflow Hive Provider Beeline remote code execution with Principal&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2023-35797, PYSEC-2026-273&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow-providers-apache-hive&lt;/code&gt; — fixed in 6.1.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Improper Input Validation vulnerability in Apache Software Foundation Apache Airflow Hive Provider.
-This issue affects Apache Airflow Apache Hive Provider: before 6.1.1.
-
-Before version 6.1.1 it was possible to bypass the security check to RCE via
-principal parameter. For this to be exploited it requires access to modifying the connection details.
-
-It is recommended updating provider version to 6.1.1 in order to avoid this vulnerability.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2023-35797"&gt;https://nvd.nist.gov/vuln/detail/CVE-2023-35797&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/31983"&gt;https://github.com/apache/airflow/pull/31983&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/commit/6724eeb6210d5965937eaf9dae3e476eb30f8268"&gt;https://github.com/apache/airflow/commit/6724eeb6210d5965937eaf9dae3e476eb30f8268&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-apache-hive/PYSEC-2026-273.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-apache-hive/PYSEC-2026-273.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/30y19ok07fw52x5hnkbhwqo3ho0wwc1y"&gt;https://lists.apache.org/thread/30y19ok07fw52x5hnkbhwqo3ho0wwc1y&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow-providers-apache-hive"&gt;https://pypi.org/project/apache-airflow-providers-apache-hive&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2023/07/12/3"&gt;http://www.openwall.com/lists/oss-security/2023/07/12/3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hg6c-qqcm-r79r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

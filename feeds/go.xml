@@ -3,12 +3,186 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-10-26T14:45:05Z</updated>
+  <updated>2026-10-27T15:47:24Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-fpmh-frq8-7rj8: compress zstd: Panic on two-block frames</title>
+    <id>https://osv.dev/vulnerability/GHSA-fpmh-frq8-7rj8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fpmh-frq8-7rj8"/>
+    <published>2026-10-27T15:38:14Z</published>
+    <updated>2026-10-27T15:47:24Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-116591"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;compress zstd: Panic on two-block frames&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116591&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klauspost/compress/zstd&lt;/code&gt; — fixed in 1.20.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A crafted ~27 KB two-block zstd frame makes DecodeAll and the streaming decoder panic with an out-of-range slice index instead of returning a decode error. The same bytes decode fine with the reference zstd. Any program that decompresses untrusted zstd input can be crashed by it. Reproduced on v1.20.0 and v1.20.1.
+
+Released in https://github.com/klauspost/compress/releases/tag/v1.20.2
+
+### Details
+
+ The panic is in the FSE decoder that `huff0.ReadTable` uses to read a block&amp;#x27;s Huffman-weight table. Three conditions have to hold at once, and the crafted frame arranges all three.
+
+  **1. A count that doesn&amp;#x27;t fit is accepted.** `readNCount` permits a tableLog up to 15 ([`tablelogAbsoluteMax`](https://github.com/klauspost/compress/blob/v1.20.0/fse/decompress.go#L9), checked at [`fs…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/security/advisories/GHSA-fpmh-frq8-7rj8"&gt;https://github.com/klauspost/compress/security/advisories/GHSA-fpmh-frq8-7rj8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116591"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116591&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/commit/7f5d8528720c895a6106f201719f87eb030a565d"&gt;https://github.com/klauspost/compress/commit/7f5d8528720c895a6106f201719f87eb030a565d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress"&gt;https://github.com/klauspost/compress&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/releases/tag/v1.20.2"&gt;https://github.com/klauspost/compress/releases/tag/v1.20.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fpmh-frq8-7rj8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4hv6-xc92-j86g: Vikunja: WebSocket authentication ignores server-side session state, so revoked sessions keep receiving live pushes</title>
+    <id>https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g"/>
+    <published>2026-10-09T20:57:34Z</published>
+    <updated>2026-10-27T15:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111917"/>
+    <category term="GO-2026-6715"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: WebSocket authentication ignores server-side session state, so revoked sessions keep receiving live pushes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111917, GO-2026-6715&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Vikunja v2.6.0 introduced server-side sessions with revocation semantics: `DELETE /api/v2/user/sessions/{id}` documents &amp;quot;Revokes a specific session by its UUID&amp;quot;, and enabling TOTP calls `DeleteAllUserSessions` to invalidate all sessions. The WebSocket endpoint accepts any cryptographically valid user JWT without ever resolving its `sid` (session id) claim against the sessions table. A connection authenticated before revocation stays authenticated and continues to receive live pushes indefinitely, and even brand-new WebSocket connections are accepted with a token whose session was deleted. The revocation feature therefore does not cover the WebSocket boundary at all.
+
+### Details
+
+User access JWTs carry a session reference: `NewUserJWTAuthtoken` (`pkg/modules/auth/auth.go:188`)…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-4hv6-xc92-j86g"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-4hv6-xc92-j86g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/46ae98355462acbea451356326146675d3feeaab"&gt;https://github.com/go-vikunja/vikunja/commit/46ae98355462acbea451356326146675d3feeaab&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-4g5x-hcwm-82jw: Goploy: Arbitrary File Read via Path Traversal in /deploy/fileDiff allows Remote Server Compromise</title>
+    <id>https://osv.dev/vulnerability/GHSA-4g5x-hcwm-82jw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4g5x-hcwm-82jw"/>
+    <published>2026-07-07T23:42:24Z</published>
+    <updated>2026-10-27T15:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-114665"/>
+    <category term="CVE-2026-53553"/>
+    <category term="GO-2026-5938"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Goploy: Arbitrary File Read via Path Traversal in /deploy/fileDiff allows Remote Server Compromise&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114665, CVE-2026-53553, GO-2026-5938&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zhenorzz/goploy&lt;/code&gt; — fixed in 1.18.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Goploy System Arbitrary File Read Vulnerability
+
+## Basic Information
+- **Vulnerability Name**: Goploy Endpoints Arbitrary File Read via Path Traversal
+- **Affected Product**: Goploy
+- **Known Affected Versions**: &amp;lt;=1.17.5 
+
+## Vulnerability Description
+Goploy is an open-source automation deployment system. A severe path traversal vulnerability exists in its backend API endpoints, specifically `/deploy/fileDiff` (File Compare), when handling file paths provided by the client.
+
+The original logic of this endpoint is to read a local project file and compare it with a file on a remote target server. However, due to insufficient validation and sanitization of the `filePath` parameter, and the lack of security constraints on the final absolute file path, malicious paths containing `../` are d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/security/advisories/GHSA-4g5x-hcwm-82jw"&gt;https://github.com/zhenorzz/goploy/security/advisories/GHSA-4g5x-hcwm-82jw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53553"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53553&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/commit/d51aa15ebc0a474d9d71d6c453a0fe798dd5e007"&gt;https://github.com/zhenorzz/goploy/commit/d51aa15ebc0a474d9d71d6c453a0fe798dd5e007&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy"&gt;https://github.com/zhenorzz/goploy&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://github.com/zhenorzz/goploy/releases/tag/v1.18.0"&gt;http://github.com/zhenorzz/goploy/releases/tag/v1.18.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4g5x-hcwm-82jw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fmmf-xq98-g327: Vikunja: Write-level project members can delete admin-tier link shares through an unloaded permission check</title>
+    <id>https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327"/>
+    <published>2026-10-09T20:57:47Z</published>
+    <updated>2026-10-27T15:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111921"/>
+    <category term="GO-2026-6730"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Write-level project members can delete admin-tier link shares through an unloaded permission check&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111921, GO-2026-6730&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A project member with Write permission can delete an admin-tier link share on that project. The deletion authorization check reads the permission from an object populated only with URL IDs, rather than from the stored share. Its zero value is Read, so the check falls through to project Write permission instead of requiring Admin.
+
+## Details
+
+Affected endpoints:
+
+- `DELETE /api/v1/projects/{project}/shares/{share}`
+- `DELETE /api/v2/projects/{project}/shares/{share}`
+
+Older v1 releases used `/lists/{list}/shares/{share}` before lists were renamed to projects.
+
+In `pkg/routes/api/v2/link_sharing.go:156`, the delete handler passes `&amp;amp;models.LinkSharing{ID: in.ID, ProjectID: in.ProjectID}` to `handler.DoDelete`. The v1 generic handler likewise binds the URL IDs without loading the …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fmmf-xq98-g327"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fmmf-xq98-g327&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/60e543777b4d3ec8376f5485911cdec697e8c8ee"&gt;https://github.com/go-vikunja/vikunja/commit/60e543777b4d3ec8376f5485911cdec697e8c8ee&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-32r8-5843-4qw2: Vikunja: Link-share principal-type confusion enables cross-account team removal, bot takeover, and roster disclosure</title>
+    <id>https://osv.dev/vulnerability/GHSA-32r8-5843-4qw2</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-32r8-5843-4qw2"/>
+    <published>2026-10-09T20:43:40Z</published>
+    <updated>2026-10-27T15:30:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-76216"/>
+    <category term="GO-2026-6711"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Link-share principal-type confusion enables cross-account team removal, bot takeover, and roster disclosure&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76216, GO-2026-6711&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+Vikunja&amp;#x27;s `web.Auth` interface (`pkg/web/web.go`, single method `GetID() int64`) is satisfied by BOTH `*user.User` and `*models.LinkSharing`. A link-share&amp;#x27;s `GetID()` returns the **raw positive** `share.ID` (`pkg/models/link_sharing.go:83-85`), which lives in the same positive autoincrement ID space as `users.id`. The safe negated form `getUserID() = share.ID * -1` (`link_sharing.go:126-128`) exists but is NOT used at three permission sinks. As a result, a link-share principal with id `N` — which should have zero authority over teams or bot users — is treated as the *user* whose `users.id == N` at three permission checks that lack the `a.(*LinkSharing)` guard their sibling methods have. This is the same principal-type-confusion class as CVE-2026-68581 (GHSA-vvcv-vpph-h844), but …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-32r8-5843-4qw2"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-32r8-5843-4qw2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-76216"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-76216&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/a717d64d5658708ba390f18dd697f5e567e68aac"&gt;https://github.com/go-vikunja/vikunja/commit/a717d64d5658708ba390f18dd697f5e567e68aac&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.5.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.5.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/vikunja-through-principal-type-confusion-via-linksharing"&gt;https://www.vulncheck.com/advisories/vikunja-through-principal-type-confusion-via-linksharing&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-32r8-5843-4qw2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-26rh-24rg-j3vv: Goploy: Cross-namespace IDOR and RCE via body-supplied row id in project and project_file handlers</title>
+    <id>https://osv.dev/vulnerability/GHSA-26rh-24rg-j3vv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-26rh-24rg-j3vv"/>
+    <published>2026-07-07T23:42:12Z</published>
+    <updated>2026-10-27T15:30:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-53552"/>
+    <category term="GO-2026-5936"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Goploy: Cross-namespace IDOR and RCE via body-supplied row id in project and project_file handlers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53552, GO-2026-5936&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zhenorzz/goploy&lt;/code&gt; — fixed in 1.18.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`Project.AddFile`, `Project.EditFile`, `Project.RemoveFile`, and `Project.Edit` in `cmd/server/api/project/handler.go` accept a project or project-file row id from the JSON body and act on it without checking that the project belongs to the caller&amp;#x27;s namespace. The corresponding `model.ProjectFile.GetData` and `model.Project.GetData` queries filter only by row id. A user holding the `manager` role (or any role that includes the `FileSync` / `EditProject` permission) in their own namespace can read, write, or delete files in any project across the install, and can rewrite any project&amp;#x27;s git remote URL by submitting the foreign id in the body. The git-URL primitive escalates to RCE on the next deploy because `Edit` runs `git remote set-url` on the project&amp;#x27;s working tree.
+
+### Affe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/security/advisories/GHSA-26rh-24rg-j3vv"&gt;https://github.com/zhenorzz/goploy/security/advisories/GHSA-26rh-24rg-j3vv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53552"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53552&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/commit/b49eabe903c7d7df1a3763385f5067676da4fdd3"&gt;https://github.com/zhenorzz/goploy/commit/b49eabe903c7d7df1a3763385f5067676da4fdd3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy"&gt;https://github.com/zhenorzz/goploy&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/releases/tag/v1.18.0"&gt;https://github.com/zhenorzz/goploy/releases/tag/v1.18.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-26rh-24rg-j3vv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-fprf-r6rv-xg99: Vikunja: Saved filter creation with an empty filter string recalculates task positions across all tenants</title>
+    <id>https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99"/>
+    <published>2026-10-09T20:57:38Z</published>
+    <updated>2026-10-27T15:30:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-111918"/>
+    <category term="GO-2026-6731"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Saved filter creation with an empty filter string recalculates task positions across all tenants&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111918, GO-2026-6731&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+In Vikunja v2.6.0 the task position recalculation that runs when a saved filter view is created fails open when the requesting user has no accessible projects. Instead of aborting, the search that feeds the recalculation loses its project scope entirely and returns every task in the instance. The server then writes one `task_positions` row per task per view (four views per filter) into views owned by the requesting user, including rows that reference tasks of other tenants the user can never see. Any authenticated user can trigger this. The impact is a cross-tenant integrity violation, a single-request write amplification primitive that scales with instance size, and a violation of the invariant stated in the fix for GHSA-w39f-h553-h2mx that position writes are scoped by proje…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fprf-r6rv-xg99"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fprf-r6rv-xg99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/24e4563a547be182b338be2f614df339a64a6058"&gt;https://github.com/go-vikunja/vikunja/commit/24e4563a547be182b338be2f614df339a64a6058&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c8r8-95hg-mp34: SiYuan: MCP file tool's blocklist is incomplete relative to the HTTP file API it claims to align with, exposing publish-mode passwords and other sensitive workspace files</title>
+    <id>https://osv.dev/vulnerability/GHSA-c8r8-95hg-mp34</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c8r8-95hg-mp34"/>
+    <published>2026-10-27T14:43:57Z</published>
+    <updated>2026-10-27T15:00:04Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-60083"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: MCP file tool&amp;#x27;s blocklist is incomplete relative to the HTTP file API it claims to align with, exposing publish-mode passwords and other sensitive workspace files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-60083&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260808051406-3542530c505f&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`kernel/mcp/tools/file.go`&amp;#x27;s `resolvePath()` includes an explicit comment stating its
+sensitive-path blocklist is meant to align with the HTTP file API&amp;#x27;s established blacklist
+(`refuseToAccess()` in `kernel/api/file.go`), following the remediation for GHSA-cvhv-7xhj-xjp8
+(&amp;quot;Unauthenticated Administrator takeover exfiltrated via the MCP&amp;quot;), which specifically
+recommended restricting this tool&amp;#x27;s scope. In practice, the MCP tool implements only 1 of the
+4 static blocklist entries the HTTP API enforces.
+
+## Comparison
+
+`kernel/api/file.go` `refuseToAccess()` blocks:
+1. `conf/conf.json` (API token, cookie signing key, accessAuthCode)
+2. `data/snippets/conf.json`
+3. the entire `data/templates` directory
+4. `data/.siyuan/publishAccess.json`
+5. (dynamic, per-request) any path the current…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-c8r8-95hg-mp34"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-c8r8-95hg-mp34&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-60083"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-60083&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/3542530c505f13aa3fbd0343627409ca6c000dd2"&gt;https://github.com/siyuan-note/siyuan/commit/3542530c505f13aa3fbd0343627409ca6c000dd2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/releases/tag/v3.8.0"&gt;https://github.com/siyuan-note/siyuan/releases/tag/v3.8.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/siyuan-before-incomplete-path-blocklist-via-mcp-file-tool"&gt;https://www.vulncheck.com/advisories/siyuan-before-incomplete-path-blocklist-via-mcp-file-tool&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c8r8-95hg-mp34"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-47hv-j4px-h3c9: Wails: wildcardPatternToRegex allows Origin bypass via suffix match in BindingsAllowedOrigins</title>
+    <id>https://osv.dev/vulnerability/GHSA-47hv-j4px-h3c9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-47hv-j4px-h3c9"/>
+    <published>2026-10-27T13:29:47Z</published>
+    <updated>2026-10-27T13:45:03Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-34157"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Wails: wildcardPatternToRegex allows Origin bypass via suffix match in BindingsAllowedOrigins&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34157&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/wailsapp/wails/v2&lt;/code&gt; — fixed in 2.13.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Security Vulnerability Report: Wails v2 — Origin Validator Bypass via Wildcard Pattern
+
+| | |
+|---|---|
+| **Product** | wailsapp/wails (v2) |
+| **Affected File** | `v2/internal/frontend/originvalidator/originValidator.go` |
+| **Affected Versions** | All versions containing originValidator (latest as of 2026-03-26) |
+| **CVSSv4.0** | **7.6 HIGH** — `CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:N` |
+| **CWE** | CWE-625: Permissive Regular Expression |
+| **Platforms** | Windows / Linux / macOS (all desktop targets) |
+
+---
+
+## Summary
+
+Wails v2 provides `BindingsAllowedOrigins` to restrict which web origins can invoke Go backend methods via IPC. The wildcard pattern matching in `wildcardPatternToRegex` converts `*` to `.*` without anchoring subcomponents, allowing suffix-mat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/wailsapp/wails/security/advisories/GHSA-47hv-j4px-h3c9"&gt;https://github.com/wailsapp/wails/security/advisories/GHSA-47hv-j4px-h3c9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wailsapp/wails/pull/5074"&gt;https://github.com/wailsapp/wails/pull/5074&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wailsapp/wails/commit/bcc5941b72fdab6a13942b58871a2696faa85b81"&gt;https://github.com/wailsapp/wails/commit/bcc5941b72fdab6a13942b58871a2696faa85b81&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wailsapp/wails"&gt;https://github.com/wailsapp/wails&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-47hv-j4px-h3c9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GHSA-7cxh-94cf-mfp6: Talos Linux: Support bundle does not redact registry credentials</title>
     <id>https://osv.dev/vulnerability/GHSA-7cxh-94cf-mfp6</id>
@@ -81,175 +255,5 @@ The patched versions (`v0.7.7` or `v0.7.8-nightly.*`) observe stronger input val
 The attack is remote and requires one unauthenticated HTTP request with no user interaction (AV:N/AC:L/PR:N/UI:N). It changes security decisions and exposes one protected handler within the same application (S:U/C:L/I:L); no availability loss was observed (A:N).
 
 **Preconditions:** The application uses `ClientIPFromXFF` and makes the origin server reachable by an anonymous client outside the configured trusted-proxy CIDRs. No victim interactio…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/security/advisories/GHSA-j6qf-3m9c-vwj3"&gt;https://github.com/go-chi/chi/security/advisories/GHSA-j6qf-3m9c-vwj3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114437"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114437&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/pull/1214"&gt;https://github.com/go-chi/chi/pull/1214&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/commit/7f9b7448f51d28804fac98c0a17bc2a7cec1079f"&gt;https://github.com/go-chi/chi/commit/7f9b7448f51d28804fac98c0a17bc2a7cec1079f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi"&gt;https://github.com/go-chi/chi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-chi/chi/releases/tag/v5.4.0"&gt;https://github.com/go-chi/chi/releases/tag/v5.4.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.tenable.com/security/research/tra-2026-66"&gt;https://www.tenable.com/security/research/tra-2026-66&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j6qf-3m9c-vwj3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-cxf3-9h37-7rr8: Echo: Rejected WebSocket upgrades can bypass Echo route-level access controls</title>
-    <id>https://osv.dev/vulnerability/GHSA-cxf3-9h37-7rr8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cxf3-9h37-7rr8"/>
-    <published>2026-10-23T20:49:37Z</published>
-    <updated>2026-10-23T21:00:06Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Echo: Rejected WebSocket upgrades can bypass Echo route-level access controls&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/labstack/echo/v4&lt;/code&gt; — fixed in 4.16.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/labstack/echo/v5&lt;/code&gt; — fixed in 5.4.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-Echo&amp;#x27;s Proxy middleware selected a raw tunnel when the client requested a WebSocket upgrade, before validating whether the configured upstream accepted it. If the upstream returned an ordinary HTTP response and kept the connection alive, subsequent HTTP requests on that connection were forwarded directly to the same upstream without passing through Echo&amp;#x27;s router or route-specific middleware.
-
-This can bypass authentication or authorization enforced only at Echo&amp;#x27;s routes. Exploitation requires an accessible proxy route, an upstream that rejects the upgrade without closing the connection, and a target resource on that upstream without independent authorization. The issue does not provide arbitrary-host proxying or bypass the upstream&amp;#x27;s own authentication.
-
-## Affected versions and…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/security/advisories/GHSA-cxf3-9h37-7rr8"&gt;https://github.com/labstack/echo/security/advisories/GHSA-cxf3-9h37-7rr8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/commit/1855061e572ae9dab727c811d8382f266bfbaaec"&gt;https://github.com/labstack/echo/commit/1855061e572ae9dab727c811d8382f266bfbaaec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/commit/3fb0ba7e17645bb65611e2a08875d0a2f65c421f"&gt;https://github.com/labstack/echo/commit/3fb0ba7e17645bb65611e2a08875d0a2f65c421f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo"&gt;https://github.com/labstack/echo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/releases/tag/v4.16.1"&gt;https://github.com/labstack/echo/releases/tag/v4.16.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/releases/tag/v5.4.1"&gt;https://github.com/labstack/echo/releases/tag/v5.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cxf3-9h37-7rr8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-f48p-c9v4-h7xv: Echo: BodyDump captures request and response bodies without size limits in v4</title>
-    <id>https://osv.dev/vulnerability/GHSA-f48p-c9v4-h7xv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-f48p-c9v4-h7xv"/>
-    <published>2026-10-23T20:48:44Z</published>
-    <updated>2026-10-23T21:00:05Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Echo: BodyDump captures request and response bodies without size limits in v4&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/labstack/echo/v4&lt;/code&gt; — fixed in 4.16.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-Echo v4&amp;#x27;s opt-in BodyDump middleware read complete request bodies into memory and retained complete response bodies without a capture limit. A client able to submit large requests to a route using BodyDump could cause large allocations before the application handler ran. Large responses, including responses whose size can be influenced by a client, also caused an additional unbounded capture allocation.
-
-Repeated or concurrent requests can exhaust process memory and cause denial of service. BodyDump is not enabled by default. Deployments with effective request limits may reduce the request-side exposure; response capture requires separate consideration.
-
-## Affected versions and patch
-
-Echo v4 versions through v4.16.0 are affected. Upgrade to [v4.16.1](https://github.com/labstac…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/security/advisories/GHSA-f48p-c9v4-h7xv"&gt;https://github.com/labstack/echo/security/advisories/GHSA-f48p-c9v4-h7xv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/pull/3105"&gt;https://github.com/labstack/echo/pull/3105&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/commit/3fb0ba7e17645bb65611e2a08875d0a2f65c421f"&gt;https://github.com/labstack/echo/commit/3fb0ba7e17645bb65611e2a08875d0a2f65c421f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo"&gt;https://github.com/labstack/echo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/releases/tag/v4.16.1"&gt;https://github.com/labstack/echo/releases/tag/v4.16.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-f48p-c9v4-h7xv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-x9ff-22gv-65f4: Echo: BodyDump can discard BodyLimit overflow errors for unknown-length requests</title>
-    <id>https://osv.dev/vulnerability/GHSA-x9ff-22gv-65f4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x9ff-22gv-65f4"/>
-    <published>2026-10-23T20:49:11Z</published>
-    <updated>2026-10-23T21:00:05Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Echo: BodyDump can discard BodyLimit overflow errors for unknown-length requests&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/labstack/echo/v5&lt;/code&gt; — fixed in 5.4.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-Echo v5&amp;#x27;s BodyDump middleware captured a bounded prefix, drained the remaining request body while ignoring read errors, and then replaced the body with the captured prefix. With an outer BodyLimit, an unknown-length request such as an HTTP/1.1 chunked request, and a BodyDump capture limit below the BodyLimit threshold, an overflow detected during that drain could be discarded.
-
-The handler could consequently process a truncated request and return success even though the original body exceeded the configured limit. This is a conditional size-policy bypass; no general authentication bypass, production data modification or denial of service is claimed. Known-length requests rejected before BodyDump runs are unaffected by this path.
-
-## Affected versions and patch
-
-All v5 releases f…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/security/advisories/GHSA-x9ff-22gv-65f4"&gt;https://github.com/labstack/echo/security/advisories/GHSA-x9ff-22gv-65f4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/pull/3105"&gt;https://github.com/labstack/echo/pull/3105&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/commit/1855061e572ae9dab727c811d8382f266bfbaaec"&gt;https://github.com/labstack/echo/commit/1855061e572ae9dab727c811d8382f266bfbaaec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo"&gt;https://github.com/labstack/echo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/releases/tag/v5.4.1"&gt;https://github.com/labstack/echo/releases/tag/v5.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x9ff-22gv-65f4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-9969-6676-49h5: Echo: WebSocket proxy can retain connections and handlers after client disconnect</title>
-    <id>https://osv.dev/vulnerability/GHSA-9969-6676-49h5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9969-6676-49h5"/>
-    <published>2026-10-23T20:50:17Z</published>
-    <updated>2026-10-23T21:00:05Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Echo: WebSocket proxy can retain connections and handlers after client disconnect&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/labstack/echo/v4&lt;/code&gt; — fixed in 4.16.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/labstack/echo/v5&lt;/code&gt; — fixed in 5.4.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-Echo&amp;#x27;s Proxy middleware could retain a handler, copy goroutines and network connections after a WebSocket client disconnected if the upstream kept its connection open. The raw proxy waited for both copy directions to finish without reliably closing the other connection when one direction ended. Rejected upgrade responses with HTTP keep-alive were one way to trigger this behavior.
-
-Repeated connections can accumulate resources and cause denial of service. The impact depends on the proxy route&amp;#x27;s accessibility, upstream behavior and configured connection deadlines. This is a medium-severity resource-retention issue; no confidentiality or integrity impact is claimed.
-
-## Affected versions and patch
-
-Affected versions are v4.15.0 through v4.16.0 and v5.0.0 through v5.4.0. The regress…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/security/advisories/GHSA-9969-6676-49h5"&gt;https://github.com/labstack/echo/security/advisories/GHSA-9969-6676-49h5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/commit/1855061e572ae9dab727c811d8382f266bfbaaec"&gt;https://github.com/labstack/echo/commit/1855061e572ae9dab727c811d8382f266bfbaaec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/commit/3fb0ba7e17645bb65611e2a08875d0a2f65c421f"&gt;https://github.com/labstack/echo/commit/3fb0ba7e17645bb65611e2a08875d0a2f65c421f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo"&gt;https://github.com/labstack/echo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/releases/tag/v4.16.1"&gt;https://github.com/labstack/echo/releases/tag/v4.16.1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/releases/tag/v5.4.1"&gt;https://github.com/labstack/echo/releases/tag/v5.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9969-6676-49h5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-h7wr-284f-5qvc: Echo: Decompress permits unbounded gzip expansion in v4</title>
-    <id>https://osv.dev/vulnerability/GHSA-h7wr-284f-5qvc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h7wr-284f-5qvc"/>
-    <published>2026-10-23T20:49:49Z</published>
-    <updated>2026-10-23T21:00:04Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Echo: Decompress permits unbounded gzip expansion in v4&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/labstack/echo/v4&lt;/code&gt; — fixed in 4.16.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-Echo v4&amp;#x27;s opt-in Decompress middleware exposed a gzip-decoded request stream without limiting its expanded size. A small compressed request could therefore produce a very large decoded body. Handlers that read or bind that body could consume excessive memory or CPU, and repeated or concurrent requests could cause denial of service.
-
-The middleware is not enabled by default. A limit on the compressed request size alone does not bound the decompressed size. Applications that already apply an effective body limit after decompression have reduced exposure.
-
-## Affected versions and patch
-
-Echo v4 versions through v4.16.0 are affected. Upgrade to [v4.16.1](https://github.com/labstack/echo/releases/tag/v4.16.1).
-
-The patch adds `DecompressConfig.MaxDecompressedSize`, defaulting to 100…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/security/advisories/GHSA-h7wr-284f-5qvc"&gt;https://github.com/labstack/echo/security/advisories/GHSA-h7wr-284f-5qvc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/pull/3136"&gt;https://github.com/labstack/echo/pull/3136&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/commit/3fb0ba7e17645bb65611e2a08875d0a2f65c421f"&gt;https://github.com/labstack/echo/commit/3fb0ba7e17645bb65611e2a08875d0a2f65c421f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo"&gt;https://github.com/labstack/echo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/releases/tag/v4.16.1"&gt;https://github.com/labstack/echo/releases/tag/v4.16.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h7wr-284f-5qvc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-h53f-rm2w-w7rg: Echo: X-Real-IP extractor trusts the header value instead of the sending peer</title>
-    <id>https://osv.dev/vulnerability/GHSA-h53f-rm2w-w7rg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h53f-rm2w-w7rg"/>
-    <published>2026-10-23T20:50:25Z</published>
-    <updated>2026-10-23T21:00:04Z</updated>
-    <category term="Go"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Echo: X-Real-IP extractor trusts the header value instead of the sending peer&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/labstack/echo/v5&lt;/code&gt; — fixed in 5.4.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-
-In Echo v5, `ExtractIPFromRealIPHeader` checked whether the address supplied in `X-Real-IP` belonged to a trusted range instead of checking the address of the direct network peer. An untrusted client could therefore supply a loopback or private address and have it returned by `c.RealIP()` with the extractor&amp;#x27;s default trust options.
-
-Applications using this extractor for IP allowlists, IP-based rate limiting, audit logs or forwarding headers could accept a spoofed client identity. Exploitation requires that the attacker can reach Echo directly or that an intervening proxy passes through the attacker&amp;#x27;s `X-Real-IP` value. Applications using the default direct IP extractor are unaffected. Echo v4 is unaffected by this v5 regression.
-
-## Affected versions and patch
-
-All v5 releases f…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/security/advisories/GHSA-h53f-rm2w-w7rg"&gt;https://github.com/labstack/echo/security/advisories/GHSA-h53f-rm2w-w7rg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/commit/1855061e572ae9dab727c811d8382f266bfbaaec"&gt;https://github.com/labstack/echo/commit/1855061e572ae9dab727c811d8382f266bfbaaec&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo"&gt;https://github.com/labstack/echo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/labstack/echo/releases/tag/v5.4.1"&gt;https://github.com/labstack/echo/releases/tag/v5.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h53f-rm2w-w7rg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-c8w8-3pqp-wr83: SiYuan: A parser differential between the WebSocket keepalive exemption and the session quarantine allows unauthenticated access to the broadcast event stream</title>
-    <id>https://osv.dev/vulnerability/GHSA-c8w8-3pqp-wr83</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c8w8-3pqp-wr83"/>
-    <published>2026-10-23T18:34:09Z</published>
-    <updated>2026-10-23T18:45:09Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-73054"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: A parser differential between the WebSocket keepalive exemption and the session quarantine allows unauthenticated access to the broadcast event stream&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73054&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260731131820-67bc300b6ea6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Two checks on the same WebSocket request URI parse it differently. The authentication exemption for keepalive sessions matches raw substrings, while the quarantine introduced to contain those sessions reads a parsed query parameter. Because Go&amp;#x27;s `url.Values.Get` returns only the first value for a repeated key, a single URI can satisfy the exemption and still resolve to a non-auth session identity.
-
-The result is that an unauthenticated remote caller connects to the kernel WebSocket with a valid access auth code configured, is placed in the general broadcast pool rather than the quarantined pool, and receives the live event stream.
-
-### Details
-
-**The exemption matches substrings.** `kernel/server/serve.go:1222` on the development branch, `:1074` on master:
-
-```go
-authOk = stri…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-c8w8-3pqp-wr83"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-c8w8-3pqp-wr83&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-73054"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-73054&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/67bc300b6ea6650d99dae55c827aeced419c8ac4"&gt;https://github.com/siyuan-note/siyuan/commit/67bc300b6ea6650d99dae55c827aeced419c8ac4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/releases/tag/v3.7.4-alpha.4"&gt;https://github.com/siyuan-note/siyuan/releases/tag/v3.7.4-alpha.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/siyuan-before-authentication-bypass-via-websocket"&gt;https://www.vulncheck.com/advisories/siyuan-before-authentication-bypass-via-websocket&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c8w8-3pqp-wr83"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-rpx2-p6hp-x5gj: SiYuan: Missing consistency check between packageName and repoURL/repoHash in bazaar package install allows overwriting an existing, trusted plugin</title>
-    <id>https://osv.dev/vulnerability/GHSA-rpx2-p6hp-x5gj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rpx2-p6hp-x5gj"/>
-    <published>2026-10-23T18:38:25Z</published>
-    <updated>2026-10-23T18:45:08Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-62204"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: Missing consistency check between packageName and repoURL/repoHash in bazaar package install allows overwriting an existing, trusted plugin&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-62204&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:C/C:L/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260808010544-26ccb40d390e&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`installBazaarPlugin` (and the equivalent endpoints for widgets/icons/templates/themes) accept
-`packageName`, `repoURL`, and `repoHash` as independent request fields with no validation that
-they refer to the same package. `packageName` alone determines the install destination;
-`repoURL`/`repoHash` alone determine what content gets downloaded and written there. A request
-can name an already-installed, already-enabled plugin as `packageName` while pointing `repoURL`/
-`repoHash` at different, attacker-influenced content, silently overwriting the existing plugin&amp;#x27;s
-files.
-
-## Affected code
-
-`kernel/api/bazaar.go`:
-```go
-util.BindJsonArg(&amp;quot;packageName&amp;quot;, &amp;amp;packageName, true, true)
-util.BindJsonArg(&amp;quot;repoURL&amp;quot;, &amp;amp;repoURL, true, true)
-util.BindJsonArg(&amp;quot;repoHash&amp;quot;, &amp;amp;repoHash, true, true)
-err :…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-rpx2-p6hp-x5gj"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-rpx2-p6hp-x5gj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-62204"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-62204&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/26ccb40d390eb7d9b04673629a58ab1d69cc7e53"&gt;https://github.com/siyuan-note/siyuan/commit/26ccb40d390eb7d9b04673629a58ab1d69cc7e53&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/releases/tag/v3.8.0"&gt;https://github.com/siyuan-note/siyuan/releases/tag/v3.8.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/siyuan-before-plugin-overwrite-via-bazaar-install"&gt;https://www.vulncheck.com/advisories/siyuan-before-plugin-overwrite-via-bazaar-install&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rpx2-p6hp-x5gj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4pjg-x8qj-33j5: SiYuan: authFilePublishAccess distinguishes hidden and forbidden documents from public and nonexistent ones, and issues a publish-auth cookie for documents it reports as forbidden</title>
-    <id>https://osv.dev/vulnerability/GHSA-4pjg-x8qj-33j5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4pjg-x8qj-33j5"/>
-    <published>2026-10-23T18:31:42Z</published>
-    <updated>2026-10-23T18:45:08Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-73630"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: authFilePublishAccess distinguishes hidden and forbidden documents from public and nonexistent ones, and issues a publish-auth cookie for documents it reports as forbidden&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-73630&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260731093152-c7522b8db586&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`/api/filetree/authFilePublishAccess` is registered with `CheckAuth` only and is reachable anonymously. It never sets a failure code, so its outcome is signalled entirely by the response message and by whether a `Set-Cookie` header is present. Those two signals differ across access tiers, which lets an anonymous caller determine, for any candidate document identifier, whether that document is public or nonexistent, password-protected, or exists at the hidden or forbidden tier.
-
-Separately, hidden and forbidden entries carry an empty password. Submitting `password:&amp;quot;&amp;quot;` therefore satisfies the equality check for them, and the server responds by issuing `Set-Cookie: publish-auth-&amp;lt;docID&amp;gt;` for a document whose own tier is forbidden.
-
-### Details
-
-**Route,** identical on both refs:
-
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-4pjg-x8qj-33j5"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-4pjg-x8qj-33j5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-73630"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-73630&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/c7522b8db586ef1e1d6fa98bbe7ca0eb9d019efe"&gt;https://github.com/siyuan-note/siyuan/commit/c7522b8db586ef1e1d6fa98bbe7ca0eb9d019efe&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/releases/tag/v3.7.4-alpha.4"&gt;https://github.com/siyuan-note/siyuan/releases/tag/v3.7.4-alpha.4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/siyuan-before-information-disclosure-via-authfilepublishaccess"&gt;https://www.vulncheck.com/advisories/siyuan-before-information-disclosure-via-authfilepublishaccess&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4pjg-x8qj-33j5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

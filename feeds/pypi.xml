@@ -3,12 +3,520 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-10-28T00:45:08Z</updated>
+  <updated>2026-10-28T11:11:03Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-4rm8-3hmm-39fg: Pillow: Reachable undefined behavior in native integer operations, potentially leading to denial of service or logic integrity compromise</title>
+    <id>https://osv.dev/vulnerability/GHSA-4rm8-3hmm-39fg</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4rm8-3hmm-39fg"/>
+    <published>2026-10-22T16:01:14Z</published>
+    <updated>2026-10-28T11:11:03Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96641"/>
+    <category term="PYSEC-2026-4340"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Reachable undefined behavior in native integer operations, potentially leading to denial of service or logic integrity compromise&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96641, PYSEC-2026-4340&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Affected Object and Source
+
+Package: Pillow 12.3.0
+Source: PyPI sdist pillow-12.3.0.tar.gz
+SHA-256: 3b8182a766685eaa002637e28b4ec8d6b18819a0c71f579bf0dbaa5830297cce
+Sink: src/_imaging.c:2809:15, xsize += dx
+
+### Details
+The code in Pillow 12.3.0 is:
+```c
+for (xsize = 0; *text; text++) {
+    int dx = self-&amp;gt;glyphs[*text].dx;
+    if (dx &amp;gt; 0 &amp;amp;&amp;amp; xsize &amp;gt; INT_MAX - dx) {
+        PyErr_SetString(PyExc_OverflowError, &amp;quot;Width too large&amp;quot;);
+        return -1;
+    }
+    xsize += dx;
+}
+```
+The PILfont glyph advance is parsed from a signed 16-bit field, so the valid range for `dx` is `[-32768, 32767]`. The existing check only proves:
+`dx &amp;gt; 0 =&amp;gt; xsize &amp;lt;= INT_MAX - dx`
+It does **not** prove the other half of the contract:
+`dx &amp;lt; 0 =&amp;gt; xsize &amp;gt;= INT_MIN - dx`
+Taking `dx = -32768` and repeating it 65…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rm8-3hmm-39fg"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rm8-3hmm-39fg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-96641"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-96641&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10010"&gt;https://github.com/python-pillow/Pillow/pull/10010&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/80de4be9e38d3a6148dd4d8491eb80cd12b760a4"&gt;https://github.com/python-pillow/Pillow/commit/80de4be9e38d3a6148dd4d8491eb80cd12b760a4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4rm8-3hmm-39fg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-654x-cwwv-5j9c: Pillow: Arrow export leaks stale heap memory when PILLOW_ALIGNMENT &gt; 1</title>
+    <id>https://osv.dev/vulnerability/GHSA-654x-cwwv-5j9c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-654x-cwwv-5j9c"/>
+    <published>2026-10-23T21:53:21Z</published>
+    <updated>2026-10-28T11:10:57Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-114501"/>
+    <category term="PYSEC-2026-4336"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Arrow export leaks stale heap memory when PILLOW_ALIGNMENT &amp;gt; 1&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114501, PYSEC-2026-4336&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When [`PILLOW_ALIGNMENT`](https://pillow.readthedocs.io/en/stable/reference/block_allocator.html#memory-pools) is set above 1, exporting an image to Arrow returns uninitialized heap memory mixed in with the pixel data. That memory can include pixels from images the process freed earlier. 
+
+### Details
+
+With an alignment above 1, the default allocator pads each row up to `aligned_linesize` and starts the first row at an aligned offset into the block. It then exports `im-&amp;gt;blocks[0].ptr` as `xsize * ysize` tightly packed pixels, so exported data includes the padding bytes, and can include a few bytes from before the first row.
+
+Tested vulnerable on 11.2.1, 12.3.0, 4c1ed27a5.
+
+### PoC
+
+Whether things leak may depend on allocator configuration. This does show a leak on my Mac.
+
+```…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-654x-cwwv-5j9c"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-654x-cwwv-5j9c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114501"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114501&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10172"&gt;https://github.com/python-pillow/Pillow/pull/10172&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/19f64946eb247b973dd4560be7dea3bf979d2e6a"&gt;https://github.com/python-pillow/Pillow/commit/19f64946eb247b973dd4560be7dea3bf979d2e6a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-654x-cwwv-5j9c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-xgh8-jp6q-p5x8: Pillow: ReDoS in XbmImagePlugin: 512-byte file stalls Image.open() for minutes</title>
+    <id>https://osv.dev/vulnerability/GHSA-xgh8-jp6q-p5x8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-xgh8-jp6q-p5x8"/>
+    <published>2026-10-21T20:45:06Z</published>
+    <updated>2026-10-28T11:10:55Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112901"/>
+    <category term="CVE-2026-112901"/>
+    <category term="PYSEC-2026-4335"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: ReDoS in XbmImagePlugin: 512-byte file stalls Image.open() for minutes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112901, CVE-2026-112901, PYSEC-2026-4335&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+ReDoS in XbmImagePlugin: 512-byte file stalls Image.open() for minutes
+Location: src/PIL/XbmImagePlugin.py:58  in XbmImageFile._open()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+A crafted 512-byte file makes Pillow&amp;#x27;s `Image.open()` spend about six minutes of processor time on one core before it gives up with `UnidentifiedImageError`. Anyone who can hand bytes to an application that opens images with Pillow&amp;#x27;s default settings can trigger this, for example through an upload form, a thumbnailer, or a service that checks whether a blob is an image. A few such files sent at once can tie up a typical pool of worker processes.
+
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-xgh8-jp6q-p5x8"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-xgh8-jp6q-p5x8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112901"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112901&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/2852a3e3d568997ddec745fc800991f138878f4b"&gt;https://github.com/python-pillow/Pillow/commit/2852a3e3d568997ddec745fc800991f138878f4b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-xgh8-jp6q-p5x8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4335: Pillow is a Python imaging library. Prior to 13.0.0, Pillow's XBM header parser is vulnerable to regular-expression deni</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4335</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4335"/>
+    <published>2026-10-19T22:17:10Z</published>
+    <updated>2026-10-28T11:10:55Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112901"/>
+    <category term="CVE-2026-112901"/>
+    <category term="GHSA-xgh8-jp6q-p5x8"/>
+    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112901, CVE-2026-112901, GHSA-xgh8-jp6q-p5x8&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, Pillow&amp;#x27;s XBM header parser is vulnerable to regular-expression denial of service. In XbmImageFile._open, when an application calls Image.open() on a small crafted XBM file, XbmImagePlugin applies a backtracking expression to the attacker-controlled header before image dimensions are accepted, stalling a worker for minutes and denying service. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/2852a3e3d568997ddec745fc800991f138878f4b"&gt;https://github.com/python-pillow/Pillow/commit/2852a3e3d568997ddec745fc800991f138878f4b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-xgh8-jp6q-p5x8"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-xgh8-jp6q-p5x8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4335"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-58r4-6rv3-gfh8: Pillow: Out-of-bounds access in _imagingmorph on a zero-width image</title>
+    <id>https://osv.dev/vulnerability/GHSA-58r4-6rv3-gfh8</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-58r4-6rv3-gfh8"/>
+    <published>2026-10-20T20:56:22Z</published>
+    <updated>2026-10-28T11:10:53Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112397"/>
+    <category term="CVE-2026-112397"/>
+    <category term="PYSEC-2026-4329"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Out-of-bounds access in _imagingmorph on a zero-width image&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112397, CVE-2026-112397, PYSEC-2026-4329&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+A PPM or PGM file can declare a width of 0, which Pillow accepts, producing an image of size `(0, N)`. Passing that image to `ImageMorph.MorphOp.apply()` makes the native morphology code index a row buffer at `outrow[width - 1]`, which is `outrow[-1]` when the width is 0. The process crashes.
+
+### Details
+The PPM parser reads width and height with no lower-bound check:
+
+- `src/PIL/PpmImagePlugin.py:119`
+
+The native `apply()` writes the row edges with no guard that the width is positive:
+
+- `src/_imagingmorph.c:81` sets `outrow[0] = outrow[width - 1] = 0;`
+
+`match()` and `get_on_pixels()` use the same edge-indexing pattern.
+
+### PoC
+```python
+from PIL import Image, ImageMorph
+
+# A width-0 image (also producible from a crafted PPM header). apply() indexes
+# outrow[width - 1] == o…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-58r4-6rv3-gfh8"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-58r4-6rv3-gfh8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112397"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112397&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/18f7c0dfee93063c51db6ed0ca8c4da2999dcb64"&gt;https://github.com/python-pillow/Pillow/commit/18f7c0dfee93063c51db6ed0ca8c4da2999dcb64&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-58r4-6rv3-gfh8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4329: Pillow is a Python imaging library. Prior to 13.0.0, Pillow's ImageMorph.MorphOp.apply() can access memory before a row </title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4329</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4329"/>
+    <published>2026-10-19T22:17:06Z</published>
+    <updated>2026-10-28T11:10:53Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112397"/>
+    <category term="CVE-2026-112397"/>
+    <category term="GHSA-58r4-6rv3-gfh8"/>
+    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112397, CVE-2026-112397, GHSA-58r4-6rv3-gfh8&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, Pillow&amp;#x27;s ImageMorph.MorphOp.apply() can access memory before a row buffer for a zero-width image. PPM and PGM input can create an image with width zero, and the native morphology routine indexes outrow[width - 1] without rejecting that geometry. An attacker can supply such an image to an application that applies a morphology operation. This can crash the process. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/18f7c0dfee93063c51db6ed0ca8c4da2999dcb64"&gt;https://github.com/python-pillow/Pillow/commit/18f7c0dfee93063c51db6ed0ca8c4da2999dcb64&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-58r4-6rv3-gfh8"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-58r4-6rv3-gfh8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4329"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g842-9rc4-69pw: Pillow: Decompression bomb check bypass in SpiderImagePlugin.seek() leads to unbounded allocation DoS</title>
+    <id>https://osv.dev/vulnerability/GHSA-g842-9rc4-69pw</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g842-9rc4-69pw"/>
+    <published>2026-10-22T15:57:17Z</published>
+    <updated>2026-10-28T11:10:53Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96637"/>
+    <category term="PYSEC-2026-4338"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Decompression bomb check bypass in SpiderImagePlugin.seek() leads to unbounded allocation DoS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96637, PYSEC-2026-4338&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+SpiderImagePlugin&amp;#x27;s seek() bypasses the decompression bomb check, allowing a tiny (&amp;lt;1KB) crafted SPIDER stack file to trigger a multi-gigabyte allocation on im.load().
+
+## Affected versions
+All versions up to and including current HEAD (v13.0.0.dev0, commit e7a7ea84)
+
+## Root cause
+Image.open() runs Image._decompression_bomb_check(im.size) exactly once, in _open_core (src/PIL/Image.py:3668), right after the initial _open(). 
+
+SPIDER stack files are multi-frame: SpiderImageFile.seek(frame) (SpiderImagePlugin.py:179-190) computes an attacker-influenced stkoffset and calls self._open() AGAIN directly (line 190) — NOT through Image.open(). _open() re-parses a fresh 27-float header at that offset and reassigns:
+
+    self._size = int(h[12]), int(h[2])      # SpiderImagePlugin.py:131
+
+…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-g842-9rc4-69pw"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-g842-9rc4-69pw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-96637"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-96637&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10076"&gt;https://github.com/python-pillow/Pillow/pull/10076&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/7cb0e02389d8aac2a60896a490f572db0b07b841"&gt;https://github.com/python-pillow/Pillow/commit/7cb0e02389d8aac2a60896a490f572db0b07b841&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g842-9rc4-69pw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-8g5g-8vmr-9782: Pillow: Heap buffer overflow in ImagingJpegDecode</title>
+    <id>https://osv.dev/vulnerability/GHSA-8g5g-8vmr-9782</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8g5g-8vmr-9782"/>
+    <published>2026-10-20T20:40:07Z</published>
+    <updated>2026-10-28T11:10:51Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112403"/>
+    <category term="CVE-2026-112403"/>
+    <category term="PYSEC-2026-4332"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Heap buffer overflow in ImagingJpegDecode&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112403, CVE-2026-112403, PYSEC-2026-4332&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`JpegImageFile.draft()` — which `Image.thumbnail()` calls automatically — requests 1/2, 1/4 or 1/8 scaled JPEG output and shrinks `self._size` and the tile extents to match, so `_setimage()` allocates a single-row decode buffer of `ceil(W/s)` samples. `ImagingJpegDecode()` sets `cinfo.scale_num`/`scale_denom`, calls `jpeg_start_decompress()`, and then reads scanlines into that buffer without ever comparing `cinfo.output_width`, `cinfo.output_height` or `cinfo.out_color_components` against `state-&amp;gt;xsize`, `state-&amp;gt;ysize` and `state-&amp;gt;bits`.
+
+libjpeg-turbo 3.x decodes lossless (SOF3) JPEG, but hardwires lossless streams to no scaling — the requested `scale_denom` is silently discarded. It therefore returns full-width `W`-sample rows into a buffer sized for `ceil(W/s)`. Each `jpeg_r…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-8g5g-8vmr-9782"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-8g5g-8vmr-9782&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112403"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112403&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75"&gt;https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8g5g-8vmr-9782"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4332: Pillow is a Python imaging library. Prior to 13.0.0, Pillow's JPEG decoder can write a full-width scanline into a buffer</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4332</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4332"/>
+    <published>2026-10-19T22:17:07Z</published>
+    <updated>2026-10-28T11:10:51Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112403"/>
+    <category term="CVE-2026-112403"/>
+    <category term="GHSA-8g5g-8vmr-9782"/>
+    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112403, CVE-2026-112403, GHSA-8g5g-8vmr-9782&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, Pillow&amp;#x27;s JPEG decoder can write a full-width scanline into a buffer sized for a requested draft scale. ImagingJpegDecode does not verify libjpeg&amp;#x27;s actual output width and component count after scaling is requested, and an 8-bit lossless SOF3 JPEG decoded by a build linked to libjpeg-turbo 3.x can ignore the requested downscaling geometry. An attacker can supply such a JPEG to an application that uses draft() or thumbnail() to request downscaling. This can corrupt heap memory, crash the process, or potentially allow code execution. Older libjpeg-turbo 2.x and IJG builds reject the SOF3 input. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75"&gt;https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-8g5g-8vmr-9782"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-8g5g-8vmr-9782&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4332"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-5x8w-8jj5-q52h: Pillow: Heap buffer overflow in FlashPix (FPX) JPEG decoding leads to code execution</title>
+    <id>https://osv.dev/vulnerability/GHSA-5x8w-8jj5-q52h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5x8w-8jj5-q52h"/>
+    <published>2026-10-23T21:55:21Z</published>
+    <updated>2026-10-28T11:10:48Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112398"/>
+    <category term="CVE-2026-112398"/>
+    <category term="PYSEC-2026-4330"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Heap buffer overflow in FlashPix (FPX) JPEG decoding leads to code execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112398, CVE-2026-112398, PYSEC-2026-4330&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Credits
+
+**Researcher**: Alex Bouffard (mixbo@pebwalker.com)
+
+### Summary
+
+A heap buffer overflow in Pillow&amp;#x27;s FlashPix (FPX) JPEG-tile decoder lets an attacker achieve arbitrary code execution by getting an application to open a single crafted file with `Image.open()`. The file is recognized by content (the OLE2 magic), not by extension, so any service that opens or thumbnails untrusted uploads with the optional `olefile` dependency installed is reachable with no user interaction. In the PoC below, opening one crafted file executes an attacker-chosen command on stock Pillow 12.2.0 (x86_64 Ubuntu 24.04, glibc 2.39).
+
+### Details
+
+`FpxImagePlugin` decodes FlashPix (FPX) files, which are OLE2/CFBF compound documents.
+
+`Image.open()` auto-detects them from the OLE2 magic `D0CF11E0...` when…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-5x8w-8jj5-q52h"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-5x8w-8jj5-q52h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112398"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112398&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75"&gt;https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5x8w-8jj5-q52h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4330: Pillow is a Python imaging library. Prior to 13.0.0, Pillow's FlashPix JPEG-tile decoder can write decoded scanlines bey</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4330</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4330"/>
+    <published>2026-10-19T22:17:07Z</published>
+    <updated>2026-10-28T11:10:48Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112398"/>
+    <category term="CVE-2026-112398"/>
+    <category term="GHSA-5x8w-8jj5-q52h"/>
+    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112398, CVE-2026-112398, GHSA-5x8w-8jj5-q52h&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, Pillow&amp;#x27;s FlashPix JPEG-tile decoder can write decoded scanlines beyond the allocated tile buffer. FlashPix (FPX) JPEG decoding selects raw mode LA with two bytes per pixel, while an unrecognized JPEG mode can be decoded as JCS_UNKNOWN with four components, causing ImagingJpegDecode to write four-component scanlines into the two-byte tile buffer. An attacker can supply a crafted OLE2 FlashPix file to an application with the optional olefile dependency installed that opens or thumbnails untrusted input. This can corrupt heap memory and may allow arbitrary code execution. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75"&gt;https://github.com/python-pillow/Pillow/commit/242a059aedc1935097d9aa1dc3f099750467ba75&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-5x8w-8jj5-q52h"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-5x8w-8jj5-q52h&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4330"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-p8hx-v2p6-rp84: Pillow: Decompression-bomb protection bypass via multi-frame seek() in MPO and DCX (MpoImageFile.seek / DcxImageFile.seek)</title>
+    <id>https://osv.dev/vulnerability/GHSA-p8hx-v2p6-rp84</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p8hx-v2p6-rp84"/>
+    <published>2026-10-22T15:56:37Z</published>
+    <updated>2026-10-28T11:10:47Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96636"/>
+    <category term="PYSEC-2026-4337"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Decompression-bomb protection bypass via multi-frame seek() in MPO and DCX (MpoImageFile.seek / DcxImageFile.seek)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96636, PYSEC-2026-4337&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Pillow&amp;#x27;s decompression-bomb protection (`Image._decompression_bomb_check`, gated by `Image.MAX_IMAGE_PIXELS`) is enforced only on the **first frame**, inside `Image.open()`. For multi-frame formats, `seek()` re-parses the target frame&amp;#x27;s header and resets `self._size`. `GifImagePlugin` and `TiffImagePlugin` re-run the bomb check on `seek()`, but **`MpoImageFile.seek()` and `DcxImageFile.seek()` do not.** A crafted MPO or DCX whose first frame is tiny (passing the check) but whose later frame declares enormous dimensions therefore bypasses the protection: loading that frame decodes an over-limit image and commits large amounts of memory — a denial of service (memory exhaustion / OOM).
+
+Same class as the recently assigned CVE-2026-55379 (BdfFontFile), CVE-2026-55380 (GdImageFile) …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-p8hx-v2p6-rp84"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-p8hx-v2p6-rp84&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-96636"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-96636&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10011"&gt;https://github.com/python-pillow/Pillow/pull/10011&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/f1acfc54c53502948d0d14121872061df931db48"&gt;https://github.com/python-pillow/Pillow/commit/f1acfc54c53502948d0d14121872061df931db48&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p8hx-v2p6-rp84"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-3j72-p6qg-6xp7: Pillow: TarIO negative size field causes infinite CPU-spin loop</title>
+    <id>https://osv.dev/vulnerability/GHSA-3j72-p6qg-6xp7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3j72-p6qg-6xp7"/>
+    <published>2026-10-22T16:01:46Z</published>
+    <updated>2026-10-28T11:10:43Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96642"/>
+    <category term="PYSEC-2026-4341"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: TarIO negative size field causes infinite CPU-spin loop&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96642, PYSEC-2026-4341&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`TarIO.__init__` does not check that a tar header&amp;#x27;s size field is positive. A crafted header with a negative size makes it seek backward onto itself. This causes an infinite loop that uses 100% CPU and never returns.
+
+### Details
+`TarIO.__init__` reads 512-byte tar headers one at a time, looking for a member with a given name. For each header it reads the size field and skips ahead to the next header:
+
+```python
+size = int(s[124:135], 8)
+...
+self.fh.seek((size + 511) &amp;amp; (~511), io.SEEK_CUR)
+```
+There is no check that size is zero or more. A tar header can set this field to a negative octal value. For size = -512, the seek offset comes out to exactly -512, which cancels the 512 bytes the loop had just read. The file position goes right back to where this loop step started.
+
+The l…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-3j72-p6qg-6xp7"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-3j72-p6qg-6xp7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-96642"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-96642&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10012"&gt;https://github.com/python-pillow/Pillow/pull/10012&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/19b695fdcc5eddc37374e2b1645fc4185edaf71d"&gt;https://github.com/python-pillow/Pillow/commit/19b695fdcc5eddc37374e2b1645fc4185edaf71d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3j72-p6qg-6xp7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-g4qv-2jxx-769h: Pillow: PNG eXIf chunk makes EXIF parsing run in quadratic time</title>
+    <id>https://osv.dev/vulnerability/GHSA-g4qv-2jxx-769h</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-g4qv-2jxx-769h"/>
+    <published>2026-10-22T16:02:39Z</published>
+    <updated>2026-10-28T11:10:42Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96643"/>
+    <category term="PYSEC-2026-4342"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: PNG eXIf chunk makes EXIF parsing run in quadratic time&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96643, PYSEC-2026-4342&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+  A PNG file with a large eXIf chunk full of repeated 6-byte markers makes Pillow&amp;#x27;s EXIF parser take seconds of CPU instead of milliseconds. The cost grows with the square of the chunk size, so a normal small-photo-sized file is enough to cause real delay.
+
+  ### Details
+  `Exif.load()` in `src/PIL/Image.py` strips a marker from the start of the EXIF data like this:
+
+  ```python
+  while data and data.startswith(b&amp;quot;Exif\x00\x00&amp;quot;):
+      data = data[6:]
+  ```
+
+  Each pass makes a new copy of the remaining data. A real camera writes this marker once, so this is not normally a problem.
+
+  `chunk_eXIf()` in `src/PIL/PngImagePlugin.py` puts the raw PNG eXIf chunk straight into `info[&amp;quot;exif&amp;quot;]` with no size limit and no check of its content. PNG text chunks (tEXt, zTXt, iTXt) are capped …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-g4qv-2jxx-769h"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-g4qv-2jxx-769h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-96643"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-96643&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10073"&gt;https://github.com/python-pillow/Pillow/pull/10073&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/806e38381c781f32bbd22f4cd026678acd40fd6c"&gt;https://github.com/python-pillow/Pillow/commit/806e38381c781f32bbd22f4cd026678acd40fd6c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-g4qv-2jxx-769h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-pchr-8j38-3x4p: Pillow: TIFF encoder ColorMap plane-size mismatch causes a heap out-of-bounds read</title>
+    <id>https://osv.dev/vulnerability/GHSA-pchr-8j38-3x4p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pchr-8j38-3x4p"/>
+    <published>2026-10-20T20:51:40Z</published>
+    <updated>2026-10-28T11:10:41Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112896"/>
+    <category term="CVE-2026-112896"/>
+    <category term="PYSEC-2026-4334"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: TIFF encoder ColorMap plane-size mismatch causes a heap out-of-bounds read&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112896, CVE-2026-112896, PYSEC-2026-4334&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+A small attacker-supplied TIFF can be opened and loaded normally, then reach an out-of-bounds read when an application saves it back to TIFF with retained metadata. The fixed reproducer is a 1×1, 16-bit grayscale, PackBits-compressed TIFF containing tag 320 (ColorMap) with **768 SHORT values**: three zero-filled planes of 256 entries each. No Python object is forged and no metadata is injected after loading.
+
+Pillow&amp;#x27;s TIFF encoder allocates **768 × 2 = 1536 bytes**, then passes three plane pointers separated by 256 SHORT entries to libtiff. With `BitsPerSample = 16`, libtiff instead expects **65536 SHORT values per plane** and attempts a **131072-byte read** from a plane pointer. Existing ASAN observations identify a heap-buffer-overflow READ crossing the 1536-byte allocation m…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-pchr-8j38-3x4p"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-pchr-8j38-3x4p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112896"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112896&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/d03dc3c587a9b0bdc9e4304d70d59a635a87b742"&gt;https://github.com/python-pillow/Pillow/commit/d03dc3c587a9b0bdc9e4304d70d59a635a87b742&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pchr-8j38-3x4p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4334: Pillow is a Python imaging library. Prior to 13.0.0, Pillow's TIFF encoder can read beyond a ColorMap buffer when retain</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4334</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4334"/>
+    <published>2026-10-19T22:17:09Z</published>
+    <updated>2026-10-28T11:10:41Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112896"/>
+    <category term="CVE-2026-112896"/>
+    <category term="GHSA-pchr-8j38-3x4p"/>
+    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112896, CVE-2026-112896, GHSA-pchr-8j38-3x4p&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, Pillow&amp;#x27;s TIFF encoder can read beyond a ColorMap buffer when retained TIFF metadata has a plane size inconsistent with BitsPerSample. A small TIFF can be opened normally and then retain a crafted ColorMap that is reused when the image is saved. An application that re-encodes the attacker&amp;#x27;s TIFF with libtiff can trigger the out-of-bounds read. This can disclose heap memory in the output or crash the process. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/d03dc3c587a9b0bdc9e4304d70d59a635a87b742"&gt;https://github.com/python-pillow/Pillow/commit/d03dc3c587a9b0bdc9e4304d70d59a635a87b742&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-pchr-8j38-3x4p"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-pchr-8j38-3x4p&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4334"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-v9pv-5gc8-w2m6: Pillow multi-frame loaders can reuse stale native image storage after mode transitions</title>
+    <id>https://osv.dev/vulnerability/GHSA-v9pv-5gc8-w2m6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-v9pv-5gc8-w2m6"/>
+    <published>2026-10-22T16:00:15Z</published>
+    <updated>2026-10-28T11:10:36Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96639"/>
+    <category term="PYSEC-2026-4339"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow multi-frame loaders can reuse stale native image storage after mode transitions&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96639, PYSEC-2026-4339&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+Pillow multi-frame image loaders can retain native `ImagingCore` storage allocated for one frame while changing the Python-side image `mode` and decoder tiles for a later frame.
+
+If frame 0 allocates storage for a narrow mode such as `L`, and a later frame of the same dimensions switches to a wider mode such as `RGB` or `CMYK`, Pillow may decode wider pixels into the stale narrow native buffer. This causes native
+out-of-bounds writes and process crashes. In the MPO/JPEG path, I also demonstrated command execution in matching Python/Pillow runtime profiles through Pillow&amp;#x27;s documented `ImageSequence.Iterator` + `frame.load()` path.
+
+### Details
+The root cause appears to be that `ImageFile.load_prepare()` only reallocates native storage when `_im is None`. It does not verify that …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-v9pv-5gc8-w2m6"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-v9pv-5gc8-w2m6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-96639"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-96639&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10105"&gt;https://github.com/python-pillow/Pillow/pull/10105&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/78d97d994579aef81aafe123773d525f40f2522a"&gt;https://github.com/python-pillow/Pillow/commit/78d97d994579aef81aafe123773d525f40f2522a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-v9pv-5gc8-w2m6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-cp9v-662q-vvx9: Pillow: NULL pointer dereference in Image.merge via an unvalidated band 0</title>
+    <id>https://osv.dev/vulnerability/GHSA-cp9v-662q-vvx9</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-cp9v-662q-vvx9"/>
+    <published>2026-10-21T20:30:25Z</published>
+    <updated>2026-10-28T11:10:36Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112405"/>
+    <category term="CVE-2026-112405"/>
+    <category term="PYSEC-2026-4333"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: NULL pointer dereference in Image.merge via an unvalidated band 0&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112405, CVE-2026-112405, PYSEC-2026-4333&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+`Image.merge()` checks the mode of every input band except band 0. If band 0 is a single-band `I` or `F` image, the native merge routine reads a pixel pointer that is NULL for those modes and the process crashes. The IPTC plugin reaches this from a plain `Image.open()` followed by a load, and IPTC has no magic-byte prefilter, so a crafted file with no recognizable header can drive it.
+
+### Details
+The validation loop skips band 0:
+
+- `src/PIL/Image.py:3795` iterates `for band in bands[1:]` and checks mode and size only for those.
+
+For an `I` or `F` image the 8-bit plane `image8` is NULL (only `image32` is set). `ImagingMerge` dereferences `bands[0]-&amp;gt;image8[y]` for the multi-band output modes:
+
+- `src/libImaging/Bands.c:302`, `:311`, `:321`
+
+The IPTC loader builds the band list …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-cp9v-662q-vvx9"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-cp9v-662q-vvx9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112405"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112405&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/b6ee66e8b2c2c0932bdf65f963268d9f2927ef86"&gt;https://github.com/python-pillow/Pillow/commit/b6ee66e8b2c2c0932bdf65f963268d9f2927ef86&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-cp9v-662q-vvx9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4333: Pillow is a Python imaging library. From 12.0.0 until 13.0.0, Pillow's Image.merge() can dereference a null image8 plane</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4333</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4333"/>
+    <published>2026-10-19T22:17:08Z</published>
+    <updated>2026-10-28T11:10:36Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112405"/>
+    <category term="CVE-2026-112405"/>
+    <category term="GHSA-cp9v-662q-vvx9"/>
+    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112405, CVE-2026-112405, GHSA-cp9v-662q-vvx9&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. From 12.0.0 until 13.0.0, Pillow&amp;#x27;s Image.merge() can dereference a null image8 plane. Validation skips the first input band, allowing a 32-bit integer or floating-point image backed by image32 storage to be merged as a narrower multiband image. A crafted IPTC file can reach this path when an application opens and loads it, or a caller can invoke Image.merge() directly with such a first band. This causes a native process crash. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/b6ee66e8b2c2c0932bdf65f963268d9f2927ef86"&gt;https://github.com/python-pillow/Pillow/commit/b6ee66e8b2c2c0932bdf65f963268d9f2927ef86&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-cp9v-662q-vvx9"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-cp9v-662q-vvx9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4333"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-7mwm-ghpf-9vrm: Pillow: Double free in ImagingScaleAffine on calloc failure via Image.transform</title>
+    <id>https://osv.dev/vulnerability/GHSA-7mwm-ghpf-9vrm</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7mwm-ghpf-9vrm"/>
+    <published>2026-10-21T20:03:56Z</published>
+    <updated>2026-10-28T11:10:35Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112402"/>
+    <category term="CVE-2026-112402"/>
+    <category term="PYSEC-2026-4331"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Double free in ImagingScaleAffine on calloc failure via Image.transform&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112402, CVE-2026-112402, PYSEC-2026-4331&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
+============================================================================
+Double free in ImagingScaleAffine on calloc failure via Image.transform
+Location: src/libImaging/Geometry.c:866  in ImagingScaleAffine()
+Commit:   a707c6b21c313880d0771e54965d142dd42358b6
+============================================================================
+```
+
+There is a double free in Pillow&amp;#x27;s `Image.transform()` that crashes the process when an oversized transform runs out of memory. Instead of only raising `MemoryError`, Pillow frees the output image&amp;#x27;s memory once while handling the error and then again when the Python object is cleaned up. Anyone who can choose the output size of `Image.transform()` can trigger it, but only on a worker with a memory limit (a common hardening for image workers) or …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-7mwm-ghpf-9vrm"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-7mwm-ghpf-9vrm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112402"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112402&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/aafa6c75f7cdabb9f409a8aac7c780bea31d08d9"&gt;https://github.com/python-pillow/Pillow/commit/aafa6c75f7cdabb9f409a8aac7c780bea31d08d9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7mwm-ghpf-9vrm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4331: Pillow is a Python imaging library. Prior to 13.0.0, Pillow can double free image memory when ImagingScaleAffine encount</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4331</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4331"/>
+    <published>2026-10-19T22:17:07Z</published>
+    <updated>2026-10-28T11:10:35Z</updated>
+    <category term="PyPI"/>
+    <category term="BIT-pillow-2026-112402"/>
+    <category term="CVE-2026-112402"/>
+    <category term="GHSA-7mwm-ghpf-9vrm"/>
+    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112402, CVE-2026-112402, GHSA-7mwm-ghpf-9vrm&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, Pillow can double free image memory when ImagingScaleAffine encounters a selective allocation failure. The affected fast path handles Transform.EXTENT or pure scale-and-translate Transform.AFFINE operations with the default NEAREST resampling. The output image allocation must succeed while the additional per-column lookup allocation fails, after which the error path deletes image storage that later cleanup releases again. An attacker who can drive such a large Image.transform() operation under memory pressure may trigger the failure. This can crash the process and may corrupt memory. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/aafa6c75f7cdabb9f409a8aac7c780bea31d08d9"&gt;https://github.com/python-pillow/Pillow/commit/aafa6c75f7cdabb9f409a8aac7c780bea31d08d9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-7mwm-ghpf-9vrm"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-7mwm-ghpf-9vrm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4331"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-9v9v-9qvf-h2hj: Pillow: Heap over-read in WMF/EMF rendering via 16-bit dimension truncation (Windows builds)</title>
+    <id>https://osv.dev/vulnerability/GHSA-9v9v-9qvf-h2hj</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9v9v-9qvf-h2hj"/>
+    <published>2026-10-22T16:03:14Z</published>
+    <updated>2026-10-28T11:10:35Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96644"/>
+    <category term="PYSEC-2026-4343"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Heap over-read in WMF/EMF rendering via 16-bit dimension truncation (Windows builds)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96644, PYSEC-2026-4343&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:L/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+On Windows builds, Pillow stores EMF and WMF image dimensions without a range check and passes them to the native `drawwmf` handler. That code sizes its allocation from dimensions truncated into 16-bit header fields but copies the result using the full 32-bit dimensions. A crafted metafile that is wide and short passes the decompression-bomb pixel check yet causes a heap over-read.
+
+### Details
+The EMF branch computes the size straight from signed 32-bit header fields and stores it with no positivity or range check:
+
+- `src/PIL/WmfImagePlugin.py:121-129` reads the bounding box; `:148` stores it; the size reaches the native handler through `src/PIL/WmfImagePlugin.py:56`.
+
+In the native handler the DIB header fields `bcWidth` and `bcHeight` are 16-bit and truncate the allocation,…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-9v9v-9qvf-h2hj"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-9v9v-9qvf-h2hj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-96644"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-96644&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10120"&gt;https://github.com/python-pillow/Pillow/pull/10120&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/4cf46bee338304c5c8968fd7f132ba0d40c428b7"&gt;https://github.com/python-pillow/Pillow/commit/4cf46bee338304c5c8968fd7f132ba0d40c428b7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9v9v-9qvf-h2hj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4341: Pillow is a Python imaging library. Prior to 13.0.0, the TarIO initializer in src/PIL/TarIO.py accepts a negative octal </title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4341</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4341"/>
+    <published>2026-10-21T21:20:32Z</published>
+    <updated>2026-10-28T11:00:02Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96642"/>
+    <category term="GHSA-3j72-p6qg-6xp7"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-96642, GHSA-3j72-p6qg-6xp7&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, the TarIO initializer in src/PIL/TarIO.py accepts a negative octal member size and computes a backward seek that returns to the same 512-byte header. When the requested member name does not match, the parser repeatedly reads that header, consumes a full CPU core, and never returns. TarIO is reached only when an application directly uses PIL.TarIO.TarIO rather than the default Image.open() path. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-3j72-p6qg-6xp7"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-3j72-p6qg-6xp7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10012"&gt;https://github.com/python-pillow/Pillow/pull/10012&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/19b695fdcc5eddc37374e2b1645fc4185edaf71d"&gt;https://github.com/python-pillow/Pillow/commit/19b695fdcc5eddc37374e2b1645fc4185edaf71d&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4341"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4342: Pillow is a Python imaging library. From 11.0.0 until 13.0.0, Exif.load() in src/PIL/Image.py repeatedly slices the rema</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4342</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4342"/>
+    <published>2026-10-21T21:20:32Z</published>
+    <updated>2026-10-28T11:00:02Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96643"/>
+    <category term="GHSA-g4qv-2jxx-769h"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-96643, GHSA-g4qv-2jxx-769h&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. From 11.0.0 until 13.0.0, Exif.load() in src/PIL/Image.py repeatedly slices the remaining EXIF data while it begins with the six-byte Exif header. src/PIL/PngImagePlugin.py accepts an uncapped PNG eXIf chunk, so a file filled with repeated headers causes a new shrinking copy on every iteration and quadratic CPU work. The condition is reachable through Image.getexif(), Image._getexif(), and ImageOps.exif_transpose(), including common photo-upload rotation workflows. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-g4qv-2jxx-769h"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-g4qv-2jxx-769h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10073"&gt;https://github.com/python-pillow/Pillow/pull/10073&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/806e38381c781f32bbd22f4cd026678acd40fd6c"&gt;https://github.com/python-pillow/Pillow/commit/806e38381c781f32bbd22f4cd026678acd40fd6c&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4342"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4343: Pillow is a Python imaging library. Prior to 13.0.0 on Windows, src/PIL/WmfImagePlugin.py passes unchecked 32-bit WMF or</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4343</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4343"/>
+    <published>2026-10-21T21:20:32Z</published>
+    <updated>2026-10-28T11:00:02Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96644"/>
+    <category term="GHSA-9v9v-9qvf-h2hj"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-96644, GHSA-9v9v-9qvf-h2hj&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0 on Windows, src/PIL/WmfImagePlugin.py passes unchecked 32-bit WMF or EMF dimensions to the native drawwmf handler in src/display.c. The handler sizes a DIB allocation from 16-bit-truncated bcWidth and bcHeight fields but copies pixel data using the original full dimensions. A crafted wide, short metafile can pass the pixel-count decompression-bomb check and make the Windows-only renderer read beyond the heap buffer, potentially disclosing memory or crashing the process. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-9v9v-9qvf-h2hj"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-9v9v-9qvf-h2hj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10120"&gt;https://github.com/python-pillow/Pillow/pull/10120&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/4cf46bee338304c5c8968fd7f132ba0d40c428b7"&gt;https://github.com/python-pillow/Pillow/commit/4cf46bee338304c5c8968fd7f132ba0d40c428b7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4343"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4336: Pillow is a Python imaging library. From 11.2.1 until 13.0.0, Arrow export assumes that an image's rows are tightly cont</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4336</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4336"/>
+    <published>2026-10-21T22:16:49Z</published>
+    <updated>2026-10-28T11:00:02Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-114501"/>
+    <category term="GHSA-654x-cwwv-5j9c"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-114501, GHSA-654x-cwwv-5j9c&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. From 11.2.1 until 13.0.0, Arrow export assumes that an image&amp;#x27;s rows are tightly contiguous and exports from im-&amp;gt;blocks[0].ptr even when PILLOW_ALIGNMENT makes aligned_linesize include row padding or an aligned offset before the first row. The resulting Arrow buffer can include uninitialized padding, bytes preceding the first row, or stale heap contents from previously freed images. Applications that configure alignment and export images to Arrow can therefore disclose one user&amp;#x27;s pixels or other process memory to another user. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-654x-cwwv-5j9c"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-654x-cwwv-5j9c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10172"&gt;https://github.com/python-pillow/Pillow/pull/10172&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/19f64946eb247b973dd4560be7dea3bf979d2e6a"&gt;https://github.com/python-pillow/Pillow/commit/19f64946eb247b973dd4560be7dea3bf979d2e6a&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4336"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4339: Pillow is a Python imaging library. From 11.0.0 until 13.0.0, multi-frame loaders can retain an ImagingCore allocation c</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4339</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4339"/>
+    <published>2026-10-21T21:20:32Z</published>
+    <updated>2026-10-28T11:00:02Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96639"/>
+    <category term="GHSA-v9pv-5gc8-w2m6"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-96639, GHSA-v9pv-5gc8-w2m6&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. From 11.0.0 until 13.0.0, multi-frame loaders can retain an ImagingCore allocation created for a narrow frame mode while a later frame of the same dimensions changes the logical mode and decoder tiles to wider RGB or CMYK data. ImageFile.load_prepare() reuses the stale native storage because _im is non-null without verifying that its mode and size still match. Crafted PSD, MPO, DCX, or MIC frame transitions can then write wider pixels into the narrow allocation, causing native out-of-bounds writes and crashes. The MPO path can also cause a native over-read and, in demonstrated runtime-specific profiles, command execution. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-v9pv-5gc8-w2m6"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-v9pv-5gc8-w2m6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10105"&gt;https://github.com/python-pillow/Pillow/pull/10105&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/78d97d994579aef81aafe123773d525f40f2522a"&gt;https://github.com/python-pillow/Pillow/commit/78d97d994579aef81aafe123773d525f40f2522a&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4339"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4337: Pillow is a Python imaging library. Prior to 13.0.0, MpoImageFile.seek() and DcxImageFile.seek() reparse later MPO or DC</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4337</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4337"/>
+    <published>2026-10-21T21:20:31Z</published>
+    <updated>2026-10-28T11:00:02Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96636"/>
+    <category term="GHSA-p8hx-v2p6-rp84"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-96636, GHSA-p8hx-v2p6-rp84&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, MpoImageFile.seek() and DcxImageFile.seek() reparse later MPO or DCX frames and replace self._size without rerunning Image._decompression_bomb_check(). A crafted multi-frame image can use a tiny first frame to pass Image.open() and then declare an over-limit later frame. Normal frame iteration through seek(), load(), or ImageSequence.Iterator can decode that frame and commit hundreds of megabytes or more, causing memory-exhaustion denial of service. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-p8hx-v2p6-rp84"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-p8hx-v2p6-rp84&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10011"&gt;https://github.com/python-pillow/Pillow/pull/10011&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/f1acfc54c53502948d0d14121872061df931db48"&gt;https://github.com/python-pillow/Pillow/commit/f1acfc54c53502948d0d14121872061df931db48&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4337"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4340: Pillow is a Python imaging library. Prior to 13.0.0, PILfont text-width accumulation in src/_imaging.c checks positive g</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4340</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4340"/>
+    <published>2026-10-21T21:20:32Z</published>
+    <updated>2026-10-28T11:00:02Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96641"/>
+    <category term="GHSA-4rm8-3hmm-39fg"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-96641, GHSA-4rm8-3hmm-39fg&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, PILfont text-width accumulation in src/_imaging.c checks positive glyph advances against INT_MAX but does not check negative advances against INT_MIN. Repeating a signed 16-bit advance of -32768 can therefore execute a signed C integer overflow in xsize += dx, producing a large positive width from a negative mathematical result. Applications that use getlength(), getsize(), or derived layout, quota, serialization, or allocation calculations can experience logic-integrity errors or resource consumption, while the high-level mask path commonly retains a decompression-bomb check. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rm8-3hmm-39fg"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rm8-3hmm-39fg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10010"&gt;https://github.com/python-pillow/Pillow/pull/10010&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/80de4be9e38d3a6148dd4d8491eb80cd12b760a4"&gt;https://github.com/python-pillow/Pillow/commit/80de4be9e38d3a6148dd4d8491eb80cd12b760a4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4340"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] PYSEC-2026-4338: Pillow is a Python imaging library. Prior to 13.0.0, SpiderImageFile.seek() in src/PIL/SpiderImagePlugin.py reparses a l</title>
+    <id>https://osv.dev/vulnerability/PYSEC-2026-4338</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4338"/>
+    <published>2026-10-21T21:20:31Z</published>
+    <updated>2026-10-28T11:00:02Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-96637"/>
+    <category term="GHSA-g842-9rc4-69pw"/>
+    <content type="html">&lt;p&gt;Aliases: CVE-2026-96637, GHSA-g842-9rc4-69pw&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, SpiderImageFile.seek() in src/PIL/SpiderImagePlugin.py reparses a later SPIDER stack frame and replaces self._size without rerunning Image._decompression_bomb_check(). A tiny file can use a safe first frame to pass Image.open() and then declare very large dimensions in a later mode F frame. Loading that frame allocates approximately four bytes per attacker-declared pixel and can consume multiple gigabytes of memory. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-g842-9rc4-69pw"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-g842-9rc4-69pw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/10076"&gt;https://github.com/python-pillow/Pillow/pull/10076&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/7cb0e02389d8aac2a60896a490f572db0b07b841"&gt;https://github.com/python-pillow/Pillow/commit/7cb0e02389d8aac2a60896a490f572db0b07b841&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4338"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] MAL-2026-18354: Malicious code in trajmetrics (PyPI)</title>
     <id>https://osv.dev/vulnerability/MAL-2026-18354</id>
@@ -1965,515 +2473,5 @@ When verifying W3C Format Verifiable Credentials using JSON-LD with Linked Data 
         {
           &amp;quot;@context&amp;quot;: [
             &amp;quot;https://www.w3.org/2018/crede…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/aries-cloudagent-python/security/advisories/GHSA-97x9-59rv-q5pm"&gt;https://github.com/hyperledger/aries-cloudagent-python/security/advisories/GHSA-97x9-59rv-q5pm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-21669"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-21669&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/aries-cloudagent-python/commit/0b01ffffc0789205ac990292f97238614c9fd293"&gt;https://github.com/hyperledger/aries-cloudagent-python/commit/0b01ffffc0789205ac990292f97238614c9fd293&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/aries-cloudagent-python/commit/4c45244e2085aeff2f038dd771710e92d7682ff2"&gt;https://github.com/hyperledger/aries-cloudagent-python/commit/4c45244e2085aeff2f038dd771710e92d7682ff2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/aries-cloudagent-python"&gt;https://github.com/hyperledger/aries-cloudagent-python&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/aries-cloudagent-python/releases/tag/0.10.5"&gt;https://github.com/hyperledger/aries-cloudagent-python/releases/tag/0.10.5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/hyperledger/aries-cloudagent-python/releases/tag/0.11.0"&gt;https://github.com/hyperledger/aries-cloudagent-python/releases/tag/0.11.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/aries-cloudagent/PYSEC-2026-284.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/aries-cloudagent/PYSEC-2026-284.yaml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-97x9-59rv-q5pm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-mrmq-3q62-6cc8: BentoML SSRF Vulnerability in File Upload Processing  </title>
-    <id>https://osv.dev/vulnerability/GHSA-mrmq-3q62-6cc8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mrmq-3q62-6cc8"/>
-    <published>2025-07-29T19:24:47Z</published>
-    <updated>2026-10-27T15:30:03Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2025-54381"/>
-    <category term="PYSEC-2026-297"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;BentoML SSRF Vulnerability in File Upload Processing  &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2025-54381, PYSEC-2026-297&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;bentoml&lt;/code&gt; — fixed in 1.4.19&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Description
-
-There&amp;#x27;s an SSRF in the file upload processing system that allows remote attackers to make arbitrary HTTP requests from the server without authentication. The vulnerability exists in the serialization/deserialization handlers for multipart form data and JSON requests, which automatically download files from user-provided URLs without proper validation of internal network addresses.
-
-The framework automatically registers any service endpoint with file-type parameters (`pathlib.Path`, `PIL.Image.Image`) as vulnerable to this attack, making it a framework-wide security issue that affects most real-world ML services handling file uploads. While BentoML implements basic URL scheme validation in the `JSONSerde` path, the `MultipartSerde` path has no validation whatsoever, and nei…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bentoml/BentoML/security/advisories/GHSA-mrmq-3q62-6cc8"&gt;https://github.com/bentoml/BentoML/security/advisories/GHSA-mrmq-3q62-6cc8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2025-54381"&gt;https://nvd.nist.gov/vuln/detail/CVE-2025-54381&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bentoml/BentoML/commit/534c3584621da4ab954bdc3d814cc66b95ae5fb8"&gt;https://github.com/bentoml/BentoML/commit/534c3584621da4ab954bdc3d814cc66b95ae5fb8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bentoml/BentoML"&gt;https://github.com/bentoml/BentoML&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/bentoml/PYSEC-2026-297.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/bentoml/PYSEC-2026-297.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/bentoml"&gt;https://pypi.org/project/bentoml&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mrmq-3q62-6cc8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-wvwj-cvrp-7pv5: Authlib JWS JWK Header Injection: Signature Verification Bypass</title>
-    <id>https://osv.dev/vulnerability/GHSA-wvwj-cvrp-7pv5</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wvwj-cvrp-7pv5"/>
-    <published>2026-03-16T15:17:15Z</published>
-    <updated>2026-10-27T15:30:03Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-27962"/>
-    <category term="PYSEC-2026-287"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Authlib JWS JWK Header Injection: Signature Verification Bypass&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-27962, PYSEC-2026-287&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;authlib&lt;/code&gt; — fixed in 1.6.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Description
-
-### Summary
-
-A JWK Header Injection vulnerability in `authlib`&amp;#x27;s JWS implementation allows an unauthenticated
-attacker to forge arbitrary JWT tokens that pass signature verification. When `key=None` is passed
-to any JWS deserialization function, the library extracts and uses the cryptographic key embedded
-in the attacker-controlled JWT `jwk` header field. An attacker can sign a token with their own
-private key, embed the matching public key in the header, and have the server accept the forged
-token as cryptographically valid — bypassing authentication and authorization entirely.
-
-This behavior violates **RFC 7515 §4.1.3** and the validation algorithm defined in **RFC 7515 §5.2**.
-
-### Details
-
-**Vulnerable file:** `authlib/jose/rfc7515/jws.py`  
-**Vulnerable method:** `Json…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/security/advisories/GHSA-wvwj-cvrp-7pv5"&gt;https://github.com/authlib/authlib/security/advisories/GHSA-wvwj-cvrp-7pv5&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-27962"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-27962&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/commit/a5d4b2d4c9e46bfa11c82f85fdc2bcc0b50ae681"&gt;https://github.com/authlib/authlib/commit/a5d4b2d4c9e46bfa11c82f85fdc2bcc0b50ae681&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:19375"&gt;https://access.redhat.com/errata/RHSA-2026:19375&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:24853"&gt;https://access.redhat.com/errata/RHSA-2026:24853&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:48085"&gt;https://access.redhat.com/errata/RHSA-2026:48085&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:5665"&gt;https://access.redhat.com/errata/RHSA-2026:5665&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://access.redhat.com/errata/RHSA-2026:7314"&gt;https://access.redhat.com/errata/RHSA-2026:7314&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wvwj-cvrp-7pv5"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-j586-36cw-2gc2: MessagePack: Unbounded memory leak in msgpack C extension on strict_map_key validation failure</title>
-    <id>https://osv.dev/vulnerability/GHSA-j586-36cw-2gc2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j586-36cw-2gc2"/>
-    <published>2026-10-27T15:04:07Z</published>
-    <updated>2026-10-27T15:15:08Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-114613"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;MessagePack: Unbounded memory leak in msgpack C extension on strict_map_key validation failure&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114613&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;msgpack&lt;/code&gt; — fixed in 1.2.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-The msgpack-python C extension (`msgpack._cmsgpack`) leaks a decoded map value when deserialization rejects a key with `strict_map_key=True` (the default). Repeated malformed inputs can cause unbounded process memory growth and denial of service in applications that deserialize attacker-controlled MessagePack data. Both `unpackb()` and the streaming `Unpacker` API are affected. The pure-Python fallback does not exhibit this leak in the reported tests.
-
-The report measured approximately 4 MiB retained per failed parse and 100 MiB after 25 failed parses on Windows with Python 3.14 and msgpack 1.2.2. These are reporter-provided results.
-
-### Additional impact: stale parser-stack references
-
-The reference-ownership audit performed while fixing this leak found an
-additional memory-s…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/msgpack/msgpack-python/security/advisories/GHSA-j586-36cw-2gc2"&gt;https://github.com/msgpack/msgpack-python/security/advisories/GHSA-j586-36cw-2gc2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114613"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114613&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/msgpack/msgpack-python/commit/620b0eb4c89cd72d4098564537624d9dbb2ce141"&gt;https://github.com/msgpack/msgpack-python/commit/620b0eb4c89cd72d4098564537624d9dbb2ce141&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/msgpack/msgpack-python"&gt;https://github.com/msgpack/msgpack-python&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/msgpack/msgpack-python/releases/tag/v1.2.3"&gt;https://github.com/msgpack/msgpack-python/releases/tag/v1.2.3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j586-36cw-2gc2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-7hp6-4w63-5g45: LiteLLM: Privilege Escalation to Proxy Admin via Cross-Domain Reuse of the Salt Key</title>
-    <id>https://osv.dev/vulnerability/GHSA-7hp6-4w63-5g45</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-7hp6-4w63-5g45"/>
-    <published>2026-10-27T15:04:14Z</published>
-    <updated>2026-10-27T15:15:08Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-114612"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;LiteLLM: Privilege Escalation to Proxy Admin via Cross-Domain Reuse of the Salt Key&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114612&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;litellm&lt;/code&gt; — fixed in 1.100.4&lt;/li&gt;&lt;li&gt;&lt;code&gt;litellm&lt;/code&gt; — fixed in 1.101.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;litellm&lt;/code&gt; — fixed in 1.102.2&lt;/li&gt;&lt;li&gt;&lt;code&gt;litellm&lt;/code&gt; — fixed in 1.103.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;litellm&lt;/code&gt; — fixed in 1.104.0rc2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-An authenticated user with `internal_user` privileges can escalate to `proxy_admin` and achieve remote code execution. The proxy uses one encryption key for two purposes: sealing secrets at rest and minting session tokens. An attacker exploits this by requesting a new API key with a crafted metadata field containing a forged admin credential as the &amp;quot;secret&amp;quot; value. The proxy encrypts and returns this payload. When this value is then presented as a bearer token, the proxy decrypts it, trusts the forged admin identity, and grants full administrative access, including the ability to execute arbitrary commands via the MCP stdio endpoint.
-
-### Affected versions
-
-Versions later than 1.91.0 are exploitable in the default configuration. Versions 1.87.0 through 1.90.x are exploitable on…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/security/advisories/GHSA-7hp6-4w63-5g45"&gt;https://github.com/BerriAI/litellm/security/advisories/GHSA-7hp6-4w63-5g45&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114612"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114612&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/commit/1d5fdc87fed66b49e1df8cf7d708ad93249eb7d0"&gt;https://github.com/BerriAI/litellm/commit/1d5fdc87fed66b49e1df8cf7d708ad93249eb7d0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/commit/9161d7f9d6073603ba61ee4aa5e2c0ef5b37a81b"&gt;https://github.com/BerriAI/litellm/commit/9161d7f9d6073603ba61ee4aa5e2c0ef5b37a81b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/commit/9fa1a641119dd0d4fe43e93622eae5f482ceb63f"&gt;https://github.com/BerriAI/litellm/commit/9fa1a641119dd0d4fe43e93622eae5f482ceb63f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/commit/a80eacacee118fbed54e3d98f239d17a63fac818"&gt;https://github.com/BerriAI/litellm/commit/a80eacacee118fbed54e3d98f239d17a63fac818&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm/commit/f7cd90f09e9716652b38daec9f0640cdf49d582b"&gt;https://github.com/BerriAI/litellm/commit/f7cd90f09e9716652b38daec9f0640cdf49d582b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/BerriAI/litellm"&gt;https://github.com/BerriAI/litellm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-7hp6-4w63-5g45"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-frvg-qw88-hww9: vllm p2p never connected zmq_exhaustion</title>
-    <id>https://osv.dev/vulnerability/GHSA-frvg-qw88-hww9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-frvg-qw88-hww9"/>
-    <published>2026-10-27T14:45:53Z</published>
-    <updated>2026-10-27T15:10:41Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-94624"/>
-    <category term="PYSEC-2026-4006"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;vllm p2p never connected zmq_exhaustion&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-94624, PYSEC-2026-4006&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.32.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-When the `OffloadingConnector` uses `TieringOffloadingSpec` with a P2P secondary tier, an API client can submit many unique non-listening peer addresses through `kv_transfer_params.prefill`. vLLM keeps every never-established P2P session and its ZeroMQ sockets after the request finishes. On vLLM 0.26.0, 340 such peers filled the default ZeroMQ context socket quota; creating the next peer raised an uncaught `ZMQError`, terminated `EngineCore`, and shut down the API server. The path was reproduced with a normal API key and no access to the internal P2P listener.
-
-### Details
-
-#### Root cause
-
-In vLLM 0.26.0, `P2PSecondaryTierManager.on_new_request()` reads the following request-controlled fields:
-
-```json
-{
-  &amp;quot;kv_transfer_params&amp;quot;: {
-    &amp;quot;prefill&amp;quot;: {
-      &amp;quot;kv_request_id&amp;quot;: &amp;quot;id&amp;quot;,
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-frvg-qw88-hww9"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-frvg-qw88-hww9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-94624"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-94624&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/51504"&gt;https://github.com/vllm-project/vllm/pull/51504&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/93d2cab35e8ae66bbaa1dea1c077986d5a79eb80"&gt;https://github.com/vllm-project/vllm/commit/93d2cab35e8ae66bbaa1dea1c077986d5a79eb80&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/vllm/PYSEC-2026-4006.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/vllm/PYSEC-2026-4006.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/blob/v0.29.0/vllm/v1/kv_offload/tiering/p2p/control/zmq.py#L240-L260"&gt;https://github.com/vllm-project/vllm/blob/v0.29.0/vllm/v1/kv_offload/tiering/p2p/control/zmq.py#L240-L260&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/blob/v0.29.0/vllm/v1/kv_offload/tiering/p2p/manager.py#L667-L677"&gt;https://github.com/vllm-project/vllm/blob/v0.29.0/vllm/v1/kv_offload/tiering/p2p/manager.py#L667-L677&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-frvg-qw88-hww9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2026-4006: vLLM through 0.29.0 contains a denial of service vulnerability in P2P KV offloading when OffloadingConnector is configur</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-4006</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4006"/>
-    <published>2026-09-21T22:17:01Z</published>
-    <updated>2026-10-27T15:10:41Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-94624"/>
-    <category term="GHSA-frvg-qw88-hww9"/>
-    <content type="html">&lt;p&gt;Aliases: CVE-2026-94624, GHSA-frvg-qw88-hww9&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.30.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;vLLM through 0.29.0 contains a denial of service vulnerability in P2P KV offloading when OffloadingConnector is configured with TieringOffloadingSpec and a peer-to-peer secondary tier. Attackers can supply arbitrary remote host and port values in kv_transfer_params to create unreachable peer sessions that retain ZeroMQ sockets until the context quota is exhausted, causing an uncaught ZMQError that crashes EngineCore and stops all inference.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/blob/v0.29.0/vllm/v1/kv_offload/tiering/p2p/control/zmq.py#L240-L260"&gt;https://github.com/vllm-project/vllm/blob/v0.29.0/vllm/v1/kv_offload/tiering/p2p/control/zmq.py#L240-L260&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/blob/v0.29.0/vllm/v1/kv_offload/tiering/p2p/manager.py#L667-L677"&gt;https://github.com/vllm-project/vllm/blob/v0.29.0/vllm/v1/kv_offload/tiering/p2p/manager.py#L667-L677&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/vllm-through-0.29.0-denial-of-service-via-unbounded-p2p-kv-offloading-sessions"&gt;https://www.vulncheck.com/advisories/vllm-through-0.29.0-denial-of-service-via-unbounded-p2p-kv-offloading-sessions&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/51504"&gt;https://github.com/vllm-project/vllm/pull/51504&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4006"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-j456-xh4h-cpf2: NLTK: WekaClassifier passes an unvalidated caller-controlled model path to the weka JVM, bypassing nltk.pathsec containment</title>
-    <id>https://osv.dev/vulnerability/GHSA-j456-xh4h-cpf2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-j456-xh4h-cpf2"/>
-    <published>2026-10-27T14:50:30Z</published>
-    <updated>2026-10-27T15:00:05Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-109956"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;NLTK: WekaClassifier passes an unvalidated caller-controlled model path to the weka JVM, bypassing nltk.pathsec containment&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-109956&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nltk&lt;/code&gt; — fixed in 3.10.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-`WekaClassifier` in NLTK passes a caller-controlled model file path to the weka Java VM without any `nltk.pathsec` validation. `WekaClassifier.train` puts the caller&amp;#x27;s `model_filename` verbatim into the weka argv `[&amp;quot;-d&amp;quot;, model_filename, ...]` (weka *writes* the trained model there), and `WekaClassifier._classify_many` puts `self._model` into `[&amp;quot;-l&amp;quot;, self._model, ...]` (weka *reads* it). Under `nltk.pathsec.ENFORCE=True` (the default on current HEAD), NLTK&amp;#x27;s stated invariant — established by advisory CVE-2026-81726 / GHSA-8mgp-746c-j5xp — is that caller-controlled model-artifact paths must be bounded to the allowed NLTK data roots before any native tool opens them. `WekaClassifier` is the one `java()`-based tool wrapper that skips this entirely, giving an untrusted workflow arbit…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/security/advisories/GHSA-j456-xh4h-cpf2"&gt;https://github.com/nltk/nltk/security/advisories/GHSA-j456-xh4h-cpf2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/pull/3863"&gt;https://github.com/nltk/nltk/pull/3863&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/commit/6a17606293fe9d3ea1006f99dd3fed2e2b25d519"&gt;https://github.com/nltk/nltk/commit/6a17606293fe9d3ea1006f99dd3fed2e2b25d519&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk"&gt;https://github.com/nltk/nltk&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nltk/nltk/releases/tag/v3.10.4"&gt;https://github.com/nltk/nltk/releases/tag/v3.10.4&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-j456-xh4h-cpf2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-6v38-4h7w-rj9h: Authlib: empty signatures validation in JWS JSON deserialization</title>
-    <id>https://osv.dev/vulnerability/GHSA-6v38-4h7w-rj9h</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6v38-4h7w-rj9h"/>
-    <published>2026-10-27T14:50:18Z</published>
-    <updated>2026-10-27T15:00:05Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-96760"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Authlib: empty signatures validation in JWS JSON deserialization&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-96760&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;authlib&lt;/code&gt; — fixed in 1.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Authlib (prior to 1.9.0) contains a signature verification bypass vulnerability. The JsonWebSignature.deserialize_json() method accepts a JSON Serialization JWS object and returns the payload as successfully verified without checking for a signature and without requiring a cryptographic key.
-
-## Root cause
-
-`authlib/jose/rfc7515/jws.py`, read on the installed 1.8.0 artifact:
-
-```python
-is_valid = True                        # set before anything is checked
-for header_obj in obj[&amp;quot;signatures&amp;quot;]:   # empty array means the body never runs
-    jws_header, valid = self._validate_json_jws(...)
-    if not valid:
-        is_valid = False
-...
-if is_valid:
-    return rv                          # returns the payload as verified
-```
-
-`is_valid` is initialised to `True` and only ever set to `False` from…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/security/advisories/GHSA-6v38-4h7w-rj9h"&gt;https://github.com/authlib/authlib/security/advisories/GHSA-6v38-4h7w-rj9h&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-96760"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-96760&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/pull/938"&gt;https://github.com/authlib/authlib/pull/938&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/commit/6c11a02da8730914cea08ec195f1108a40dc6733"&gt;https://github.com/authlib/authlib/commit/6c11a02da8730914cea08ec195f1108a40dc6733&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib"&gt;https://github.com/authlib/authlib&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/releases/tag/v1.9.0"&gt;https://github.com/authlib/authlib/releases/tag/v1.9.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://kb.cert.org/vuls/id/762428"&gt;https://kb.cert.org/vuls/id/762428&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.kb.cert.org/vuls/id/762428"&gt;https://www.kb.cert.org/vuls/id/762428&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6v38-4h7w-rj9h"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-qr6x-7v33-6qmg: Rembg: Unauthenticated SAM model injection permits local-file disclosure through malicious ONNX graphs</title>
-    <id>https://osv.dev/vulnerability/GHSA-qr6x-7v33-6qmg</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qr6x-7v33-6qmg"/>
-    <published>2026-10-27T14:45:36Z</published>
-    <updated>2026-10-27T15:00:05Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-115924"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rembg: Unauthenticated SAM model injection permits local-file disclosure through malicious ONNX graphs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115924&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rembg&lt;/code&gt; — fixed in 2.0.82&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The public `/api/remove` endpoint uses attacker-controlled `extras.sam_model` in both SAM filenames and GitHub download URLs. Path traversal plus a URL fragment lets an unauthenticated attacker place malicious ONNX models beside a target file. The models read the file as ONNX external data and encode its bytes into the returned PNG.
-
- This issue affects SAM&amp;#x27;s `sam_model` in 2.0.81 and returns complete file contents.
-
-
-&amp;lt;img width=&amp;quot;2172&amp;quot; height=&amp;quot;1182&amp;quot; alt=&amp;quot;image&amp;quot; src=&amp;quot;https://github.com/user-attachments/assets/70aacab1-5ef8-4aad-b30e-e3780adef4d2&amp;quot; /&amp;gt;
-
- *Screenshot 1 — First unauthenticated request primes the path and returns HTTP 500.*
-
-
-### Technical details
-
-`rembg/commands/s_command.py:188-223,384-397` accepts public `extras` JSON and passes it to `new_session()`. `rembg/sessions/sam.py:3…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/danielgatis/rembg/security/advisories/GHSA-qr6x-7v33-6qmg"&gt;https://github.com/danielgatis/rembg/security/advisories/GHSA-qr6x-7v33-6qmg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-115924"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-115924&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/danielgatis/rembg/commit/b2758c6b39bb2b02df90a03128110339476984d3"&gt;https://github.com/danielgatis/rembg/commit/b2758c6b39bb2b02df90a03128110339476984d3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/danielgatis/rembg"&gt;https://github.com/danielgatis/rembg&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/danielgatis/rembg/releases/tag/v2.0.82"&gt;https://github.com/danielgatis/rembg/releases/tag/v2.0.82&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qr6x-7v33-6qmg"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-rw7v-4hrq-x6r9: fpdf2 implicitly loads external URLs and local image paths when rendering attacker-controlled content</title>
-    <id>https://osv.dev/vulnerability/GHSA-rw7v-4hrq-x6r9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rw7v-4hrq-x6r9"/>
-    <published>2026-10-27T14:43:16Z</published>
-    <updated>2026-10-27T15:00:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-114609"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;fpdf2 implicitly loads external URLs and local image paths when rendering attacker-controlled content&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114609&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fpdf2&lt;/code&gt; — fixed in 2.8.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`fpdf2` implicitly dereferences image resource references supplied to rendering APIs. If an application passes untrusted HTML, SVG, template data, or image paths into those APIs, `fpdf2` may issue outbound HTTP(S) requests or attempt to open local filesystem paths.
-
-This behavior is relevant in applications that render untrusted or user-provided input without sanitizing or restricting embedded resource references.
-
-## Description
-
-In affected versions, `fpdf2` uses a shared internal image-loading mechanism for multiple features. This loader:
-
-* fetches `http://` and `https://` URLs over the network
-* opens other string values as local filesystem paths
-
-During document processing, resource references embedded in input content are automatically dereferenced using this mechanism.
-…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/security/advisories/GHSA-rw7v-4hrq-x6r9"&gt;https://github.com/py-pdf/fpdf2/security/advisories/GHSA-rw7v-4hrq-x6r9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114609"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114609&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/pull/1824"&gt;https://github.com/py-pdf/fpdf2/pull/1824&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/pull/1857"&gt;https://github.com/py-pdf/fpdf2/pull/1857&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/commit/0d27190a8c907e02ebe9cd881471a14d0622b432"&gt;https://github.com/py-pdf/fpdf2/commit/0d27190a8c907e02ebe9cd881471a14d0622b432&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/commit/6e23f610b7946e96e9a5dd0535dcbfbe7ac1397d"&gt;https://github.com/py-pdf/fpdf2/commit/6e23f610b7946e96e9a5dd0535dcbfbe7ac1397d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2"&gt;https://github.com/py-pdf/fpdf2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/releases/tag/2.8.8"&gt;https://github.com/py-pdf/fpdf2/releases/tag/2.8.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rw7v-4hrq-x6r9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-22qq-2fwx-7p67: Pylint: Arbitrary code execution via pickle deserialization of the stats cache in PYLINT_HOME</title>
-    <id>https://osv.dev/vulnerability/GHSA-22qq-2fwx-7p67</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-22qq-2fwx-7p67"/>
-    <published>2026-10-27T14:46:51Z</published>
-    <updated>2026-10-27T15:00:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-114608"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pylint: Arbitrary code execution via pickle deserialization of the stats cache in PYLINT_HOME&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114608&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pylint&lt;/code&gt; — fixed in 4.0.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-Since 2006 / pylint 0.15.2, pylint caches its stats as pickles in `PYLINT_HOME` and reload them on the next run with `pickle.load`. Someone without access to the configuration or linted code, but with access to the cache directory (predictable `PYLINT_HOME` on a multi-user host) can write a crafted pickle that will runs arbitrary code when pylint access its stat cache.
-
-### Patches
-
-From pylint 4.0.9, the result cache is now stored as JSON instead of pickle, preventing code-execution. 
-
-### Workarounds
-
-Until upgrading do not point `PYLINT_HOME` to an untrusted, shared, or group-writable directory. The default value, `~/.cache/pylint`, is writable only by the user running pylint.
-
-### Credits
-
-- Reported privately via Tidelift coordinated disclosure (Dan Lenz).&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/pylint-dev/pylint/security/advisories/GHSA-22qq-2fwx-7p67"&gt;https://github.com/pylint-dev/pylint/security/advisories/GHSA-22qq-2fwx-7p67&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114608"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114608&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pylint-dev/pylint/commit/58c87cffca9de2b3e89aa07b89686cbc90cfea2d"&gt;https://github.com/pylint-dev/pylint/commit/58c87cffca9de2b3e89aa07b89686cbc90cfea2d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pylint-dev/pylint/commit/5b241f66318220e9ba7b21ca631fbfe8e77682ca"&gt;https://github.com/pylint-dev/pylint/commit/5b241f66318220e9ba7b21ca631fbfe8e77682ca&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pylint-dev/pylint"&gt;https://github.com/pylint-dev/pylint&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pylint-dev/pylint/releases/tag/v4.0.9"&gt;https://github.com/pylint-dev/pylint/releases/tag/v4.0.9&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-22qq-2fwx-7p67"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-jj36-9pvh-vj5r: Twisted: DNS Response Spoofing in twisted.names Due to Missing Source Address Validation</title>
-    <id>https://osv.dev/vulnerability/GHSA-jj36-9pvh-vj5r</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-jj36-9pvh-vj5r"/>
-    <published>2026-10-27T14:45:29Z</published>
-    <updated>2026-10-27T15:00:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-83813"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Twisted: DNS Response Spoofing in twisted.names Due to Missing Source Address Validation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-83813&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:A/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;twisted&lt;/code&gt; — fixed in 26.10.0rc1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`twisted.names.dns.DNSDatagramProtocol`, the UDP transport used by twisted&amp;#x27;s DNS client (`twisted.names.client.Resolver`, `createResolver`, and anything built on it, including MX lookups in `twisted.mail`), accepts a DNS response for a pending query solely on the basis of the 16-bit transaction ID matching. It never checks that the response actually originated from the server the query was sent to. Any host that can deliver a UDP packet to the resolver&amp;#x27;s listening port with the correct transaction ID can inject a forged answer, independent of the real server&amp;#x27;s address. This is a materially weaker defense than standard DNS resolver practice (transaction ID plus source-address validation, typically also source-port rotation), and enables off-path DNS response spoofing / cache po…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/twisted/twisted/security/advisories/GHSA-jj36-9pvh-vj5r"&gt;https://github.com/twisted/twisted/security/advisories/GHSA-jj36-9pvh-vj5r&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-83813"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-83813&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twisted/twisted/pull/12700"&gt;https://github.com/twisted/twisted/pull/12700&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twisted/twisted/commit/b53e1c3477c209b5609a1c74cf9e48373b5879ac"&gt;https://github.com/twisted/twisted/commit/b53e1c3477c209b5609a1c74cf9e48373b5879ac&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twisted/twisted"&gt;https://github.com/twisted/twisted&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/twisted/twisted/releases/tag/twisted-26.10.0rc1"&gt;https://github.com/twisted/twisted/releases/tag/twisted-26.10.0rc1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-jj36-9pvh-vj5r"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-wqw6-wpr3-45rh: fpdf2: Exponential SVG '&lt;use&gt;' expansion causes CPU and memory exhaustion in 'FPDF.image()'</title>
-    <id>https://osv.dev/vulnerability/GHSA-wqw6-wpr3-45rh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-wqw6-wpr3-45rh"/>
-    <published>2026-10-27T14:43:19Z</published>
-    <updated>2026-10-27T15:00:04Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-114610"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;fpdf2: Exponential SVG &amp;#x27;&amp;lt;use&amp;gt;&amp;#x27; expansion causes CPU and memory exhaustion in &amp;#x27;FPDF.image()&amp;#x27;&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114610&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;fpdf2&lt;/code&gt; — fixed in 2.8.8&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-fpdf2 expands SVG `&amp;lt;use&amp;gt;` references by deep-copying the complete referenced graphics tree. A small SVG can use nested references to make the number of in-memory objects grow exponentially, causing excessive CPU and memory consumption during `FPDF.image()` processing.
-
-This was reproduced with an 895-byte SVG on fpdf2 2.8.7. Under a 128 MB process limit, the input kept the process busy for about 14 seconds before raising `MemoryError`. 
-
-### Details
-
-The issue is in fpdf2&amp;#x27;s own SVG reference handling. It does not rely on XML entities, external URLs, local files, or vulnerable behavior in another dependency.
-
-When fpdf2 resolves an SVG reference, [`SVGObject.build_xref()`](https://github.com/py-pdf/fpdf2/blob/a3307f96a0d165831029b3fb644aee5a7ca03328/fpdf/svg.py#L1584) passes th…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/security/advisories/GHSA-wqw6-wpr3-45rh"&gt;https://github.com/py-pdf/fpdf2/security/advisories/GHSA-wqw6-wpr3-45rh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114610"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114610&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/pull/1889"&gt;https://github.com/py-pdf/fpdf2/pull/1889&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/commit/d7bd1061205d50da6a541dadfdb9d66beb763f2f"&gt;https://github.com/py-pdf/fpdf2/commit/d7bd1061205d50da6a541dadfdb9d66beb763f2f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2"&gt;https://github.com/py-pdf/fpdf2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/py-pdf/fpdf2/releases/tag/2.8.8"&gt;https://github.com/py-pdf/fpdf2/releases/tag/2.8.8&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-wqw6-wpr3-45rh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-m4w4-3r8h-jw98: Agno: Arbitrary code execution via `eval()` on `field_type` in `FunctionCall`</title>
-    <id>https://osv.dev/vulnerability/GHSA-m4w4-3r8h-jw98</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m4w4-3r8h-jw98"/>
-    <published>2026-10-27T13:30:41Z</published>
-    <updated>2026-10-27T13:55:51Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-35002"/>
-    <category term="GHSA-77rh-m34w-rv36"/>
-    <category term="PYSEC-2026-256"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Agno: Arbitrary code execution via `eval()` on `field_type` in `FunctionCall`&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35002, GHSA-77rh-m34w-rv36, PYSEC-2026-256&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;agno&lt;/code&gt; — fixed in 2.3.24&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-Agno versions prior to 2.3.24 contain an arbitrary code execution vulnerability
-in the model execution component. The `field_type` parameter on a `FunctionCall`
-input field was passed to Python&amp;#x27;s built-in `eval()`, allowing an attacker who
-could influence that value to execute arbitrary Python code in the Agno process.
-
-This is a code injection flaw (CWE-95) with full impact to confidentiality,
-integrity, and availability. CVSS 3.1 score: 9.3 (Critical).
-
-Any deployment that exposes Agno to user-influenced FunctionCall inputs
-(for example via an API, web UI, or untrusted tool/model output) is affected.
-
-### Patches
-Fixed in **Agno 2.3.24**.
-
-The unsafe `eval()` call was replaced with a fixed `type_mapping` dictionary
-lookup, and `field_type` is now validated as either a known st…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/agno-agi/agno/security/advisories/GHSA-m4w4-3r8h-jw98"&gt;https://github.com/agno-agi/agno/security/advisories/GHSA-m4w4-3r8h-jw98&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35002"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35002&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/agno-agi/agno/commit/cbf675521d4d2281925a051784a3b94172e56416"&gt;https://github.com/agno-agi/agno/commit/cbf675521d4d2281925a051784a3b94172e56416&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/agno-agi/agno"&gt;https://github.com/agno-agi/agno&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/agno-agi/agno/releases/tag/v2.3.24"&gt;https://github.com/agno-agi/agno/releases/tag/v2.3.24&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/agno/PYSEC-2026-256.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/agno/PYSEC-2026-256.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/agno"&gt;https://pypi.org/project/agno&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/agno-field-type-eval-injection-arbitrary-code-execution"&gt;https://www.vulncheck.com/advisories/agno-field-type-eval-injection-arbitrary-code-execution&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m4w4-3r8h-jw98"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2026-256: Agno is vulnerable to Eval Injection</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-256</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-256"/>
-    <published>2026-06-29T11:50:46Z</published>
-    <updated>2026-10-27T13:55:51Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-35002"/>
-    <category term="GHSA-77rh-m34w-rv36"/>
-    <category term="GHSA-m4w4-3r8h-jw98"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Agno is vulnerable to Eval Injection&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-35002, GHSA-77rh-m34w-rv36, GHSA-m4w4-3r8h-jw98&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;agno&lt;/code&gt; — fixed in 2.3.24&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Agno versions prior to 2.3.24 contain an arbitrary code execution vulnerability in the model execution component that allows attackers to execute arbitrary Python code by manipulating the field_type parameter passed to eval(). Attackers can influence the field_type value in a FunctionCall to achieve remote code execution.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-35002"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-35002&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/agno-agi/agno/commit/cbf675521d4d2281925a051784a3b94172e56416"&gt;https://github.com/agno-agi/agno/commit/cbf675521d4d2281925a051784a3b94172e56416&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/agno-agi/agno"&gt;https://github.com/agno-agi/agno&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/agno-agi/agno/releases/tag/v2.3.24"&gt;https://github.com/agno-agi/agno/releases/tag/v2.3.24&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/agno-field-type-eval-injection-arbitrary-code-execution"&gt;https://www.vulncheck.com/advisories/agno-field-type-eval-injection-arbitrary-code-execution&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/agno"&gt;https://pypi.org/project/agno&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-77rh-m34w-rv36"&gt;https://github.com/advisories/GHSA-77rh-m34w-rv36&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-256"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-6hp3-vr39-rqw8: MONAILabel Server Crash and Silent Inference Corruption via Crafted DICOM (pydicom DS/IS Validation Bypass)</title>
-    <id>https://osv.dev/vulnerability/GHSA-6hp3-vr39-rqw8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6hp3-vr39-rqw8"/>
-    <published>2026-10-27T13:30:10Z</published>
-    <updated>2026-10-27T13:45:03Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-48705"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;MONAILabel Server Crash and Silent Inference Corruption via Crafted DICOM (pydicom DS/IS Validation Bypass)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-48705&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;monai&lt;/code&gt; — fixed in 1.6.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-An unauthenticated remote attacker can crash a running MONAILabel server or silently corrupt its medical AI inference results by uploading a single crafted DICOM file (~132 KB) via the REST API. The vulnerability stems from pydicom&amp;#x27;s lack of validation for Decimal String (DS) and Integer String (IS) DICOM Value Representations, which allows NaN and infinity values to pass through MONAI&amp;#x27;s PydicomReader and propagate through the entire spatial transform and ML inference pipeline.
-
-No authentication is required for the default MONAILabel REST API. The attacker needs only network access to the server (default port 8000).
-
-**Severity:** CVSS 3.1: 8.7 HIGH  
-**CVSS Vector:** CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:H/A:L  
-**CWE:** CWE-20 (Improper Input Validation) → CWE-682 (Incorre…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI/security/advisories/GHSA-6hp3-vr39-rqw8"&gt;https://github.com/Project-MONAI/MONAI/security/advisories/GHSA-6hp3-vr39-rqw8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI/commit/434c094a3e6b84cca5b6e81da51e0d18a0100607"&gt;https://github.com/Project-MONAI/MONAI/commit/434c094a3e6b84cca5b6e81da51e0d18a0100607&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI"&gt;https://github.com/Project-MONAI/MONAI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Project-MONAI/MONAI/releases/tag/1.6.1"&gt;https://github.com/Project-MONAI/MONAI/releases/tag/1.6.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6hp3-vr39-rqw8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-vcw3-r3fx-j444: Ajenti has potential Remote Code Execution</title>
-    <id>https://osv.dev/vulnerability/GHSA-vcw3-r3fx-j444</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vcw3-r3fx-j444"/>
-    <published>2026-10-27T13:27:58Z</published>
-    <updated>2026-10-27T13:45:03Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-27975"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Ajenti has potential Remote Code Execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-27975&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H · CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N/E:U&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;aj&lt;/code&gt; — fixed in 2.2.13&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-An unauthenticated user could gain access to a server to execute arbitrary code on this server.
-
-### Patches
-
-This is fixed in the version 2.2.13. Users should upgrade to this version as soon as possible.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ajenti/ajenti/security/advisories/GHSA-vcw3-r3fx-j444"&gt;https://github.com/ajenti/ajenti/security/advisories/GHSA-vcw3-r3fx-j444&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-27975"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-27975&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ajenti/ajenti"&gt;https://github.com/ajenti/ajenti&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ajenti/ajenti/releases/tag/v2.2.13"&gt;https://github.com/ajenti/ajenti/releases/tag/v2.2.13&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vcw3-r3fx-j444"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-3jp2-3mrg-2vxc: OAuthLib: Bearer token can be retrieved as long as client knows a valid client ID for device workflow</title>
-    <id>https://osv.dev/vulnerability/GHSA-3jp2-3mrg-2vxc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-3jp2-3mrg-2vxc"/>
-    <published>2026-10-27T13:30:17Z</published>
-    <updated>2026-10-27T13:45:03Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-49272"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;OAuthLib: Bearer token can be retrieved as long as client knows a valid client ID for device workflow&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-49272&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;oauthlib&lt;/code&gt; — fixed in 4.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-A call to the token endpoint with a grant type of `&amp;quot;urn:ietf:params:oauth:grant-type:device_code&amp;quot;` and a bogus `device_code` is able to get a bearer token as long as they know a valid client ID enabled for the device workflow.
-
-### Details
-
-[Section 3.4 of the RFC 8628 spec](https://datatracker.ietf.org/doc/html/rfc8628#section-3.4) says that the token endpoint should take in `device_code` as a required parameter.`DeviceCodeGrant.validate_token_request` does not perform any validation of `device_code`. `DeviceCodeGrant.validate_token_request` should be validating that `device_code` was passed in as a parameter and that it is valid, similar to how `AuthorizationCodeGrant.validate_token_request` does the checks [here](https://github.com/oauthlib/oauthlib/blob/a015b446622f2b925517…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/oauthlib/oauthlib/security/advisories/GHSA-3jp2-3mrg-2vxc"&gt;https://github.com/oauthlib/oauthlib/security/advisories/GHSA-3jp2-3mrg-2vxc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oauthlib/oauthlib"&gt;https://github.com/oauthlib/oauthlib&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/oauthlib/oauthlib/releases/tag/v4.0.0"&gt;https://github.com/oauthlib/oauthlib/releases/tag/v4.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-3jp2-3mrg-2vxc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2026-2946: PraisonAI: Coarse-Grained Tool Approval Cache Bypasses Per-Invocation Consent for Shell Commands</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-2946</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-2946"/>
-    <published>2026-07-13T14:36:52Z</published>
-    <updated>2026-10-27T12:45:02Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-56074"/>
-    <category term="GHSA-ffp3-3562-8cv3"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;PraisonAI: Coarse-Grained Tool Approval Cache Bypasses Per-Invocation Consent for Shell Commands&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-56074, GHSA-ffp3-3562-8cv3&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;praisonaiagents&lt;/code&gt; — fixed in 4.5.128&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The approval system in PraisonAI Agents caches tool approval decisions by tool name only, not by invocation arguments. Once a user approves `execute_command` for any command (e.g., `ls -la`), all subsequent `execute_command` calls in that execution context bypass the approval prompt entirely. Combined with `os.environ.copy()` passing all process environment variables to subprocesses, this allows an LLM agent (potentially via prompt injection) to silently exfiltrate API keys and credentials without further user consent.
-
-## Details
-
-The `require_approval` decorator in `src/praisonai-agents/praisonaiagents/approval/__init__.py:176-178` checks approval status by tool name only:
-
-```python
-@wraps(func)
-def wrapper(*args, **kwargs):
-    if is_already_approved(tool_name):   # line 17…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-ffp3-3562-8cv3"&gt;https://github.com/MervinPraison/PraisonAI/security/advisories/GHSA-ffp3-3562-8cv3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-56074"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-56074&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI"&gt;https://github.com/MervinPraison/PraisonAI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/MervinPraison/PraisonAI/releases/tag/v4.5.128"&gt;https://github.com/MervinPraison/PraisonAI/releases/tag/v4.5.128&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/praisonai-tool-approval-cache-bypass-via-coarse-grained-caching"&gt;https://www.vulncheck.com/advisories/praisonai-tool-approval-cache-bypass-via-coarse-grained-caching&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/praisonaiagents"&gt;https://pypi.org/project/praisonaiagents&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/advisories/GHSA-ffp3-3562-8cv3"&gt;https://github.com/advisories/GHSA-ffp3-3562-8cv3&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-2946"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4rr5-89j8-mwwm: Pillow: Heap use-after-free when encoding TIFF to an in-memory buffer</title>
-    <id>https://osv.dev/vulnerability/GHSA-4rr5-89j8-mwwm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4rr5-89j8-mwwm"/>
-    <published>2026-10-21T21:24:19Z</published>
-    <updated>2026-10-27T11:10:49Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-pillow-2026-112396"/>
-    <category term="CVE-2026-112396"/>
-    <category term="PYSEC-2026-4328"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: Heap use-after-free when encoding TIFF to an in-memory buffer&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112396, CVE-2026-112396, PYSEC-2026-4328&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-Saving an image as TIFF to an in-memory buffer can trigger a heap use-after-free if libtiff rejects a tag at encode time. When `TIFFWriteScanline` fails, the encoder frees its output buffer but leaves the libtiff handle open. Later, when the encoder object is torn down, `TIFFClose` flushes buffered bytes through the write callback and writes into the freed buffer. An application that re-encodes attacker-influenced images to TIFF in memory can be crashed and is a candidate for remote code execution.
-
-### Details
-The failure path in `ImagingLibTiffEncode` frees `clientstate-&amp;gt;data` for the in-memory case but does not close the TIFF or null `clientstate-&amp;gt;tiff` (the file-descriptor branch just above it does set `tiff = NULL`):
-
-- `src/libImaging/TiffDecode.c:1041-1046`
-
-Teardown the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rr5-89j8-mwwm"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rr5-89j8-mwwm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112396"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112396&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/dc95da20207827a062cfbf551ee9f6031465a8bb"&gt;https://github.com/python-pillow/Pillow/commit/dc95da20207827a062cfbf551ee9f6031465a8bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4rr5-89j8-mwwm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2026-4328: Pillow is a Python imaging library. From 11.3.0 until 13.0.0, Pillow has a heap use-after-free when libtiff rejects a ta</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-4328</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4328"/>
-    <published>2026-10-19T22:17:06Z</published>
-    <updated>2026-10-27T11:10:49Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-pillow-2026-112396"/>
-    <category term="CVE-2026-112396"/>
-    <category term="GHSA-4rr5-89j8-mwwm"/>
-    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112396, CVE-2026-112396, GHSA-4rr5-89j8-mwwm&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. From 11.3.0 until 13.0.0, Pillow has a heap use-after-free when libtiff rejects a tag while encoding TIFF data to an in-memory buffer. When an application saves attacker-influenced TIFF tags to BytesIO, libtiff can reject a tag during encoding in ImagingLibTiffEncode; the error path then frees the output buffer without closing or clearing the TIFF handle, and later cleanup flushes through the write callback into freed memory, which can crash the process and may enable code execution. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/dc95da20207827a062cfbf551ee9f6031465a8bb"&gt;https://github.com/python-pillow/Pillow/commit/dc95da20207827a062cfbf551ee9f6031465a8bb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rr5-89j8-mwwm"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-4rr5-89j8-mwwm&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4328"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-27h8-gf7j-v5hc: Pillow: NULL dereference in ImagingExpand via rank filters on zero-size images</title>
-    <id>https://osv.dev/vulnerability/GHSA-27h8-gf7j-v5hc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-27h8-gf7j-v5hc"/>
-    <published>2026-10-21T20:32:37Z</published>
-    <updated>2026-10-27T11:10:35Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-pillow-2026-112392"/>
-    <category term="CVE-2026-112392"/>
-    <category term="PYSEC-2026-4326"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: NULL dereference in ImagingExpand via rank filters on zero-size images&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112392, CVE-2026-112392, PYSEC-2026-4326&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;```
-============================================================================
-NULL dereference in ImagingExpand via rank filters on zero-size images
-Location: src/libImaging/Filter.c:79  in ImagingExpand()
-Commit:   a707c6b21c313880d0771e54965d142dd42358b6
-============================================================================
-```
-
-Applying Pillow&amp;#x27;s median, minimum, maximum or rank filter to an image with zero width or zero height crashes the whole Python process instead of raising an error. Empty images like this are easy to produce with ordinary calls, for example a crop box whose left and right edges (or top and bottom edges) are equal, or the second page of a crafted multi-page image file. An attacker who can supply crop coordinates or an uploaded file to an application that ru…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-27h8-gf7j-v5hc"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-27h8-gf7j-v5hc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112392"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112392&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/443e3130a8c11594fd0e296afad497e11e678961"&gt;https://github.com/python-pillow/Pillow/commit/443e3130a8c11594fd0e296afad497e11e678961&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-27h8-gf7j-v5hc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2026-4326: Pillow is a Python imaging library. Prior to 13.0.0, Pillow's rank-based filters can dereference invalid image storage f</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-4326</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4326"/>
-    <published>2026-10-19T22:17:06Z</published>
-    <updated>2026-10-27T11:10:35Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-pillow-2026-112392"/>
-    <category term="CVE-2026-112392"/>
-    <category term="GHSA-27h8-gf7j-v5hc"/>
-    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112392, CVE-2026-112392, GHSA-27h8-gf7j-v5hc&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, Pillow&amp;#x27;s rank-based filters can dereference invalid image storage for a zero-size image. ImagingExpand() allocates a non-empty output and then faults while replicating edges by reading the first pixel from empty input storage; ImagingRankFilter is never reached. An attacker can supply or cause creation of a zero-size image to an application that applies a rank, median, minimum, or maximum filter. This causes a native process crash. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/443e3130a8c11594fd0e296afad497e11e678961"&gt;https://github.com/python-pillow/Pillow/commit/443e3130a8c11594fd0e296afad497e11e678961&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-27h8-gf7j-v5hc"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-27h8-gf7j-v5hc&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4326"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4558-3h8r-v8xp: Pillow: P;2L and P;4L decoders may read 1 to 3 bytes past the passed buffer size</title>
-    <id>https://osv.dev/vulnerability/GHSA-4558-3h8r-v8xp</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4558-3h8r-v8xp"/>
-    <published>2026-10-21T20:00:32Z</published>
-    <updated>2026-10-27T11:10:34Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-pillow-2026-112394"/>
-    <category term="CVE-2026-112394"/>
-    <category term="PYSEC-2026-4327"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Pillow: P;2L and P;4L decoders may read 1 to 3 bytes past the passed buffer size&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-pillow-2026-112394, CVE-2026-112394, PYSEC-2026-4327&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-On `main`, even with the guard in #9725, it&amp;#x27;s possible to have these decoders read 1 to 3 bytes past the end of the passed buffer with a suitable width/height.
-
-### Details
-
-`ImagingRawDecode` and the `P;2L` / `P;4L` unpackers disagree about how many bytes a line of data occupies.
-
-The raw decoder derives the line size from the bits per pixel
-
-```c
-state-&amp;gt;bytes = (state-&amp;gt;xsize * state-&amp;gt;bits + 7) / 8;
-```
-
-and uses it both for the bounds check and to advance to the next line. For `P;2L` and `P;4L`, `bits` is 2 and 4 respectively.
-
-But these two rawmodes are not packed pixels but 2 or 4 *bit planes*, each padded to a whole number of bytes. `unpackP2L` computes `s = (pixels + 7) / 8` and reads plane *k* at offset `k * s`, and `unpackP4L` does the same across four planes. Their re…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-4558-3h8r-v8xp"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-4558-3h8r-v8xp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-112394"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-112394&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/pull/9723"&gt;https://github.com/python-pillow/Pillow/pull/9723&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/392ee6f0d19a4adb766a63e9a99f3c28193b8d31"&gt;https://github.com/python-pillow/Pillow/commit/392ee6f0d19a4adb766a63e9a99f3c28193b8d31&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow"&gt;https://github.com/python-pillow/Pillow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4558-3h8r-v8xp"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] PYSEC-2026-4327: Pillow is a Python imaging library. Prior to 13.0.0, Pillow's P;2L and P;4L raw decoders can read past the end of an inp</title>
-    <id>https://osv.dev/vulnerability/PYSEC-2026-4327</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/PYSEC-2026-4327"/>
-    <published>2026-10-19T21:17:07Z</published>
-    <updated>2026-10-27T11:10:34Z</updated>
-    <category term="PyPI"/>
-    <category term="BIT-pillow-2026-112394"/>
-    <category term="CVE-2026-112394"/>
-    <category term="GHSA-4558-3h8r-v8xp"/>
-    <content type="html">&lt;p&gt;Aliases: BIT-pillow-2026-112394, CVE-2026-112394, GHSA-4558-3h8r-v8xp&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;pillow&lt;/code&gt; — fixed in 13.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Pillow is a Python imaging library. Prior to 13.0.0, Pillow&amp;#x27;s P;2L and P;4L raw decoders can read past the end of an input buffer. ImagingRawDecode calculates a packed-pixel row size, while the unpackers read separately padded bit planes. A caller can supply a buffer and image dimensions whose accepted size is smaller than the unpacker&amp;#x27;s actual footprint. This can disclose up to three adjacent heap bytes in output pixels or crash the process. This issue is fixed in version 13.0.0.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/releases/tag/13.0.0"&gt;https://github.com/python-pillow/Pillow/releases/tag/13.0.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/commit/392ee6f0d19a4adb766a63e9a99f3c28193b8d31"&gt;https://github.com/python-pillow/Pillow/commit/392ee6f0d19a4adb766a63e9a99f3c28193b8d31&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/python-pillow/Pillow/security/advisories/GHSA-4558-3h8r-v8xp"&gt;https://github.com/python-pillow/Pillow/security/advisories/GHSA-4558-3h8r-v8xp&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/PYSEC-2026-4327"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] MAL-2026-18336: Malicious code in h13t0ry-hello-demo (PyPI)</title>
-    <id>https://osv.dev/vulnerability/MAL-2026-18336</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/MAL-2026-18336"/>
-    <published>2026-10-27T03:49:17Z</published>
-    <updated>2026-10-27T04:30:03Z</updated>
-    <category term="PyPI"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Malicious code in h13t0ry-hello-demo (PyPI)&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;h13t0ry-hello-demo&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;
----
-_-= Per source details. Do not edit below this line.=-_
-
-## Source: kam193 (e27409f6c0ba5c7e7ba22f21c8b4806686ae8b64f4d7daf2dd9a7e6182bef5ab)
-During import package starts a reverse shell
-
-
----
-
-Category: MALICIOUS - The campaign has clearly malicious intent, like infostealers.
-
-
-Campaign: 2026-10-h13t0ry-hello-demo
-
-
-Reasons (based on the campaign):
-
-
- - The package contains code to create a reverse shell, allowing an attacker to execute any commands on the victim&amp;#x27;s machine.
-&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://bad-packages.kam193.eu/pypi/package/h13t0ry-hello-demo"&gt;https://bad-packages.kam193.eu/pypi/package/h13t0ry-hello-demo&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/MAL-2026-18336"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-x5pm-h33q-cjrw: Improper Certificate Validation in apache airflow mongo hook</title>
-    <id>https://osv.dev/vulnerability/GHSA-x5pm-h33q-cjrw</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-x5pm-h33q-cjrw"/>
-    <published>2024-02-20T21:30:26Z</published>
-    <updated>2026-10-26T21:30:05Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2024-25141"/>
-    <category term="PYSEC-2026-278"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Improper Certificate Validation in apache airflow mongo hook&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2024-25141, PYSEC-2026-278&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;apache-airflow-providers-mongo&lt;/code&gt; — fixed in 4.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When ssl was enabled for Mongo Hook, default settings included &amp;quot;allow_insecure&amp;quot; which caused that certificates were not validated. This was unexpected and undocumented.
-Users are recommended to upgrade to version 4.0.0, which fixes this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2024-25141"&gt;https://nvd.nist.gov/vuln/detail/CVE-2024-25141&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow/pull/37214"&gt;https://github.com/apache/airflow/pull/37214&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/apache/airflow"&gt;https://github.com/apache/airflow&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-mongo/PYSEC-2026-278.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/apache-airflow-providers-mongo/PYSEC-2026-278.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://lists.apache.org/thread/sqgbfqngjmn45ommmrgj7hvs7fgspsgm"&gt;https://lists.apache.org/thread/sqgbfqngjmn45ommmrgj7hvs7fgspsgm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/apache-airflow-providers-mongo"&gt;https://pypi.org/project/apache-airflow-providers-mongo&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://www.openwall.com/lists/oss-security/2024/02/20/5"&gt;http://www.openwall.com/lists/oss-security/2024/02/20/5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-x5pm-h33q-cjrw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

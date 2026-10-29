@@ -3,12 +3,70 @@
   <title>OSV — new &amp; updated vulnerabilities: PyPI (Python)</title>
   <subtitle>Open-source vulns affecting PyPI (Python) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:pypi</id>
-  <updated>2026-10-28T21:45:08Z</updated>
+  <updated>2026-10-28T23:00:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/pypi.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-r4j5-9xpp-3985: Tornado: Event loop blocking and excess memory use from chunked bodies with many small chunks</title>
+    <id>https://osv.dev/vulnerability/GHSA-r4j5-9xpp-3985</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-r4j5-9xpp-3985"/>
+    <published>2026-10-28T22:43:50Z</published>
+    <updated>2026-10-28T23:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-115927"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Tornado: Event loop blocking and excess memory use from chunked bodies with many small chunks&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115927&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tornado&lt;/code&gt; — fixed in 6.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+When Tornado reads an HTTP/1.1 body that uses chunked transfer encoding, it processes all chunks that have already arrived without yielding to the event loop. A client can send a body made of millions of 1-byte chunks, which blocks the event loop (and therefore every other connection served by that process) for the entire time it takes to parse the body. A body near the default `max_body_size` of 100 MB can block the process for close to a minute, and the attacker can repeat or parallelize these requests.
+
+Bodies made of tiny chunks also consumed far more memory than their size: a handler that does not use `@stream_request_body` stored each chunk as a separate object, using roughly 20 times as much memory as the bytes received.
+
+### Impact
+
+All Tornado HTTP servers are affecte…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/security/advisories/GHSA-r4j5-9xpp-3985"&gt;https://github.com/tornadoweb/tornado/security/advisories/GHSA-r4j5-9xpp-3985&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-115927"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-115927&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/pull/3773"&gt;https://github.com/tornadoweb/tornado/pull/3773&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/commit/ceab33581489751a66fba8566ad6d5960d4b01c8"&gt;https://github.com/tornadoweb/tornado/commit/ceab33581489751a66fba8566ad6d5960d4b01c8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado"&gt;https://github.com/tornadoweb/tornado&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/releases/tag/v6.6.0"&gt;https://github.com/tornadoweb/tornado/releases/tag/v6.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-r4j5-9xpp-3985"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-pcg2-g6cj-q92c: Tornado: Quadratic CPU usage when parsing HTTP headers with line folding</title>
+    <id>https://osv.dev/vulnerability/GHSA-pcg2-g6cj-q92c</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pcg2-g6cj-q92c"/>
+    <published>2026-10-28T22:43:41Z</published>
+    <updated>2026-10-28T23:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116577"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Tornado: Quadratic CPU usage when parsing HTTP headers with line folding&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116577&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tornado&lt;/code&gt; — fixed in 6.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Tornado&amp;#x27;s HTTP header parser takes quadratic time (O(n²)) when a header value is continued across many &amp;quot;obsolete line folding&amp;quot; (obs-fold) lines. An unauthenticated attacker can send a request whose header block is mostly short continuation lines. Parsing it uses a large amount of CPU on the IOLoop thread and blocks every other connection that process is serving.
+
+This issue is closely related to CVE-2025-67725 (GHSA-c98p-7wgm-6p64). The fix for that advisory covered repeated headers but not line-folded continuations.
+
+### Impact
+
+All Tornado HTTP servers are affected. Header parsing runs before any application code, so no authentication or particular handler is required.
+
+How bad it gets depends on `max_header_size`:
+
+- **Default (64 KB):** each malicious request blocks the ev…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/security/advisories/GHSA-pcg2-g6cj-q92c"&gt;https://github.com/tornadoweb/tornado/security/advisories/GHSA-pcg2-g6cj-q92c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116577"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116577&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/pull/3765"&gt;https://github.com/tornadoweb/tornado/pull/3765&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/commit/1b7a1dc9f340f52de929852e8125aa12f25297c9"&gt;https://github.com/tornadoweb/tornado/commit/1b7a1dc9f340f52de929852e8125aa12f25297c9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado"&gt;https://github.com/tornadoweb/tornado&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/releases/tag/v6.6.0"&gt;https://github.com/tornadoweb/tornado/releases/tag/v6.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pcg2-g6cj-q92c"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-pw9p-v7r6-gx4p: Tornado: Open redirect in RedirectHandler via protocol-relative URLs</title>
+    <id>https://osv.dev/vulnerability/GHSA-pw9p-v7r6-gx4p</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-pw9p-v7r6-gx4p"/>
+    <published>2026-10-28T22:43:45Z</published>
+    <updated>2026-10-28T23:00:04Z</updated>
+    <category term="PyPI"/>
+    <category term="CVE-2026-116578"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Tornado: Open redirect in RedirectHandler via protocol-relative URLs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116578&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;tornado&lt;/code&gt; — fixed in 6.6&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+`tornado.web.RedirectHandler` builds its target URL by substituting parts of the request path into a template. Depending on where those substitutions appear in the template, an attacker can craft a request that redirects to a host of their choosing. This creates an open redirect on the application&amp;#x27;s domain, which can be used in phishing.
+
+### Impact
+
+Applications are affected if they use `RedirectHandler` with a URL template where a regex capture group can influence the scheme or host of the redirect. This includes:
+
+- **A substitution at the start of the path**, for example `(r&amp;quot;/(.*)/target&amp;quot;, RedirectHandler, {&amp;quot;url&amp;quot;: &amp;quot;/{0}/destination&amp;quot;})`. A request to `https://example.com//evil.com/target` redirects to `//evil.com/destination`, a protocol-relative URL pointing to evil.com. V…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/security/advisories/GHSA-pw9p-v7r6-gx4p"&gt;https://github.com/tornadoweb/tornado/security/advisories/GHSA-pw9p-v7r6-gx4p&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116578"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116578&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/pull/3786"&gt;https://github.com/tornadoweb/tornado/pull/3786&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/commit/940ea725bdd9bc68231d68a105eef17ea6e11233"&gt;https://github.com/tornadoweb/tornado/commit/940ea725bdd9bc68231d68a105eef17ea6e11233&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/commit/cc75ab0eb3af459c714895a49f682ad354f50117"&gt;https://github.com/tornadoweb/tornado/commit/cc75ab0eb3af459c714895a49f682ad354f50117&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/commit/ccb6a2e5482f17997efd4a74b8200d5b4babc035"&gt;https://github.com/tornadoweb/tornado/commit/ccb6a2e5482f17997efd4a74b8200d5b4babc035&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado"&gt;https://github.com/tornadoweb/tornado&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/tornadoweb/tornado/releases/tag/v6.6.0"&gt;https://github.com/tornadoweb/tornado/releases/tag/v6.6.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-pw9p-v7r6-gx4p"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] GHSA-6jp4-8v48-cc5v: Electrum: Malicious server can replace a just-broadcast tx and try to trick user into RBF-ing it</title>
     <id>https://osv.dev/vulnerability/GHSA-6jp4-8v48-cc5v</id>
@@ -2395,59 +2453,5 @@ GitPython has spent 2022-2026 rolling out two reusable guards method-by-method: 
 
 1. **`Git.ls_remote`** (git/cmd.py:1128-1143) - checks options (:1139-1141) but forwards the URL positional unchecked; no `allow_unsafe_protocols` parameter exists. The same URL through `clone_from` raises `UnsafeProtocolError`.
 2. **`Repo.merge_base`** (git/repo/base.py:895-936) - forwards `**kwargs`/`*rev` to `self.git.merge_base` wit…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-w8jc-g24h-crhw"&gt;https://github.com/gitpython-developers/GitPython/security/advisories/GHSA-w8jc-g24h-crhw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/pull/2251"&gt;https://github.com/gitpython-developers/GitPython/pull/2251&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/commit/9ad28cc4c7176d22cd6181d69805058a719dd03b"&gt;https://github.com/gitpython-developers/GitPython/commit/9ad28cc4c7176d22cd6181d69805058a719dd03b&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython"&gt;https://github.com/gitpython-developers/GitPython&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gitpython-developers/GitPython/releases/tag/3.2.0"&gt;https://github.com/gitpython-developers/GitPython/releases/tag/3.2.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w8jc-g24h-crhw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-q686-2qmg-hqc7: Authlib: OpenID implicit grant checks raw scope instead of allowed scope before issuing ID tokens</title>
-    <id>https://osv.dev/vulnerability/GHSA-q686-2qmg-hqc7</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q686-2qmg-hqc7"/>
-    <published>2026-10-27T15:38:53Z</published>
-    <updated>2026-10-27T15:47:24Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-114619"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Authlib: OpenID implicit grant checks raw scope instead of allowed scope before issuing ID tokens&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114619&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;authlib&lt;/code&gt; — fixed in 1.9.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Report metadata
-
-| Field | Value |
-| --- | --- |
-| Package | `authlib` (PyPI, `pkg:pypi/authlib`) |
-| Repository | https://github.com/authlib/authlib |
-| Component | `authlib.oidc.core.grants.implicit.OpenIDImplicitGrant.validate_authorization_request` |
-| Vulnerability class | Authorization bypass: a client&amp;#x27;s scope restriction is bypassed for OpenID Connect ID token issuance |
-| Verified against | `c529a61af40e3efe05286140e00fbdced07d7987` (v1.8.0). Earlier releases were not checked. |
-| API surface | Public API (`OpenIDImplicitGrant`, registered with `server.register_grant(...)`) |
-| Affected in default configuration | Yes. No non-default option is needed once `OpenIDImplicitGrant` is registered. Client metadata decides exposure: Authlib&amp;#x27;s standard `ClientMixin` checks response type a…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/security/advisories/GHSA-q686-2qmg-hqc7"&gt;https://github.com/authlib/authlib/security/advisories/GHSA-q686-2qmg-hqc7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-114619"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-114619&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/pull/945"&gt;https://github.com/authlib/authlib/pull/945&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/commit/e3bd41cb29dcfee434453b135ffb487884baeedf"&gt;https://github.com/authlib/authlib/commit/e3bd41cb29dcfee434453b135ffb487884baeedf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib"&gt;https://github.com/authlib/authlib&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/authlib/authlib/releases/tag/v1.9.0"&gt;https://github.com/authlib/authlib/releases/tag/v1.9.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q686-2qmg-hqc7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-p3m5-h5v9-vqj6: Datadog dd-trace-py: IAST instrumentation can lead to application DOS</title>
-    <id>https://osv.dev/vulnerability/GHSA-p3m5-h5v9-vqj6</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-p3m5-h5v9-vqj6"/>
-    <published>2026-10-27T15:37:24Z</published>
-    <updated>2026-10-27T15:47:24Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-116589"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Datadog dd-trace-py: IAST instrumentation can lead to application DOS&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116589&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;ddtrace&lt;/code&gt; — fixed in 4.15.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-A flaw in dd-trace-py’s IAST instrumentation can cause the Python application process to terminate unexpectedly when processing certain attacker-controlled input. Only applications with IAST enabled are affected. IAST is disabled by default.
-
-### Details
-
-The affected IAST string-processing instrumentation does not properly handle certain internal errors, allowing an error to terminate the application process. Exploitation requires IAST to be enabled and application code to perform an affected string-processing operation on attacker-controlled input.
-
-If you are unable to upgrade to a patched version of dd-trace-py, you can mitigate this issue by either disabling IAST (setting DD_IAST_ENABLED=false) or by replacing replace % string interpolations with str.format or f-strings f…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-py/security/advisories/GHSA-p3m5-h5v9-vqj6"&gt;https://github.com/DataDog/dd-trace-py/security/advisories/GHSA-p3m5-h5v9-vqj6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116589"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116589&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-py/pull/20786"&gt;https://github.com/DataDog/dd-trace-py/pull/20786&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-py/pull/20823"&gt;https://github.com/DataDog/dd-trace-py/pull/20823&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-py/commit/69dc19853247434ceab83e0c1c4e279a2eb2a3f7"&gt;https://github.com/DataDog/dd-trace-py/commit/69dc19853247434ceab83e0c1c4e279a2eb2a3f7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-py/commit/ace972489b57dd020ff52b706bb548a354f2dd69"&gt;https://github.com/DataDog/dd-trace-py/commit/ace972489b57dd020ff52b706bb548a354f2dd69&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-py"&gt;https://github.com/DataDog/dd-trace-py&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/DataDog/dd-trace-py/releases/tag/v4.15.5"&gt;https://github.com/DataDog/dd-trace-py/releases/tag/v4.15.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-p3m5-h5v9-vqj6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-h3rc-6mm3-gc2m: vLLM: Request-controlled mm_processor_kwargs.code_revision allows remote code execution</title>
-    <id>https://osv.dev/vulnerability/GHSA-h3rc-6mm3-gc2m</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h3rc-6mm3-gc2m"/>
-    <published>2026-10-27T15:36:17Z</published>
-    <updated>2026-10-27T15:47:24Z</updated>
-    <category term="PyPI"/>
-    <category term="CVE-2026-114053"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;vLLM: Request-controlled mm_processor_kwargs.code_revision allows remote code execution&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114053&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;vllm&lt;/code&gt; — fixed in 0.31.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-An untrusted multimodal request can set `mm_processor_kwargs.code_revision`. When vLLM serves a model whose Hugging Face processor uses dynamic `auto_map` code and the operator enabled `--trust-remote-code`, this request value reaches `AutoProcessor.from_pretrained` and selects the Python revision imported by Transformers.
-
-This lets a client replace the operator-reviewed processor module with code from another revision of the same model repository. The operator-selected model/data `revision` remains pinned; only the executed processor code changes.
-
-Importing a Python module is arbitrary code execution in the vLLM API/renderer process. The PoC below demonstrates this with an import-time filesystem write. It is fully offline and does not require a GPU, model weights, or changes…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/security/advisories/GHSA-h3rc-6mm3-gc2m"&gt;https://github.com/vllm-project/vllm/security/advisories/GHSA-h3rc-6mm3-gc2m&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/pull/58830"&gt;https://github.com/vllm-project/vllm/pull/58830&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/commit/31f2e70cd3e403aaa471fb7fe3d33a7207aaf3cc"&gt;https://github.com/vllm-project/vllm/commit/31f2e70cd3e403aaa471fb7fe3d33a7207aaf3cc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm"&gt;https://github.com/vllm-project/vllm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/vllm-project/vllm/releases/tag/v0.31.0"&gt;https://github.com/vllm-project/vllm/releases/tag/v0.31.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/cve-2026-114053"&gt;https://nvd.nist.gov/vuln/detail/cve-2026-114053&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/vllm-0.7.3-before-0.31.0-rce-via-mm-processor-kwargs-code-revision"&gt;https://www.vulncheck.com/advisories/vllm-0.7.3-before-0.31.0-rce-via-mm-processor-kwargs-code-revision&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h3rc-6mm3-gc2m"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

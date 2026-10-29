@@ -3,12 +3,39 @@
   <title>OSV — new &amp; updated vulnerabilities: Go</title>
   <subtitle>Open-source vulns affecting Go packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:go</id>
-  <updated>2026-10-29T10:55:54Z</updated>
+  <updated>2026-10-29T16:45:05Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/go.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-rhj7-vh3v-mcq6: Daptin: ParseAcceptLanguage `_` separator bypass enables &gt;250x CPU amplification via Accept-Language header in LanguageMiddleware</title>
+    <id>https://osv.dev/vulnerability/GHSA-rhj7-vh3v-mcq6</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rhj7-vh3v-mcq6"/>
+    <published>2026-10-29T16:33:09Z</published>
+    <updated>2026-10-29T16:45:05Z</updated>
+    <category term="Go"/>
+    <category term="CVE-2026-62160"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Daptin: ParseAcceptLanguage `_` separator bypass enables &amp;gt;250x CPU amplification via Accept-Language header in LanguageMiddleware&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-62160&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/daptin/daptin&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+Daptin&amp;#x27;s `LanguageMiddleware` (registered as a global gin middleware) calls `golang.org/x/text/language.ParseAcceptLanguage` on the raw `Accept-Language` header of every HTTP request without imposing any size or shape filter. The underlying parser has quadratic-time behaviour on long lists of malformed language tags. The CVE-2022-32149 guard that golang.org/x/text added in v0.3.8 caps the number of `-` characters in the input at 1000, but it does not cap `_` characters even though the parser&amp;#x27;s internal scanner aliases `_` to `-` before parsing. A single unauthenticated GET request with an `Accept-Language` header built out of `_` separators (only 256 KiB, not even the 1 MiB ceiling) consumes about 27 seconds of server CPU on the host running Daptin. A 1 MiB payload exceeds the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/daptin/daptin/security/advisories/GHSA-rhj7-vh3v-mcq6"&gt;https://github.com/daptin/daptin/security/advisories/GHSA-rhj7-vh3v-mcq6&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/daptin/daptin"&gt;https://github.com/daptin/daptin&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rhj7-vh3v-mcq6"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-8rvj-mm4h-c258: cert-manager: Direct ACME Challenge resources can bypass Issuer DNS01 solver policy and use ClusterIssuer DNS credentials</title>
+    <id>https://osv.dev/vulnerability/GHSA-8rvj-mm4h-c258</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8rvj-mm4h-c258"/>
+    <published>2026-10-29T16:39:41Z</published>
+    <updated>2026-10-29T16:45:05Z</updated>
+    <category term="Go"/>
+    <category term="BIT-cert-manager-2026-62290"/>
+    <category term="CVE-2026-62290"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;cert-manager: Direct ACME Challenge resources can bypass Issuer DNS01 solver policy and use ClusterIssuer DNS credentials&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: BIT-cert-manager-2026-62290, CVE-2026-62290&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:L/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/cert-manager/cert-manager&lt;/code&gt; — fixed in 1.19.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/cert-manager/cert-manager&lt;/code&gt; — fixed in 1.20.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
+
+`Challenge` resources under `acme.cert-manager.io` can be created directly by namespace users. On create, cert-manager performs no admission validation tying the Challenge to an `Order`, an owner reference, or an Issuer-selected solver. The ACME Challenge controller then reconciles the direct resource and uses `Challenge.spec.solver` as the DNS01 provider configuration.
+
+When the direct Challenge references a `ClusterIssuer`, cert-manager derives the DNS provider secret namespace and ambient-credential policy from the `ClusterIssuer` reference, but the DNS provider configuration itself is attacker-controlled through `Challenge.spec.solver`. This lets a namespace user bypass `Issuer`/`ClusterIssuer` solver selectors such as `dnsZones`, `dnsNames`, and `matchLabels`, and make the…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cert-manager/cert-manager/security/advisories/GHSA-8rvj-mm4h-c258"&gt;https://github.com/cert-manager/cert-manager/security/advisories/GHSA-8rvj-mm4h-c258&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-62290"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-62290&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cert-manager/cert-manager/pull/8940"&gt;https://github.com/cert-manager/cert-manager/pull/8940&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cert-manager/cert-manager/pull/8941"&gt;https://github.com/cert-manager/cert-manager/pull/8941&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cert-manager/cert-manager/commit/6bda47297c8fbc6b121b8b76624b668d26f1a155"&gt;https://github.com/cert-manager/cert-manager/commit/6bda47297c8fbc6b121b8b76624b668d26f1a155&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cert-manager/cert-manager/commit/b37dbf01ecea50a0b3a19df0a7fe4c5ad6803f16"&gt;https://github.com/cert-manager/cert-manager/commit/b37dbf01ecea50a0b3a19df0a7fe4c5ad6803f16&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cert-manager/cert-manager"&gt;https://github.com/cert-manager/cert-manager&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cert-manager/cert-manager/releases/tag/v1.19.6"&gt;https://github.com/cert-manager/cert-manager/releases/tag/v1.19.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8rvj-mm4h-c258"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] GO-2026-6809: Distrust compromised intermediate certificates in crypto/x509</title>
     <id>https://osv.dev/vulnerability/GO-2026-6809</id>
@@ -523,325 +550,5 @@ r.GET(&amp;quot;/otp_secret&amp;quot;, GenerateTOTP)
 r.POST(&amp;quot;/otp_enroll&amp;quot;, EnrollTOTP)                     // ← outside RequireSecureSession
 r.GET(&amp;quot;/begin_passkey_register&amp;quot;, BeginPasskeyRegistration)
 r.POST(&amp;quot;/finis…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-gfrc-g87h-7h5w"&gt;https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-gfrc-g87h-7h5w&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-84313"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-84313&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2"&gt;https://github.com/0xJacky/nginx-ui/commit/23d1934099b05b2a01589b48129dc3d3159d91c2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui"&gt;https://github.com/0xJacky/nginx-ui&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1"&gt;https://github.com/0xJacky/nginx-ui/releases/tag/v2.4.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-gfrc-g87h-7h5w"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GO-2026-6866: Check all ancestor namespace transitions when rendering raw text in html in golang.org/x/net</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6866</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6866"/>
-    <published>2026-10-27T21:16:18Z</published>
-    <updated>2026-10-27T21:45:08Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-97045"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Check all ancestor namespace transitions when rendering raw text in html in golang.org/x/net&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-97045&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.62.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In childTextNodesAreLiteral, walking up the tree previously stopped at the nearest foreign ancestor once an HTML integration point was found. However, that integration point may itself be a descendant of an element that was foster-parented into a foreign namespace (such as &amp;lt;mglyph&amp;gt; or &amp;lt;malignmark&amp;gt; fostered under &amp;lt;mtext&amp;gt;), causing a parser to resolve the subtree in a different foreign namespace upon re-parsing the rendered output.
-
-Continue walking the full ancestor chain and verify that every transition from a non-empty namespace occurs at an HTML integration point before emitting literal text.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/855121"&gt;https://go.dev/cl/855121&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/82622"&gt;https://go.dev/issue/82622&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/sqrs2vTx_Xs"&gt;https://groups.google.com/g/golang-announce/c/sqrs2vTx_Xs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6866"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GO-2026-6860: Avoid quadratic complexity when coalescing text nodes in html in golang.org/x/net</title>
-    <id>https://osv.dev/vulnerability/GO-2026-6860</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GO-2026-6860"/>
-    <published>2026-10-27T21:16:18Z</published>
-    <updated>2026-10-27T21:30:04Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-78661"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Avoid quadratic complexity when coalescing text nodes in html in golang.org/x/net&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-78661&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;golang.org/x/net&lt;/code&gt; — fixed in 0.62.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When coalescing adjacent text nodes in addText and fosterParent, appending to an existing TextNode&amp;#x27;s Data via string concatenation (n.Data += text) reallocated and copied the accumulated string on every token. Inputs containing many short text runs separated by ignored end tags (such as &amp;quot;a&amp;lt;/x&amp;gt;&amp;quot;) caused O(n^2) allocations and byte copies.
-
-Accumulate coalesced text in per-node byte slices during parsing and materialize Data strings once at the end of parse.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://go.dev/cl/849365"&gt;https://go.dev/cl/849365&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://go.dev/issue/82224"&gt;https://go.dev/issue/82224&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://groups.google.com/g/golang-announce/c/sqrs2vTx_Xs"&gt;https://groups.google.com/g/golang-announce/c/sqrs2vTx_Xs&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GO-2026-6860"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-mgqf-5mf5-prfj: FileBrowser: Symlink following escapes user scope allowing arbitrary file read outside the served directory</title>
-    <id>https://osv.dev/vulnerability/GHSA-mgqf-5mf5-prfj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mgqf-5mf5-prfj"/>
-    <published>2026-10-27T21:04:40Z</published>
-    <updated>2026-10-27T21:15:03Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-116682"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;FileBrowser: Symlink following escapes user scope allowing arbitrary file read outside the served directory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116682&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/gtsteffaniak/filebrowser/backend&lt;/code&gt; — fixed in 0.0.0-20260814233832-4126edeb07a0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-File read paths resolve symbolic links with `filepath.EvalSymlinks` and then operate on the resolved target without re-checking that the target still lies inside the user&amp;#x27;s source/scope. 
-
-A symlink located inside a user&amp;#x27;s accessible directory that points outside the scope (for example to `/etc/passwd`, another tenant&amp;#x27;s directory, SSH keys, or container secrets) is followed transparently, and its contents are served through the normal download, preview, media, and OnlyOffice endpoints. Any authenticated user with download access can read files anywhere the server process can, whenever such a symlink is reachable in their scope. 
-
-The same symlink-following read path is used by the public share endpoints, which are authorized only by a share hash and not by any account, so when …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/security/advisories/GHSA-mgqf-5mf5-prfj"&gt;https://github.com/gtsteffaniak/filebrowser/security/advisories/GHSA-mgqf-5mf5-prfj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116682"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116682&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/pull/2795"&gt;https://github.com/gtsteffaniak/filebrowser/pull/2795&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/pull/2800"&gt;https://github.com/gtsteffaniak/filebrowser/pull/2800&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/commit/3c8c02414eefd3351ffe437fa39ff6eb150ffa67"&gt;https://github.com/gtsteffaniak/filebrowser/commit/3c8c02414eefd3351ffe437fa39ff6eb150ffa67&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/commit/4126edeb07a015c3809a89249b283e07a4e50c38"&gt;https://github.com/gtsteffaniak/filebrowser/commit/4126edeb07a015c3809a89249b283e07a4e50c38&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser"&gt;https://github.com/gtsteffaniak/filebrowser&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/gtsteffaniak/filebrowser/releases/tag/v1.5.2-stable"&gt;https://github.com/gtsteffaniak/filebrowser/releases/tag/v1.5.2-stable&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mgqf-5mf5-prfj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-rjh2-4xgw-p2hj: Atlantis: OS command injection through PR-controlled Terraform workspace enables RCE during plan</title>
-    <id>https://osv.dev/vulnerability/GHSA-rjh2-4xgw-p2hj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-rjh2-4xgw-p2hj"/>
-    <published>2026-10-27T21:04:50Z</published>
-    <updated>2026-10-27T21:15:03Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-116676"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Atlantis: OS command injection through PR-controlled Terraform workspace enables RCE during plan&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116676&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/runatlantis/atlantis&lt;/code&gt; — fixed in 0.47.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Atlantis passes the Terraform `workspace` value from a pull request&amp;#x27;s `atlantis.yaml` into a shell command without quoting or escaping it.
-
-A contributor whose pull request is eligible for an Atlantis plan can include shell metacharacters in the workspace name and execute arbitrary commands as the Atlantis service account. This does not require custom workflows, `allow_custom_workflows`, or permission to run `terraform apply`.
-
-The executed command inherits the Atlantis process environment, which commonly contains cloud-provider, Terraform, and VCS credentials.
-
-### Details
-
-Verified against current `upstream/main` commit `92ce5c51d1a050357e44df3535483425e59fa984` on August 13, 2026.
-
-The vulnerable data flow is:
-
-1. The PR-controlled project workspace is validated in [`server…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/runatlantis/atlantis/security/advisories/GHSA-rjh2-4xgw-p2hj"&gt;https://github.com/runatlantis/atlantis/security/advisories/GHSA-rjh2-4xgw-p2hj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116676"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116676&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/runatlantis/atlantis/pull/6792"&gt;https://github.com/runatlantis/atlantis/pull/6792&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/runatlantis/atlantis/commit/8dd22b4d0a9d7c129fdbf6a3398dd1c4cf8c3a59"&gt;https://github.com/runatlantis/atlantis/commit/8dd22b4d0a9d7c129fdbf6a3398dd1c4cf8c3a59&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/runatlantis/atlantis/commit/f04df0d53f0544d9eb6f5026dd8b74fbefd82ac8"&gt;https://github.com/runatlantis/atlantis/commit/f04df0d53f0544d9eb6f5026dd8b74fbefd82ac8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/runatlantis/atlantis"&gt;https://github.com/runatlantis/atlantis&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/runatlantis/atlantis/releases/tag/v0.47.1"&gt;https://github.com/runatlantis/atlantis/releases/tag/v0.47.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-rjh2-4xgw-p2hj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-5cp7-fp4j-wwcv: Neko: Authorization bypass in legacy WebRTC input handling</title>
-    <id>https://osv.dev/vulnerability/GHSA-5cp7-fp4j-wwcv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-5cp7-fp4j-wwcv"/>
-    <published>2026-10-27T21:04:57Z</published>
-    <updated>2026-10-27T21:15:03Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-116679"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Neko: Authorization bypass in legacy WebRTC input handling&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116679&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/m1k1o/neko/server&lt;/code&gt; — fixed in 0.0.0-20260805142851-395ca1a6f62b&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-When legacy mode is enabled and `session.implicit_hosting` is enabled, the legacy WebRTC data channel incorrectly authorizes input events due to a logic error in `LegacyIsHost()`.
-
-As a result, an authenticated room member may be able to send mouse and keyboard input through the legacy WebRTC control channel even when controls are locked or the member would otherwise not be authorized through the modern control API.
-
-The issue affects only the legacy WebRTC input path. The modern HTTP/WebSocket control path correctly enforces authorization checks and is not affected.
-
-To exploit this issue, an attacker must:
-
-* Be authenticated as a room member.
-* Successfully establish a WebRTC connection.
-* Access a deployment using the legacy WebRTC input handler.
-
-No unauthenticated access …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/m1k1o/neko/security/advisories/GHSA-5cp7-fp4j-wwcv"&gt;https://github.com/m1k1o/neko/security/advisories/GHSA-5cp7-fp4j-wwcv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116679"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116679&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/m1k1o/neko/pull/675"&gt;https://github.com/m1k1o/neko/pull/675&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/m1k1o/neko/commit/395ca1a6f62b7b0e270e654d366a2d57b8042efd"&gt;https://github.com/m1k1o/neko/commit/395ca1a6f62b7b0e270e654d366a2d57b8042efd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/m1k1o/neko"&gt;https://github.com/m1k1o/neko&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/m1k1o/neko/releases/tag/v3.1.5"&gt;https://github.com/m1k1o/neko/releases/tag/v3.1.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-5cp7-fp4j-wwcv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-mgcc-cww5-fp2q: Go JOSE: DoS when parsing JWKs that contain RSA keys</title>
-    <id>https://osv.dev/vulnerability/GHSA-mgcc-cww5-fp2q</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mgcc-cww5-fp2q"/>
-    <published>2026-10-27T19:01:30Z</published>
-    <updated>2026-10-27T19:15:23Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-116587"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Go JOSE: DoS when parsing JWKs that contain RSA keys&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116587&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/go-jose/go-jose/v4&lt;/code&gt; — fixed in 4.1.6&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/go-jose/go-jose/v3&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-A crafted RSA key inside a JWK can cause operations that parse JWKs to consume excess CPU.
-
-### Details
-
-go-jose does not check for bounds on RSA modulus and primes before validating them. Values are passed directly to `crypto/rsa.PrivateKey.Validate()`. On Go 1.24+, this takes cubic time complexity with respect to the RSA modulus and primes. This allows an attacker to supply a crafted JWK to consume excessive CPU.
-
-https://github.com/go-jose/go-jose/blob/5b371aecfcf7aabe06068d67da4344591ecddc76/jwk.go#L655-L700
-
-### Proof of concept
-
-No special configuration of go-jose is required to reproduce this vulnerability.
-
-```go
-package main
-
-import (
-	&amp;quot;encoding/base64&amp;quot;
-	&amp;quot;encoding/json&amp;quot;
-	&amp;quot;fmt&amp;quot;
-	&amp;quot;math/big&amp;quot;
-	&amp;quot;time&amp;quot;
-
-	&amp;quot;github.com/go-jose/go-jose/v4&amp;quot;
-)
-
-func main() {
-	// The RSA parameter…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-jose/go-jose/security/advisories/GHSA-mgcc-cww5-fp2q"&gt;https://github.com/go-jose/go-jose/security/advisories/GHSA-mgcc-cww5-fp2q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116587"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116587&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-jose/go-jose/commit/a0111f82742fa92bceec9ede40845e73319e6230"&gt;https://github.com/go-jose/go-jose/commit/a0111f82742fa92bceec9ede40845e73319e6230&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-jose/go-jose"&gt;https://github.com/go-jose/go-jose&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-jose/go-jose/releases/tag/v4.1.6"&gt;https://github.com/go-jose/go-jose/releases/tag/v4.1.6&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mgcc-cww5-fp2q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-vg84-c5mg-76xh: CTFer.io's CTFd Terraform Provider allows a local or remote attacker to read team passwords in state as non sensitive values</title>
-    <id>https://osv.dev/vulnerability/GHSA-vg84-c5mg-76xh</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vg84-c5mg-76xh"/>
-    <published>2026-10-27T19:00:50Z</published>
-    <updated>2026-10-27T19:15:22Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-116683"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;CTFer.io&amp;#x27;s CTFd Terraform Provider allows a local or remote attacker to read team passwords in state as non sensitive values&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116683&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:L/UI:N/VC:H/VI:N/VA:N/SC:N/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/ctfer-io/terraform-provider-ctfd&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;github.com/ctfer-io/terraform-provider-ctfd/v2&lt;/code&gt; — fixed in 2.8.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
-
-CTFer.io&amp;#x27;s CTFd Terraform Provider stores `ctfd_team.password` as non-sensitive values (CWE-522). A local or remote attacker, who can have access to the Terraform state, can read team passwords without the need for the state password for decryption.
-
-### Patches
-
-Patched in v2.8.2.
-
-### Workarounds
-
-No workaround exist, yet CTFer.io recommends you keep your state in safe environments with a limited set of users who can access it as a good practice to avoid exploitation of this vulnerability.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/ctfer-io/terraform-provider-ctfd/security/advisories/GHSA-vg84-c5mg-76xh"&gt;https://github.com/ctfer-io/terraform-provider-ctfd/security/advisories/GHSA-vg84-c5mg-76xh&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ctfer-io/terraform-provider-ctfd/pull/376"&gt;https://github.com/ctfer-io/terraform-provider-ctfd/pull/376&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ctfer-io/terraform-provider-ctfd/commit/b4acaef1df23ea3ca36936fc2d8ef8d157a58e04"&gt;https://github.com/ctfer-io/terraform-provider-ctfd/commit/b4acaef1df23ea3ca36936fc2d8ef8d157a58e04&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ctfer-io/terraform-provider-ctfd"&gt;https://github.com/ctfer-io/terraform-provider-ctfd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/ctfer-io/terraform-provider-ctfd/releases/tag/v2.8.2"&gt;https://github.com/ctfer-io/terraform-provider-ctfd/releases/tag/v2.8.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vg84-c5mg-76xh"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-fpmh-frq8-7rj8: compress zstd: Panic on two-block frames</title>
-    <id>https://osv.dev/vulnerability/GHSA-fpmh-frq8-7rj8</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fpmh-frq8-7rj8"/>
-    <published>2026-10-27T15:38:14Z</published>
-    <updated>2026-10-27T15:47:24Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-116591"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;compress zstd: Panic on two-block frames&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-116591&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/klauspost/compress/zstd&lt;/code&gt; — fixed in 1.20.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-A crafted ~27 KB two-block zstd frame makes DecodeAll and the streaming decoder panic with an out-of-range slice index instead of returning a decode error. The same bytes decode fine with the reference zstd. Any program that decompresses untrusted zstd input can be crashed by it. Reproduced on v1.20.0 and v1.20.1.
-
-Released in https://github.com/klauspost/compress/releases/tag/v1.20.2
-
-### Details
-
- The panic is in the FSE decoder that `huff0.ReadTable` uses to read a block&amp;#x27;s Huffman-weight table. Three conditions have to hold at once, and the crafted frame arranges all three.
-
-  **1. A count that doesn&amp;#x27;t fit is accepted.** `readNCount` permits a tableLog up to 15 ([`tablelogAbsoluteMax`](https://github.com/klauspost/compress/blob/v1.20.0/fse/decompress.go#L9), checked at [`fs…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/security/advisories/GHSA-fpmh-frq8-7rj8"&gt;https://github.com/klauspost/compress/security/advisories/GHSA-fpmh-frq8-7rj8&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-116591"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-116591&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/commit/7f5d8528720c895a6106f201719f87eb030a565d"&gt;https://github.com/klauspost/compress/commit/7f5d8528720c895a6106f201719f87eb030a565d&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress"&gt;https://github.com/klauspost/compress&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/klauspost/compress/releases/tag/v1.20.2"&gt;https://github.com/klauspost/compress/releases/tag/v1.20.2&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fpmh-frq8-7rj8"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4hv6-xc92-j86g: Vikunja: WebSocket authentication ignores server-side session state, so revoked sessions keep receiving live pushes</title>
-    <id>https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g"/>
-    <published>2026-10-09T20:57:34Z</published>
-    <updated>2026-10-27T15:30:05Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-111917"/>
-    <category term="GO-2026-6715"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: WebSocket authentication ignores server-side session state, so revoked sessions keep receiving live pushes&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111917, GO-2026-6715&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Vikunja v2.6.0 introduced server-side sessions with revocation semantics: `DELETE /api/v2/user/sessions/{id}` documents &amp;quot;Revokes a specific session by its UUID&amp;quot;, and enabling TOTP calls `DeleteAllUserSessions` to invalidate all sessions. The WebSocket endpoint accepts any cryptographically valid user JWT without ever resolving its `sid` (session id) claim against the sessions table. A connection authenticated before revocation stays authenticated and continues to receive live pushes indefinitely, and even brand-new WebSocket connections are accepted with a token whose session was deleted. The revocation feature therefore does not cover the WebSocket boundary at all.
-
-### Details
-
-User access JWTs carry a session reference: `NewUserJWTAuthtoken` (`pkg/modules/auth/auth.go:188`)…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-4hv6-xc92-j86g"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-4hv6-xc92-j86g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/46ae98355462acbea451356326146675d3feeaab"&gt;https://github.com/go-vikunja/vikunja/commit/46ae98355462acbea451356326146675d3feeaab&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4hv6-xc92-j86g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-4g5x-hcwm-82jw: Goploy: Arbitrary File Read via Path Traversal in /deploy/fileDiff allows Remote Server Compromise</title>
-    <id>https://osv.dev/vulnerability/GHSA-4g5x-hcwm-82jw</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-4g5x-hcwm-82jw"/>
-    <published>2026-07-07T23:42:24Z</published>
-    <updated>2026-10-27T15:30:05Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-114665"/>
-    <category term="CVE-2026-53553"/>
-    <category term="GO-2026-5938"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Goploy: Arbitrary File Read via Path Traversal in /deploy/fileDiff allows Remote Server Compromise&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-114665, CVE-2026-53553, GO-2026-5938&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zhenorzz/goploy&lt;/code&gt; — fixed in 1.18.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Goploy System Arbitrary File Read Vulnerability
-
-## Basic Information
-- **Vulnerability Name**: Goploy Endpoints Arbitrary File Read via Path Traversal
-- **Affected Product**: Goploy
-- **Known Affected Versions**: &amp;lt;=1.17.5 
-
-## Vulnerability Description
-Goploy is an open-source automation deployment system. A severe path traversal vulnerability exists in its backend API endpoints, specifically `/deploy/fileDiff` (File Compare), when handling file paths provided by the client.
-
-The original logic of this endpoint is to read a local project file and compare it with a file on a remote target server. However, due to insufficient validation and sanitization of the `filePath` parameter, and the lack of security constraints on the final absolute file path, malicious paths containing `../` are d…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/security/advisories/GHSA-4g5x-hcwm-82jw"&gt;https://github.com/zhenorzz/goploy/security/advisories/GHSA-4g5x-hcwm-82jw&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53553"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53553&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/commit/d51aa15ebc0a474d9d71d6c453a0fe798dd5e007"&gt;https://github.com/zhenorzz/goploy/commit/d51aa15ebc0a474d9d71d6c453a0fe798dd5e007&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy"&gt;https://github.com/zhenorzz/goploy&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="http://github.com/zhenorzz/goploy/releases/tag/v1.18.0"&gt;http://github.com/zhenorzz/goploy/releases/tag/v1.18.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-4g5x-hcwm-82jw"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-fmmf-xq98-g327: Vikunja: Write-level project members can delete admin-tier link shares through an unloaded permission check</title>
-    <id>https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327"/>
-    <published>2026-10-09T20:57:47Z</published>
-    <updated>2026-10-27T15:30:05Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-111921"/>
-    <category term="GO-2026-6730"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Write-level project members can delete admin-tier link shares through an unloaded permission check&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111921, GO-2026-6730&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:L/VA:L/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-A project member with Write permission can delete an admin-tier link share on that project. The deletion authorization check reads the permission from an object populated only with URL IDs, rather than from the stored share. Its zero value is Read, so the check falls through to project Write permission instead of requiring Admin.
-
-## Details
-
-Affected endpoints:
-
-- `DELETE /api/v1/projects/{project}/shares/{share}`
-- `DELETE /api/v2/projects/{project}/shares/{share}`
-
-Older v1 releases used `/lists/{list}/shares/{share}` before lists were renamed to projects.
-
-In `pkg/routes/api/v2/link_sharing.go:156`, the delete handler passes `&amp;amp;models.LinkSharing{ID: in.ID, ProjectID: in.ProjectID}` to `handler.DoDelete`. The v1 generic handler likewise binds the URL IDs without loading the …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fmmf-xq98-g327"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fmmf-xq98-g327&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/60e543777b4d3ec8376f5485911cdec697e8c8ee"&gt;https://github.com/go-vikunja/vikunja/commit/60e543777b4d3ec8376f5485911cdec697e8c8ee&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fmmf-xq98-g327"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-32r8-5843-4qw2: Vikunja: Link-share principal-type confusion enables cross-account team removal, bot takeover, and roster disclosure</title>
-    <id>https://osv.dev/vulnerability/GHSA-32r8-5843-4qw2</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-32r8-5843-4qw2"/>
-    <published>2026-10-09T20:43:40Z</published>
-    <updated>2026-10-27T15:30:05Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-76216"/>
-    <category term="GO-2026-6711"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Link-share principal-type confusion enables cross-account team removal, bot takeover, and roster disclosure&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-76216, GO-2026-6711&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.5.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-Vikunja&amp;#x27;s `web.Auth` interface (`pkg/web/web.go`, single method `GetID() int64`) is satisfied by BOTH `*user.User` and `*models.LinkSharing`. A link-share&amp;#x27;s `GetID()` returns the **raw positive** `share.ID` (`pkg/models/link_sharing.go:83-85`), which lives in the same positive autoincrement ID space as `users.id`. The safe negated form `getUserID() = share.ID * -1` (`link_sharing.go:126-128`) exists but is NOT used at three permission sinks. As a result, a link-share principal with id `N` — which should have zero authority over teams or bot users — is treated as the *user* whose `users.id == N` at three permission checks that lack the `a.(*LinkSharing)` guard their sibling methods have. This is the same principal-type-confusion class as CVE-2026-68581 (GHSA-vvcv-vpph-h844), but …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-32r8-5843-4qw2"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-32r8-5843-4qw2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-76216"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-76216&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/a717d64d5658708ba390f18dd697f5e567e68aac"&gt;https://github.com/go-vikunja/vikunja/commit/a717d64d5658708ba390f18dd697f5e567e68aac&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.5.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.5.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/vikunja-through-principal-type-confusion-via-linksharing"&gt;https://www.vulncheck.com/advisories/vikunja-through-principal-type-confusion-via-linksharing&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-32r8-5843-4qw2"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-26rh-24rg-j3vv: Goploy: Cross-namespace IDOR and RCE via body-supplied row id in project and project_file handlers</title>
-    <id>https://osv.dev/vulnerability/GHSA-26rh-24rg-j3vv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-26rh-24rg-j3vv"/>
-    <published>2026-07-07T23:42:12Z</published>
-    <updated>2026-10-27T15:30:04Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-53552"/>
-    <category term="GO-2026-5936"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Goploy: Cross-namespace IDOR and RCE via body-supplied row id in project and project_file handlers&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-53552, GO-2026-5936&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/zhenorzz/goploy&lt;/code&gt; — fixed in 1.18.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-`Project.AddFile`, `Project.EditFile`, `Project.RemoveFile`, and `Project.Edit` in `cmd/server/api/project/handler.go` accept a project or project-file row id from the JSON body and act on it without checking that the project belongs to the caller&amp;#x27;s namespace. The corresponding `model.ProjectFile.GetData` and `model.Project.GetData` queries filter only by row id. A user holding the `manager` role (or any role that includes the `FileSync` / `EditProject` permission) in their own namespace can read, write, or delete files in any project across the install, and can rewrite any project&amp;#x27;s git remote URL by submitting the foreign id in the body. The git-URL primitive escalates to RCE on the next deploy because `Edit` runs `git remote set-url` on the project&amp;#x27;s working tree.
-
-### Affe…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/security/advisories/GHSA-26rh-24rg-j3vv"&gt;https://github.com/zhenorzz/goploy/security/advisories/GHSA-26rh-24rg-j3vv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-53552"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-53552&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/commit/b49eabe903c7d7df1a3763385f5067676da4fdd3"&gt;https://github.com/zhenorzz/goploy/commit/b49eabe903c7d7df1a3763385f5067676da4fdd3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy"&gt;https://github.com/zhenorzz/goploy&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zhenorzz/goploy/releases/tag/v1.18.0"&gt;https://github.com/zhenorzz/goploy/releases/tag/v1.18.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-26rh-24rg-j3vv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-fprf-r6rv-xg99: Vikunja: Saved filter creation with an empty filter string recalculates task positions across all tenants</title>
-    <id>https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99"/>
-    <published>2026-10-09T20:57:38Z</published>
-    <updated>2026-10-27T15:30:03Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-111918"/>
-    <category term="GO-2026-6731"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Vikunja: Saved filter creation with an empty filter string recalculates task positions across all tenants&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-111918, GO-2026-6731&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;code.vikunja.io/api&lt;/code&gt; — fixed in 2.7.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-In Vikunja v2.6.0 the task position recalculation that runs when a saved filter view is created fails open when the requesting user has no accessible projects. Instead of aborting, the search that feeds the recalculation loses its project scope entirely and returns every task in the instance. The server then writes one `task_positions` row per task per view (four views per filter) into views owned by the requesting user, including rows that reference tasks of other tenants the user can never see. Any authenticated user can trigger this. The impact is a cross-tenant integrity violation, a single-request write amplification primitive that scales with instance size, and a violation of the invariant stated in the fix for GHSA-w39f-h553-h2mx that position writes are scoped by proje…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fprf-r6rv-xg99"&gt;https://github.com/go-vikunja/vikunja/security/advisories/GHSA-fprf-r6rv-xg99&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/commit/24e4563a547be182b338be2f614df339a64a6058"&gt;https://github.com/go-vikunja/vikunja/commit/24e4563a547be182b338be2f614df339a64a6058&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja"&gt;https://github.com/go-vikunja/vikunja&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0"&gt;https://github.com/go-vikunja/vikunja/releases/tag/v2.7.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-fprf-r6rv-xg99"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-c8r8-95hg-mp34: SiYuan: MCP file tool's blocklist is incomplete relative to the HTTP file API it claims to align with, exposing publish-mode passwords and other sensitive workspace files</title>
-    <id>https://osv.dev/vulnerability/GHSA-c8r8-95hg-mp34</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c8r8-95hg-mp34"/>
-    <published>2026-10-27T14:43:57Z</published>
-    <updated>2026-10-27T15:00:04Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-60083"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;SiYuan: MCP file tool&amp;#x27;s blocklist is incomplete relative to the HTTP file API it claims to align with, exposing publish-mode passwords and other sensitive workspace files&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-60083&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/siyuan-note/siyuan/kernel&lt;/code&gt; — fixed in 0.0.0-20260808051406-3542530c505f&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-`kernel/mcp/tools/file.go`&amp;#x27;s `resolvePath()` includes an explicit comment stating its
-sensitive-path blocklist is meant to align with the HTTP file API&amp;#x27;s established blacklist
-(`refuseToAccess()` in `kernel/api/file.go`), following the remediation for GHSA-cvhv-7xhj-xjp8
-(&amp;quot;Unauthenticated Administrator takeover exfiltrated via the MCP&amp;quot;), which specifically
-recommended restricting this tool&amp;#x27;s scope. In practice, the MCP tool implements only 1 of the
-4 static blocklist entries the HTTP API enforces.
-
-## Comparison
-
-`kernel/api/file.go` `refuseToAccess()` blocks:
-1. `conf/conf.json` (API token, cookie signing key, accessAuthCode)
-2. `data/snippets/conf.json`
-3. the entire `data/templates` directory
-4. `data/.siyuan/publishAccess.json`
-5. (dynamic, per-request) any path the current…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/security/advisories/GHSA-c8r8-95hg-mp34"&gt;https://github.com/siyuan-note/siyuan/security/advisories/GHSA-c8r8-95hg-mp34&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-60083"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-60083&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/commit/3542530c505f13aa3fbd0343627409ca6c000dd2"&gt;https://github.com/siyuan-note/siyuan/commit/3542530c505f13aa3fbd0343627409ca6c000dd2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan"&gt;https://github.com/siyuan-note/siyuan&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/siyuan-note/siyuan/releases/tag/v3.8.0"&gt;https://github.com/siyuan-note/siyuan/releases/tag/v3.8.0&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://www.vulncheck.com/advisories/siyuan-before-incomplete-path-blocklist-via-mcp-file-tool"&gt;https://www.vulncheck.com/advisories/siyuan-before-incomplete-path-blocklist-via-mcp-file-tool&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c8r8-95hg-mp34"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-47hv-j4px-h3c9: Wails: wildcardPatternToRegex allows Origin bypass via suffix match in BindingsAllowedOrigins</title>
-    <id>https://osv.dev/vulnerability/GHSA-47hv-j4px-h3c9</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-47hv-j4px-h3c9"/>
-    <published>2026-10-27T13:29:47Z</published>
-    <updated>2026-10-27T13:45:03Z</updated>
-    <category term="Go"/>
-    <category term="CVE-2026-34157"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Wails: wildcardPatternToRegex allows Origin bypass via suffix match in BindingsAllowedOrigins&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-34157&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;github.com/wailsapp/wails/v2&lt;/code&gt; — fixed in 2.13.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;# Security Vulnerability Report: Wails v2 — Origin Validator Bypass via Wildcard Pattern
-
-| | |
-|---|---|
-| **Product** | wailsapp/wails (v2) |
-| **Affected File** | `v2/internal/frontend/originvalidator/originValidator.go` |
-| **Affected Versions** | All versions containing originValidator (latest as of 2026-03-26) |
-| **CVSSv4.0** | **7.6 HIGH** — `CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:H/VI:H/VA:L/SC:L/SI:L/SA:N` |
-| **CWE** | CWE-625: Permissive Regular Expression |
-| **Platforms** | Windows / Linux / macOS (all desktop targets) |
-
----
-
-## Summary
-
-Wails v2 provides `BindingsAllowedOrigins` to restrict which web origins can invoke Go backend methods via IPC. The wildcard pattern matching in `wildcardPatternToRegex` converts `*` to `.*` without anchoring subcomponents, allowing suffix-mat…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/wailsapp/wails/security/advisories/GHSA-47hv-j4px-h3c9"&gt;https://github.com/wailsapp/wails/security/advisories/GHSA-47hv-j4px-h3c9&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wailsapp/wails/pull/5074"&gt;https://github.com/wailsapp/wails/pull/5074&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wailsapp/wails/commit/bcc5941b72fdab6a13942b58871a2696faa85b81"&gt;https://github.com/wailsapp/wails/commit/bcc5941b72fdab6a13942b58871a2696faa85b81&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/wailsapp/wails"&gt;https://github.com/wailsapp/wails&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-47hv-j4px-h3c9"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

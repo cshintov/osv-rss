@@ -3,12 +3,198 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-10-29T10:56:01Z</updated>
+  <updated>2026-10-29T17:00:04Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[NEW] GHSA-8hxf-qr8p-62x4: zip: AES Entry HMAC Authentication Bypass on Premature EOF</title>
+    <id>https://osv.dev/vulnerability/GHSA-8hxf-qr8p-62x4</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-8hxf-qr8p-62x4"/>
+    <published>2026-10-29T16:40:07Z</published>
+    <updated>2026-10-29T17:00:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-115906"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zip: AES Entry HMAC Authentication Bypass on Premature EOF&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115906&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zip&lt;/code&gt; — fixed in 9.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+An AES-encrypted (AE-x) entry&amp;#x27;s authentication code is verified only when the reader&amp;#x27;s byte counter lands exactly on zero. If the bounded entry reader reaches the archive&amp;#x27;s actual EOF before the attacker-controlled, header-declared `compressed_size`, the counter remains positive, the HMAC is never read or compared, and the truncated, unauthenticated plaintext is returned as a clean end of stream. A zero-payload entry also returns before authentication. An attacker who does not know the password can modify an archive so chosen or modified plaintext is accepted with no error.
+
+### Details
+
+[`src/aes.rs:246-292`](https://github.com/zip-rs/zip2/blob/6f09b3064ec87c3a69ea9f3413f9f9638b4aa446/src/aes.rs#L246-L292):
+
+```rust
+fn read(&amp;amp;mut self, buf: &amp;amp;mut [u8]) -&amp;gt; io::Result&amp;lt;usize&amp;gt; {
+  …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/security/advisories/GHSA-8hxf-qr8p-62x4"&gt;https://github.com/zip-rs/zip2/security/advisories/GHSA-8hxf-qr8p-62x4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-115906"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-115906&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/commit/ec265db0b0602f8ffb9479327397bddefb7e2216"&gt;https://github.com/zip-rs/zip2/commit/ec265db0b0602f8ffb9479327397bddefb7e2216&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2"&gt;https://github.com/zip-rs/zip2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/releases/tag/v9.0.0"&gt;https://github.com/zip-rs/zip2/releases/tag/v9.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-8hxf-qr8p-62x4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-q7v9-x93c-xqv3: zip: Unbounded Symlink-Target Handling Can Abort Or Exhaust Memory During Extraction</title>
+    <id>https://osv.dev/vulnerability/GHSA-q7v9-x93c-xqv3</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-q7v9-x93c-xqv3"/>
+    <published>2026-10-29T16:40:01Z</published>
+    <updated>2026-10-29T17:00:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-115909"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zip: Unbounded Symlink-Target Handling Can Abort Or Exhaust Memory During Extraction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115909&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zip&lt;/code&gt; — fixed in 9.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+The symbolic-link branch of `ZipArchive::extract_internal()` allocates a buffer using an attacker-declared size before reading any entry data. A 112-byte archive terminates the extracting process with `SIGABRT` through this infallible allocation.
+
+### Details
+
+```rust
+#[cfg(any(unix, windows))]
+if file.is_symlink() {
+    let mut target = Vec::with_capacity(file.size() as usize); // @audit unbounded memory allocation
+    file.read_to_end(&amp;amp;mut target)?;
+    drop(file);
+    make_symlink(&amp;amp;outpath, &amp;amp;target, &amp;amp;self.shared.files)?;
+    continue;
+}
+```
+
+[`src/read/mod.rs#L399-L405`](https://github.com/zip-rs/zip2/blob/6f09b3064ec87c3a69ea9f3413f9f9638b4aa446/src/read/mod.rs#L399-L405) (reviewed commit `6f09b306`); the same code is at [`src/read.rs#L417-L418`](https://github.com/zip-rs/…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/security/advisories/GHSA-q7v9-x93c-xqv3"&gt;https://github.com/zip-rs/zip2/security/advisories/GHSA-q7v9-x93c-xqv3&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-115909"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-115909&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/pull/984"&gt;https://github.com/zip-rs/zip2/pull/984&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/commit/a543a1fc8f3f3eef36f27bb137230295284cdb98"&gt;https://github.com/zip-rs/zip2/commit/a543a1fc8f3f3eef36f27bb137230295284cdb98&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2"&gt;https://github.com/zip-rs/zip2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/releases/tag/v9.0.0"&gt;https://github.com/zip-rs/zip2/releases/tag/v9.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-q7v9-x93c-xqv3"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-9hj8-73fh-9963: zip: legacy Shrink/Reduce/Implode decoder: denial of service from attacker-controlled ZIP64 uncompressed size</title>
+    <id>https://osv.dev/vulnerability/GHSA-9hj8-73fh-9963</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-9hj8-73fh-9963"/>
+    <published>2026-10-29T16:40:19Z</published>
+    <updated>2026-10-29T17:00:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-115907"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zip: legacy Shrink/Reduce/Implode decoder: denial of service from attacker-controlled ZIP64 uncompressed size&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115907&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zip&lt;/code&gt; — fixed in 9.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A malicious 149-byte ZIP archive can cause a denial of service in applications that enable `legacy-zip` and use `ZipArchive::extract()`. An attacker-controlled ZIP64 uncompressed size triggers a `capacity overflow` panic in the Shrink decoder in optimized builds, potentially terminating the affected process.
+
+### Details
+
+When reading a Shrink-compressed entry, `ShrinkDecoder::read()` buffers the compressed input and reserves output capacity using the entry&amp;#x27;s declared uncompressed size:
+
+```rust
+if !self.stream_read {
+    self.stream_read = true;
+    let mut compressed_bytes = Vec::new();
+    self.compressed_reader.read_to_end(&amp;amp;mut compressed_bytes)?;
+    self.stream.reserve(self.uncompressed_size as usize);
+    hwunshrink(
+        &amp;amp;compressed_bytes,
+        self.uncompressed_…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/security/advisories/GHSA-9hj8-73fh-9963"&gt;https://github.com/zip-rs/zip2/security/advisories/GHSA-9hj8-73fh-9963&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-115907"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-115907&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/pull/991"&gt;https://github.com/zip-rs/zip2/pull/991&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/commit/8b4991288b79ad11cce201c2d785d5baa795bd3e"&gt;https://github.com/zip-rs/zip2/commit/8b4991288b79ad11cce201c2d785d5baa795bd3e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2"&gt;https://github.com/zip-rs/zip2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/releases/tag/v9.0.0"&gt;https://github.com/zip-rs/zip2/releases/tag/v9.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-9hj8-73fh-9963"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-hjqx-j4rw-g7xv: zip: Arbitrary file write outside the extraction directory, because ZipArchive::extract validates symlink targets lexically. </title>
+    <id>https://osv.dev/vulnerability/GHSA-hjqx-j4rw-g7xv</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-hjqx-j4rw-g7xv"/>
+    <published>2026-10-29T16:40:12Z</published>
+    <updated>2026-10-29T17:00:04Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-115908"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;zip: Arbitrary file write outside the extraction directory, because ZipArchive::extract validates symlink targets lexically. &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115908&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zip&lt;/code&gt; — fixed in 9.0.0&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+- **Verified version:** zip `9.0.0-pre3`
+- **Affected versions:** `7.2.0` and later
+- **Precondition:** The attacker knows (or can guess) the absolute path of the extraction destination
+
+The validation applied to symlinks is purely lexical.
+As a result, an attacker can write arbitrary files outside the extraction directory through a symlink.
+Exploitation requires the attacker to know (or guess) the absolute path of the destination, but this is realistic in practice: CI workspaces, `/opt/app`, a fixed Downloads path, and so on.
+
+&amp;gt; **Impact extends further on Windows (verified on real hardware for both the separate-drive and UNC-share cases)**:  
+&amp;gt; Because `simplified_components` discards the `Prefix` component, paths like `D:\&amp;lt;same tail as dest&amp;gt;` or a UNC path `\\attacker\share…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/security/advisories/GHSA-hjqx-j4rw-g7xv"&gt;https://github.com/zip-rs/zip2/security/advisories/GHSA-hjqx-j4rw-g7xv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-115908"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-115908&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/commit/09c030eab56e8db8fb3c1c33f554407b30bad8fa"&gt;https://github.com/zip-rs/zip2/commit/09c030eab56e8db8fb3c1c33f554407b30bad8fa&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2"&gt;https://github.com/zip-rs/zip2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/releases/tag/v9.0.0"&gt;https://github.com/zip-rs/zip2/releases/tag/v9.0.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-hjqx-j4rw-g7xv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] GHSA-c33x-vcv4-vg3g: Cedar: JSON template is in scope missing slot-id validation allows link panic and decision divergence</title>
+    <id>https://osv.dev/vulnerability/GHSA-c33x-vcv4-vg3g</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c33x-vcv4-vg3g"/>
+    <published>2026-10-29T16:35:04Z</published>
+    <updated>2026-10-29T16:45:05Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Cedar: JSON template is in scope missing slot-id validation allows link panic and decision divergence&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:N/VC:N/VI:N/VA:L/SC:L/SI:L/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cedar-policy&lt;/code&gt; — fixed in 4.11.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;cedar-policy&lt;/code&gt; — fixed in 3.4.3&lt;/li&gt;&lt;li&gt;&lt;code&gt;@cedar-policy/cedar-wasm&lt;/code&gt; — fixed in 4.11.1&lt;/li&gt;&lt;li&gt;&lt;code&gt;@cedar-policy/cedar-wasm&lt;/code&gt; — fixed in 3.4.3&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Cedar users must be using all of the following features to be affected by this advisory: JSON format policies, policy templates, and the `is in` scope condition. This advisory only affects JSON-formatted Cedar policy templates containing `is in` scope conditions that are **malformed** according to the Cedar syntax. It does **not** affect syntactically well-formed policies.
+
+Users of Cedar who author policies in the JSON format were able to write Cedar policies using the `is in` condition with an incorrect slot identifier in the principal and resource scope constraints (e.g., `?principal` in the resource scope constraint) even though this is not allowed when parsing policies from the Cedar policy syntax. Internally, the slot identifiers were silently corrected (e.g. `?resource` is placed in…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/cedar-policy/cedar/security/advisories/GHSA-c33x-vcv4-vg3g"&gt;https://github.com/cedar-policy/cedar/security/advisories/GHSA-c33x-vcv4-vg3g&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/cedar-policy/cedar"&gt;https://github.com/cedar-policy/cedar&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c33x-vcv4-vg3g"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0417: Excessive CPU and memory use on crafted GraphQL documents</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0417</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0417"/>
+    <published>2026-10-28T12:00:00Z</published>
+    <updated>2026-10-29T14:15:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-36rq-8957-mjrx"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Excessive CPU and memory use on crafted GraphQL documents&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-36rq-8957-mjrx&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;juniper&lt;/code&gt; — fixed in 0.17.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Several parts of `juniper` did work that grew faster than the size of the GraphQL document. A small document could thus use seconds of CPU time or gigabytes of memory. The requests need no authentication.
+
+- `OverlappingFieldsCanBeMerged` compared all pairs of fields with the same response name. The rule also reported one error for each pair of conflicting fields.
+- `NoFragmentCycles` and `OverlappingFieldsCanBeMerged` visited a fragment again for each path that spread the fragment. Validation time thus doubled with each fragment that spread the next fragment twice.
+- Execution resolved the fields of a fragment once for each spread of the fragment. A document of 1.2 KB could expand into a billion fields.
+- The parser removed each token from the front of a vector. Parsing time thus grew wit…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/juniper"&gt;https://crates.io/crates/juniper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0417.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0417.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/graphql-rust/juniper/pull/1405"&gt;https://github.com/graphql-rust/juniper/pull/1405&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0417"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0415: Unbounded memory use on large request bodies</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0415</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0415"/>
+    <published>2026-10-28T12:00:00Z</published>
+    <updated>2026-10-29T14:15:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-pfrg-qg4f-grmv"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unbounded memory use on large request bodies&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-pfrg-qg4f-grmv&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;juniper_hyper&lt;/code&gt; — fixed in 0.10.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `graphql()` and `graphql_sync()` functions of `juniper_hyper` read the whole body of a POST request into memory before they parsed the body. The functions had no limit on the size of the body. A client could thus send a large body and exhaust the memory of the server. The request needs no authentication.
+
+`juniper_hyper` 0.10.1 reads at most 2 MiB of a request body by default. The functions respond with `413 Payload Too Large` to larger bodies. A `juniper_hyper::BodyLimit` in the extensions of a request changes the limit for the request.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/juniper_hyper"&gt;https://crates.io/crates/juniper_hyper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0415.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0415.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/graphql-rust/juniper/pull/1405"&gt;https://github.com/graphql-rust/juniper/pull/1405&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0415"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0419: Unbounded memory use on large request bodies</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0419</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0419"/>
+    <published>2026-10-29T12:00:00Z</published>
+    <updated>2026-10-29T14:15:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-fj3h-2jc3-973v"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Unbounded memory use on large request bodies&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-fj3h-2jc3-973v&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;juniper_warp&lt;/code&gt; — fixed in 0.9.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The `make_graphql_filter()` and `make_graphql_filter_sync()` filters of `juniper_warp` read the whole body of a POST request into memory before they parsed the body. The filters had no limit on the size of the body. A client could thus send a large body and exhaust the memory of the server. The request needs no authentication.
+
+`juniper_warp` 0.9.1 reads at most 2 MiB of a request body by default. The filters respond with `413 Payload Too Large` to larger bodies. `make_graphql_filter_with_body_limit()` and `make_graphql_filter_sync_with_body_limit()` set another limit.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/juniper_warp"&gt;https://crates.io/crates/juniper_warp&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0419.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0419.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/graphql-rust/juniper/pull/1406"&gt;https://github.com/graphql-rust/juniper/pull/1406&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0419"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0418: libz-sys build script leaks environment variables in the build directory</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0418</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0418"/>
+    <published>2026-10-28T12:00:00Z</published>
+    <updated>2026-10-29T14:15:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-8p3x-q3q3-q3v5"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;libz-sys build script leaks environment variables in the build directory&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-8p3x-q3q3-q3v5&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;libz-sys&lt;/code&gt; — fixed in 1.1.31&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The build script of `libz-sys` version &amp;lt;= 1.1.30 prints the full environment
+of the build, including any secrets it contains, to its stdout when compiled
+with `cc@1.6.0` or later on a Unix host. This affects any build that depends on
+`libz-sys`. Cargo saves build script stdout under `target/`, so the values end
+up in anything that stores or shares the `target/` directory, such as CI caches.
+
+This is similar to the [Miri issue](https://blog.rust-lang.org/2026/09/21/github-actions-leaking-secrets-when-miri-output-is-cached/).
+
+## Details
+
+To decide whether to link against a system zlib, the `libz-sys` build script
+compiles a small test program with a compiler command from `cc` and logs it
+with:
+
+```rust
+println!(&amp;quot;running {:?}&amp;quot;, cmd);
+```
+
+On Unix, `Debug` impl for `std::process::Command` pri…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/libz-sys"&gt;https://crates.io/crates/libz-sys&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0418.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0418.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rust-lang/libz-sys/pull/280"&gt;https://github.com/rust-lang/libz-sys/pull/280&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0418"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[NEW] RUSTSEC-2026-0416: Stack overflow on deeply nested GraphQL documents</title>
+    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0416</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0416"/>
+    <published>2026-10-28T12:00:00Z</published>
+    <updated>2026-10-29T14:15:02Z</updated>
+    <category term="crates.io"/>
+    <category term="GHSA-34cw-x8g7-rcv5"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;Stack overflow on deeply nested GraphQL documents&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-34cw-x8g7-rcv5&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;juniper&lt;/code&gt; — fixed in 0.17.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;The parser of `juniper` called itself once for each level of nesting in a GraphQL document. The parser had no limit on the nesting depth. Deeply nested selection sets, input values, and list types thus overflowed the stack of the thread that parsed the document. Validation and execution followed fragment spreads in the same recursive way. Long chains of fragment spreads thus overflowed the stack in validation and execution.
+
+A stack overflow aborts the whole process. One request can thus stop a server and drop all other requests in progress. The request needs no authentication.
+
+`juniper` 0.17.2 rejects documents that nest deeper than 64 levels or contain more than 15,000 tokens. `RootNode::limit_depth()` and `RootNode::limit_tokens()` change the limits.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/juniper"&gt;https://crates.io/crates/juniper&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0416.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0416.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/graphql-rust/juniper/pull/1405"&gt;https://github.com/graphql-rust/juniper/pull/1405&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0416"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[UPDATED] RUSTSEC-2026-0352: Filesystem sandbox escape when renaming symlinks with trailing slashes</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0352</id>
@@ -157,152 +343,5 @@ Parsing without it is not affected.
 
 The flaw was fixed in
 [#1102](https://github.com/pulldo…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/pulldown-cmark"&gt;https://crates.io/crates/pulldown-cmark&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0414.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0414.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pulldown-cmark/pulldown-cmark/issues/1179"&gt;https://github.com/pulldown-cmark/pulldown-cmark/issues/1179&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pulldown-cmark/pulldown-cmark/pull/1102"&gt;https://github.com/pulldown-cmark/pulldown-cmark/pull/1102&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0414"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-796p-j2gh-9m2q: dcap-qvl has Missing Verification for QE Identity</title>
-    <id>https://osv.dev/vulnerability/GHSA-796p-j2gh-9m2q</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-796p-j2gh-9m2q"/>
-    <published>2026-01-26T18:55:13Z</published>
-    <updated>2026-10-27T16:30:07Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-22696"/>
-    <category term="PYSEC-2026-326"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;dcap-qvl has Missing Verification for QE Identity&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-22696, PYSEC-2026-326&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;dcap-qvl&lt;/code&gt; — fixed in 0.3.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;@phala/dcap-qvl&lt;/code&gt; — fixed in 0.3.9&lt;/li&gt;&lt;li&gt;&lt;code&gt;@phala/dcap-qvl-web&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;@phala/dcap-qvl-node&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;code&gt;dcap-qvl&lt;/code&gt; — fixed in 0.3.9&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Impact
-This vulnerability involves a critical gap in the cryptographic verification process within the dcap-qvl.
-
-The library fetches QE Identity collateral (including qe_identity, qe_identity_signature, and qe_identity_issuer_chain) from the PCCS. However, it skips to verify the QE Identity signature against its certificate chain and does not enforce policy constraints on the QE Report.
-
-## Consequences
-An attacker can forge the QE Identity data to whitelist a malicious or non-Intel Quoting Enclave. This allows the attacker to forge the QE and sign untrusted quotes that the verifier will accept as valid. Effectively, this bypasses the entire remote attestation security model, as the verifier can no longer trust the entity responsible for signing the quotes.
-
-## Who is impacted
-All depl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/Phala-Network/dcap-qvl/security/advisories/GHSA-796p-j2gh-9m2q"&gt;https://github.com/Phala-Network/dcap-qvl/security/advisories/GHSA-796p-j2gh-9m2q&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-22696"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-22696&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/Phala-Network/dcap-qvl"&gt;https://github.com/Phala-Network/dcap-qvl&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/pypa/advisory-database/tree/main/vulns/dcap-qvl/PYSEC-2026-326.yaml"&gt;https://github.com/pypa/advisory-database/tree/main/vulns/dcap-qvl/PYSEC-2026-326.yaml&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://pypi.org/project/dcap-qvl"&gt;https://pypi.org/project/dcap-qvl&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-796p-j2gh-9m2q"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-c8m5-c952-6cm4: Rustls: Session Debug formatting exposes TLS master secrets and resumption PSKs</title>
-    <id>https://osv.dev/vulnerability/GHSA-c8m5-c952-6cm4</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-c8m5-c952-6cm4"/>
-    <published>2026-10-27T16:08:47Z</published>
-    <updated>2026-10-27T16:15:05Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0346"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rustls: Session Debug formatting exposes TLS master secrets and resumption PSKs&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0346&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:H/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.23.46&lt;/li&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.24.0-dev.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-Formatting a client session value with Debug exposes its TLS 1.2 master secret or TLS 1.3 resumption PSK. A custom session store that logs these values can disclose keys to readers of the logs. Ordinary connection and built-in cache diagnostics remain redacted, and the session-store interface already warns that its values are sensitive.
-
-### Details
-
-Derived formatters traverse the session&amp;#x27;s secret-bearing fields. This conflicts with the project&amp;#x27;s explicit [key-material redaction policy](https://github.com/rustls/rustls/blob/99f2358cae2954837dbb866faf6727de75489ab9/SECURITY.md#boundary-public-api).
-
-### Proof of concept
-
-Custom `ClientSessionStore` implementations could leak secret data by using the provided `Tls12ClientSessionValue` or `Tls13ClientSessionValue` in a way that …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/security/advisories/GHSA-c8m5-c952-6cm4"&gt;https://github.com/rustls/rustls/security/advisories/GHSA-c8m5-c952-6cm4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/pull/3299"&gt;https://github.com/rustls/rustls/pull/3299&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/pull/3354"&gt;https://github.com/rustls/rustls/pull/3354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/dcdb9464d376f45f42a94a5f837cda1506449f23"&gt;https://github.com/rustls/rustls/commit/dcdb9464d376f45f42a94a5f837cda1506449f23&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/f5f7bf5078a7edcbd81a9e82a97f2bd14dc1c855"&gt;https://github.com/rustls/rustls/commit/f5f7bf5078a7edcbd81a9e82a97f2bd14dc1c855&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls"&gt;https://github.com/rustls/rustls&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/releases/tag/v/0.23.46"&gt;https://github.com/rustls/rustls/releases/tag/v/0.23.46&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0346.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0346.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-c8m5-c952-6cm4"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-w44r-93j7-qv28: rustls: An unauthenticated ServerHello poisons the per-name key-exchange record, so later ClientHellos carry only a classical X25519 share</title>
-    <id>https://osv.dev/vulnerability/GHSA-w44r-93j7-qv28</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-w44r-93j7-qv28"/>
-    <published>2026-10-27T16:08:54Z</published>
-    <updated>2026-10-27T16:15:05Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0349"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;rustls: An unauthenticated ServerHello poisons the per-name key-exchange record, so later ClientHellos carry only a classical X25519 share&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0349&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.23.46&lt;/li&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.24.0-dev.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-The client records the server-selected key-exchange group per server name when it processes the ServerHello, before the server is authenticated. A network attacker can answer one connection attempt for a target name with a ServerHello that selects X25519 and close the connection. Later ClientHellos for that name carry one X25519 share while supported_groups still lists X25519MLKEM768 first. If the server accepts that share instead of sending a HelloRetryRequest, the handshake completes with classical key exchange only and no error.
-
-An attacker that answers one connection attempt for the target name with a ServerHello selecting X25519 changes every later ClientHello of that client for that name, for as long as the entry stays in the store. No certificate or completed handshake …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/security/advisories/GHSA-w44r-93j7-qv28"&gt;https://github.com/rustls/rustls/security/advisories/GHSA-w44r-93j7-qv28&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/pull/3355"&gt;https://github.com/rustls/rustls/pull/3355&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/8fa0dc5d517a63411ad1e528249bdf5b098ae5e4"&gt;https://github.com/rustls/rustls/commit/8fa0dc5d517a63411ad1e528249bdf5b098ae5e4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/f04804fa13341a9b1dc02b5d1dd8a746f2c4b7fb"&gt;https://github.com/rustls/rustls/commit/f04804fa13341a9b1dc02b5d1dd8a746f2c4b7fb&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls"&gt;https://github.com/rustls/rustls&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/releases/tag/v/0.23.46"&gt;https://github.com/rustls/rustls/releases/tag/v/0.23.46&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0349.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0349.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-w44r-93j7-qv28"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-h2v8-394m-p7vv: Rustls: Brotli certificate decompression can allocate an attacker-controlled amount of memory up to 1 GiB before authentication.</title>
-    <id>https://osv.dev/vulnerability/GHSA-h2v8-394m-p7vv</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-h2v8-394m-p7vv"/>
-    <published>2026-10-27T16:08:36Z</published>
-    <updated>2026-10-27T16:15:05Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0348"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rustls: Brotli certificate decompression can allocate an attacker-controlled amount of memory up to 1 GiB before authentication.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0348&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.23.46&lt;/li&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.24.0-dev.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
-
-The built-in (but disabled by default) Brotli certificate decoder bounds the output buffer but accepts an input-selected history window. A header of five bytes can specify a 1 GiB window allocation. A peer can abort a process whose allocator cannot satisfy that request. A client must enable Brotli and connect to the peer; a server must enable Brotli and request a client certificate. Neither direction requires a trusted attacker certificate.
-
-### Details
-
-rustls calls `BrotliDecompress` which enables Brotli&amp;#x27;s large-window extension. rustls applies a limit to certificates, but this applies to the decompressed result, and not to any internal allocations the process requires.
-
-### Impact
-
-Client applications that enable the `brotli` feature will be vulnerable to malicious servers.…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/security/advisories/GHSA-h2v8-394m-p7vv"&gt;https://github.com/rustls/rustls/security/advisories/GHSA-h2v8-394m-p7vv&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/pull/3297"&gt;https://github.com/rustls/rustls/pull/3297&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/pull/3354"&gt;https://github.com/rustls/rustls/pull/3354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/1aa987af37d0d79b98781d345895ac0059ce345c"&gt;https://github.com/rustls/rustls/commit/1aa987af37d0d79b98781d345895ac0059ce345c&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/402b7b78b7ae87d59e19cf07ee07f3fc19e6537e"&gt;https://github.com/rustls/rustls/commit/402b7b78b7ae87d59e19cf07ee07f3fc19e6537e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls"&gt;https://github.com/rustls/rustls&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/releases/tag/v/0.23.46"&gt;https://github.com/rustls/rustls/releases/tag/v/0.23.46&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0348.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0348.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-h2v8-394m-p7vv"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-vp88-798v-h67f: rustls: ECH rejection can expose buffered application data to authenticated outer server before `ech_required` alert</title>
-    <id>https://osv.dev/vulnerability/GHSA-vp88-798v-h67f</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-vp88-798v-h67f"/>
-    <published>2026-10-27T16:08:59Z</published>
-    <updated>2026-10-27T16:15:05Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0347"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;rustls: ECH rejection can expose buffered application data to authenticated outer server before `ech_required` alert&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0347&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.23.46&lt;/li&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.24.0-dev.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In rustls 0.23.44 and 0.23.45, application data that a client buffers before the handshake completes is sent to the server even when the server rejects Encrypted Client Hello (ECH).
-
-When the server rejects ECH, the client completes the handshake with the outer ClientHello and authenticates the server against the ECH config&amp;#x27;s `public_name`. At the end of the handshake, `start_traffic()` encrypts and queues any plaintext buffered by `ClientConnection::writer()`. It does this *before* checking for `EchStatus::Rejected` and queueing the `ech_required` alert.
-
-The application then receives `Error::PeerIncompatible(ServerRejectedEncryptedClientHello)`, as expected. However, the client is still expected to call `write_tls()` to send the fatal alert, and that call also sends the encrypted applica…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/security/advisories/GHSA-vp88-798v-h67f"&gt;https://github.com/rustls/rustls/security/advisories/GHSA-vp88-798v-h67f&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/pull/3300"&gt;https://github.com/rustls/rustls/pull/3300&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/pull/3354"&gt;https://github.com/rustls/rustls/pull/3354&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/2bd5c0cefabb2c5fd4100383a736d59f9671b9b4"&gt;https://github.com/rustls/rustls/commit/2bd5c0cefabb2c5fd4100383a736d59f9671b9b4&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/4de14a508fbfa2273203ec17d9dfdd0fbd29e8d1"&gt;https://github.com/rustls/rustls/commit/4de14a508fbfa2273203ec17d9dfdd0fbd29e8d1&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/7dcbe4c1ae12185237d22e9197583329630a2014"&gt;https://github.com/rustls/rustls/commit/7dcbe4c1ae12185237d22e9197583329630a2014&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls"&gt;https://github.com/rustls/rustls&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/releases/tag/v/0.23.46"&gt;https://github.com/rustls/rustls/releases/tag/v/0.23.46&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-vp88-798v-h67f"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] GHSA-2mjx-qc3c-rqvc: Rustls: TLS 1.3 handshake messages incorrectly accepted across encryption level boundaries</title>
-    <id>https://osv.dev/vulnerability/GHSA-2mjx-qc3c-rqvc</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-2mjx-qc3c-rqvc"/>
-    <published>2026-10-05T23:30:17Z</published>
-    <updated>2026-10-27T15:30:05Z</updated>
-    <category term="crates.io"/>
-    <category term="RUSTSEC-2026-0285"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Rustls: TLS 1.3 handshake messages incorrectly accepted across encryption level boundaries&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: RUSTSEC-2026-0285&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rustls&lt;/code&gt; — fixed in 0.23.45&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Rustls accepted TLS 1.3 handshake messages sent at the wrong encryption level when they followed a key-changing message in the same record. The handshake transcript is still authenticated, so a network-position attacker cannot use this to alter or complete a handshake; the practical effect is that a peer could send handshake messages that should be encrypted in plaintext without rustls rejecting the connection.
-
-This issue affects rustls versions 0.23.13 through 0.23.44 inclusive.
-
-# Original report
-### Summary
-Rustls (tested version 0.23.44, and it appears still an issue on latest master though I have not tested this) accepts a TLS 1.3 server flight where a plaintext EncryptedExtensions is packed into the same record as the ServerHello.
-
-This is very similar to Go&amp;#x27;s CVE-2025-61730 fixed i…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/security/advisories/GHSA-2mjx-qc3c-rqvc"&gt;https://github.com/rustls/rustls/security/advisories/GHSA-2mjx-qc3c-rqvc&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/pull/3265"&gt;https://github.com/rustls/rustls/pull/3265&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/golang/go/commit/5046bdf8a612b35a2c1a9e168054c1d5c65e7dd7"&gt;https://github.com/golang/go/commit/5046bdf8a612b35a2c1a9e168054c1d5c65e7dd7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/commit/98456aea708a7e3c6151e00ca2d4428e7a58257a"&gt;https://github.com/rustls/rustls/commit/98456aea708a7e3c6151e00ca2d4428e7a58257a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls"&gt;https://github.com/rustls/rustls&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls/releases/tag/v/0.23.45"&gt;https://github.com/rustls/rustls/releases/tag/v/0.23.45&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0285.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0285.html&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-2mjx-qc3c-rqvc"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0413: Use-after-free of caller-owned server name in client connection constructors</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0413</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0413"/>
-    <published>2026-10-26T12:00:00Z</published>
-    <updated>2026-10-27T10:15:12Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-rc3f-4j82-cmrg"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Use-after-free of caller-owned server name in client connection constructors&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-rc3f-4j82-cmrg&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;rustls-ffi&lt;/code&gt; — fixed in 0.15.7&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;In rustls-ffi 0.12.0 through 0.15.6, `rustls_client_connection_new()` and
-`rustls_client_connection_new_alpn()` retained a reference to the caller&amp;#x27;s
-`server_name` buffer after returning, rather than copying it. The API
-documentation did not require the buffer to outlive the call and as a result
-if the caller freed or reused the buffer, later TLS processing read freed
-memory.
-
-Clients that free or reuse the `server_name` buffer after the constructor
-returns are affected. This is most likely for language bindings that pass
-temporary strings. Callers that keep the `server_name` buffer alive for the
-lifetime of the `rustls_client_config` are not affected.
-
-Versions 0.12.0 through 0.15.6 are affected. Version 0.15.7+ changed these APIs
-to copy the input buffer.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/rustls-ffi"&gt;https://crates.io/crates/rustls-ffi&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0413.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0413.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/rustls-ffi/releases/tag/v/0.15.7"&gt;https://github.com/rustls/rustls-ffi/releases/tag/v/0.15.7&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0413"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[UPDATED] RUSTSEC-2026-0412: Arbitrary code execution when rerunning tests from a portable recording</title>
-    <id>https://osv.dev/vulnerability/RUSTSEC-2026-0412</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/RUSTSEC-2026-0412"/>
-    <published>2026-10-26T12:00:00Z</published>
-    <updated>2026-10-27T10:00:02Z</updated>
-    <category term="crates.io"/>
-    <category term="GHSA-vc25-qg58-w57c"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Arbitrary code execution when rerunning tests from a portable recording&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: GHSA-vc25-qg58-w57c&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;cargo-nextest&lt;/code&gt; — fixed in 0.9.150&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-Nextest versions between 0.9.125 and 0.9.149 (inclusive) allow the `cargo nextest run --rerun` (or `-R`) command with a malicious [portable recording](https://nexte.st/docs/features/record-replay-rerun/portable-recordings/) to run arbitrary code during the build. The result is arbitrary code execution with the privileges of the user running `cargo nextest`.
-
-This vulnerability requires that the experimental [run recording](https://nexte.st/docs/features/record-replay-rerun/) functionality is enabled. An attacker can plausibly trick a victim into enabling this feature.
-
-## Details
-
-Nextest&amp;#x27;s portable recordings contain [build scope arguments](https://nexte.st/docs/design/architecture/recording-runs/#build-scope-arguments). These arguments are deserialized verbatim from portable …&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/cargo-nextest"&gt;https://crates.io/crates/cargo-nextest&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0412.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0412.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nextest-rs/nextest/commit/456818b35d906551b2273e635c9b343704caaeaf"&gt;https://github.com/nextest-rs/nextest/commit/456818b35d906551b2273e635c9b343704caaeaf&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nextest-rs/nextest/commit/59ef7afc7887caea50aabed289756820e08f366a"&gt;https://github.com/nextest-rs/nextest/commit/59ef7afc7887caea50aabed289756820e08f366a&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nexte.st/changelog/#0.9.150"&gt;https://nexte.st/changelog/#0.9.150&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0412"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>

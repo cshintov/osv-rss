@@ -3,12 +3,55 @@
   <title>OSV — new &amp; updated vulnerabilities: crates.io (Rust)</title>
   <subtitle>Open-source vulns affecting crates.io (Rust) packages, last 48h. Source: OSV.dev (CC-BY-4.0).</subtitle>
   <id>tag:cshintov.github.io,2026:osv-rss:crates</id>
-  <updated>2026-10-30T11:15:02Z</updated>
+  <updated>2026-10-30T15:45:11Z</updated>
   <link rel="self" href="https://cshintov.github.io/osv-rss/crates.xml"/>
   <link rel="alternate" href="https://osv.dev/"/>
   <author><name>osv-rss (data from OSV.dev)</name></author>
   <rights>Vulnerability data from OSV.dev and upstream sources (e.g. GitHub Advisory Database), licensed CC-BY-4.0.</rights>
   <generator uri="https://github.com/cshintov/osv-rss">osv-rss</generator>
+  <entry>
+    <title>[UPDATED] GHSA-qwgh-2vcv-g2f7: block_buffer: panic corrupts inline buffer position</title>
+    <id>https://osv.dev/vulnerability/GHSA-qwgh-2vcv-g2f7</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-qwgh-2vcv-g2f7"/>
+    <published>2026-08-19T19:15:34Z</published>
+    <updated>2026-10-30T15:45:11Z</updated>
+    <category term="crates.io"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;block_buffer: panic corrupts inline buffer position&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;block_buffer&lt;/code&gt; — fixed in 0.12.1&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Summary
+
+A caught panic may leave the cursor position of `EagerBuffer` or `ReadBuffer` in a corrupted state; this in turn allows out-of-bounds reads/writes.
+
+### Details &amp;amp; PoC
+
+The following two tests fail miri:
+
+```rust
+#[cfg(miri)]
+#[test]
+fn eager_digest_blocks_panic_corrupts_inline_position() {
+    // `EagerBuffer` stores its cursor in the last byte of the internal block.
+    // When `digest_blocks` completes a previously partial block, it overwrites
+    // that byte with input data before invoking the caller-provided `compress`
+    // callback. If the callback panics, safe code can catch the panic and keep
+    // using the buffer while its cursor byte no longer satisfies the internal
+    // `pos &amp;lt; block_size` invariant. Under Miri this `get_pos` call reaches the
+    // `unreachabl…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/utils/security/advisories/GHSA-qwgh-2vcv-g2f7"&gt;https://github.com/RustCrypto/utils/security/advisories/GHSA-qwgh-2vcv-g2f7&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/utils"&gt;https://github.com/RustCrypto/utils&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/RustCrypto/utils/releases/tag/block-buffer-v0.12.1"&gt;https://github.com/RustCrypto/utils/releases/tag/block-buffer-v0.12.1&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-qwgh-2vcv-g2f7"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <title>[UPDATED] GHSA-6973-8887-87ff: nimiq-block has skip block quorum bypass via out-of-range BitSet indices &amp; u16 truncation</title>
+    <id>https://osv.dev/vulnerability/GHSA-6973-8887-87ff</id>
+    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-6973-8887-87ff"/>
+    <published>2026-04-22T19:13:47Z</published>
+    <updated>2026-10-30T15:45:11Z</updated>
+    <category term="crates.io"/>
+    <category term="CVE-2026-33471"/>
+    <content type="html">&lt;p&gt;&lt;strong&gt;nimiq-block has skip block quorum bypass via out-of-range BitSet indices &amp;amp; u16 truncation&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-33471&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:N/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;nimiq-block&lt;/code&gt; — fixed in 1.7.2&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;### Impact
+`SkipBlockProof::verify` computes its quorum check using `BitSet.len()`, then iterates `BitSet` indices and casts each `usize` index to `u16` (`slot as u16`) for slot lookup. If an attacker can get a `SkipBlockProof` verified where `MultiSignature.signers` contains out-of-range indices spaced by 65536, these indices inflate `len()` but collide onto the same in-range `u16` slot during aggregation.
+
+This makes it possible for a malicious validator with far fewer than `2f+1` real signer slots to pass skip block proof verification by multiplying a single BLS signature by the same factor.
+
+### Patches
+[The patch for this vulnerability](https://github.com/nimiq/core-rs-albatross/pull/3657) is included as part of [v1.3.0](https://github.com/nimiq/core-rs-albatross/releases/tag/v1.3.0).…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-6973-8887-87ff"&gt;https://github.com/nimiq/core-rs-albatross/security/advisories/GHSA-6973-8887-87ff&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-33471"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-33471&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/pull/3657"&gt;https://github.com/nimiq/core-rs-albatross/pull/3657&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/commit/d02059053181ed8ddad6b59a0adfd661ef5cd823"&gt;https://github.com/nimiq/core-rs-albatross/commit/d02059053181ed8ddad6b59a0adfd661ef5cd823&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross"&gt;https://github.com/nimiq/core-rs-albatross&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/nimiq/core-rs-albatross/releases/tag/v1.3.0"&gt;https://github.com/nimiq/core-rs-albatross/releases/tag/v1.3.0&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-6973-8887-87ff"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <title>[NEW] RUSTSEC-2026-0426: LLVM introduces timing-vulnerable optimizations into ML-KEM and ML-DSA operations intended to be constant-time</title>
     <id>https://osv.dev/vulnerability/RUSTSEC-2026-0426</id>
@@ -644,47 +687,5 @@ Version 0.26.11 is a compatibility wrapper that re-exports
 `parent::TLS_SERVER_ROOT_CERTS` from its `webpki-root-certs` 1.x dependency; it
 contains no separate root certificate list. Its resolved 1.x dependency must be
 updated to 1.0.10 or later.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://crates.io/crates/webpki-root-certs"&gt;https://crates.io/crates/webpki-root-certs&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://rustsec.org/advisories/RUSTSEC-2026-0383.html"&gt;https://rustsec.org/advisories/RUSTSEC-2026-0383.html&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/rustls/webpki-roots/pull/133"&gt;https://github.com/rustls/webpki-roots/pull/133&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://emudhra.we-have-a-problem.com/"&gt;https://emudhra.we-have-a-problem.com/&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://bugzilla.mozilla.org/show_bug.cgi?id=2083449"&gt;https://bugzilla.mozilla.org/show_bug.cgi?id=2083449&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/RUSTSEC-2026-0383"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-m665-v7pm-7grj: zip: Critical Parser Differential &amp; Security Control Bypass via Dual-Header Inconsistencies (Zip Cloaking) Leading to Arbitrary File Overwrite &amp; RCE</title>
-    <id>https://osv.dev/vulnerability/GHSA-m665-v7pm-7grj</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-m665-v7pm-7grj"/>
-    <published>2026-10-28T21:09:50Z</published>
-    <updated>2026-10-28T21:30:05Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115905"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;zip: Critical Parser Differential &amp;amp; Security Control Bypass via Dual-Header Inconsistencies (Zip Cloaking) Leading to Arbitrary File Overwrite &amp;amp; RCE&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115905&lt;/p&gt;&lt;p&gt;Severity: CVSS_V4: CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:H/SI:H/SA:L&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;zip&lt;/code&gt; — fixed in 9.0.5&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-A critical architectural parser differential exists in the `zip` crate (`&amp;lt;= 9.0.4`) between random-access archive readers (`ZipArchive`) and streaming readers (`ZipStreamReader`). `ZipArchive` considers the Central Directory File Header (CDFH) authoritative and ignores the filename declared in the Local File Header (LFH). In contrast, `ZipStreamReader` relies exclusively on the Local File Header (LFH) when extracting files to the filesystem.
-
-This discrepancy enables ZIP archives to appear to have different file paths and contents according to which tool is reading them.
-
----
-
-## Details
-
-### Architectural Root Cause
-In the PKWARE ZIP archive format, every file entry is defined in two distinct locations:
-1. **Local File Header (LFH):** Precedes the compressed payload of each fil…&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/security/advisories/GHSA-m665-v7pm-7grj"&gt;https://github.com/zip-rs/zip2/security/advisories/GHSA-m665-v7pm-7grj&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-115905"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-115905&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/commit/8068ab480ccf8daa7411424e365fcdbe6d09443e"&gt;https://github.com/zip-rs/zip2/commit/8068ab480ccf8daa7411424e365fcdbe6d09443e&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2"&gt;https://github.com/zip-rs/zip2&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/zip-rs/zip2/releases/tag/v9.0.5"&gt;https://github.com/zip-rs/zip2/releases/tag/v9.0.5&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-m665-v7pm-7grj"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
-    <title>[NEW] GHSA-mghf-wjfp-p5xm: Wasmtime: Cranelift backend on aarch64 can jump to incorrect target on large Wasm `br_table` instruction</title>
-    <id>https://osv.dev/vulnerability/GHSA-mghf-wjfp-p5xm</id>
-    <link rel="alternate" href="https://osv.dev/vulnerability/GHSA-mghf-wjfp-p5xm"/>
-    <published>2026-10-28T21:14:14Z</published>
-    <updated>2026-10-28T21:30:05Z</updated>
-    <category term="crates.io"/>
-    <category term="CVE-2026-115893"/>
-    <category term="RUSTSEC-2026-0379"/>
-    <content type="html">&lt;p&gt;&lt;strong&gt;Wasmtime: Cranelift backend on aarch64 can jump to incorrect target on large Wasm `br_table` instruction&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Aliases: CVE-2026-115893, RUSTSEC-2026-0379&lt;/p&gt;&lt;p&gt;Severity: CVSS_V3: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H&lt;/p&gt;&lt;p&gt;Affected:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 36.0.19&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 48.0.7&lt;/li&gt;&lt;li&gt;&lt;code&gt;wasmtime&lt;/code&gt; — fixed in 49.0.4&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;## Summary
-
-When running with the Cranelift compiler backend on an aarch64 target, Wasmtime can compile a Wasm module with more than ~256k targets on one `br_table` instruction in a way that results in an incorrect conditional branch target. This conditional branch could then jump to arbitrary other code (at an user-controlled offset), leading to arbitrary sandbox escapes.
-
-## Impact
-
-Any Wasmtime engine running on aarch64 with default settings can be forced to jump to arbitrary code by a user-controlled Wasm module. All versions of Wasmtime/Cranelift that support aarch64, since the initial release of that support in 2020 (before Wasmtime v1.0), are affected.
-
-## Patches
-
-Wasmtime v36.0.19, v48.0.7, and v49.0.4 have been released which all fix this issue.&lt;/p&gt;&lt;p&gt;References:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-mghf-wjfp-p5xm"&gt;https://github.com/bytecodealliance/wasmtime/security/advisories/GHSA-mghf-wjfp-p5xm&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://nvd.nist.gov/vuln/detail/CVE-2026-115893"&gt;https://nvd.nist.gov/vuln/detail/CVE-2026-115893&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14818"&gt;https://github.com/bytecodealliance/wasmtime/pull/14818&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14819"&gt;https://github.com/bytecodealliance/wasmtime/pull/14819&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14820"&gt;https://github.com/bytecodealliance/wasmtime/pull/14820&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/pull/14826"&gt;https://github.com/bytecodealliance/wasmtime/pull/14826&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/222ff3a65dab9aa7011f8c246937751a0bac5abd"&gt;https://github.com/bytecodealliance/wasmtime/commit/222ff3a65dab9aa7011f8c246937751a0bac5abd&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="https://github.com/bytecodealliance/wasmtime/commit/994549891c8a706cb4f2809f9d17b9f67b31e618"&gt;https://github.com/bytecodealliance/wasmtime/commit/994549891c8a706cb4f2809f9d17b9f67b31e618&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;a href="https://osv.dev/vulnerability/GHSA-mghf-wjfp-p5xm"&gt;View on OSV.dev →&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
 </feed>
